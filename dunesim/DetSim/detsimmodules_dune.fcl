@@ -1,0 +1,87 @@
+#include "detsimmodules.fcl"
+
+BEGIN_PROLOG
+
+dunefd_simwire:  
+{ 
+ module_type:        "SimWireDUNE10kt"
+ DriftEModuleLabel:  "largeant"
+ NoiseFactU:          0.0132       #Noise Scale for U plane
+ NoiseWidthU:         62.4         #Exponential Noise width (kHz) for U plane
+ LowCutoffU:          7.5          #Low frequency filter cutoff (kHz) for U plane
+ NoiseFactV:          0.0132       #Noise Scale for V plane
+ NoiseWidthV:         62.4         #Exponential Noise width (kHz) for V plane
+ LowCutoffV:          7.5          #Low frequency filter cutoff (kHz) for V plane
+ NoiseFactZ:          0.0132       #Noise Scale for Z plane
+ NoiseWidthZ:         62.4         #Exponential Noise width (kHz) for Z plane
+ LowCutoffZ:          7.5          #Low frequency filter cutoff (kHz) for Z plane
+ CompressionType:    "ZeroSuppression"       #could also be none
+ #CompressionType:    ""       #could also be none	
+ ZeroThreshold:       10        #Threshold for zero suppression
+ NearestNeighbor:     25        #Maximum distance between hits above threshold before they are separated into different blocks
+ NeighboringChannels: 3        #Number of neighboring channels on either side allowed to influence zero suppression
+ NoiseArrayPoints:    1000     #number of points in noise array
+ NoiseOn:             1        #1 for noise on, 0 for noise off
+ NoiseModel:          2        #1 for original model, 2 for a model similar to uBooNE
+
+ CollectionPed:       400         #ADC baseline for coll plane
+ CollectionPedRMS:    0.01        #ADC baseline RMS for coll plane
+ InductionPed:        2048        #ADC baseline for ind plane
+ InductionPedRMS:     0.01        #ADC baseline RMS for ind plane
+ PedestalOn:          false     #add pedestal value to ADC vector
+
+ SimCombs:           false
+ SaveEmptyChannel:   true      #if channel's ADC vector is entirely full of zeros, save it in RawDigit collection (true) or discard (false)
+ SimStuckBits:       false        #simulate stuck bits
+
+# random initial guesses for charge inefficiency and wrong-type collection on the induction-plane wires
+
+ FractUUCollect:     0.5        # fraction of charge that collects on U (non-transparency) when charge drifts over the comb holding U wires
+ FractUVCollect:     0.1        # fraction of charge that collects on U (non-transparency) when charge drifts over the comb holding V wires
+ FractVUCollect:     0.5        # fraction of charge that collects on V (non-transparency) when charge drifts over the comb holding U wires
+ FractVVCollect:     0.1        # fraction of charge that collects on V (non-transparency) when charge drifts over the comb holding V wires
+ FractUUMiss:        0.2        # fraction of charge that gets missed on U when charge drifts over the comb holding U
+ FractUVMiss:        0.2        # fraction of charge that gets missed on U when charge drifts over the comb holding V
+ FractVUMiss:        0.2        # fraction of charge that gets missed on V when charge drifts over the comb holding U
+ FractVVMiss:        0.2        # fraction of charge that gets missed on V when charge drifts over the comb holding V
+ FractHorizGapMiss:  0.8        # fraction of charge in the horizontal gap that is missing
+ FractVertGapMiss:   0.8        # fraction of charge in the horizontal gaps that is missing
+
+
+}
+
+dunefd_simwireana:            @local::standard_simwireana
+dunefd_wienerfilterana:       @local::standard_wienerfilterana
+
+
+# For now treat the other dune geometries like FD
+
+dune35t_simwire:		@local::dunefd_simwire
+dune35t_simwire.CollectionPed:  500         #ADC baseline for coll plane
+dune35t_simwire.InductionPed:   1800        #ADC baseline for ind plane
+dune35t_simwire.ZeroThreshold:  5
+dune35t_simwire.NoiseModel:     1
+dune35t_simwire.NoiseWidthU:   0.624  # If turn NoiseModel to 1 use these numbers..
+dune35t_simwire.NoiseWidthV:   0.624  # If turn NoiseModel to 1 use these numbers..
+dune35t_simwire.NoiseWidthZ:   0.624  # If turn NoiseModel to 1 use these numbers..
+dune35t_simwire.NoiseFactU:   0.332  # If turn NoiseModel to 1 use these numbers..
+dune35t_simwire.NoiseFactV:   0.332  # If turn NoiseModel to 1 use these numbers..
+dune35t_simwire.NoiseFactZ:   0.332  # If turn NoiseModel to 1 use these numbers..
+dune35t_simwire.SimStuckBits:    false   # Simulate stuck bits
+dune35t_simwireana:             @local::dunefd_simwireana
+dune35t_wienerfilterana:        @local::dunefd_wienerfilterana
+dune35t_simwire.module_type:    "SimWireDUNE35t"
+
+dune35t_simcounter:
+{
+    module_type:           "SimCounter35t"
+    LArGeantModuleLabel:   "largeant"
+    MakeTree:              false
+    BSUTriggerThreshold:   0.5 # MeV
+    TSUTriggerThreshold:   0.25 # MeV
+    TriggerEfficiency:     1.0
+    ClockSpeedCounter:     31.25 # MHz
+    CombinedTimeDelay:     160 # ns. cable length delay + various electronics delays
+}
+
+END_PROLOG

@@ -1,0 +1,19 @@
+#include "cry.fcl"
+
+BEGIN_PROLOG
+
+dune35t_cry:              @local::standard_cry
+dune35t_cry.TimeOffset:   -1.6e-3               #pre-readout window (s)
+dune35t_cry.SampleTime:   3.2e-3                #pre-readout + readout (s)
+dune35t_cry.Latitude:     "latitude 41.8 "
+dune35t_cry.SubBoxLength: "subboxLength 75 "
+
+dune35t_milliblock_cry:    @local::dune35t_cry
+dune35t_milliblock_cry.SampleTime: 1.76e-2   #11*3200 ticks. 11 so have 1 drift window before T = 0, and 10 after.
+
+dunefd_cry:               @local::standard_cry
+dunefd_cry.SampleTime:    1.47e-3               #the maximum time it would take an electron to drift through the volume is 2.4 ms
+dune1fdcry.Latitude:      "latitude 44.35 "
+dunefd_cry.SubBoxLength:  "subboxLength 75 "
+
+END_PROLOG
