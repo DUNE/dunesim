@@ -9,7 +9,7 @@ services:
 {
   # Load the service that manages root files for histograms.
   TFileService: { fileName: "textfd_hist.root" }
-  Timing:       {}
+  TimeTracker:       {}
   RandomNumberGenerator: {} #ART native random number generator
   user:         @local::dunefd_simulation_services
 }
