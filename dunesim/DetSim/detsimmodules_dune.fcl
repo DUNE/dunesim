@@ -57,10 +57,10 @@ dunefd_wienerfilterana:       @local::standard_wienerfilterana
 # For now treat the other dune geometries like FD
 
 dune35t_simwire:		@local::dunefd_simwire
-#dune35t_simwire.CollectionPed:  500         #ADC baseline for coll plane
-#dune35t_simwire.InductionPed:   1800        #ADC baseline for ind plane
-dune35t_simwire.CollectionPed:  0         #ADC baseline for coll plane
-dune35t_simwire.InductionPed:   0        #ADC baseline for ind plane
+dune35t_simwire.CollectionPed:  500         #ADC baseline for coll plane
+dune35t_simwire.InductionPed:   1800        #ADC baseline for ind plane
+#dune35t_simwire.CollectionPed:  0         #ADC baseline for coll plane
+#dune35t_simwire.InductionPed:   0        #ADC baseline for ind plane
 dune35t_simwire.ZeroThreshold:  5
 dune35t_simwire.NoiseModel:     1
 dune35t_simwire.NoiseWidthU:   0.624  # If turn NoiseModel to 1 use these numbers..
