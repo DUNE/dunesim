@@ -1,0 +1,16 @@
+#include "simulationservices.fcl"
+
+BEGIN_PROLOG
+
+
+dunefd_largeantparameters:   @local::standard_largeantparameters
+dunefd_larvoxelcalculator:   @local::standard_larvoxelcalculator
+dunefd_largeantparameters.UseLitePhotons: true
+
+dune35t_largeantparameters:   @local::dunefd_largeantparameters
+dune35t_largeantparameters.UseModBoxRecomb: true
+dune35t_larvoxelcalculator:   @local::dunefd_larvoxelcalculator
+
+
+
+END_PROLOG

@@ -1,0 +1,28 @@
+#include "genie.fcl"
+
+BEGIN_PROLOG
+
+dunefd_genie:                         @local::standard_genie
+dunefd_genie.BeamName:                "lbnf"
+
+dunefd_genie_hist:                    @local::dunefd_genie
+dunefd_genie_hist.FluxType:           "histogram"
+dunefd_genie_hist.FluxFiles:          ["GenieFluxFiles/g4dune_v3r2p4b_FHC_FD_RIK.root"]
+dunefd_genie_hist.BeamCenter:         [0., 0., -1.] 
+dunefd_genie_hist.BeamDirection:      [0., 0.101, 0.995] # beam angle is 101mrad
+dunefd_genie_hist.BeamRadius:         7. #sqrt(pow(3.6,2)+pow(6,2)
+dunefd_genie_hist.TopVolume:          "volCryostat"
+
+dunefd_genie_simple_neutrino:         @local::dunefd_genie
+dunefd_genie_simple_neutrino.TopVolume:        "volDetEnclosure"
+
+dune35t_genie_simple_neutrino:                @local::standard_genie
+dune35t_genie_simple_neutrino.TopVolume:      "volCryostat"
+
+dune35t_genie_hist:                           @local::standard_genie
+dune35t_genie_hist.BeamCenter:                [100., 50., 0.]
+dune35t_genie_hist.BeamDirection:             [0., 0., 0.]
+
+
+
+END_PROLOG

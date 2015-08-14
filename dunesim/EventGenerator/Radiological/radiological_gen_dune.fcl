@@ -1,0 +1,37 @@
+BEGIN_PROLOG
+
+# parameters for a radiological generation generator.  Currently, it generates radiologicals within rectangular prisms
+# with sides parallel to the x, y, and z axes, and within a specified time window.  The parameters Nuclide through
+# T1 are arrays, so that many volumes can be specified to be radioactive with different nuclides.
+
+dune4apa_radiogen_apaexclude:
+{
+ module_type:           "RadioGen"
+ Nuclide:               [ "39Ar", "39Ar" ]  # list of nuclides to simulate, supported so far: 39Ar, 60Co, 85Kr, 40K, 232Th, 238U
+ BqPercc:               [ 0.00141, 0.00141 ]      # activity -- Becquerels per cc. 0.00141 assumes 1.01 Bq/kg (typical for 39Ar) and a density of 1.396 g/cc for LAr
+ X0:                    [    0.,   -3. ]     # in cm in world coordinates, bottom corner of box
+ X1:                    [  475., -475. ]     # in cm in world coordinates, top corner of box
+ Y0:                    [ -750., -750. ]     # in cm in world coordinates, bottom corner of box
+ Y1:                    [  800.,  800. ]     # in cm in world coordinates, top corner of box
+ Z0:                    [  -55.,  -55. ]     # in cm in world coordinates, bottom corner of box
+ Z1:                    [  555.,  555. ]     # in cm in world coordinates, top corner of box
+ T0:                    [ -3200000., -3200000. ]  # starting time in ns
+ T1:                    [  3200000.,  3200000. ]   # ending time in ns
+}
+
+dune4apa_radiogen:
+{
+ module_type:           "RadioGen"
+ Nuclide:               [ "39Ar" ]    # list of nuclides to simulate, supported so far: 39Ar, 60Co, 85Kr, 40K, 232Th, 238U
+ BqPercc:               [ 0.00141 ]   # activity -- Becquerels per cc. 0.00141 assumes 1.01 Bq/kg (typical for 39Ar) and a density of 1.396 g/cc for LAr
+ X0:                    [ -475. ]     # in cm in world coordinates, bottom corner of box
+ X1:                    [  475. ]     # in cm in world coordinates, top corner of box
+ Y0:                    [ -750. ]     # in cm in world coordinates, bottom corner of box
+ Y1:                    [  800. ]     # in cm in world coordinates, top corner of box
+ Z0:                    [  -55. ]     # in cm in world coordinates, bottom corner of box
+ Z1:                    [  555. ]     # in cm in world coordinates, top corner of box
+ T0:                    [ -3200000. ] # starting time in ns
+ T1:                    [  3200000. ] # ending time in ns
+}
+
+END_PROLOG
