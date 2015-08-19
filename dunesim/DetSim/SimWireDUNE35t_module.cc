@@ -406,6 +406,7 @@ namespace detsim {
     // wire running over the comb are beyond the endpoints.  So we need to extrapolate.
 
     double xyzbeg[3],xyzend[3];
+    int lastwire = 0;
 
     // Numbers in comments are from Geometry V3 for debugging purposes.
 
@@ -415,7 +416,8 @@ namespace detsim {
     zcomb2 = xyzbeg[2];  // 0.0
     ycomb5 = xyzend[1];  // 113.142
 
-    geo->WireEndPoints(0,0,0,358,xyzbeg,xyzend);  // last U wire in TPC 0.
+    lastwire = geo->Nwires(0,0,0)-1;  // 358 in v3
+    geo->WireEndPoints(0,0,0,lastwire,xyzbeg,xyzend);  // last U wire in TPC 0.
     zcomb5 = xyzend[2];  // 50.8929
     ycomb2 = xyzbeg[1];  // -82.9389
 
@@ -423,7 +425,8 @@ namespace detsim {
     zcomb4 = xyzend[2];  //  50.5774
     ycomb4 = xyzbeg[1];  //  113.142
 
-    geo->WireEndPoints(0,0,1,344,xyzbeg,xyzend);  // last V wire in TPC 0.  
+    lastwire = geo->Nwires(1,0,0)-1;  // 344 in v3
+    geo->WireEndPoints(0,0,1,lastwire,xyzbeg,xyzend);  // last V wire in TPC 0.  
     zcomb3 = xyzbeg[2];  //  0.3155
     ycomb3 = xyzend[1];  //  -82.6234
 
@@ -446,7 +449,8 @@ namespace detsim {
     zcomb11 = xyzend[2];  // 102.817
     ycomb8 = xyzbeg[1];  // -85.221
 
-    geo->WireEndPoints(0,2,0,194,xyzbeg,xyzend);  // last U wire in TPC 2.
+    lastwire = geo->Nwires(0,2,0)-1;  // 194 in v3
+    geo->WireEndPoints(0,2,0,lastwire,xyzbeg,xyzend);  // last U wire in TPC 2.
     zcomb8 = xyzbeg[2];  // 51.924
     ycomb11 = xyzend[1];  // -0.831
 
@@ -454,7 +458,8 @@ namespace detsim {
     zcomb9 = xyzbeg[2];  //  52.2395 
     ycomb9 = xyzend[1];  //  -85.222
 
-    geo->WireEndPoints(0,2,1,188,xyzbeg,xyzend);  // last V wire in TPC 2.  
+    lastwire = geo->Nwires(1,2,0)-1;  // 188 in v3
+    geo->WireEndPoints(0,2,1,lastwire,xyzbeg,xyzend);  // last V wire in TPC 2.  
     zcomb10 = xyzend[2];  //  102.501
     ycomb10 = xyzbeg[1];  //  -1.14655
 
@@ -475,7 +480,8 @@ namespace detsim {
     zcomb8 = xyzbeg[2]; // 51.924 -- same as above
     ycomb17 = xyzend[1];  // 113.142 -- same as above 
 
-    geo->WireEndPoints(0,4,0,235,xyzbeg,xyzend);  // last U wire in TPC 4.
+    lastwire = geo->Nwires(0,4,0)-1;  // 235 in v3
+    geo->WireEndPoints(0,4,0,lastwire,xyzbeg,xyzend);  // last U wire in TPC 4.
     zcomb11 = xyzend[2];  // 102.817 -- same as above 
     ycomb14 = xyzbeg[1];  // 0.83105 
 
@@ -483,7 +489,8 @@ namespace detsim {
     zcomb10 = xyzend[2];  //   102.501 -- same as above
     ycomb16 = xyzbeg[1];  //  113.142 -- everything ends here in y
 
-    geo->WireEndPoints(0,4,1,227,xyzbeg,xyzend);  // last V wire in TPC 4.  
+    lastwire = geo->Nwires(1,4,0)-1;  // 227 in v3
+    geo->WireEndPoints(0,4,1,lastwire,xyzbeg,xyzend);  // last V wire in TPC 4.  
     zcomb9 = xyzbeg[2];  //  52.2395  -- same as above
     ycomb15 = xyzend[1];  //  1.14655
 
@@ -505,7 +512,8 @@ namespace detsim {
     zcomb14 = xyzbeg[2];  // 103.84
     ycomb5 = xyzend[1];  //  113.142 -- same as above
 
-    geo->WireEndPoints(0,6,0,358,xyzbeg,xyzend);  // last U wire in TPC 6.
+    lastwire = geo->Nwires(0,6,0)-1;  // 358 in v3
+    geo->WireEndPoints(0,6,0,lastwire,xyzbeg,xyzend);  // last U wire in TPC 6.
     zcomb17 = xyzend[2];  // 154.741
     ycomb2 = xyzbeg[1];  // -82.9389 -- same as above
 
@@ -513,7 +521,8 @@ namespace detsim {
     zcomb16 = xyzend[2];  //  154.425
     ycomb4 = xyzbeg[1];  //  113.142 -- same as above
 
-    geo->WireEndPoints(0,6,1,344,xyzbeg,xyzend);  // last V wire in TPC 6.  
+    lastwire = geo->Nwires(1,6,0)-1;  // 344 in v3
+    geo->WireEndPoints(0,6,1,lastwire,xyzbeg,xyzend);  // last V wire in TPC 6.  
     zcomb15 = xyzbeg[2];  //  104.164
     ycomb3 = xyzend[1];  //  -82.6234 -- same as above
 
