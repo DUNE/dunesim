@@ -36,18 +36,26 @@ dunefd_simwire:
 
 # random initial guesses for charge inefficiency and wrong-type collection on the induction-plane wires
 
- FractUUCollect:     0.5        # fraction of charge that collects on U (non-transparency) when charge drifts over the comb holding U wires
- FractUVCollect:     0.1        # fraction of charge that collects on U (non-transparency) when charge drifts over the comb holding V wires
- FractVUCollect:     0.5        # fraction of charge that collects on V (non-transparency) when charge drifts over the comb holding U wires
- FractVVCollect:     0.1        # fraction of charge that collects on V (non-transparency) when charge drifts over the comb holding V wires
- FractUUMiss:        0.2        # fraction of charge that gets missed on U when charge drifts over the comb holding U
- FractUVMiss:        0.2        # fraction of charge that gets missed on U when charge drifts over the comb holding V
- FractVUMiss:        0.2        # fraction of charge that gets missed on V when charge drifts over the comb holding U
- FractVVMiss:        0.2        # fraction of charge that gets missed on V when charge drifts over the comb holding V
- FractHorizGapMiss:  0.8        # fraction of charge in the horizontal gap that is missing
- FractVertGapMiss:   0.8        # fraction of charge in the horizontal gaps that is missing
-
-
+ FractUUCollect:         0.5        # fraction of charge that collects on U (non-transparency) when charge drifts over the comb holding U wires
+ FractUVCollect:         0.1        # fraction of charge that collects on U (non-transparency) when charge drifts over the comb holding V wires
+ FractVUCollect:         0.5        # fraction of charge that collects on V (non-transparency) when charge drifts over the comb holding U wires
+ FractVVCollect:         0.1        # fraction of charge that collects on V (non-transparency) when charge drifts over the comb holding V wires
+ FractUUMiss:            0.2        # fraction of charge that gets missed on U when charge drifts over the comb holding U
+ FractUVMiss:            0.2        # fraction of charge that gets missed on U when charge drifts over the comb holding V
+ FractVUMiss:            0.2        # fraction of charge that gets missed on V when charge drifts over the comb holding U
+ FractVVMiss:            0.2        # fraction of charge that gets missed on V when charge drifts over the comb holding V
+ FractZUMiss:            0.2        # fraction of charge that gets missed on Z (collection) when charge drifts over the comb holding U
+ FractZVMiss:            0.2        # fraction of charge that gets missed on Z (collection) when charge drifts over the comb holding V
+ FractHorizGapUMiss:     0.8        # fraction of charge in the horizontal gap that is missing on U
+ FractVertGapUMiss:      0.8        # fraction of charge in the horizontal gaps that is missing on U
+ FractHorizGapVMiss:     0.8        # fraction of charge in the horizontal gap that is missing on V
+ FractVertGapVMiss:      0.8        # fraction of charge in the horizontal gaps that is missing on V
+ FractHorizGapZMiss:     0.8        # fraction of charge in the horizontal gap that is missing on Z
+ FractVertGapZMiss:      0.8        # fraction of charge in the horizontal gaps that is missing on Z
+ FractHorizGapUCollect:  0.1        # fraction of charge in the horizontal gap that collects on U
+ FractHorizGapVCollect:  0.1        # fraction of charge in the horizontal gap that collects on V
+ FractVertGapUCollect:   0.1        # fraction of charge in the vertical gap that collects on U
+ FractVertGapVCollect:   0.1        # fraction of charge in the vertical gap that collects on V
 }
 
 dunefd_simwireana:            @local::standard_simwireana

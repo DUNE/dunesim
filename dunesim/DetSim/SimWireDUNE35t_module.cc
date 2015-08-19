@@ -148,8 +148,18 @@ namespace detsim {
     float                  fFractUVMiss;       // fraction of charge that gets missed on U when charge drifts over the comb holding V
     float                  fFractVUMiss;       // fraction of charge that gets missed on V when charge drifts over the comb holding U
     float                  fFractVVMiss;       // fraction of charge that gets missed on V when charge drifts over the comb holding V
-    float                  fFractHorizGapMiss;     // fraction of charge in the horizontal gap that is missing
-    float                  fFractVertGapMiss;     // fraction of charge in the horizontal gaps that is missing
+    float                  fFractZUMiss;       // fraction of charge that gets missed on Z (collection)  when charge drifts over the comb holding U
+    float                  fFractZVMiss;       // fraction of charge that gets missed on Z (collection)  when charge drifts over the comb holding V
+    float                  fFractHorizGapUMiss;     // fraction of charge in the horizontal gap that is missing on U (and not collected)
+    float                  fFractVertGapUMiss;     // fraction of charge in the horizontal gaps that is missing on U
+    float                  fFractHorizGapVMiss;     // fraction of charge in the horizontal gap that is missing on V
+    float                  fFractVertGapVMiss;     // fraction of charge in the horizontal gaps that is missing on V
+    float                  fFractHorizGapZMiss;     // fraction of charge in the horizontal gap that is missing on Z (collection)
+    float                  fFractVertGapZMiss;     // fraction of charge in the horizontal gaps that is missing on Z (collection
+    float                  fFractHorizGapUCollect;     // fraction of charge in the horizontal gap that collects on U
+    float                  fFractVertGapUCollect;     // fraction of charge in the horizontal gaps that collects on U
+    float                  fFractHorizGapVCollect;     // fraction of charge in the horizontal gap that collects on V
+    float                  fFractVertGapVCollect;     // fraction of charge in the horizontal gaps that collects on V
 
     // boundaries of the combs -- cached here for speed
 
@@ -253,8 +263,18 @@ namespace detsim {
     fFractUVMiss         = p.get< float >("FractUVMiss");
     fFractVUMiss         = p.get< float >("FractVUMiss");
     fFractVVMiss         = p.get< float >("FractVVMiss");
-    fFractHorizGapMiss  = p.get< float >("FractHorizGapMiss");
-    fFractVertGapMiss   = p.get< float >("FractVertGapMiss");
+    fFractZUMiss         = p.get< float >("FractZUMiss");
+    fFractZVMiss         = p.get< float >("FractZVMiss");
+    fFractHorizGapUMiss  = p.get< float >("FractHorizGapUMiss");
+    fFractVertGapUMiss   = p.get< float >("FractVertGapUMiss");
+    fFractHorizGapVMiss  = p.get< float >("FractHorizGapVMiss");
+    fFractVertGapVMiss   = p.get< float >("FractVertGapVMiss");
+    fFractHorizGapZMiss  = p.get< float >("FractHorizGapZMiss");
+    fFractVertGapZMiss   = p.get< float >("FractVertGapZMiss");
+    fFractHorizGapUCollect  = p.get< float >("FractHorizGapUCollect");
+    fFractVertGapUCollect   = p.get< float >("FractVertGapUCollect");
+    fFractHorizGapVCollect  = p.get< float >("FractHorizGapVCollect");
+    fFractVertGapVCollect   = p.get< float >("FractVertGapVCollect");
 
     return;
   }
@@ -696,13 +716,13 @@ namespace detsim {
 			    }
 			  case geo::kV:
 			    {
-			      fChargeWork[t] += ide.numElectrons * (1.0-fFractVUCollect-fFractVUMiss);
+			      fChargeWork[t] += ide.numElectrons * (1.0-fFractVUCollect-fFractUUCollect-fFractVUMiss);
 			      fChargeWorkCollInd[t] += ide.numElectrons * fFractVUCollect;
 			      break;
 			    }
 			  case geo::kZ:
 			    {
-			      fChargeWork[t] += ide.numElectrons * (1.0-fFractVUCollect-fFractUUCollect);
+			      fChargeWork[t] += ide.numElectrons * (1.0-fFractVUCollect-fFractUUCollect-fFractZUMiss);
 			      break;
 			    }
 			  default:
@@ -724,13 +744,13 @@ namespace detsim {
 			    }
 			  case geo::kV:
 			    {
-			      fChargeWork[t] += ide.numElectrons * (1.0-fFractVVCollect-fFractVVMiss);
+			      fChargeWork[t] += ide.numElectrons * (1.0-fFractUVCollect-fFractVVCollect-fFractVVMiss);
 			      fChargeWorkCollInd[t] += ide.numElectrons * fFractVVCollect;
 			      break;
 			    }
 			  case geo::kZ:
 			    {
-			      fChargeWork[t] += ide.numElectrons * (1.0-fFractVVCollect-fFractUVCollect);
+			      fChargeWork[t] += ide.numElectrons * (1.0-fFractVVCollect-fFractUVCollect-fFractZVMiss);
 			      break;
 			    }
 			  default:
@@ -740,25 +760,70 @@ namespace detsim {
 			  }
 			break;
 		      }
-		    case NONACTIVE:
-		      { 
-			break;
-		      }
 		    case HORIZGAP:
 		      {
-			fChargeWork[t] += ide.numElectrons * (1.0-fFractHorizGapMiss);
+			switch (view)
+			  {
+			  case geo::kU:
+			    {
+			      fChargeWork[t] += ide.numElectrons * (1.0-fFractHorizGapUMiss-fFractHorizGapUCollect);
+			      fChargeWorkCollInd[t] += ide.numElectrons * fFractHorizGapUCollect;
+			      break;
+			    }
+			  case geo::kV:
+			    {
+			      fChargeWork[t] += ide.numElectrons * (1.0-fFractHorizGapVMiss-fFractHorizGapUCollect-fFractHorizGapVCollect);
+			      fChargeWorkCollInd[t] += ide.numElectrons * fFractHorizGapVCollect;
+			      break;
+			    }
+			  case geo::kZ:
+			    {
+			      fChargeWork[t] += ide.numElectrons * (1.0-fFractHorizGapZMiss-fFractHorizGapUCollect-fFractHorizGapVCollect);
+			      break;
+			    }
+			  default:
+			    {
+			      throw cet::exception("SimWireDUNE35t") << "ILLEGAL VIEW Type: " << view <<"\n";
+			    }
+			  }
 			break;
 		      }
 		    case VERTGAP:
 		      {
-			fChargeWork[t] += ide.numElectrons * (1.0-fFractVertGapMiss);
+			switch (view)
+			  {
+			  case geo::kU:
+			    {
+			      fChargeWork[t] += ide.numElectrons * (1.0-fFractVertGapUMiss-fFractVertGapUCollect);
+			      fChargeWorkCollInd[t] += ide.numElectrons * fFractVertGapUCollect;
+			      break;
+			    }
+			  case geo::kV:
+			    {
+			      fChargeWork[t] += ide.numElectrons * (1.0-fFractVertGapVMiss-fFractVertGapUCollect-fFractVertGapVCollect);
+			      fChargeWorkCollInd[t] += ide.numElectrons * fFractVertGapVCollect;
+			      break;
+			    }
+			  case geo::kZ:
+			    {
+			      fChargeWork[t] += ide.numElectrons * (1.0-fFractVertGapZMiss-fFractVertGapUCollect-fFractVertGapVCollect);
+			      break;
+			    }
+			  default:
+			    {
+			      throw cet::exception("SimWireDUNE35t") << "ILLEGAL VIEW Type: " << view <<"\n";
+			    }
+			  }
 			break;
 		      }
-		    }
-		  
+		    case NONACTIVE: 
+		      { 
+			break;
+		      }
+		    }		  
 		}
-	      // fChargeWork[t] = sc->Charge(t);
- 
+	      // the line all this replaced.
+	      // fChargeWork[t] = sc->Charge(t); 
 	    }
 	  else
 	    {
@@ -1204,18 +1269,18 @@ namespace detsim {
   GapType_t SimWireDUNE35t::combtest35t(double x, double y, double z)
   {
 
-    if (z<zcomb1) return NONACTIVE;  // outside first APA
+    if (z<zcomb1) return VERTGAP;  // off to the side of the first APA -- kind of like being in a vertical gap
     if (z<zcomb2) return UCOMB;  // over U comb
     if (z<zcomb3) return VCOMB;  // over V comb
     if (z<zcomb4) 
       {
-	if (y<ycomb1) return NONACTIVE; // below the bottom
+	if (y<ycomb1) return HORIZGAP; // below the bottom
 	if (y<ycomb2) return UCOMB; // over U comb
 	if (y<ycomb3) return VCOMB; // over V comb
 	if (y<ycomb4) return ACTIVE; // active volume
 	if (y<ycomb5) return VCOMB; // over V comb
 	if (y<ycomb6) return UCOMB; // over U comb
-	return NONACTIVE; // outside top edge
+	return HORIZGAP; // outside top edge
 
       }
     if (z<zcomb5) return VCOMB;  // over V comb
@@ -1226,7 +1291,7 @@ namespace detsim {
     if (z<zcomb9) return VCOMB; // over V comb
     if (z<zcomb10) 
       {
-	if (y<ycomb7) return NONACTIVE; // off the bottom
+	if (y<ycomb7) return HORIZGAP; // off the bottom
 	if (y<ycomb8) return UCOMB; // over U comb
 	if (y<ycomb9) return VCOMB; // over V comb
 	if (y<ycomb10) return ACTIVE; // active
@@ -1238,7 +1303,7 @@ namespace detsim {
 	if (y<ycomb16) return ACTIVE; // active volume
 	if (y<ycomb17) return VCOMB; // over V comb
 	if (y<ycomb18) return UCOMB; // over U comb
-	return NONACTIVE;  // above the top edge
+	return HORIZGAP;  // above the top edge
       }
     if (z<zcomb11) return VCOMB;  // over V comb
     if (z<zcomb12) return UCOMB;  // over U comb
@@ -1248,17 +1313,17 @@ namespace detsim {
     if (z<zcomb15) return VCOMB;  // over V comb
     if (z<zcomb16) 
       {
-	if (y<ycomb1) return NONACTIVE; // below the bottom
+	if (y<ycomb1) return HORIZGAP; // below the bottom
 	if (y<ycomb2) return UCOMB; // over U comb
 	if (y<ycomb3) return VCOMB; // over V comb
 	if (y<ycomb4) return ACTIVE; // active volume
 	if (y<ycomb5) return VCOMB; // over V comb
 	if (y<ycomb6) return UCOMB; // over U comb
-	return NONACTIVE; // outside top edge
+	return HORIZGAP; // outside top edge
       }
     if (z<zcomb17) return VCOMB;  // over V comb
     if (z<zcomb18) return UCOMB;  // over U comb
-    return NONACTIVE; // off the end in Z.
+    return VERTGAP; // off the end in Z.
 
   }
 
