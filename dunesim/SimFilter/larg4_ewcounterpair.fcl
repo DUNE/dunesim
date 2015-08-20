@@ -1,0 +1,15 @@
+BEGIN_PROLOG
+
+dune35t_larg4extcounterfilter_ewcounterpair:
+{
+   module_type:              "LArG4ExtCounterFilter"
+   UseEWCounterPair: true
+   UseNupSdownCounterPair: false
+   UseNdownSupCounterPair: false
+
+   InterestingPDGs: [13, -13]
+   ParticleMinEnergy: 0.
+   ParticleMaxEnergy: 1.0e20
+}
+
+END_PROLOG

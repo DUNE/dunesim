@@ -1,0 +1,16 @@
+BEGIN_PROLOG
+
+dune35t_genextcounterfilter_ewcounterpair:
+{
+   module_type:              "GenExtCounterFilter"
+   UseEWCounterPair: true
+   UseNupSdownCounterPair: false
+   UseNdownSupCounterPair: false
+
+   InterestingPDGs: [13, -13]
+   ParticleMinEnergy: 0.
+   ParticleMaxEnergy: 1.0e20
+   CounterSizeScaleFactor: 1.
+}
+
+END_PROLOG

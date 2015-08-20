@@ -1,0 +1,14 @@
+BEGIN_PROLOG
+
+dune35t_larg4particlefilter:
+{
+   module_type:              "LArG4ParticleFilter"
+
+   InterestingPDGs: [13, -13]
+   ParticleMinEnergy: -1.
+   ParticleMaxEnergy: -1.
+   StopInTPC: true
+   ParticleMinTPCLength: -1.
+}
+
+END_PROLOG
