@@ -227,6 +227,8 @@ void detsim::SimCounter35t::produce(art::Event & e)
   }    
 
   // fill collection of raw::ExternalTriggers, if eDep is above threshold
+  // Build triggers from individual hits
+  uint iRM=0; uint iCL=0; uint iNU=0; uint iNL=0; uint iSU=0; uint iSL=0; uint iWU=0; uint iEL=0;
   std::vector<chanTick>::iterator it;
   for (it = tickv.begin(); it != tickv.end(); ++it) {
     chanTick ct = *it;
@@ -234,7 +236,20 @@ void detsim::SimCounter35t::produce(art::Event & e)
 	 (ct.auxDetID >= 0 && ct.auxDetID <=43 && ct.eDep > fTSUTriggerThreshold) ||
 	 (ct.auxDetID >= 92 && ct.eDep > 1.e-6) )
       trigcol->push_back(raw::ExternalTrigger(ct.auxDetID,ct.tick));
+    if (ct.auxDetID<6) iSL=ct.tick; 
+    if (ct.auxDetID>5 &&ct.auxDetID<16) iEL=ct.tick; 
+    if (ct.auxDetID>15 &&ct.auxDetID<22) iNL=ct.tick; 
+    if (ct.auxDetID>21 &&ct.auxDetID<28) iNU=ct.tick; 
+    if (ct.auxDetID>27 &&ct.auxDetID<38) iWU=ct.tick; 
+    if (ct.auxDetID>43 &&ct.auxDetID<57) iCL=ct.tick; 
+    if (ct.auxDetID>66 &&ct.auxDetID<83) iRM=ct.tick; 
   }
+
+  if (iRM>0 && iCL>0 && (fabs(iRM-iCL)<5)) trigcol->push_back(raw::ExternalTrigger(110,0.5*(iRM+iCL)));
+  if (iEL>0 && iWU>0 && (fabs(iEL-iWU)<5)) trigcol->push_back(raw::ExternalTrigger(111,0.5*(iEL+iWU)));
+  if (iNU>0 && iSL>0 && (fabs(iNU-iSL)<5)) trigcol->push_back(raw::ExternalTrigger(112,0.5*(iNU+iSL)));
+  if (iSU>0 && iNL>0 && (fabs(iSU-iNL)<5)) trigcol->push_back(raw::ExternalTrigger(113,0.5*(iSU+iNL)));
+
 
   // put ExternalTrigger collection into event record
   e.put(std::move(trigcol));
