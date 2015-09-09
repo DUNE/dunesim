@@ -7,6 +7,8 @@
 // from cetpkgsupport v1_08_04.
 ////////////////////////////////////////////////////////////////////////
 
+// workaround for Mac build problem
+#define BOOST_SYSTEM_NO_DEPRICATED
 #include "art/Framework/Core/EDProducer.h"
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Principal/Event.h"
@@ -228,7 +230,7 @@ void detsim::SimCounter35t::produce(art::Event & e)
 
   // fill collection of raw::ExternalTriggers, if eDep is above threshold
   // Build triggers from individual hits
-  uint iRM=0; uint iCL=0; uint iNU=0; uint iNL=0; uint iSU=0; uint iSL=0; uint iWU=0; uint iEL=0;
+  unsigned int iRM=0; unsigned int iCL=0; unsigned int iNU=0; unsigned int iNL=0; unsigned int iSU=0; unsigned int iSL=0; unsigned int iWU=0; unsigned int iEL=0;
   std::vector<chanTick>::iterator it;
   for (it = tickv.begin(); it != tickv.end(); ++it) {
     chanTick ct = *it;
