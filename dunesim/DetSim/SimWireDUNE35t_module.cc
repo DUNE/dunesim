@@ -13,7 +13,7 @@
 #include <string>
 #include <algorithm>
 #include <sstream>
-#include <fstream>
+//#include <fstream>
 #include <bitset>
 
 extern "C" {
@@ -51,6 +51,7 @@ extern "C" {
 #include "TH2.h"
 #include "TH1D.h"
 #include "TFile.h"
+#include "TProfile.h"
 
 #include "CLHEP/Random/RandFlat.h"
 #include "CLHEP/Random/RandGaussQ.h"
@@ -133,12 +134,17 @@ namespace detsim {
     float                  fCollectionPedRMS;    ///< ADC value of baseline RMS for collection plane
     float                  fInductionPed;     ///< ADC value of baseline for induction plane
     float                  fInductionPedRMS;     ///< ADC value of baseline RMS for induction plane
-    bool                   fPedestalOn;          // switch for simulation of nonzero pedestals
+    bool                   fPedestalOn;          ///< switch for simulation of nonzero pedestals
 
     // input fcl parameters
 
-    bool                   fSimCombs;          // switch for simulation of the combs
-    bool                   fSimStuckBits;      // switch for simulation of stuck bits
+    bool                   fSimCombs;          ///< switch for simulation of the combs
+    bool                   fSimStuckBits;      ///< switch for simulation of stuck bits
+
+    std::string            fStuckBitsProbabilitiesFname; ///< file holding ADC stuck code overflow and underflow probabilities 
+    std::string            fStuckBitsOverflowProbHistoName; ///< Name of histogram holding ADC stuck code overflow probabilities 
+    std::string            fStuckBitsUnderflowProbHistoName; ///< Name of histogram holding ADC stuck code underflow probabilities 
+
     bool                   fSaveEmptyChannel;  // switch for saving channels with all zero entries
     float                  fFractUUCollect;    // fraction of charge that collects on U (non-transparency) when charge drifts over the comb holding U wires
     float                  fFractUVCollect;    // fraction of charge that collects on U (non-transparency) when charge drifts over the comb holding V wires
@@ -173,12 +179,8 @@ namespace detsim {
     GapType_t combtest35t(double x, double y, double z);
 
 
-    double               fZeroprobs[32];       ///< array of probabilities of 6 LSF bits getting stuck at 000000
-    double               fThreefprobs[32];     ///< array of probabilities of 6 LSF bits getting stuck at 111111
-
-    TH1D*                fZeroProbabilities;          ///< histogram for probabilities of 6 LSF bits getting stuck at 000000
-    TH1D*                fThreefProbabilities;        ///< histogram for probabilities of 6 LSF bits getting stuck at 111111
-
+    double               fOverflowProbs[64];       ///< array of probabilities of 6 LSF bits getting stuck at 000000
+    double               fUnderflowProbs[64];     ///< array of probabilities of 6 LSF bits getting stuck at 111111
 
   }; // class SimWireDUNE35t
 
@@ -253,7 +255,12 @@ namespace detsim {
     fNTimeSamples  = detprop->NumberTimeSamples();
     
     fSimCombs            = p.get< bool >("SimCombs");  
-    fSimStuckBits        = p.get< bool >("SimStuckBits");   
+    fSimStuckBits        = p.get< bool >("SimStuckBits"); 
+
+    fStuckBitsProbabilitiesFname = p.get< std::string         >("StuckBitsProbabilitiesFname");
+    fStuckBitsOverflowProbHistoName = p.get< std::string         >("StuckBitsOverflowProbHistoName");
+    fStuckBitsUnderflowProbHistoName = p.get< std::string         >("StuckBitsUnderflowProbHistoName");
+  
     fSaveEmptyChannel    = p.get< bool >("SaveEmptyChannel");  
     fFractUUCollect      = p.get< float >("FractUUCollect");
     fFractUVCollect      = p.get< float >("FractUVCollect");
@@ -541,80 +548,35 @@ namespace detsim {
 
     if(fSimStuckBits){
   
-      fZeroprobs[0] = 0.38;
-      fZeroprobs[1] = 0.38;
-      fZeroprobs[2] = 0.245;
-      fZeroprobs[3] = 0.155;
-      fZeroprobs[4] = 0.12;
-      fZeroprobs[5] = 0.082;
-      fZeroprobs[6] = 0.07;
-      fZeroprobs[7] = 0.075;
-      fZeroprobs[8] = 0.078;
-      fZeroprobs[9] = 0.08;
-      fZeroprobs[10] = 0.082;
-      fZeroprobs[11] = 0.105;
-      fZeroprobs[12] = 0.11;
-      fZeroprobs[13] = 0.112;
-      fZeroprobs[14] = 0.11;
-      fZeroprobs[15] = 0.075;
-      fZeroprobs[16] = 0.065;
-      fZeroprobs[17] = 0.125;
-      fZeroprobs[18] = 0.145;
-      fZeroprobs[19] = 0.145;
-      fZeroprobs[20] = 0.1;
-      fZeroprobs[21] = 0.145;
-      fZeroprobs[22] = 0.175;
-      fZeroprobs[23] = 0.21;
-      fZeroprobs[24] = 0.245;
-      fZeroprobs[25] = 0.25;
-      fZeroprobs[26] = 0.24;
-      fZeroprobs[27] = 0.265;
-      fZeroprobs[28] = 0.305;
-      fZeroprobs[29] = 0.26;
-      fZeroprobs[30] = 0.275;
-      fZeroprobs[31] = 0.27;
+      mf::LogInfo("SimWireDUNE35t") << " using ADC stuck code probabilities from .root file " ;
+
+      // constructor decides if initialized value is a path or an environment variable
+      std::string fname;
+      cet::search_path sp("FW_SEARCH_PATH");
+      sp.find_file( fStuckBitsProbabilitiesFname, fname );
+   
+      std::unique_ptr<TFile> fin(new TFile(fStuckBitsProbabilitiesFname.c_str(), "READ"));
+      if ( !fin->IsOpen() ) throw art::Exception( art::errors::NotFound ) << "Could not find the ADC stuck code probabilities file " << fname << "!" << std::endl;
+ 
+      TString iOverflowHistoName = Form( "%s", fStuckBitsOverflowProbHistoName.c_str());
+      TProfile *overflowtemp = (TProfile*) fin->Get( iOverflowHistoName );  
+      if ( !overflowtemp ) throw art::Exception( art::errors::NotFound ) << "Could not find the ADC code overflow probabilities file " << fStuckBitsOverflowProbHistoName << "!" << std::endl;
       
-      fThreefprobs[0] = 0.27;
-      fThreefprobs[1] = 0.2175;
-      fThreefprobs[2] = 0.23;
-      fThreefprobs[3] = 0.18;
-      fThreefprobs[4] = 0.12;
-      fThreefprobs[5] = 0.178;
-      fThreefprobs[6] = 0.125;
-      fThreefprobs[7] = 0.11;
-      fThreefprobs[8] = 0.10;
-      fThreefprobs[9] = 0.097;
-      fThreefprobs[10] = 0.05;
-      fThreefprobs[11] = 0.055;
-      fThreefprobs[12] = 0.05;
-      fThreefprobs[13] = 0.054;
-      fThreefprobs[14] = 0.02;
-      fThreefprobs[15] = 0.02;
-      fThreefprobs[16] = 0.02;
-      fThreefprobs[17] = 0.018;
-      fThreefprobs[18] = 0.025;
-      fThreefprobs[19] = 0.017;
-      fThreefprobs[20] = 0.018;
-      fThreefprobs[21] = 0.017;
-      fThreefprobs[22] = 0.025;
-      fThreefprobs[23] = 0.0252;
-      fThreefprobs[24] = 0.02;
-      fThreefprobs[25] = 0.035;
-      fThreefprobs[26] = 0.05;
-      fThreefprobs[27] = 0.065;
-      fThreefprobs[28] = 0.07;
-      fThreefprobs[29] = 0.12;
-      fThreefprobs[30] = 0.165;
-      fThreefprobs[31] = 0.38;
+      if ( overflowtemp->GetNbinsX() != 64 ) throw art::Exception( art::errors::InvalidNumber ) << "Overflow ADC stuck code probability histograms should always have 64 bins corresponding to each of 64 LSB cells!" << std::endl;
+ 
+      TString iUnderflowHistoName = Form( "%s", fStuckBitsUnderflowProbHistoName.c_str());     
+      TProfile *underflowtemp = (TProfile*) fin->Get( iUnderflowHistoName );  
+      if ( !underflowtemp ) throw art::Exception( art::errors::NotFound ) << "Could not find the ADC code underflow probabilities file " << fStuckBitsUnderflowProbHistoName << "!" << std::endl;
+      
+      if ( underflowtemp->GetNbinsX() != 64 ) throw art::Exception( art::errors::InvalidNumber ) << "Underflow ADC stuck code probability histograms should always have 64 bins corresponding to each of 64 LSB cells!" << std::endl;
 
-      fZeroProbabilities  = tfs->make<TH1D>("ZeroProbabilities", "Probability of 6 LSBs sticking to 0x00; Input voltage (ADC modulo 64);", 32,   0., 64.);
-      fThreefProbabilities  = tfs->make<TH1D>("ThreefProbabilities", "Probability of 6 LSBs sticking to 0x3f; Input voltage (ADC modulo 64);", 32,   0., 64.);
 
-      for(int i=0;i<32;++i){
-	fZeroProbabilities->SetBinContent(i+1,fZeroprobs[i]);
-	fThreefProbabilities->SetBinContent(i+1,fThreefprobs[i]);
+      for(unsigned int cellnumber=0; cellnumber < 64; ++cellnumber){
+	fOverflowProbs[cellnumber] = overflowtemp->GetBinContent(cellnumber+1);
+	fUnderflowProbs[cellnumber] = underflowtemp->GetBinContent(cellnumber+1);
       }
-
+    
+      fin->Close();
     }
     return;
 
@@ -992,26 +954,30 @@ namespace detsim {
       // add pedestal values
       if(fPedestalOn)
 	{
-	  art::ServiceHandle<art::RandomNumberGenerator> rng;
-	  CLHEP::HepRandomEngine &engine = rng->getEngine();
-	  CLHEP::RandGaussQ rGauss_Ped(engine, 0.0, ped_rms);
-	  for(unsigned int i = 0; i < signalSize; ++i){
-	    
-	    float ped_variation = rGauss_Ped.fire();
-	    tmpfv = adcvec_a[i] + ped_mean + ped_variation;
-	  
-	    adcvec_a[i] = (short) tmpfv; 
-	  
+	  if(ped_rms>0){
+	    art::ServiceHandle<art::RandomNumberGenerator> rng;
+	    CLHEP::HepRandomEngine &engine = rng->getEngine();
+	    CLHEP::RandGaussQ rGauss_Ped(engine, 0.0, ped_rms);
+	    for(unsigned int i = 0; i < signalSize; ++i){
+	      float ped_variation = rGauss_Ped.fire();
+	      tmpfv = adcvec_a[i] + ped_mean + ped_variation;
+	      
+	      adcvec_a[i] = (short) tmpfv; 
+	      
+	    }
+	  }
+	  else{
+	    for(unsigned int i = 0; i < signalSize; ++i){
+	      tmpfv = adcvec_a[i] + ped_mean;
+	      adcvec_a[i] = (short) tmpfv; 
+	      
+	    }
+
 	  }
 	}
 
- 
-
-
       if(fSimStuckBits)//
       	{
-
-
 
 	  for(size_t i = 0; i < adcvec.size(); ++i){
 
@@ -1020,8 +986,8 @@ namespace detsim {
 	    CLHEP::RandFlat flat(engine);
 	    
 	    
-	    double rnd[2] = {0.};
-	    flat.fireArray(2,rnd,0,1);
+	    double rnd = flat.fire(0,1);
+	   
 
 	    unsigned int zeromask = 0xffc0;
 	    unsigned int onemask = 0x003f;
@@ -1030,25 +996,20 @@ namespace detsim {
 
 	    int probability_index = (int)sixlsbs/2.0;
 
-	    if(adcvec_a[i] != 0){
-	      if(rnd[0] < rnd[1]){
-		if(rnd[0] < fZeroprobs[probability_index]){  // 6 LSBs are stuck at 0
-		  
-		  adcvec_a[i] = adcvec_a[i] & zeromask;
-		  
-		}
-	      }
-	      
-	      else{ 
-		if(rnd[1] < fThreefprobs[probability_index]){  // 6 LSBs are stuck at 3F
-		  
-		  adcvec_a[i] = adcvec_a[i] | onemask;
-		  
-		}	      
-	      }
+	 
+	    if(rnd < fUnderflowProbs[probability_index]){
+
+	      adcvec_a[i] = adcvec_a[i] | onemask; // 6 LSBs are stuck at 3F
+
 	    }
+	    else if(rnd > fUnderflowProbs[probability_index] && rnd < fUnderflowProbs[probability_index] + fOverflowProbs[probability_index]){
+
+	      adcvec_a[i] = adcvec_a[i] & zeromask; // 6 LSBs are stuck at 0
+
+	    }
+	    //else adcvec value remains unchanged
 	  }
- 
+
       	}
 
       if(fNeighboringChannels==0){ // case where neighboring channels are disregarded in zero suppression
