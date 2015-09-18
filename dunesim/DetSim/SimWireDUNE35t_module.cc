@@ -13,7 +13,6 @@
 #include <string>
 #include <algorithm>
 #include <sstream>
-//#include <fstream>
 #include <bitset>
 
 extern "C" {
@@ -994,18 +993,15 @@ namespace detsim {
 
 	    unsigned int sixlsbs = adcvec_a[i] & onemask;
 
-	    int probability_index = (int)sixlsbs/2.0;
+	    int probability_index = (int)sixlsbs;
 
-	 
 	    if(rnd < fUnderflowProbs[probability_index]){
-
 	      adcvec_a[i] = adcvec_a[i] | onemask; // 6 LSBs are stuck at 3F
-
+	      adcvec_a[i] -= 64; // correct 1st MSB value by subtracting 64
 	    }
 	    else if(rnd > fUnderflowProbs[probability_index] && rnd < fUnderflowProbs[probability_index] + fOverflowProbs[probability_index]){
-
 	      adcvec_a[i] = adcvec_a[i] & zeromask; // 6 LSBs are stuck at 0
-
+	      adcvec_a[i] += 64; // correct 1st MSB value by adding 64
 	    }
 	    //else adcvec value remains unchanged
 	  }
