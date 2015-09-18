@@ -553,19 +553,19 @@ namespace detsim {
       std::string fname;
       cet::search_path sp("FW_SEARCH_PATH");
       sp.find_file( fStuckBitsProbabilitiesFname, fname );
-   
-      std::unique_ptr<TFile> fin(new TFile(fStuckBitsProbabilitiesFname.c_str(), "READ"));
+        
+      std::unique_ptr<TFile> fin(new TFile(fname.c_str(), "READ"));
       if ( !fin->IsOpen() ) throw art::Exception( art::errors::NotFound ) << "Could not find the ADC stuck code probabilities file " << fname << "!" << std::endl;
  
       TString iOverflowHistoName = Form( "%s", fStuckBitsOverflowProbHistoName.c_str());
       TProfile *overflowtemp = (TProfile*) fin->Get( iOverflowHistoName );  
-      if ( !overflowtemp ) throw art::Exception( art::errors::NotFound ) << "Could not find the ADC code overflow probabilities file " << fStuckBitsOverflowProbHistoName << "!" << std::endl;
+      if ( !overflowtemp ) throw art::Exception( art::errors::NotFound ) << "Could not find the ADC code overflow probabilities histogram " << fStuckBitsOverflowProbHistoName << "!" << std::endl;
       
       if ( overflowtemp->GetNbinsX() != 64 ) throw art::Exception( art::errors::InvalidNumber ) << "Overflow ADC stuck code probability histograms should always have 64 bins corresponding to each of 64 LSB cells!" << std::endl;
  
       TString iUnderflowHistoName = Form( "%s", fStuckBitsUnderflowProbHistoName.c_str());     
       TProfile *underflowtemp = (TProfile*) fin->Get( iUnderflowHistoName );  
-      if ( !underflowtemp ) throw art::Exception( art::errors::NotFound ) << "Could not find the ADC code underflow probabilities file " << fStuckBitsUnderflowProbHistoName << "!" << std::endl;
+      if ( !underflowtemp ) throw art::Exception( art::errors::NotFound ) << "Could not find the ADC code underflow probabilities histogram " << fStuckBitsUnderflowProbHistoName << "!" << std::endl;
       
       if ( underflowtemp->GetNbinsX() != 64 ) throw art::Exception( art::errors::InvalidNumber ) << "Underflow ADC stuck code probability histograms should always have 64 bins corresponding to each of 64 LSB cells!" << std::endl;
 
