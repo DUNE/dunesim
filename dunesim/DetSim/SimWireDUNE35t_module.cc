@@ -13,7 +13,6 @@
 #include <string>
 #include <algorithm>
 #include <sstream>
-//#include <fstream>
 #include <bitset>
 
 extern "C" {
@@ -554,19 +553,19 @@ namespace detsim {
       std::string fname;
       cet::search_path sp("FW_SEARCH_PATH");
       sp.find_file( fStuckBitsProbabilitiesFname, fname );
-   
-      std::unique_ptr<TFile> fin(new TFile(fStuckBitsProbabilitiesFname.c_str(), "READ"));
+        
+      std::unique_ptr<TFile> fin(new TFile(fname.c_str(), "READ"));
       if ( !fin->IsOpen() ) throw art::Exception( art::errors::NotFound ) << "Could not find the ADC stuck code probabilities file " << fname << "!" << std::endl;
  
       TString iOverflowHistoName = Form( "%s", fStuckBitsOverflowProbHistoName.c_str());
       TProfile *overflowtemp = (TProfile*) fin->Get( iOverflowHistoName );  
-      if ( !overflowtemp ) throw art::Exception( art::errors::NotFound ) << "Could not find the ADC code overflow probabilities file " << fStuckBitsOverflowProbHistoName << "!" << std::endl;
+      if ( !overflowtemp ) throw art::Exception( art::errors::NotFound ) << "Could not find the ADC code overflow probabilities histogram " << fStuckBitsOverflowProbHistoName << "!" << std::endl;
       
       if ( overflowtemp->GetNbinsX() != 64 ) throw art::Exception( art::errors::InvalidNumber ) << "Overflow ADC stuck code probability histograms should always have 64 bins corresponding to each of 64 LSB cells!" << std::endl;
  
       TString iUnderflowHistoName = Form( "%s", fStuckBitsUnderflowProbHistoName.c_str());     
       TProfile *underflowtemp = (TProfile*) fin->Get( iUnderflowHistoName );  
-      if ( !underflowtemp ) throw art::Exception( art::errors::NotFound ) << "Could not find the ADC code underflow probabilities file " << fStuckBitsUnderflowProbHistoName << "!" << std::endl;
+      if ( !underflowtemp ) throw art::Exception( art::errors::NotFound ) << "Could not find the ADC code underflow probabilities histogram " << fStuckBitsUnderflowProbHistoName << "!" << std::endl;
       
       if ( underflowtemp->GetNbinsX() != 64 ) throw art::Exception( art::errors::InvalidNumber ) << "Underflow ADC stuck code probability histograms should always have 64 bins corresponding to each of 64 LSB cells!" << std::endl;
 
@@ -994,18 +993,15 @@ namespace detsim {
 
 	    unsigned int sixlsbs = adcvec_a[i] & onemask;
 
-	    int probability_index = (int)sixlsbs/2.0;
+	    int probability_index = (int)sixlsbs;
 
-	 
 	    if(rnd < fUnderflowProbs[probability_index]){
-
 	      adcvec_a[i] = adcvec_a[i] | onemask; // 6 LSBs are stuck at 3F
-
+	      adcvec_a[i] -= 64; // correct 1st MSB value by subtracting 64
 	    }
 	    else if(rnd > fUnderflowProbs[probability_index] && rnd < fUnderflowProbs[probability_index] + fOverflowProbs[probability_index]){
-
 	      adcvec_a[i] = adcvec_a[i] & zeromask; // 6 LSBs are stuck at 0
-
+	      adcvec_a[i] += 64; // correct 1st MSB value by adding 64
 	    }
 	    //else adcvec value remains unchanged
 	  }

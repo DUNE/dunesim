@@ -34,7 +34,7 @@ dunefd_simwire:
  SaveEmptyChannel:   true      #if channel's ADC vector is entirely full of zeros, save it in RawDigit collection (true) or discard (false)
  SimStuckBits:       false        #simulate stuck bits
 
- StuckBitsProbabilitiesFname:     "output_produceDcScanSummaryPlots_20150827_coldTest_0p1to1p4_step0p0010.root"
+ StuckBitsProbabilitiesFname:     "ADCStuckCodeProbabilities35t/output_produceDcScanSummaryPlots_20150827_coldTest_0p1to1p4_step0p0010.root"
  StuckBitsOverflowProbHistoName:     "pCorrFracOverflowVsInputLsbCell"
  StuckBitsUnderflowProbHistoName:     "pCorrFracUnderflowVsInputLsbCell"
 
