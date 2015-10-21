@@ -14,7 +14,7 @@
 #include <algorithm>
 #include <sstream>
 #include <bitset>
-
+//#include <fstream>
 extern "C" {
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -133,6 +133,10 @@ namespace detsim {
     float                  fCollectionPedRMS;    ///< ADC value of baseline RMS for collection plane
     float                  fInductionPed;     ///< ADC value of baseline for induction plane
     float                  fInductionPedRMS;     ///< ADC value of baseline RMS for induction plane
+    float                  fCollectionCalibPed;  ///< Assumed measured value for coll plane pedestal
+    float                  fCollectionCalibPedRMS;  ///< Assumed measured value for coll plane pedestal RMS
+    float                  fInductionCalibPed;     ///< Assumed measured value for ind plane pedestal
+    float                  fInductionCalibPedRMS;     ///< Assumed measured value for ind plane pedestal RMS
     bool                   fPedestalOn;          ///< switch for simulation of nonzero pedestals
 
     // input fcl parameters
@@ -247,6 +251,10 @@ namespace detsim {
     fCollectionPedRMS = p.get< float                >("CollectionPedRMS");
     fInductionPed     = p.get< float                >("InductionPed");
     fInductionPedRMS  = p.get< float                >("InductionPedRMS");
+    fCollectionCalibPed    = p.get< float                >("CollectionCalibPed");
+    fCollectionCalibPedRMS = p.get< float                >("CollectionCalibPedRMS");
+    fInductionCalibPed     = p.get< float                >("InductionCalibPed");
+    fInductionCalibPedRMS  = p.get< float                >("InductionCalibPedRMS");
     fPedestalOn       = p.get< bool                 >("PedestalOn");  
     art::ServiceHandle<util::DetectorProperties> detprop;
     fSampleRate       = detprop->SamplingRate();
@@ -950,6 +958,10 @@ namespace detsim {
 
       adcvec.resize(fNSamplesReadout);
 
+      float calibrated_pedestal_value = 0; // Estimated calibrated value of pedestal to be passed to RawDigits collection
+      float calibrated_pedestal_rms_value = 0; // Estimated calibrated value of pedestal RMS to be passed to RawDigits collection
+      int calibrated_integer_pedestal_value = 0; // Estimated calibrated value of pedestal to be passed to data compression
+
       // add pedestal values
       if(fPedestalOn)
 	{
@@ -969,11 +981,30 @@ namespace detsim {
 	    for(unsigned int i = 0; i < signalSize; ++i){
 	      tmpfv = adcvec_a[i] + ped_mean;
 	      adcvec_a[i] = (short) tmpfv; 
-	      
 	    }
 
 	  }
+	  
+
+
+	  if (sigtype == geo::kInduction){
+	    calibrated_pedestal_value = fInductionCalibPed;
+	    calibrated_pedestal_rms_value = fInductionCalibPedRMS;
+	  }
+	  else if (sigtype == geo::kCollection){
+	    calibrated_pedestal_value = fCollectionCalibPed;
+	    calibrated_pedestal_rms_value = fCollectionCalibPedRMS;
+	  }
+	  
 	}
+      else{
+	calibrated_pedestal_value = 0;
+	calibrated_pedestal_rms_value = 0;
+
+      }
+      
+      calibrated_integer_pedestal_value = (int) calibrated_pedestal_value;
+      
 
       if(fSimStuckBits)//
       	{
@@ -1008,6 +1039,20 @@ namespace detsim {
 
       	}
 
+
+   
+      // char filename0[250];
+      // sprintf(filename0,"/lbne/data/users/jti3/testpedestals/adcvec_precompressed_evt%d_chan%d.dat",evt.id().event(),chan);
+      // std::ofstream ofs1 (filename0,std::ofstream::out); 
+      
+      // for(size_t t = 0; t < adcvec.size(); ++t){ 
+      // 	  ofs1 << adcvec_a[t] << std::endl;
+      // }
+      
+      // ofs1.close();
+
+      
+
       if(fNeighboringChannels==0){ // case where neighboring channels are disregarded in zero suppression
 
 
@@ -1015,12 +1060,27 @@ namespace detsim {
 	// if raw::kNone is selected nothing happens to adcvec
 	// This shrinks adcvec, if fCompression is not kNone.
 	
-	
-	raw::Compress(adcvec, fCompression, fZeroThreshold, fNearestNeighbor); 
-
+	if(!fPedestalOn){
+	  raw::Compress(adcvec, fCompression, fZeroThreshold, calibrated_integer_pedestal_value, fNearestNeighbor, fSimStuckBits);
+	}
+	else{
+	  raw::Compress(adcvec, fCompression, fZeroThreshold, calibrated_integer_pedestal_value, fNearestNeighbor, fSimStuckBits);
+	}
+	  
 
 	raw::RawDigit rd(chan, fNSamplesReadout, adcvec, fCompression);
-	rd.SetPedestal(ped_mean,ped_rms);
+	rd.SetPedestal(calibrated_pedestal_value,calibrated_pedestal_rms_value);
+
+	// if(fSaveEmptyChannel || adcvec_a[1]>0){
+	  
+	//   sprintf(filename0,"/lbne/data/users/jti3/testpedestals/adcvec_compressed_evt%d_chan%d.dat",evt.id().event(),chan);
+	//   std::ofstream ofs2 (filename0,std::ofstream::out); 
+	  
+	//   for(size_t t = 0; t < adcvec.size(); ++t) 
+	//     ofs2 << adcvec_a[t] << std::endl;
+	  
+	//   ofs2.close();
+	// }
 
 	adcvec.resize(signalSize);        // Then, resize adcvec back to full length.  Do not initialize to zero (slow)
 	if(fSaveEmptyChannel || adcvec[1]>0)
@@ -1045,10 +1105,16 @@ namespace detsim {
 		if(adcvec_neighbors.size()>fNeighboringChannels){ // apply zero suppression to entries at start of collection plane, once ring buffer is full enough with neighbors
 		  
 		  adcvec = adcvec_neighbors.at(adcvec_neighbors.size()-fNeighboringChannels);
-		  raw::Compress(adcvec_neighbors, adcvec, fCompression, fZeroThreshold, fNearestNeighbor); // apply zero suppression to entries at start of collection plane, once ring buffer is full enough with neighbors
+		  // apply zero suppression to entries at start of collection plane, once ring buffer is full enough with neighbors
+		  if(!fPedestalOn){
+		    raw::Compress(adcvec_neighbors,adcvec, fCompression, fZeroThreshold, calibrated_integer_pedestal_value, fNearestNeighbor, fSimStuckBits);
+		  }
+		  else{
+		    raw::Compress(adcvec_neighbors,adcvec, fCompression, fZeroThreshold, calibrated_integer_pedestal_value, fNearestNeighbor, fSimStuckBits);
+		  }
 		  
 		  raw::RawDigit rd(chan-fNeighboringChannels, fNSamplesReadout, adcvec, fCompression);
-		  rd.SetPedestal(ped_mean,ped_rms);
+		  rd.SetPedestal(calibrated_pedestal_value,calibrated_pedestal_rms_value);
 	
 		  if(fSaveEmptyChannel || adcvec[1]>0)
 		    digcol->push_back(rd);            // add this digit to the collection
@@ -1062,10 +1128,15 @@ namespace detsim {
 	      // This shrinks adcvec, if fCompression is not kNone.
 	      
 	      adcvec = adcvec_neighbors.at(fNeighboringChannels);
-	      raw::Compress(adcvec_neighbors, adcvec, fCompression, fZeroThreshold, fNearestNeighbor); // apply zero suppression to entry in middle of ring buffer
-	      
+	       // apply zero suppression to entry in middle of ring buffer
+	      if(!fPedestalOn){
+		raw::Compress(adcvec_neighbors,adcvec, fCompression, fZeroThreshold, calibrated_integer_pedestal_value, fNearestNeighbor, fSimStuckBits);
+	      }
+	      else{
+		raw::Compress(adcvec_neighbors,adcvec, fCompression, fZeroThreshold, calibrated_integer_pedestal_value, fNearestNeighbor, fSimStuckBits);
+	      }
 	      raw::RawDigit rd(chan-fNeighboringChannels, fNSamplesReadout, adcvec, fCompression);
-	      rd.SetPedestal(ped_mean,ped_rms);
+	      rd.SetPedestal(calibrated_pedestal_value,calibrated_pedestal_rms_value);
 
 	      if(fSaveEmptyChannel || adcvec[1]>0)
 		digcol->push_back(rd);            // add this digit to the collection
@@ -1083,10 +1154,15 @@ namespace detsim {
 		      adcvec_neighbors.pop_front(); // remove first entry from ring buffer, to exclude it from nearest neighboring wire checks in zero
 		  	
 		      adcvec = adcvec_neighbors.at(fNeighboringChannels);
-		      raw::Compress(adcvec_neighbors, adcvec, fCompression, fZeroThreshold, fNearestNeighbor); // apply zero suppression to entry in middle of ring buffer
-		      
+		      // apply zero suppression to entry in middle of ring buffer
+		      if(!fPedestalOn){
+			raw::Compress(adcvec_neighbors,adcvec, fCompression, fZeroThreshold, calibrated_integer_pedestal_value, fNearestNeighbor, fSimStuckBits);
+		      }
+		      else{
+			raw::Compress(adcvec_neighbors,adcvec, fCompression, fZeroThreshold, calibrated_integer_pedestal_value, fNearestNeighbor, fSimStuckBits);
+		      }
 		      raw::RawDigit rd2(channel_number, fNSamplesReadout, adcvec, fCompression);
-		      rd2.SetPedestal(ped_mean,ped_rms);
+		      rd2.SetPedestal(calibrated_pedestal_value,calibrated_pedestal_rms_value);
 
 		      if(fSaveEmptyChannel || adcvec[1]>0)
 			digcol->push_back(rd2);            // add this digit to the collection
@@ -1118,10 +1194,15 @@ namespace detsim {
 		// This shrinks adcvec, if fCompression is not kNone.
 		
 		adcvec = adcvec_neighbors.at(fNeighboringChannels);
-		raw::Compress(adcvec_neighbors, adcvec, fCompression, fZeroThreshold, fNearestNeighbor); // apply zero suppression to entry in middle of ring buffer
-		
+		// apply zero suppression to entry in middle of ring buffer
+		if(!fPedestalOn){
+		  raw::Compress(adcvec_neighbors,adcvec, fCompression, fZeroThreshold, calibrated_integer_pedestal_value, fNearestNeighbor, fSimStuckBits);
+		}
+		else{
+		  raw::Compress(adcvec_neighbors,adcvec, fCompression, fZeroThreshold, calibrated_integer_pedestal_value, fNearestNeighbor, fSimStuckBits);
+		}
 		raw::RawDigit rd(chan-fNeighboringChannels, fNSamplesReadout, adcvec, fCompression);
-		rd.SetPedestal(ped_mean,ped_rms);
+		rd.SetPedestal(calibrated_pedestal_value,calibrated_pedestal_rms_value);
 
 		if(fSaveEmptyChannel || adcvec[1]>0)
 		  digcol->push_back(rd);            // add this digit to the collection
@@ -1145,10 +1226,15 @@ namespace detsim {
 		  	
 		  adcvec = adcvec_neighbors.at(fNeighboringChannels);	
 
-		  raw::Compress(adcvec_neighbors, adcvec, fCompression, fZeroThreshold, fNearestNeighbor); // apply zero suppression to entry in middle of ring buffer
-		  
+		  // apply zero suppression to entry in middle of ring buffer
+		  if(!fPedestalOn){
+		    raw::Compress(adcvec_neighbors,adcvec, fCompression, fZeroThreshold, calibrated_integer_pedestal_value, fNearestNeighbor, fSimStuckBits);
+		  }
+		  else{
+		    raw::Compress(adcvec_neighbors,adcvec, fCompression, fZeroThreshold, calibrated_integer_pedestal_value, fNearestNeighbor, fSimStuckBits);
+		  }
 		  raw::RawDigit rd2(channel_number, fNSamplesReadout, adcvec, fCompression);
-		  rd2.SetPedestal(ped_mean,ped_rms);
+		  rd2.SetPedestal(calibrated_pedestal_value,calibrated_pedestal_rms_value);
 
 		  if(fSaveEmptyChannel || adcvec[1]>0)
 		    digcol->push_back(rd2);            // add this digit to the collection

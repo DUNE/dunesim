@@ -28,6 +28,12 @@ dunefd_simwire:
  CollectionPedRMS:    0.01        #ADC baseline RMS for coll plane
  InductionPed:        2048        #ADC baseline for ind plane
  InductionPedRMS:     0.01        #ADC baseline RMS for ind plane
+
+ CollectionCalibPed:  400         #Assumed measured value for coll plane pedestal
+ CollectionCalibPed:  0.0         #Assumed measured value for coll plane pedestal RMS
+ InductionCalibPed:   2048        #Assumed measured value for ind plane pedestal
+ InductionCalibPed:   0.0        #Assumed measured value for ind plane pedestal RMS
+ 
  PedestalOn:          false     #add pedestal value to ADC vector
 
  SimCombs:           false
@@ -70,9 +76,14 @@ dunefd_wienerfilterana:       @local::standard_wienerfilterana
 
 dune35t_simwire:		@local::dunefd_simwire
 dune35t_simwire.CollectionPed:  500         #ADC baseline for coll plane
+dune35t_simwire.CollectionPedRMS:    0.0    #ADC baseline RMS for coll plane
 dune35t_simwire.InductionPed:   1800        #ADC baseline for ind plane
-#dune35t_simwire.CollectionPed:  0         #ADC baseline for coll plane
-#dune35t_simwire.InductionPed:   0        #ADC baseline for ind plane
+dune35t_simwire.InductionPedRMS:    0.0    #ADC baseline RMS for ind plane
+dune35t_simwire.CollectionCalibPed:  500         #Assumed measured value for coll plane pedestal
+dune35t_simwire.CollectionCalibPedRMS:  0.0     #Assumed measured value for coll plane pedestal RMS
+dune35t_simwire.InductionCalibPed:   1800        #Assumed measured value for ind plane pedestal
+dune35t_simwire.InductionCalibPedRMS:   0.0        #Assumed measured value for ind plane pedestal RMS
+
 dune35t_simwire.ZeroThreshold:  5
 dune35t_simwire.NoiseModel:     1
 dune35t_simwire.NoiseWidthU:   0.624  # If turn NoiseModel to 1 use these numbers..
