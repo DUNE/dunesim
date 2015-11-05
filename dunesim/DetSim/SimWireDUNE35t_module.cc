@@ -14,7 +14,7 @@
 #include <algorithm>
 #include <sstream>
 #include <bitset>
-//#include <fstream>
+
 extern "C" {
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -1038,19 +1038,6 @@ namespace detsim {
 	  }
 
       	}
-
-
-   
-      // char filename0[250];
-      // sprintf(filename0,"/lbne/data/users/jti3/testpedestals/adcvec_precompressed_evt%d_chan%d.dat",evt.id().event(),chan);
-      // std::ofstream ofs1 (filename0,std::ofstream::out); 
-      
-      // for(size_t t = 0; t < adcvec.size(); ++t){ 
-      // 	  ofs1 << adcvec_a[t] << std::endl;
-      // }
-      
-      // ofs1.close();
-
       
 
       if(fNeighboringChannels==0){ // case where neighboring channels are disregarded in zero suppression
@@ -1071,16 +1058,6 @@ namespace detsim {
 	raw::RawDigit rd(chan, fNSamplesReadout, adcvec, fCompression);
 	rd.SetPedestal(calibrated_pedestal_value,calibrated_pedestal_rms_value);
 
-	// if(fSaveEmptyChannel || adcvec_a[1]>0){
-	  
-	//   sprintf(filename0,"/lbne/data/users/jti3/testpedestals/adcvec_compressed_evt%d_chan%d.dat",evt.id().event(),chan);
-	//   std::ofstream ofs2 (filename0,std::ofstream::out); 
-	  
-	//   for(size_t t = 0; t < adcvec.size(); ++t) 
-	//     ofs2 << adcvec_a[t] << std::endl;
-	  
-	//   ofs2.close();
-	// }
 
 	adcvec.resize(signalSize);        // Then, resize adcvec back to full length.  Do not initialize to zero (slow)
 	if(fSaveEmptyChannel || adcvec[1]>0)
