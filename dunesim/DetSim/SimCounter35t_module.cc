@@ -167,6 +167,7 @@ void detsim::SimCounter35t::produce(art::Event & e)
     // get AuxDetIDEs associated with sim channel
     const std::vector<sim::AuxDetIDE>& setOfIDEs = c->AuxDetIDEs();
     ntrkids = setOfIDEs.size();
+    //    if (ntrkids>0) std::cout << auxdetid << " " << ntrkids << std::endl;
 
     // loop over all AuxDetIDEs
     for (size_t j=0; j<setOfIDEs.size(); ++j) {
@@ -228,31 +229,101 @@ void detsim::SimCounter35t::produce(art::Event & e)
     }
   }    
 
+  //   std::cout << "how many? " << tickv.size() << std::endl;
+
   // fill collection of raw::ExternalTriggers, if eDep is above threshold
-  // Build triggers from individual hits
-  unsigned int iRM=0; unsigned int iCL=0; unsigned int iNU=0; unsigned int iNL=0; unsigned int iSU=0; unsigned int iSL=0; unsigned int iWU=0; unsigned int iEL=0;
-  std::vector<chanTick>::iterator it;
-  for (it = tickv.begin(); it != tickv.end(); ++it) {
-    chanTick ct = *it;
+  std::map<int, int >trigmap;
+  std::vector<chanTick>::iterator it,it2;
+  int icount= 0;
+  if (tickv.size()>1) {
+    std::vector<chanTick>::iterator myend=tickv.end()--;
+    for (it = tickv.begin(); it != tickv.end(); ++it) {
+    chanTick ct = *it; 
+    
     if ( (ct.auxDetID >= 44 && ct.auxDetID <= 91 && ct.eDep > fBSUTriggerThreshold) || 
 	 (ct.auxDetID >= 0 && ct.auxDetID <=43 && ct.eDep > fTSUTriggerThreshold) ||
-	 (ct.auxDetID >= 92 && ct.eDep > 1.e-6) )
-      trigcol->push_back(raw::ExternalTrigger(ct.auxDetID,ct.tick));
-    if (ct.auxDetID<6) iSL=ct.tick; 
-    if (ct.auxDetID>5 &&ct.auxDetID<16) iEL=ct.tick; 
-    if (ct.auxDetID>15 &&ct.auxDetID<22) iNL=ct.tick; 
-    if (ct.auxDetID>21 &&ct.auxDetID<28) iNU=ct.tick; 
-    if (ct.auxDetID>27 &&ct.auxDetID<38) iWU=ct.tick; 
-    if (ct.auxDetID>43 &&ct.auxDetID<57) iCL=ct.tick; 
-    if (ct.auxDetID>66 &&ct.auxDetID<83) iRM=ct.tick; 
+	 (ct.auxDetID >= 92 && ct.eDep > 1.e-6) ) 
+      {
+	icount++;
+		// std::cout << "hit " << icount << " "  << ct.auxDetID << " " << 
+		//   ct.tick << " " << ct.eDep << std::endl;
+	// Build triggers from individual hits
+	unsigned int iRM=0; unsigned int iCL=0; unsigned int iNU=0; unsigned int iNL=0; 
+	unsigned int iSU=0; unsigned int iSL=0; unsigned int iWU=0; unsigned int iEL=0;
+	trigcol->push_back(raw::ExternalTrigger(ct.auxDetID,ct.tick));
+	if (ct.auxDetID<6) iSL=ct.tick; 
+	if (ct.auxDetID>5 && ct.auxDetID<16) iEL=ct.tick; 
+	if (ct.auxDetID>15 && ct.auxDetID<22) iNL=ct.tick; 
+	if (ct.auxDetID>21 && ct.auxDetID<28) iNU=ct.tick; 
+	if (ct.auxDetID>27 && ct.auxDetID<38) iWU=ct.tick; 
+	if (ct.auxDetID>37 && ct.auxDetID<44) iSU=ct.tick; 
+	if (ct.auxDetID>43 && ct.auxDetID<57) iCL=ct.tick; 
+	if (ct.auxDetID>66 && ct.auxDetID<83) iRM=ct.tick; 
+		// std::cout << "here 2" << std::endl;
+	std::vector<chanTick>::iterator start=it+1;
+	if (start != tickv.end())  {
+	for (it2 = start; it2 != tickv.end(); ++it2) {
+	  chanTick ct2 = *it2;
+	  if ( (ct2.auxDetID >= 44 && ct2.auxDetID <= 91 
+		&& ct2.eDep > fBSUTriggerThreshold) 
+	       || (ct2.auxDetID >= 0 && ct2.auxDetID <=43 
+		   && ct2.eDep > fTSUTriggerThreshold) ||
+	       (ct2.auxDetID >= 92 && ct2.eDep > 1.e-6) )  {
+	    float t1 = ct.tick; float t2=ct2.tick;
+	    //  std::cout << "times " << ct.auxDetID << " " << t1 << " " << 
+	    // ct2.auxDetID << " " << t2 << std::endl;
+	    float diff = t2-t1;  //std::cout << "diff " << fabs(diff) <<  std::endl;
+	    if (fabs(diff)<5) {
+	      if (ct2.auxDetID<6) iSL=ct2.tick; 
+	      if (ct2.auxDetID>5  && ct2.auxDetID<16) iEL=ct2.tick; 
+	      if (ct2.auxDetID>15 && ct2.auxDetID<22) iNL=ct2.tick; 
+	      if (ct2.auxDetID>21 && ct2.auxDetID<28) iNU=ct2.tick; 
+	      if (ct2.auxDetID>27 && ct2.auxDetID<38) iWU=ct2.tick; 
+	      if (ct2.auxDetID>37 && ct2.auxDetID<44) iSU=ct2.tick; 
+	      if (ct2.auxDetID>43 && ct2.auxDetID<57) iCL=ct2.tick; 
+	      if (ct2.auxDetID>66 && ct2.auxDetID<83) iRM=ct2.tick; 
+	    }
+	  }
+	}
+	}
+	float  ttime; int trigtick;
+	//       	std::cout << "NL " << iNL << " SU " << iSU << " NU " << iNU << " SL " << iSL << std::endl;
+	if (iRM>0 && iCL>0) { ttime=0.5*(iRM+iCL)+0.5; trigtick=int(ttime); 
+	  if (trigmap[trigtick]==0) {trigmap[trigtick]++;trigmap[trigtick+1]++;
+	    trigmap[trigtick+2]++;trigmap[trigtick-1]++;trigmap[trigtick-2]++;
+	    trigcol->push_back(raw::ExternalTrigger(110,trigtick));
+	    //	    std::cout << "good trig " ; 
+	  }
+	  //	  	  	    std::cout << "RM+CL trigger " << trigtick << std::endl;
+	}
+	if (iEL>0 && iWU>0) { ttime=0.5*(iEL+iWU)+0.5; trigtick=int(ttime); 
+	  if (trigmap[trigtick]==0) {trigmap[trigtick]++;trigmap[trigtick+1]++;
+	    trigmap[trigtick+2]++;trigmap[trigtick-1]++;trigmap[trigtick-2]++;
+	    trigcol->push_back(raw::ExternalTrigger(111,trigtick));
+	    //	    std::cout << "good trig " ; 
+	  }
+	  //	    std::cout << "WU+EL trigger " << trigtick << std::endl;
+	}
+	if (iNU>0 && iSL>0) { ttime=0.5*(iNU+iSL)+0.5; trigtick=int(ttime); 
+	  if (trigmap[trigtick]==0) {trigmap[trigtick]++;trigmap[trigtick+1]++;
+	    trigmap[trigtick+2]++;trigmap[trigtick-1]++;trigmap[trigtick-2]++;
+	    trigcol->push_back(raw::ExternalTrigger(112,trigtick));
+	    //	    std::cout << "good trig " ; 
+	  }
+	  //	 	  	    std::cout << "NU+SL trigger " << trigtick << std::endl;
+	}
+	if (iSU>0 && iNL>0) { ttime=0.5*(iSU+iNL)+0.5; trigtick=int(ttime); 
+	  if (trigmap[trigtick]==0) {trigmap[trigtick]++;trigmap[trigtick+1]++;
+	    trigmap[trigtick+2]++;trigmap[trigtick-1]++;trigmap[trigtick-2]++;
+	    trigcol->push_back(raw::ExternalTrigger(113,trigtick));
+	    //	    std::cout << "good trig " ; 
+	  }
+	  //	  	    std::cout << "SU+NL trigger " << trigtick << std::endl;
+	}
+      }
   }
 
-  if (iRM>0 && iCL>0 && (fabs(iRM-iCL)<5)) trigcol->push_back(raw::ExternalTrigger(110,0.5*(iRM+iCL)));
-  if (iEL>0 && iWU>0 && (fabs(iEL-iWU)<5)) trigcol->push_back(raw::ExternalTrigger(111,0.5*(iEL+iWU)));
-  if (iNU>0 && iSL>0 && (fabs(iNU-iSL)<5)) trigcol->push_back(raw::ExternalTrigger(112,0.5*(iNU+iSL)));
-  if (iSU>0 && iNL>0 && (fabs(iSU-iNL)<5)) trigcol->push_back(raw::ExternalTrigger(113,0.5*(iSU+iNL)));
-
-
+  }// if more than one counter hit
   // put ExternalTrigger collection into event record
   e.put(std::move(trigcol));
 
@@ -263,7 +334,7 @@ void detsim::SimCounter35t::produce(art::Event & e)
     chanTick ct = *it;
     if ( (ct.auxDetID >= 44 && ct.auxDetID <= 91 && ct.eDep > fBSUTriggerThreshold) ||
          (ct.auxDetID >= 0 && ct.auxDetID <=43 && ct.eDep > fTSUTriggerThreshold) ||
-	 (ct.auxDetID >= 92 && ct.eDep > 1.e-6) )
+	 (ct.auxDetID >= 92 && ct.eDep > 1.e-6) )  
       out << "AuxDet " << ct.auxDetID << " had " << ct.numHits << " hits at readout tick " << ct.tick << ". Total eDep = " << ct.eDep << " MeV.\n";
   }
   if (skippedHitsIneff) out << skippedHitsIneff << " hits were skipped due to counter inefficiency.\n";
