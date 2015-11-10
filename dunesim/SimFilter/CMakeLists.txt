@@ -5,8 +5,8 @@ simple_plugin(GenExtCounterFilter "module"
 		        Geometry
 			Geometry_service
 			Utilities
-			DetectorProperties_service
-			LArProperties_service
+			DetectorPropertiesServiceStandard_service
+			LArPropertiesServiceStandard_service
 			${SIMULATIONBASE}
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}
@@ -30,8 +30,8 @@ simple_plugin(LArG4ExtCounterFilter "module"
 		        Geometry
 			Geometry_service
 			Utilities
-			DetectorProperties_service
-			LArProperties_service
+			DetectorPropertiesServiceStandard_service
+			LArPropertiesServiceStandard_service
 			${SIMULATIONBASE}
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}
@@ -55,8 +55,8 @@ simple_plugin(LArG4ParticleFilter "module"
 		        Geometry
 			Geometry_service
 			Utilities
-			DetectorProperties_service
-			LArProperties_service
+			DetectorPropertiesServiceStandard_service
+			LArPropertiesServiceStandard_service
 			${SIMULATIONBASE}
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}
