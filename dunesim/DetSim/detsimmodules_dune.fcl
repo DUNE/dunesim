@@ -6,13 +6,13 @@ dunefd_simwire:
 { 
  module_type:        "SimWireDUNE10kt"
  DriftEModuleLabel:  "largeant"
- NoiseFactU:          0.05       #Noise Scale for U plane
+ NoiseFactU:          0.1       #Noise Scale for U plane
  NoiseWidthU:         2000         #Exponential Noise width (kHz) for U plane
  LowCutoffU:          7.5          #Low frequency filter cutoff (kHz) for U plane
- NoiseFactV:          0.05       #Noise Scale for V plane
+ NoiseFactV:          0.1       #Noise Scale for V plane
  NoiseWidthV:         2000         #Exponential Noise width (kHz) for V plane
  LowCutoffV:          7.5          #Low frequency filter cutoff (kHz) for V plane
- NoiseFactZ:          0.05       #Noise Scale for Z plane
+ NoiseFactZ:          0.1       #Noise Scale for Z plane
  NoiseWidthZ:         2000         #Exponential Noise width (kHz) for Z plane
  LowCutoffZ:          7.5          #Low frequency filter cutoff (kHz) for Z plane
  CompressionType:    "ZeroSuppression"       #could also be none
@@ -91,9 +91,9 @@ dune35t_simwire.NoiseModel:     1
 dune35t_simwire.NoiseWidthU:  2000  # If turn NoiseModel to 1 use these numbers..
 dune35t_simwire.NoiseWidthV:  2000  # If turn NoiseModel to 1 use these numbers..
 dune35t_simwire.NoiseWidthZ:  2000  # If turn NoiseModel to 1 use these numbers..
-dune35t_simwire.NoiseFactU:   0.05  # If turn NoiseModel to 1 use these numbers..
-dune35t_simwire.NoiseFactV:   0.05 # If turn NoiseModel to 1 use these numbers..
-dune35t_simwire.NoiseFactZ:   0.05  # If turn NoiseModel to 1 use these numbers..
+dune35t_simwire.NoiseFactU:   0.1  # If turn NoiseModel to 1 use these numbers..
+dune35t_simwire.NoiseFactV:   0.1 # If turn NoiseModel to 1 use these numbers..
+dune35t_simwire.NoiseFactZ:   0.1  # If turn NoiseModel to 1 use these numbers..
 dune35t_simwire.LowCutoffU:    7.5  # If turn NoiseModel to 1 use these numbers..
 dune35t_simwire.LowCutoffV:    7.5  # If turn NoiseModel to 1 use these numbers..    
 dune35t_simwire.LowCutoffZ:    7.5  # If turn NoiseModel to 1 use these numbers..    
