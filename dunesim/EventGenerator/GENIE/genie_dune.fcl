@@ -24,6 +24,15 @@ dune35t_genie_hist:                           @local::standard_genie
 dune35t_genie_hist.BeamCenter:                [100., 50., 0.]
 dune35t_genie_hist.BeamDirection:             [0., 0., 0.]
 
+dune_fd_genie_simple_flux_workspace_window: @local::dunefd_genie
+dune_fd_genie_simple_flux_workspace_window.FluxType: "simple_flux"
+dune_fd_genie_simple_flux_workspace_window.FluxSearchPaths: "/pnfs/dune/persistent/dunepro/flux/200kA/gsimple/dune10kt_workspace/nominal/"
+dune_fd_genie_simple_flux_workspace_window.FluxFiles: ["gsimple_LBNE-FarDet_Workspace_g4lbne_v3r3p8_QGSP_BERT_DK2Nu_200kA_Dk2Nu*.root"]
+dune_fd_genie_simple_flux_workspace_window.FluxCopyMethod: "IFDH"
+dune_fd_genie_simple_flux_workspace_window.TopVolume: "volCryostat"
 
+dune_fd_genie_simple_flux_workspace_window_rotated_tpc: @local::dune_fd_genie_simple_flux_workspace_window
+dune_fd_genie_simple_flux_workspace_window_rotated_tpc.FluxSearchPaths: "/pnfs/dune/persistent/dunepro/flux/200kA/gsimple/dune10kt_workspace/windowRotataed10DegreesAroundY/"
+dune_fd_genie_simple_flux_workspace_window_rotated_tpc.FluxFiles: ["gsimple_LBNE-FarDet_Workspace_Rotated_Window_g4lbne_v3r3p8_QGSP_BERT_DK2Nu_200kA_Dk2Nu*.root"]
 
 END_PROLOG
