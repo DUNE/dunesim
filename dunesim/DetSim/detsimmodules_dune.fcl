@@ -6,38 +6,38 @@ dunefd_simwire:
 { 
  module_type:        "SimWireDUNE10kt"
  DriftEModuleLabel:  "largeant"
- NoiseFactU:          0.0132       #Noise Scale for U plane
- NoiseWidthU:         62.4         #Exponential Noise width (kHz) for U plane
+ NoiseFactU:          0.05       #Noise Scale for U plane
+ NoiseWidthU:         2000         #Exponential Noise width (kHz) for U plane
  LowCutoffU:          7.5          #Low frequency filter cutoff (kHz) for U plane
- NoiseFactV:          0.0132       #Noise Scale for V plane
- NoiseWidthV:         62.4         #Exponential Noise width (kHz) for V plane
+ NoiseFactV:          0.05       #Noise Scale for V plane, should produce RMS of 2.5 ADC counts
+ NoiseWidthV:         2000         #Exponential Noise width (kHz) for V plane, should produce RMS of 2.5 ADC counts
  LowCutoffV:          7.5          #Low frequency filter cutoff (kHz) for V plane
- NoiseFactZ:          0.0132       #Noise Scale for Z plane
- NoiseWidthZ:         62.4         #Exponential Noise width (kHz) for Z plane
+ NoiseFactZ:          0.05       #Noise Scale for Z plane, should produce RMS of 2.5 ADC counts
+ NoiseWidthZ:         2000         #Exponential Noise width (kHz) for Z plane
  LowCutoffZ:          7.5          #Low frequency filter cutoff (kHz) for Z plane
  CompressionType:    "ZeroSuppression"       #could also be none
  #CompressionType:    ""       #could also be none	
  ZeroThreshold:       10        #Threshold for zero suppression
- NearestNeighbor:     25        #Maximum distance between hits above threshold before they are separated into different blocks
- NeighboringChannels: 3        #Number of neighboring channels on either side allowed to influence zero suppression
+ NearestNeighbor:     10        #Maximum distance between hits above threshold before they are separated into different blocks
+ NeighboringChannels: 0        #Number of neighboring channels on either side allowed to influence zero suppression
  NoiseArrayPoints:    1000     #number of points in noise array
  NoiseOn:             1        #1 for noise on, 0 for noise off
- NoiseModel:          2        #1 for original model, 2 for a model similar to uBooNE
+ NoiseModel:          1        #1 for original model, 2 for a model similar to uBooNE
 
  CollectionPed:       400         #ADC baseline for coll plane
- CollectionPedRMS:    0.01        #ADC baseline RMS for coll plane
+ CollectionPedRMS:    0        #ADC baseline RMS for coll plane
  InductionPed:        2048        #ADC baseline for ind plane
- InductionPedRMS:     0.01        #ADC baseline RMS for ind plane
+ InductionPedRMS:     0        #ADC baseline RMS for ind plane
 
  CollectionCalibPed:  400         #Assumed measured value for coll plane pedestal
- CollectionCalibPed:  0.0         #Assumed measured value for coll plane pedestal RMS
+ CollectionCalibPed:  0         #Assumed measured value for coll plane pedestal RMS
  InductionCalibPed:   2048        #Assumed measured value for ind plane pedestal
- InductionCalibPed:   0.0        #Assumed measured value for ind plane pedestal RMS
+ InductionCalibPed:   0        #Assumed measured value for ind plane pedestal RMS
  
- PedestalOn:          false     #add pedestal value to ADC vector
+ PedestalOn:          true     #add pedestal value to ADC vector
 
  SimCombs:           false
- SaveEmptyChannel:   true      #if channel's ADC vector is entirely full of zeros, save it in RawDigit collection (true) or discard (false)
+ SaveEmptyChannel:   false      #if channel's ADC vector is entirely full of zeros, save it in RawDigit collection (true) or discard (false)
  SimStuckBits:       false        #simulate stuck bits
 
  StuckBitsProbabilitiesFname:     "ADCStuckCodeProbabilities35t/output_produceDcScanSummaryPlots_20150827_coldTest_0p1to1p4_step0p0010.root"
@@ -91,9 +91,12 @@ dune35t_simwire.NoiseModel:     1
 dune35t_simwire.NoiseWidthU:  2000  # If turn NoiseModel to 1 use these numbers..
 dune35t_simwire.NoiseWidthV:  2000  # If turn NoiseModel to 1 use these numbers..
 dune35t_simwire.NoiseWidthZ:  2000  # If turn NoiseModel to 1 use these numbers..
-dune35t_simwire.NoiseFactU:   0.05  # If turn NoiseModel to 1 use these numbers..
-dune35t_simwire.NoiseFactV:   0.05 # If turn NoiseModel to 1 use these numbers..
-dune35t_simwire.NoiseFactZ:   0.05  # If turn NoiseModel to 1 use these numbers..
+dune35t_simwire.NoiseFactU:   0.05  # Should produce RMS of 2.5 ADC counts
+dune35t_simwire.NoiseFactV:   0.05  # Should produce RMS of 2.5 ADC counts
+dune35t_simwire.NoiseFactZ:   0.05  # Should produce RMS of 2.5 ADC counts
+#dune35t_simwire.NoiseFactU:   0.1  # Should produce RMS of 5 ADC counts
+#dune35t_simwire.NoiseFactV:   0.1  # Should produce RMS of 5 ADC counts
+#dune35t_simwire.NoiseFactZ:   0.1  # Should produce RMS of 5 ADC counts
 dune35t_simwire.LowCutoffU:    7.5  # If turn NoiseModel to 1 use these numbers..
 dune35t_simwire.LowCutoffV:    7.5  # If turn NoiseModel to 1 use these numbers..    
 dune35t_simwire.LowCutoffZ:    7.5  # If turn NoiseModel to 1 use these numbers..    
