@@ -37,14 +37,14 @@ extern "C" {
 
 #include "Utilities/LArFFT.h"
 #include "RawData/raw.h"
-#include "Utilities/LArPropertiesService.h"
+#include "DetectorInfoServices/LArPropertiesService.h"
 #include "dune/Utilities/SignalShapingServiceDUNE10kt.h"
 #include "Geometry/Geometry.h"
 
 #include "Simulation/sim.h"
 #include "Simulation/SimChannel.h"
 #include "RawData/RawDigit.h"
-#include "Utilities/DetectorPropertiesService.h"
+#include "DetectorInfoServices/DetectorPropertiesService.h"
 
 #include "TMath.h"
 #include "TComplex.h"
@@ -184,7 +184,7 @@ namespace detsim {
     fNoiseModel           = p.get< unsigned int       >("NoiseModel");
     fCollectionPed    = p.get< float               >("CollectionPed");
     fInductionPed     = p.get< float               >("InductionPed");
-    auto const *detprop = lar::providerFrom<util::DetectorPropertiesService>();
+    auto const *detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
     fSampleRate       = detprop->SamplingRate();
     fNSamplesReadout  = detprop->ReadOutWindowSize();
     fNTimeSamples  = detprop->NumberTimeSamples();

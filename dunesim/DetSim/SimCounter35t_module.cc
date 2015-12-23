@@ -23,8 +23,8 @@
 
 #include "RawData/raw.h"
 #include "RawData/ExternalTrigger.h"
-#include "Utilities/DetectorPropertiesService.h"
-#include "Utilities/DetectorClocksService.h"
+#include "DetectorInfoServices/DetectorPropertiesService.h"
+#include "DetectorInfoServices/DetectorClocksService.h"
 #include "Simulation/AuxDetSimChannel.h"
 
 #include "CLHEP/Random/RandFlat.h"
@@ -143,8 +143,8 @@ void detsim::SimCounter35t::produce(art::Event & e)
   CLHEP::HepRandomEngine &engine = rng->getEngine("rand");
   CLHEP::RandFlat flat(engine,0,1);
 
-  auto const *ts = lar::providerFrom<util::DetectorClocksService>();
-  auto const *detprop = lar::providerFrom<util::DetectorPropertiesService>();
+  auto const *ts = lar::providerFrom<detinfo::DetectorClocksService>();
+  auto const *detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
 
   // make unique_ptr that allows ownership of the produced triggers to be transferred to the art::Event after the put statement below
   std::unique_ptr<std::vector<raw::ExternalTrigger>> trigcol(new std::vector<raw::ExternalTrigger>);
