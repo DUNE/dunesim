@@ -34,6 +34,8 @@ art_make( BASENAME_ONLY
 			${ROOT_BASIC_LIB_LIST}
         )
 
+add_subdirectory(Service)
+
 # install_headers()
 install_fhicl()
 install_source()

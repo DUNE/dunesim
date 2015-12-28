@@ -1,4 +1,4 @@
-// SimChannelExtract35tService.h
+// Dune35tSimChannelExtractService.h
 
 // David Adams
 // December 2015
@@ -11,8 +11,8 @@
 // is for charge that is collected on the wire even if it is
 // an induction plane.
 
-#ifndef SimChannelExtract35tService_H
-#define SimChannelExtract35tService_H
+#ifndef Dune35tSimChannelExtractService_H
+#define Dune35tSimChannelExtractService_H
 
 #include <vector>
 #include "dune/DuneInterface/SimChannelExtractService.h"
@@ -25,11 +25,11 @@ namespace sim {
 class SimChannel;
 }
 
-class SimChannelExtract35tService : public SimChannelExtractService {
+class Dune35tSimChannelExtractService : public SimChannelExtractService {
 
 public:
 
-  SimChannelExtract35tService(fhicl::ParameterSet const& pset, art::ActivityRegistry&);
+  Dune35tSimChannelExtractService(fhicl::ParameterSet const& pset, art::ActivityRegistry&);
 
   int extract(const sim::SimChannel* psc, AdcSignalVector& sig) const;
 
@@ -81,7 +81,7 @@ private:
 
 };
 
-DECLARE_ART_SERVICE_INTERFACE_IMPL(SimChannelExtract35tService, SimChannelExtractService, LEGACY)
+DECLARE_ART_SERVICE_INTERFACE_IMPL(Dune35tSimChannelExtractService, SimChannelExtractService, LEGACY)
 
 #endif
 

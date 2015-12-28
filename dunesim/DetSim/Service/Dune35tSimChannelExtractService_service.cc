@@ -1,6 +1,6 @@
-// SimChannelExtract35tService.cxx
+// Dune35tSimChannelExtractService.cxx
 
-#include "SimChannelExtract35tService.h"
+#include "Dune35tSimChannelExtractService.h"
 #include <string>
 #include "Geometry/Geometry.h"
 #include "Simulation/SimChannel.h"
@@ -9,8 +9,8 @@ using std::string;
 
 //**********************************************************************
 
-SimChannelExtract35tService::
-SimChannelExtract35tService(fhicl::ParameterSet const& pset, art::ActivityRegistry&)
+Dune35tSimChannelExtractService::
+Dune35tSimChannelExtractService(fhicl::ParameterSet const& pset, art::ActivityRegistry&)
 : m_ntick(0),
   fFirstCollectionChannel(9999999) {
   fFractUUCollect         = pset.get< float >("FractUUCollect");
@@ -38,13 +38,13 @@ SimChannelExtract35tService(fhicl::ParameterSet const& pset, art::ActivityRegist
 
 //**********************************************************************
 
-int SimChannelExtract35tService::
+int Dune35tSimChannelExtractService::
 extract(const sim::SimChannel* psc, AdcSignalVector& fChargeWork) const {
   fChargeWork.clear();
   fChargeWork.resize(m_ntick, 0.0);
   if ( psc == nullptr ) return 0;
   AdcSignalVector fChargeWorkCollInd(m_ntick, 0.0);
-  string fname = "SimChannelExtract35tService::extract";
+  string fname = "Dune35tSimChannelExtractService::extract";
   art::ServiceHandle<geo::Geometry> geo;
   unsigned int chan = psc->Channel();
   const geo::View_t view = geo->View(chan);
@@ -142,7 +142,7 @@ extract(const sim::SimChannel* psc, AdcSignalVector& fChargeWork) const {
 
 //**********************************************************************
 
-void SimChannelExtract35tService::init() {
+void Dune35tSimChannelExtractService::init() {
 
   if ( m_init ) return;
 
@@ -299,8 +299,8 @@ void SimChannelExtract35tService::init() {
 
 // see the ASCII cartoon of APA's at the bottom of this file for a picture of what all the boundaries are
 
-SimChannelExtract35tService::GapType_t 
-SimChannelExtract35tService::combtest35t(double x, double y, double z) const {
+Dune35tSimChannelExtractService::GapType_t 
+Dune35tSimChannelExtractService::combtest35t(double x, double y, double z) const {
   if (z<zcomb1) return VERTGAP;  // off to the side of the first APA -- kind of like being in a vertical gap
   if (z<zcomb2) return UCOMB;  // over U comb
   if (z<zcomb3) return VCOMB;  // over V comb
@@ -525,6 +525,6 @@ SimChannelExtract35tService::combtest35t(double x, double y, double z) const {
 
 //**********************************************************************
 
-DEFINE_ART_SERVICE_INTERFACE_IMPL(SimChannelExtract35tService, SimChannelExtractService)
+DEFINE_ART_SERVICE_INTERFACE_IMPL(Dune35tSimChannelExtractService, SimChannelExtractService)
 
 //**********************************************************************
