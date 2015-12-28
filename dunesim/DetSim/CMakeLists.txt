@@ -1,5 +1,8 @@
+# dunetpc/dune/DetSim/CMakeLists.txt
 
 art_make( BASENAME_ONLY
+          LIBRARY_NAME DetSim
+          LIB_LIBRARIES
           MODULE_LIBRARIES Geometry
 	                dune_Geometry
 			Geometry_service
