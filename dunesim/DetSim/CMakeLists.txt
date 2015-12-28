@@ -1,5 +1,15 @@
+# dunetpc/dune/DetSim/CMakeLists.txt
+
+# David Adams
+# December 2015
+
+# We can drop the MODULE_LIBRARIES block after the old modules
+# SimWireDUNE35t_module.cc and SimWireDUNE10kt_module.cc are
+# removed.
 
 art_make( BASENAME_ONLY
+          LIBRARY_NAME DetSim
+          LIB_LIBRARIES
           MODULE_LIBRARIES Geometry
 	                dune_Geometry
 			Geometry_service
@@ -30,6 +40,9 @@ art_make( BASENAME_ONLY
                         ${ROOT_GDML}
 			${ROOT_BASIC_LIB_LIST}
         )
+
+add_subdirectory(Service)
+add_subdirectory(Module)
 
 # install_headers()
 install_fhicl()
