@@ -44,7 +44,7 @@ art_make( BASENAME_ONLY
 add_subdirectory(Service)
 add_subdirectory(Module)
 
-# install_headers()
+install_headers()
 install_fhicl()
 install_source()
 
