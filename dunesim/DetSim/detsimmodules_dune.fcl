@@ -2,6 +2,172 @@
 
 BEGIN_PROLOG
 
+#***********************************************************************
+
+# DetSim module
+
+dune35tnew_simwire: {
+  module_type:        "SimWireDUNE"
+  DriftEModuleLabel:  "largeant"
+  NoiseOn:            false
+  PedestalOn:         false
+  SuppressOn:         false
+  StuckBitsOn:        false
+  SaveEmptyChannel:   true
+}
+
+#***********************************************************************
+
+scxgeneric: {
+  service_provider: GenericSimChannelExtractService
+}
+
+scx35t: {
+  service_provider: Dune35tSimChannelExtractService
+  FractHorizGapUCollect: 0.1
+  FractHorizGapUMiss: 0.8
+  FractHorizGapVCollect: 0.1
+  FractHorizGapVMiss: 0.8
+  FractHorizGapZMiss: 0.8
+  FractUUCollect: 0.5
+  FractUUMiss: 0.2
+  FractUVCollect: 0.1
+  FractUVMiss: 0.2
+  FractVUCollect: 0.5
+  FractVUMiss: 0.2
+  FractVVCollect: 0.1
+  FractVVMiss: 0.2
+  FractVertGapUCollect: 0.1
+  FractVertGapUMiss: 0.8
+  FractVertGapVCollect: 0.1
+  FractVertGapVMiss: 0.8
+  FractVertGapZMiss: 0.8
+  FractZUMiss: 0.2
+  FractZVMiss: 0.2
+}
+
+#***********************************************************************
+
+zsnone: {
+  service_provider: FixedZeroSuppressService
+}
+
+zslegacy: {
+  service_provider: Legacy35tZeroSuppressService
+  AdcThreshold: 10.0
+  TickRange: 10
+  MinTickGap: 2
+  SuppressStickyBits: true
+}
+
+zsonline: {
+  service_provider: Dune35tZeroSuppressService
+  NS:  5
+  NL: 15
+  ND:  5
+  NT:  3
+  TS:  3
+  TL:  7
+  TD:  5
+}
+
+zsonline_nhi: {
+  service_provider: Dune35tZeroSuppressService
+  NS:  5
+  NL: 15
+  ND:  5
+  NT:  3
+  TS:  6
+  TL: 14
+  TD: 10
+}
+
+zsonline_nhi2: {
+  service_provider: Dune35tZeroSuppressService
+  NS:  5
+  NL: 15
+  ND:  5
+  NT:  3
+  TS:  6
+  TL: 10
+  TD: 10
+}
+
+#***********************************************************************
+
+cmpreplace: {
+  service_provider: ReplaceCompressService
+  Zero: 0
+}
+
+#***********************************************************************
+
+pedlegacy: {
+  service_provider: SIOVDetPedestalService
+  DetPedestalRetrievalAlg: {
+    AlgName:            "DetPedestalRetrievalAlg"
+    DatabaseRetrievalAlg: {
+      AlgName: "DatabaseRetrievalAlg"
+      DBFolderName:  ""
+      DBUrl: ""
+      DBTag: ""
+    }
+    UseDB: false
+    UseFile: false
+    DefaultCollMean:  500.0
+    DefaultCollRms:     0.01
+    DefaultIndMean:  1800.0
+    DefaultIndRms:      0.01
+    DefaultMeanErr:     0.0
+    DefaultRmsErr:      0.0
+  }
+}
+
+pedlegacynorms: @local::pedlegacy
+pedlegacynorms.DetPedestalRetrievalAlg.DefaultCollRms: 0.0
+pedlegacynorms.DetPedestalRetrievalAlg.DefaultIndRms: 0.0
+
+padprovided: {
+  service_provider: ProvidedPedestalAdditionService
+  NoiseScale: 1.0
+}
+
+#***********************************************************************
+
+chnoiseold: {
+  service_provider: ExponentialChannelNoiseService
+  NoiseFactU: 0.05
+  NoiseFactV: 0.05
+  NoiseFactZ: 0.05
+  NoiseWidthU: 2000
+  NoiseWidthV: 2000
+  NoiseWidthZ: 2000
+  LowCutoffU: 7.5
+  LowCutoffV: 7.5
+  LowCutoffZ: 7.5
+  NoiseArrayPoints: 1000
+  OldNoiseIndex: true
+}
+
+chnoisewhite: {
+  service_provider: WhiteChannelNoiseService
+}
+
+#***********************************************************************
+
+stuckbits: {
+  service_provider: StuckBitAdcDistortionService
+  StuckBitsOverflowProbHistoName: "pCorrFracOverflowVsInputLsbCell"
+  StuckBitsProbabilitiesFname: "ADCStuckCodeProbabilities35t/output_produceDcScanSummaryPlots_20150827_coldTest_0p1to1p4_step0p0010.root"
+  StuckBitsUnderflowProbHistoName: "pCorrFracUnderflowVsInputLsbCell"
+}
+
+#***********************************************************************
+# Everything below is left over from before the merge with dunezs and can
+# be removed when the old modules SimWireDUNE35t_module.cc and
+# SimWireDUNE10kt_module.cc are dropped.
+#***********************************************************************
+
 dunefd_simwire:  
 { 
  module_type:        "SimWireDUNE10kt"
