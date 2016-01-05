@@ -53,7 +53,7 @@ zsnone: {
 }
 
 zslegacy: {
-  service_provider: Legacy35tZeroSuppressLegacyService
+  service_provider: Legacy35tZeroSuppressService
   AdcThreshold: 10.0
   TickRange: 10
   MinTickGap: 2
