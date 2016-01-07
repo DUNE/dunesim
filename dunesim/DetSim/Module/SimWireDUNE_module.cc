@@ -55,7 +55,7 @@ public:
 
 private:
 
-  std::string            fDriftEModuleLabel; ///< module making the ionization electrons
+  std::string fSimChannelLabel; ///< Data product holding the ionization electrons
   
   // Flags.
   bool fNoiseOn;           ///< noise turned on or off for debugging; default is on
@@ -90,11 +90,11 @@ SimWireDUNE::~SimWireDUNE() { }
 //**********************************************************************
 
 void SimWireDUNE::reconfigure(fhicl::ParameterSet const& p) {
-  fDriftEModuleLabel = p.get<std::string>("DriftEModuleLabel");
-  fNoiseOn           = p.get<bool>("NoiseOn");
-  fPedestalOn        = p.get<bool>("PedestalOn");  
-  fDistortOn         = p.get<bool>("DistortOn");  
-  fSuppressOn        = p.get<bool>("SuppressOn");  
+  fSimChannelLabel = p.get<std::string>("SimChannelLabel");
+  fNoiseOn         = p.get<bool>("NoiseOn");
+  fPedestalOn      = p.get<bool>("PedestalOn");  
+  fDistortOn       = p.get<bool>("DistortOn");  
+  fSuppressOn      = p.get<bool>("SuppressOn");  
 
   ostringstream out;
   out << "  Compression service:";
@@ -149,7 +149,7 @@ void SimWireDUNE::produce(art::Event& evt) {
   // using the chanHandle
   std::vector<const sim::SimChannel*> chanHandle;
   std::vector<const sim::SimChannel*> simChannels(m_pgeo->Nchannels(), nullptr);
-  evt.getView(fDriftEModuleLabel, chanHandle);
+  evt.getView(fSimChannelLabel, chanHandle);
   for ( size_t c=0; c<chanHandle.size(); ++c ) {
     simChannels[chanHandle[c]->Channel()] = chanHandle[c];
   }

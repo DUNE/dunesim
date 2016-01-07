@@ -7,12 +7,12 @@ BEGIN_PROLOG
 # DetSim module
 
 dune35tnew_simwire: {
-  module_type:        "SimWireDUNE"
-  DriftEModuleLabel:  "largeant"
-  NoiseOn:            false
-  PedestalOn:         false
-  SuppressOn:         false
-  DistortOn:          false
+  module_type:      "SimWireDUNE"
+  SimChannelLabel:  "largeant"
+  NoiseOn:          false
+  PedestalOn:       false
+  SuppressOn:       false
+  DistortOn:        false
 }
 
 #***********************************************************************
