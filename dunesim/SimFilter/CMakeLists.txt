@@ -3,10 +3,10 @@ simple_plugin(GenExtCounterFilter "module"
 		      RecoBase
 		      dune_Geometry
 		        Geometry
-			Geometry_service
+			larcore_Geometry_Geometry_service
 			Utilities
-			DetectorPropertiesServiceStandard_service
-			LArPropertiesServiceStandard_service
+			lardata_DetectorInfoServices_DetectorPropertiesServiceStandard_service
+			lardata_DetectorInfoServices_LArPropertiesServiceStandard_service
 			${SIMULATIONBASE}
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}
@@ -28,10 +28,10 @@ simple_plugin(LArG4ExtCounterFilter "module"
 		      RecoBase
 		      dune_Geometry
 		        Geometry
-			Geometry_service
+			larcore_Geometry_Geometry_service
 			Utilities
-			DetectorPropertiesServiceStandard_service
-			LArPropertiesServiceStandard_service
+			lardata_DetectorInfoServices_DetectorPropertiesServiceStandard_service
+			lardata_DetectorInfoServices_LArPropertiesServiceStandard_service
 			${SIMULATIONBASE}
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}
@@ -53,10 +53,10 @@ simple_plugin(LArG4ParticleFilter "module"
 		      RecoBase
 		      dune_Geometry
 		        Geometry
-			Geometry_service
+			larcore_Geometry_Geometry_service
 			Utilities
-			DetectorPropertiesServiceStandard_service
-			LArPropertiesServiceStandard_service
+			lardata_DetectorInfoServices_DetectorPropertiesServiceStandard_service
+			lardata_DetectorInfoServices_LArPropertiesServiceStandard_service
 			${SIMULATIONBASE}
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}

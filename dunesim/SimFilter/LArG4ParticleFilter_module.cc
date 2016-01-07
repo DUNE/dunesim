@@ -6,12 +6,12 @@
 #include "art/Framework/Core/EDFilter.h" 
 #include "art/Framework/Core/ModuleMacros.h" 
 #include "art/Framework/Principal/Event.h" 
-#include "Geometry/Geometry.h"
-#include "Simulation/AuxDetSimChannel.h"
+#include "larcore/Geometry/Geometry.h"
+#include "larsim/Simulation/AuxDetSimChannel.h"
 #include "SimulationBase/MCTruth.h"
-#include "RawData/RawDigit.h"
-#include "RawData/raw.h"
-#include "RecoBase/Wire.h"
+#include "lardata/RawData/RawDigit.h"
+#include "lardata/RawData/raw.h"
+#include "lardata/RecoBase/Wire.h"
 
 namespace filt{
 

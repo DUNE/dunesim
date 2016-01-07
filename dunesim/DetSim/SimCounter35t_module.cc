@@ -21,11 +21,11 @@
 #include "messagefacility/MessageLogger/MessageLogger.h"
 #include "artextensions/SeedService/SeedService.hh"
 
-#include "RawData/raw.h"
-#include "RawData/ExternalTrigger.h"
-#include "DetectorInfoServices/DetectorPropertiesService.h"
-#include "DetectorInfoServices/DetectorClocksService.h"
-#include "Simulation/AuxDetSimChannel.h"
+#include "lardata/RawData/raw.h"
+#include "lardata/RawData/ExternalTrigger.h"
+#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
+#include "lardata/DetectorInfoServices/DetectorClocksService.h"
+#include "larsim/Simulation/AuxDetSimChannel.h"
 
 #include "CLHEP/Random/RandFlat.h"
 

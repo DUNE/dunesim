@@ -2,12 +2,12 @@
 art_make( BASENAME_ONLY
           MODULE_LIBRARIES Geometry
 	                dune_Geometry
-			Geometry_service
+			larcore_Geometry_Geometry_service
 			Simulation
 	                Utilities
 			Filters
 			RawData
-			DetectorClocksServiceStandard_service
+			lardata_DetectorInfoServices_DetectorClocksServiceStandard_service
                         SignalShapingServiceDUNE10kt_service
 			SignalShapingServiceDUNE35t_service
                         ${SEEDSERVICE_SERVICE} # artextensions
