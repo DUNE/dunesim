@@ -6,7 +6,7 @@ BEGIN_PROLOG
 
 # DetSim module
 
-dune35tnew_simwire: {
+dune_detsim: {
   module_type:      "SimWireDUNE"
   SimChannelLabel:  "largeant"
   NoiseOn:          false
