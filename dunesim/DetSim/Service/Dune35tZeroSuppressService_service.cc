@@ -81,7 +81,8 @@ Dune35tZeroSuppressService(AdcCount ts, AdcCount tl, AdcCount td,
 //**********************************************************************
 
 Dune35tZeroSuppressService::
-Dune35tZeroSuppressService(const fhicl::ParameterSet& pset, art::ActivityRegistry&) {
+Dune35tZeroSuppressService(const fhicl::ParameterSet& pset, art::ActivityRegistry&)
+: m_dbg(false) {
   m_ts = pset.get<AdcCount>("TS");
   m_tl = pset.get<AdcCount>("TL");
   m_td = pset.get<AdcCount>("TD");
