@@ -62,7 +62,6 @@ private:
   bool fPedestalOn;        ///< switch for simulation of nonzero pedestals
   bool fDistortOn;         ///< switch for simulation of stuck bits
   bool fSuppressOn;        ///< switch for simulation of zero suppression
-  bool fSaveEmptyChannel;  ///< switch for saving channels with all zero entries
 
   // Services.
   art::ServiceHandle<geo::Geometry> m_pgeo;
@@ -96,7 +95,6 @@ void SimWireDUNE::reconfigure(fhicl::ParameterSet const& p) {
   fPedestalOn        = p.get<bool>("PedestalOn");  
   fDistortOn         = p.get<bool>("DistortOn");  
   fSuppressOn        = p.get<bool>("SuppressOn");  
-  fSaveEmptyChannel  = p.get< bool >("SaveEmptyChannel");  
 
   ostringstream out;
   out << "  Compression service:";

@@ -13,7 +13,6 @@ dune35tnew_simwire: {
   PedestalOn:         false
   SuppressOn:         false
   DistortOn:          false
-  SaveEmptyChannel:   true
 }
 
 #***********************************************************************
