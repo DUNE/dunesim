@@ -57,12 +57,7 @@ ExponentialChannelNoiseService(fhicl::ParameterSet const& pset, art::ActivityReg
 //**********************************************************************
 
 int ExponentialChannelNoiseService::addNoise(Channel chan, AdcSignalVector& sigs) const {
-#ifdef UseSeedService
-  art::ServiceHandle<art::RandomNumberGenerator> rng;
-  CLHEP::HepRandomEngine& engine = rng->getEngine("ExponentialChannelNoiseServiceIndex");
-#else
   CLHEP::HepRandomEngine& engine = *m_pran;
-#endif
   CLHEP::RandFlat flat(engine);
   unsigned int noisechan = 0;
   if ( fOldNoiseIndex ) {
