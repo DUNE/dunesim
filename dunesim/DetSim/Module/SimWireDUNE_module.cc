@@ -55,14 +55,13 @@ public:
 
 private:
 
-  std::string            fDriftEModuleLabel; ///< module making the ionization electrons
+  std::string fSimChannelLabel; ///< Data product holding the ionization electrons
   
   // Flags.
   bool fNoiseOn;           ///< noise turned on or off for debugging; default is on
   bool fPedestalOn;        ///< switch for simulation of nonzero pedestals
-  bool fStuckBitsOn;       ///< switch for simulation of stuck bits
+  bool fDistortOn;         ///< switch for simulation of stuck bits
   bool fSuppressOn;        ///< switch for simulation of zero suppression
-  bool fSaveEmptyChannel;  ///< switch for saving channels with all zero entries
 
   // Services.
   art::ServiceHandle<geo::Geometry> m_pgeo;
@@ -70,7 +69,7 @@ private:
   art::ServiceHandle<AdcCompressService> m_pcmp;
   art::ServiceHandle<SimChannelExtractService> m_pscx;
   art::ServiceHandle<ChannelNoiseService> m_pcns;
-  art::ServiceHandle<AdcDistortionService> m_pasb;
+  art::ServiceHandle<AdcDistortionService> m_pdis;
   art::ServiceHandle<PedestalAdditionService> m_ppad;
 
 }; // class SimWireDUNE
@@ -91,12 +90,11 @@ SimWireDUNE::~SimWireDUNE() { }
 //**********************************************************************
 
 void SimWireDUNE::reconfigure(fhicl::ParameterSet const& p) {
-  fDriftEModuleLabel = p.get<std::string>("DriftEModuleLabel");
-  fNoiseOn           = p.get<bool>("NoiseOn");
-  fPedestalOn        = p.get<bool>("PedestalOn");  
-  fStuckBitsOn        = p.get<bool>("StuckBitsOn");  
-  fSuppressOn         = p.get<bool>("SuppressOn");  
-  fSaveEmptyChannel    = p.get< bool >("SaveEmptyChannel");  
+  fSimChannelLabel = p.get<std::string>("SimChannelLabel");
+  fNoiseOn         = p.get<bool>("NoiseOn");
+  fPedestalOn      = p.get<bool>("PedestalOn");  
+  fDistortOn       = p.get<bool>("DistortOn");  
+  fSuppressOn      = p.get<bool>("SuppressOn");  
 
   ostringstream out;
   out << "  Compression service:";
@@ -122,11 +120,11 @@ void SimWireDUNE::reconfigure(fhicl::ParameterSet const& p) {
     out << "ADC suppression is off.";
   }
   out << endl;
-  if ( fStuckBitsOn ) {
-    out << "  Stuck bits service:" << endl;;
-    m_pasb->print(out, "    ");
+  if ( fDistortOn ) {
+    out << "  ADC distortion service:" << endl;;
+    m_pdis->print(out, "    ");
   } else {
-    out << "  Stuck bits is off.";
+    out << "  ADC distortion bits is off.";
   }
   mf::LogInfo("SimWireDUNE::reconfigure") << out.str();
 
@@ -151,7 +149,7 @@ void SimWireDUNE::produce(art::Event& evt) {
   // using the chanHandle
   std::vector<const sim::SimChannel*> chanHandle;
   std::vector<const sim::SimChannel*> simChannels(m_pgeo->Nchannels(), nullptr);
-  evt.getView(fDriftEModuleLabel, chanHandle);
+  evt.getView(fSimChannelLabel, chanHandle);
   for ( size_t c=0; c<chanHandle.size(); ++c ) {
     simChannels[chanHandle[c]->Channel()] = chanHandle[c];
   }
@@ -207,8 +205,8 @@ void SimWireDUNE::produce(art::Event& evt) {
     adcvec.resize(nTickReadout);
     
     // Add stuck bits.
-    if ( fStuckBitsOn ) {
-      m_pasb->modify(chan, adcvec);
+    if ( fDistortOn ) {
+      m_pdis->modify(chan, adcvec);
     }
     
     // Zero suppress and compress.
