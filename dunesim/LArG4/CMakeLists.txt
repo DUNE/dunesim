@@ -1,8 +1,8 @@
 
 art_make( BASENAME_ONLY
-          MODULE_LIBRARIES Geometry
+          MODULE_LIBRARIES larcore_Geometry
 			larcore_Geometry_Geometry_service
-			Simulation
+			larsim_Simulation
 			${SIMULATIONBASE}
 			${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}

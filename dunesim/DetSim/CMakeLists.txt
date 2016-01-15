@@ -1,12 +1,12 @@
 
 art_make( BASENAME_ONLY
-          MODULE_LIBRARIES Geometry
+          MODULE_LIBRARIES larcore_Geometry
 	                dune_Geometry
 			larcore_Geometry_Geometry_service
-			Simulation
-	                Utilities
-			Filters
-			RawData
+			larsim_Simulation
+	                lardata_Utilities
+			larevt_Filters
+			lardata_RawData
 			lardata_DetectorInfoServices_DetectorClocksServiceStandard_service
                         SignalShapingServiceDUNE10kt_service
 			SignalShapingServiceDUNE35t_service
