@@ -149,26 +149,26 @@ namespace detsim {
     std::string            fStuckBitsUnderflowProbHistoName; ///< Name of histogram holding ADC stuck code underflow probabilities 
 
     bool                   fSaveEmptyChannel;  // switch for saving channels with all zero entries
-    float                  fFractUUCollect;    // fraction of charge that collects on U (non-transparency) when charge drifts over the comb holding U wires
-    float                  fFractUVCollect;    // fraction of charge that collects on U (non-transparency) when charge drifts over the comb holding V wires
-    float                  fFractVUCollect;    // fraction of charge that collects on V (non-transparency) when charge drifts over the comb holding U wires
-    float                  fFractVVCollect;    // fraction of charge that collects on V (non-transparency) when charge drifts over the comb holding V wires
-    float                  fFractUUMiss;       // fraction of charge that gets missed on U when charge drifts over the comb holding U
-    float                  fFractUVMiss;       // fraction of charge that gets missed on U when charge drifts over the comb holding V
-    float                  fFractVUMiss;       // fraction of charge that gets missed on V when charge drifts over the comb holding U
-    float                  fFractVVMiss;       // fraction of charge that gets missed on V when charge drifts over the comb holding V
-    float                  fFractZUMiss;       // fraction of charge that gets missed on Z (collection)  when charge drifts over the comb holding U
-    float                  fFractZVMiss;       // fraction of charge that gets missed on Z (collection)  when charge drifts over the comb holding V
-    float                  fFractHorizGapUMiss;     // fraction of charge in the horizontal gap that is missing on U (and not collected)
-    float                  fFractVertGapUMiss;     // fraction of charge in the horizontal gaps that is missing on U
-    float                  fFractHorizGapVMiss;     // fraction of charge in the horizontal gap that is missing on V
-    float                  fFractVertGapVMiss;     // fraction of charge in the horizontal gaps that is missing on V
-    float                  fFractHorizGapZMiss;     // fraction of charge in the horizontal gap that is missing on Z (collection)
-    float                  fFractVertGapZMiss;     // fraction of charge in the horizontal gaps that is missing on Z (collection
-    float                  fFractHorizGapUCollect;     // fraction of charge in the horizontal gap that collects on U
-    float                  fFractVertGapUCollect;     // fraction of charge in the horizontal gaps that collects on U
-    float                  fFractHorizGapVCollect;     // fraction of charge in the horizontal gap that collects on V
-    float                  fFractVertGapVCollect;     // fraction of charge in the horizontal gaps that collects on V
+    std::vector<float> fFractUUCollect;    // fraction of charge that collects on U (non-transparency) when charge drifts over the comb holding U wires
+    std::vector<float> fFractUVCollect;    // fraction of charge that collects on U (non-transparency) when charge drifts over the comb holding V wires
+    std::vector<float> fFractVUCollect;    // fraction of charge that collects on V (non-transparency) when charge drifts over the comb holding U wires
+    std::vector<float> fFractVVCollect;    // fraction of charge that collects on V (non-transparency) when charge drifts over the comb holding V wires
+    std::vector<float> fFractUUMiss;       // fraction of charge that gets missed on U when charge drifts over the comb holding U
+    std::vector<float> fFractUVMiss;       // fraction of charge that gets missed on U when charge drifts over the comb holding V
+    std::vector<float> fFractVUMiss;       // fraction of charge that gets missed on V when charge drifts over the comb holding U
+    std::vector<float> fFractVVMiss;       // fraction of charge that gets missed on V when charge drifts over the comb holding V
+    std::vector<float> fFractZUMiss;       // fraction of charge that gets missed on Z (collection)  when charge drifts over the comb holding U
+    std::vector<float> fFractZVMiss;       // fraction of charge that gets missed on Z (collection)  when charge drifts over the comb holding V
+    std::vector<float> fFractHorizGapUMiss;     // fraction of charge in the horizontal gap that is missing on U (and not collected)
+    std::vector<float> fFractVertGapUMiss;     // fraction of charge in the horizontal gaps that is missing on U
+    std::vector<float> fFractHorizGapVMiss;     // fraction of charge in the horizontal gap that is missing on V
+    std::vector<float> fFractVertGapVMiss;     // fraction of charge in the horizontal gaps that is missing on V
+    std::vector<float> fFractHorizGapZMiss;     // fraction of charge in the horizontal gap that is missing on Z (collection)
+    std::vector<float> fFractVertGapZMiss;     // fraction of charge in the horizontal gaps that is missing on Z (collection
+    std::vector<float> fFractHorizGapUCollect;     // fraction of charge in the horizontal gap that collects on U
+    std::vector<float> fFractVertGapUCollect;     // fraction of charge in the horizontal gaps that collects on U
+    std::vector<float> fFractHorizGapVCollect;     // fraction of charge in the horizontal gap that collects on V
+    std::vector<float> fFractVertGapVCollect;     // fraction of charge in the horizontal gaps that collects on V
 
     // boundaries of the combs -- cached here for speed
 
@@ -180,7 +180,7 @@ namespace detsim {
     double ycomb13,ycomb14,ycomb15,ycomb16,ycomb17,ycomb18;
 
     GapType_t combtest35t(double x, double y, double z);
-
+    int GapHasDeflector(double x, double y, double z);
 
     double               fOverflowProbs[64];       ///< array of probabilities of 6 LSF bits getting stuck at 000000
     double               fUnderflowProbs[64];     ///< array of probabilities of 6 LSF bits getting stuck at 111111
@@ -269,26 +269,26 @@ namespace detsim {
     fStuckBitsUnderflowProbHistoName = p.get< std::string         >("StuckBitsUnderflowProbHistoName");
   
     fSaveEmptyChannel    = p.get< bool >("SaveEmptyChannel");  
-    fFractUUCollect      = p.get< float >("FractUUCollect");
-    fFractUVCollect      = p.get< float >("FractUVCollect");
-    fFractVUCollect      = p.get< float >("FractVUCollect");
-    fFractVVCollect      = p.get< float >("FractVVCollect");
-    fFractUUMiss         = p.get< float >("FractUUMiss");
-    fFractUVMiss         = p.get< float >("FractUVMiss");
-    fFractVUMiss         = p.get< float >("FractVUMiss");
-    fFractVVMiss         = p.get< float >("FractVVMiss");
-    fFractZUMiss         = p.get< float >("FractZUMiss");
-    fFractZVMiss         = p.get< float >("FractZVMiss");
-    fFractHorizGapUMiss  = p.get< float >("FractHorizGapUMiss");
-    fFractVertGapUMiss   = p.get< float >("FractVertGapUMiss");
-    fFractHorizGapVMiss  = p.get< float >("FractHorizGapVMiss");
-    fFractVertGapVMiss   = p.get< float >("FractVertGapVMiss");
-    fFractHorizGapZMiss  = p.get< float >("FractHorizGapZMiss");
-    fFractVertGapZMiss   = p.get< float >("FractVertGapZMiss");
-    fFractHorizGapUCollect  = p.get< float >("FractHorizGapUCollect");
-    fFractVertGapUCollect   = p.get< float >("FractVertGapUCollect");
-    fFractHorizGapVCollect  = p.get< float >("FractHorizGapVCollect");
-    fFractVertGapVCollect   = p.get< float >("FractVertGapVCollect");
+    fFractUUCollect         = p.get< std::vector<float> >("FractUUCollect");
+    fFractUVCollect         = p.get< std::vector<float> >("FractUVCollect");
+    fFractVUCollect         = p.get< std::vector<float> >("FractVUCollect");
+    fFractVVCollect         = p.get< std::vector<float> >("FractVVCollect");
+    fFractUUMiss            = p.get< std::vector<float> >("FractUUMiss");
+    fFractUVMiss            = p.get< std::vector<float> >("FractUVMiss");
+    fFractVUMiss            = p.get< std::vector<float> >("FractVUMiss");
+    fFractVVMiss            = p.get< std::vector<float> >("FractVVMiss");
+    fFractZUMiss            = p.get< std::vector<float> >("FractZUMiss");
+    fFractZVMiss            = p.get< std::vector<float> >("FractZVMiss");
+    fFractHorizGapUMiss     = p.get< std::vector<float> >("FractHorizGapUMiss");
+    fFractVertGapUMiss      = p.get< std::vector<float> >("FractVertGapUMiss");
+    fFractHorizGapVMiss     = p.get< std::vector<float> >("FractHorizGapVMiss");
+    fFractVertGapVMiss      = p.get< std::vector<float> >("FractVertGapVMiss");
+    fFractHorizGapZMiss     = p.get< std::vector<float> >("FractHorizGapZMiss");
+    fFractVertGapZMiss      = p.get< std::vector<float> >("FractVertGapZMiss");
+    fFractHorizGapUCollect  = p.get< std::vector<float> >("FractHorizGapUCollect");
+    fFractVertGapUCollect   = p.get< std::vector<float> >("FractVertGapUCollect");
+    fFractHorizGapVCollect  = p.get< std::vector<float> >("FractHorizGapVCollect");
+    fFractVertGapVCollect   = p.get< std::vector<float> >("FractVertGapVCollect");
 
     return;
   }
@@ -649,6 +649,8 @@ namespace detsim {
 
     unsigned int plane_number = 0;
 
+    int dflag = 0;
+
     for(chan = 0; chan < geo->Nchannels(); chan++) {    
       
  
@@ -684,23 +686,24 @@ namespace detsim {
 		      }
 		    case UCOMB:
 		      {
+                        dflag = GapHasDeflector(ide.x,ide.y,ide.z);
 			switch (view)
 			  {
 			  case geo::kU:
 			    {
-			      fChargeWork[t] += ide.numElectrons * (1.0-fFractUUCollect-fFractUUMiss);
-			      fChargeWorkCollInd[t] += ide.numElectrons * fFractUUCollect;
+                              fChargeWork[t] += ide.numElectrons * (1.0 - fFractUUCollect[dflag] - fFractUUMiss[dflag]);
+	                      fChargeWorkCollInd[t] += ide.numElectrons * fFractUUCollect[dflag];
 			      break;
 			    }
 			  case geo::kV:
 			    {
-			      fChargeWork[t] += ide.numElectrons * (1.0-fFractVUCollect-fFractUUCollect-fFractVUMiss);
-			      fChargeWorkCollInd[t] += ide.numElectrons * fFractVUCollect;
+                              fChargeWork[t] += ide.numElectrons * (1.0 - fFractVUCollect[dflag] - fFractUUCollect[dflag] - fFractVUMiss[dflag]);
+                              fChargeWorkCollInd[t] += ide.numElectrons * fFractVUCollect[dflag];
 			      break;
 			    }
 			  case geo::kZ:
 			    {
-			      fChargeWork[t] += ide.numElectrons * (1.0-fFractVUCollect-fFractUUCollect-fFractZUMiss);
+                              fChargeWork[t] += ide.numElectrons * (1.0-fFractVUCollect[dflag]-fFractUUCollect[dflag]-fFractZUMiss[dflag]);
 			      break;
 			    }
 			  default:
@@ -712,23 +715,24 @@ namespace detsim {
 		      }
 		    case VCOMB:
 		      {
+                        dflag = GapHasDeflector(ide.x,ide.y,ide.z);
 			switch (view)
 			  {
 			  case geo::kU:
 			    {
-			      fChargeWork[t] += ide.numElectrons * (1.0-fFractUVCollect-fFractUVMiss);
-			      fChargeWorkCollInd[t] += ide.numElectrons * fFractUVCollect;
+                              fChargeWork[t] += ide.numElectrons * (1.0 - fFractUVCollect[dflag] - fFractUVMiss[dflag]);
+	                      fChargeWorkCollInd[t] += ide.numElectrons * fFractUVCollect[dflag];
 			      break;
 			    }
 			  case geo::kV:
 			    {
-			      fChargeWork[t] += ide.numElectrons * (1.0-fFractUVCollect-fFractVVCollect-fFractVVMiss);
-			      fChargeWorkCollInd[t] += ide.numElectrons * fFractVVCollect;
+                              fChargeWork[t] += ide.numElectrons * (1.0 - fFractVVCollect[dflag] - fFractUVCollect[dflag] - fFractVVMiss[dflag]);
+                              fChargeWorkCollInd[t] += ide.numElectrons * fFractVVCollect[dflag];
 			      break;
 			    }
 			  case geo::kZ:
 			    {
-			      fChargeWork[t] += ide.numElectrons * (1.0-fFractVVCollect-fFractUVCollect-fFractZVMiss);
+                              fChargeWork[t] += ide.numElectrons * (1.0-fFractVVCollect[dflag]-fFractUVCollect[dflag]-fFractZVMiss[dflag]);
 			      break;
 			    }
 			  default:
@@ -740,23 +744,24 @@ namespace detsim {
 		      }
 		    case HORIZGAP:
 		      {
+                        dflag = GapHasDeflector(ide.x,ide.y,ide.z);
 			switch (view)
 			  {
 			  case geo::kU:
 			    {
-			      fChargeWork[t] += ide.numElectrons * (1.0-fFractHorizGapUMiss-fFractHorizGapUCollect);
-			      fChargeWorkCollInd[t] += ide.numElectrons * fFractHorizGapUCollect;
+                              fChargeWork[t] += ide.numElectrons * (1.0-fFractHorizGapUMiss[dflag]-fFractHorizGapUCollect[dflag]);
+                              fChargeWorkCollInd[t] += ide.numElectrons * fFractHorizGapUCollect[dflag];
 			      break;
 			    }
 			  case geo::kV:
 			    {
-			      fChargeWork[t] += ide.numElectrons * (1.0-fFractHorizGapVMiss-fFractHorizGapUCollect-fFractHorizGapVCollect);
-			      fChargeWorkCollInd[t] += ide.numElectrons * fFractHorizGapVCollect;
+                              fChargeWork[t] += ide.numElectrons * (1.0-fFractHorizGapVMiss[dflag]-fFractHorizGapUCollect[dflag]-fFractHorizGapVCollect[dflag]);
+                              fChargeWorkCollInd[t] += ide.numElectrons * fFractHorizGapVCollect[dflag];
 			      break;
 			    }
 			  case geo::kZ:
 			    {
-			      fChargeWork[t] += ide.numElectrons * (1.0-fFractHorizGapZMiss-fFractHorizGapUCollect-fFractHorizGapVCollect);
+                              fChargeWork[t] += ide.numElectrons * (1.0-fFractHorizGapZMiss[dflag]-fFractHorizGapUCollect[dflag]-fFractHorizGapVCollect[dflag]);
 			      break;
 			    }
 			  default:
@@ -768,23 +773,24 @@ namespace detsim {
 		      }
 		    case VERTGAP:
 		      {
+                        dflag = GapHasDeflector(ide.x,ide.y,ide.z);
 			switch (view)
 			  {
 			  case geo::kU:
 			    {
-			      fChargeWork[t] += ide.numElectrons * (1.0-fFractVertGapUMiss-fFractVertGapUCollect);
-			      fChargeWorkCollInd[t] += ide.numElectrons * fFractVertGapUCollect;
+                              fChargeWork[t] += ide.numElectrons * (1.0-fFractVertGapUMiss[dflag]-fFractVertGapUCollect[dflag]);
+                              fChargeWorkCollInd[t] += ide.numElectrons * fFractVertGapUCollect[dflag];
 			      break;
 			    }
 			  case geo::kV:
 			    {
-			      fChargeWork[t] += ide.numElectrons * (1.0-fFractVertGapVMiss-fFractVertGapUCollect-fFractVertGapVCollect);
-			      fChargeWorkCollInd[t] += ide.numElectrons * fFractVertGapVCollect;
+                              fChargeWork[t] += ide.numElectrons * (1.0-fFractVertGapVMiss[dflag]-fFractVertGapUCollect[dflag]-fFractVertGapVCollect[dflag]);
+                              fChargeWorkCollInd[t] += ide.numElectrons * fFractVertGapVCollect[dflag];
 			      break;
 			    }
 			  case geo::kZ:
 			    {
-			      fChargeWork[t] += ide.numElectrons * (1.0-fFractVertGapZMiss-fFractVertGapUCollect-fFractVertGapVCollect);
+                              fChargeWork[t] += ide.numElectrons * (1.0-fFractVertGapZMiss[dflag]-fFractVertGapUCollect[dflag]-fFractVertGapVCollect[dflag]);
 			      break;
 			    }
 			  default:
@@ -1354,6 +1360,12 @@ namespace detsim {
     if (z<zcomb18) return UCOMB;  // over U comb
     return VERTGAP; // off the end in Z.
 
+  }
+
+  int SimWireDUNE35t::GapHasDeflector(double x, double y, double z) 
+  {
+    if ( y < ycomb12 && y > ycomb7 && x > 0 &&  z < zcomb9 && z > zcomb4 ) return 1;
+    return 0;
   }
 
 }
