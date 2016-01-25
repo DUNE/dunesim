@@ -13,26 +13,26 @@ Dune35tSimChannelExtractService::
 Dune35tSimChannelExtractService(fhicl::ParameterSet const& pset, art::ActivityRegistry&)
 : m_ntick(0),
   fFirstCollectionChannel(9999999) {
-  fFractUUCollect         = pset.get< float >("FractUUCollect");
-  fFractUVCollect         = pset.get< float >("FractUVCollect");
-  fFractVUCollect         = pset.get< float >("FractVUCollect");
-  fFractVVCollect         = pset.get< float >("FractVVCollect");
-  fFractUUMiss            = pset.get< float >("FractUUMiss");
-  fFractUVMiss            = pset.get< float >("FractUVMiss");
-  fFractVUMiss            = pset.get< float >("FractVUMiss");
-  fFractVVMiss            = pset.get< float >("FractVVMiss");
-  fFractZUMiss            = pset.get< float >("FractZUMiss");
-  fFractZVMiss            = pset.get< float >("FractZVMiss");
-  fFractHorizGapUMiss     = pset.get< float >("FractHorizGapUMiss");
-  fFractVertGapUMiss      = pset.get< float >("FractVertGapUMiss");
-  fFractHorizGapVMiss     = pset.get< float >("FractHorizGapVMiss");
-  fFractVertGapVMiss      = pset.get< float >("FractVertGapVMiss");
-  fFractHorizGapZMiss     = pset.get< float >("FractHorizGapZMiss");
-  fFractVertGapZMiss      = pset.get< float >("FractVertGapZMiss");
-  fFractHorizGapUCollect  = pset.get< float >("FractHorizGapUCollect");
-  fFractVertGapUCollect   = pset.get< float >("FractVertGapUCollect");
-  fFractHorizGapVCollect  = pset.get< float >("FractHorizGapVCollect");
-  fFractVertGapVCollect   = pset.get< float >("FractVertGapVCollect");
+  fFractUUCollect         = pset.get< std::vector<float> >("FractUUCollect");
+  fFractUVCollect         = pset.get< std::vector<float> >("FractUVCollect");
+  fFractVUCollect         = pset.get< std::vector<float> >("FractVUCollect");
+  fFractVVCollect         = pset.get< std::vector<float> >("FractVVCollect");
+  fFractUUMiss            = pset.get< std::vector<float> >("FractUUMiss");
+  fFractUVMiss            = pset.get< std::vector<float> >("FractUVMiss");
+  fFractVUMiss            = pset.get< std::vector<float> >("FractVUMiss");
+  fFractVVMiss            = pset.get< std::vector<float> >("FractVVMiss");
+  fFractZUMiss            = pset.get< std::vector<float> >("FractZUMiss");
+  fFractZVMiss            = pset.get< std::vector<float> >("FractZVMiss");
+  fFractHorizGapUMiss     = pset.get< std::vector<float> >("FractHorizGapUMiss");
+  fFractVertGapUMiss      = pset.get< std::vector<float> >("FractVertGapUMiss");
+  fFractHorizGapVMiss     = pset.get< std::vector<float> >("FractHorizGapVMiss");
+  fFractVertGapVMiss      = pset.get< std::vector<float> >("FractVertGapVMiss");
+  fFractHorizGapZMiss     = pset.get< std::vector<float> >("FractHorizGapZMiss");
+  fFractVertGapZMiss      = pset.get< std::vector<float> >("FractVertGapZMiss");
+  fFractHorizGapUCollect  = pset.get< std::vector<float> >("FractHorizGapUCollect");
+  fFractVertGapUCollect   = pset.get< std::vector<float> >("FractVertGapUCollect");
+  fFractHorizGapVCollect  = pset.get< std::vector<float> >("FractHorizGapVCollect");
+  fFractVertGapVCollect   = pset.get< std::vector<float> >("FractVertGapVCollect");
   init();
 }
 
@@ -40,6 +40,7 @@ Dune35tSimChannelExtractService(fhicl::ParameterSet const& pset, art::ActivityRe
 
 int Dune35tSimChannelExtractService::
 extract(const sim::SimChannel* psc, AdcSignalVector& fChargeWork) const {
+  int dflag = 0;
   fChargeWork.clear();
   fChargeWork.resize(m_ntick, 0.0);
   if ( psc == nullptr ) return 0;
@@ -59,73 +60,85 @@ extract(const sim::SimChannel* psc, AdcSignalVector& fChargeWork) const {
           fChargeWork[t] += ide.numElectrons;
           break;
         case UCOMB:
+	  {
+	  dflag = GapHasDeflector(ide.x,ide.y,ide.z);
           switch (view) {
             case geo::kU:
-              fChargeWork[t] += ide.numElectrons * (1.0-fFractUUCollect-fFractUUMiss);
-              fChargeWorkCollInd[t] += ide.numElectrons * fFractUUCollect;
+	      fChargeWork[t] += ide.numElectrons * (1.0 - fFractUUCollect[dflag] - fFractUUMiss[dflag]);
+	      fChargeWorkCollInd[t] += ide.numElectrons * fFractUUCollect[dflag];
               break;
             case geo::kV:
-              fChargeWork[t] += ide.numElectrons * (1.0-fFractVUCollect-fFractUUCollect-fFractVUMiss);
-              fChargeWorkCollInd[t] += ide.numElectrons * fFractVUCollect;
+              fChargeWork[t] += ide.numElectrons * (1.0 - fFractVUCollect[dflag] - fFractUUCollect[dflag] - fFractVUMiss[dflag]);
+              fChargeWorkCollInd[t] += ide.numElectrons * fFractVUCollect[dflag];
               break;
             case geo::kZ:
-              fChargeWork[t] += ide.numElectrons * (1.0-fFractVUCollect-fFractUUCollect-fFractZUMiss);
+              fChargeWork[t] += ide.numElectrons * (1.0-fFractVUCollect[dflag]-fFractUUCollect[dflag]-fFractZUMiss[dflag]);
               break;
             default:
               throw cet::exception(fname) << "ILLEGAL VIEW Type: " << view <<"\n";
           }
           break;
+	  }
         case VCOMB:
+	  {
+	  dflag = GapHasDeflector(ide.x,ide.y,ide.z);
           switch (view) {
             case geo::kU:
-              fChargeWork[t] += ide.numElectrons * (1.0-fFractUVCollect-fFractUVMiss);
-              fChargeWorkCollInd[t] += ide.numElectrons * fFractUVCollect;
+	      fChargeWork[t] += ide.numElectrons * (1.0 - fFractUVCollect[dflag] - fFractUVMiss[dflag]);
+	      fChargeWorkCollInd[t] += ide.numElectrons * fFractUVCollect[dflag];
               break;
             case geo::kV:
-              fChargeWork[t] += ide.numElectrons * (1.0-fFractUVCollect-fFractVVCollect-fFractVVMiss);
-              fChargeWorkCollInd[t] += ide.numElectrons * fFractVVCollect;
+	      fChargeWork[t] += ide.numElectrons * (1.0 - fFractVVCollect[dflag] - fFractUVCollect[dflag] - fFractVVMiss[dflag]);
+	      fChargeWorkCollInd[t] += ide.numElectrons * fFractVVCollect[dflag];
               break;
             case geo::kZ:
-              fChargeWork[t] += ide.numElectrons * (1.0-fFractVVCollect-fFractUVCollect-fFractZVMiss);
+              fChargeWork[t] += ide.numElectrons * (1.0-fFractVVCollect[dflag]-fFractUVCollect[dflag]-fFractZVMiss[dflag]);
               break;
             default:
               throw cet::exception(fname) << "ILLEGAL VIEW Type: " << view <<"\n";
           }
           break;
+	  }
         case HORIZGAP:
+	  {
+	  dflag = GapHasDeflector(ide.x,ide.y,ide.z);
           switch (view) {
             case geo::kU:
-              fChargeWork[t] += ide.numElectrons * (1.0-fFractHorizGapUMiss-fFractHorizGapUCollect);
-              fChargeWorkCollInd[t] += ide.numElectrons * fFractHorizGapUCollect;
+              fChargeWork[t] += ide.numElectrons * (1.0-fFractHorizGapUMiss[dflag]-fFractHorizGapUCollect[dflag]);
+              fChargeWorkCollInd[t] += ide.numElectrons * fFractHorizGapUCollect[dflag];
               break;
             case geo::kV:
-              fChargeWork[t] += ide.numElectrons * (1.0-fFractHorizGapVMiss-fFractHorizGapUCollect-fFractHorizGapVCollect);
-              fChargeWorkCollInd[t] += ide.numElectrons * fFractHorizGapVCollect;
+              fChargeWork[t] += ide.numElectrons * (1.0-fFractHorizGapVMiss[dflag]-fFractHorizGapUCollect[dflag]-fFractHorizGapVCollect[dflag]);
+              fChargeWorkCollInd[t] += ide.numElectrons * fFractHorizGapVCollect[dflag];
               break;
             case geo::kZ:
-              fChargeWork[t] += ide.numElectrons * (1.0-fFractHorizGapZMiss-fFractHorizGapUCollect-fFractHorizGapVCollect);
+              fChargeWork[t] += ide.numElectrons * (1.0-fFractHorizGapZMiss[dflag]-fFractHorizGapUCollect[dflag]-fFractHorizGapVCollect[dflag]);
               break;
             default:
               throw cet::exception(fname) << "ILLEGAL VIEW Type: " << view <<"\n";
           }
           break;
+	  }
         case VERTGAP:
+	  {
+	  dflag = GapHasDeflector(ide.x,ide.y,ide.z);
           switch (view) {
             case geo::kU:
-              fChargeWork[t] += ide.numElectrons * (1.0-fFractVertGapUMiss-fFractVertGapUCollect);
-              fChargeWorkCollInd[t] += ide.numElectrons * fFractVertGapUCollect;
+              fChargeWork[t] += ide.numElectrons * (1.0-fFractVertGapUMiss[dflag]-fFractVertGapUCollect[dflag]);
+              fChargeWorkCollInd[t] += ide.numElectrons * fFractVertGapUCollect[dflag];
               break;
             case geo::kV:
-              fChargeWork[t] += ide.numElectrons * (1.0-fFractVertGapVMiss-fFractVertGapUCollect-fFractVertGapVCollect);
-              fChargeWorkCollInd[t] += ide.numElectrons * fFractVertGapVCollect;
+              fChargeWork[t] += ide.numElectrons * (1.0-fFractVertGapVMiss[dflag]-fFractVertGapUCollect[dflag]-fFractVertGapVCollect[dflag]);
+              fChargeWorkCollInd[t] += ide.numElectrons * fFractVertGapVCollect[dflag];
               break;
             case geo::kZ:
-              fChargeWork[t] += ide.numElectrons * (1.0-fFractVertGapZMiss-fFractVertGapUCollect-fFractVertGapVCollect);
+              fChargeWork[t] += ide.numElectrons * (1.0-fFractVertGapZMiss[dflag]-fFractVertGapUCollect[dflag]-fFractVertGapVCollect[dflag]);
               break;
             default:
               throw cet::exception(fname) << "ILLEGAL VIEW Type: " << view <<"\n";
           }
           break;
+	  }
         case NONACTIVE:
           break;
       }  // end switch gaptype
@@ -353,6 +366,18 @@ Dune35tSimChannelExtractService::combtest35t(double x, double y, double z) const
   return VERTGAP; // off the end in Z.
 }
 
+  // see the ASCII cartoon of APA's at the bottom of this file for a picture of what all the boundaries are
+  // returns 0 if this gap does not have a deflector as described by Bo Yu, LBNE DocDB 10073.  Returns 1 if this gap does.
+  // Also returns 0 if we are not in a gap.   This is an int instead of a bool so it can be used as the index into the parameter array
+  // the deflector is between APA's 0 and 1 in the numbering corresponding to the cartoon below
+
+  int Dune35tSimChannelExtractService::GapHasDeflector(double x, double y, double z) const
+  {
+    if ( y < ycomb12 && y > ycomb7 && x > 0 &&  z < zcomb9 && z > zcomb4 ) return 1;
+    return 0;
+  }
+
+
 /* -------------------------------------------------
    APA Cartoons for the combtest35t method
 
@@ -432,7 +457,7 @@ Dune35tSimChannelExtractService::combtest35t(double x, double y, double z) const
    |||                                        |||
    |||                                        |||
    |||               APA2                     |||
-  |||                                        |||
+   |||                                        |||
    |||                                        |||
    |||                                        |||
    |||                                        |||
