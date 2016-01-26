@@ -7,22 +7,22 @@ BEGIN_PROLOG
 dune4apa_radiogen_apaexclude:
 {
  module_type:           "RadioGen"
- Nuclide:               [ "39Ar", "39Ar" ]  # list of nuclides to simulate, supported so far: 39Ar, 60Co, 85Kr, 40K, 232Th, 238U
- BqPercc:               [ 0.00141, 0.00141 ]      # activity -- Becquerels per cc. 0.00141 assumes 1.01 Bq/kg (typical for 39Ar) and a density of 1.396 g/cc for LAr
- X0:                    [    0.,   -3. ]     # in cm in world coordinates, bottom corner of box
- X1:                    [  475., -475. ]     # in cm in world coordinates, top corner of box
- Y0:                    [ -750., -750. ]     # in cm in world coordinates, bottom corner of box
- Y1:                    [  800.,  800. ]     # in cm in world coordinates, top corner of box
- Z0:                    [  -55.,  -55. ]     # in cm in world coordinates, bottom corner of box
- Z1:                    [  555.,  555. ]     # in cm in world coordinates, top corner of box
- T0:                    [ -3200000., -3200000. ]  # starting time in ns
- T1:                    [  3200000.,  3200000. ]   # ending time in ns
+ Nuclide:               [ "39Ar", "39Ar" ]       # list of nuclides to simulate, supported so far: 39Ar, 60Co, 85Kr, 40K, 232Th, 238U, 222Rn
+ BqPercc:               [ 0.00141, 0.00141 ]     # activity -- Becquerels per cc. 0.00141 assumes 1.01 Bq/kg (typical for 39Ar) and a density of 1.396 g/cc for LAr
+ X0:                    [    0.,   -3. ]         # in cm in world coordinates, bottom corner of box
+ X1:                    [  475., -475. ]         # in cm in world coordinates, top corner of box
+ Y0:                    [ -750., -750. ]         # in cm in world coordinates, bottom corner of box
+ Y1:                    [  800.,  800. ]         # in cm in world coordinates, top corner of box
+ Z0:                    [  -55.,  -55. ]         # in cm in world coordinates, bottom corner of box
+ Z1:                    [  555.,  555. ]         # in cm in world coordinates, top corner of box
+ T0:                    [ -3200000., -3200000. ] # starting time in ns
+ T1:                    [  3200000.,  3200000. ] # ending time in ns
 }
 
 dune4apa_radiogen:
 {
  module_type:           "RadioGen"
- Nuclide:               [ "39Ar" ]    # list of nuclides to simulate, supported so far: 39Ar, 60Co, 85Kr, 40K, 232Th, 238U
+ Nuclide:               [ "39Ar" ]    # list of nuclides to simulate, supported so far: 39Ar, 60Co, 85Kr, 40K, 232Th, 238U, 222Rn
  BqPercc:               [ 0.00141 ]   # activity -- Becquerels per cc. 0.00141 assumes 1.01 Bq/kg (typical for 39Ar) and a density of 1.396 g/cc for LAr
  X0:                    [ -475. ]     # in cm in world coordinates, bottom corner of box
  X1:                    [  475. ]     # in cm in world coordinates, top corner of box
@@ -33,5 +33,9 @@ dune4apa_radiogen:
  T0:                    [ -3200000. ] # starting time in ns
  T1:                    [  3200000. ] # ending time in ns
 }
+
+dune4apa_radiogen_rn222: @local::dune4apa_radiogen
+dune4apa_radiogen_rn222.Nuclide: [ "222Rn" ]
+dune4apa_radiogen_rn222.BqPercc: [ 0.0141  ] # Don't know this activity yet: try 10x 39Ar for now
 
 END_PROLOG
