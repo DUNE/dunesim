@@ -21,6 +21,12 @@ scxgeneric: {
   service_provider: GenericSimChannelExtractService
 }
 
+# signal extractor service for dune dual-phase detector
+scxdp: {
+  service_provider: DPhaseSimChannelExtractService
+  DPGainPerView: 10.0
+}
+
 scx35t: {
   service_provider: Dune35tSimChannelExtractService
   FractHorizGapUCollect: [ 0.1, 0.0 ]
@@ -130,6 +136,29 @@ padprovided: {
   service_provider: ProvidedPedestalAdditionService
   NoiseScale: 1.0
 }
+
+# pedestal for dual-phase collection views
+peddplegacy: {
+  service_provider: SIOVDetPedestalService
+  DetPedestalRetrievalAlg: {
+    AlgName:            "DetPedestalRetrievalAlg"
+    DatabaseRetrievalAlg: {
+      AlgName: "DatabaseRetrievalAlg"
+      DBFolderName:  ""
+      DBUrl: ""
+      DBTag: ""
+    }
+    UseDB: false
+    UseFile: false
+    DefaultCollMean:  5.0
+    DefaultCollRms:   0.0
+    DefaultIndMean:   5.0
+    DefaultIndRms:    0.0
+    DefaultMeanErr:   0.0
+    DefaultRmsErr:    0.0
+  }
+}
+
 
 #***********************************************************************
 
