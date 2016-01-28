@@ -26,6 +26,17 @@ simple_plugin(GenericSimChannelExtractService   "service"
                 ${ROOT_BASIC_LIB_LIST}
              )
 
+simple_plugin(DPhaseSimChannelExtractService   "service"
+                DetSim
+                Simulation
+                Utilities
+                SignalShapingServiceDUNEDPhase_service
+                ${ART_UTILITIES}
+		${ART_FRAMEWORK_CORE}
+                ${ROOT_BASIC_LIB_LIST}
+		${SEEDSERVICE_SERVICE}
+		${CLHEP}
+             )
 simple_plugin(ExponentialChannelNoiseService   "service"
                 Geometry
                 SignalShapingServiceDUNE35t_service
