@@ -43,5 +43,11 @@ dune_fd_genie_anu_simple_flux_workspace_window_rotated_tpc: @local::dune_fd_geni
 dune_fd_genie_anu_simple_flux_workspace_window_rotated_tpc.FluxSearchPaths: "/pnfs/dune/persistent/TaskForce_Flux/ref_01/antineutrino/gsimple/far/windowRotated10DegreesAroundY/"
 dune_fd_genie_anu_simple_flux_workspace_window_rotated_tpc.FluxFiles: ["gsimple_LBNE-FarDet_Workspace_Rotated_Window_g4lbne_v3r3p9_QGSP_BERT_Nominal_antineutrino_*.root"]
 
+#changes from LARSIM for atm nu
+
+dune_fd_genie_atmo_flux:            @local::standard_genie_atmo_flux
+dune_fd_genie_atmo_flux.TopVolume:  "volCryostat"
+dune_fd_genie_atmo_simple_flux.FluxSearchPaths: "/dune/app/users/santucci/dunetpc/jobs/outputs/atmnu/"
+dune_fd_genie_atmo_flux.FluxFiles: ["fmin10_0401z.sou_nue.txt","fmin10_0401z.sou_num.txt","fmin10_0401z.sou_nbe.txt","fmin10_0401z.sou_nbm.txt"]
 
 END_PROLOG

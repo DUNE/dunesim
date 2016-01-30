@@ -42,6 +42,8 @@ private:
   void init();
   GapType_t combtest35t(double x, double y, double z) const;
 
+  int GapHasDeflector(double x, double y, double z) const;
+
   art::ServiceHandle<util::LArFFT> m_pfft;
   art::ServiceHandle<util::SignalShapingServiceDUNE35t> m_psss;
   unsigned int m_ntick;
@@ -50,26 +52,26 @@ private:
 
   bool m_init = false;
 
-  float fFractUUCollect;    // fraction of charge that collects on U (non-transparency) when charge drifts over the comb holding U wires
-  float fFractUVCollect;    // fraction of charge that collects on U (non-transparency) when charge drifts over the comb holding V wires
-  float fFractVUCollect;    // fraction of charge that collects on V (non-transparency) when charge drifts over the comb holding U wires
-  float fFractVVCollect;    // fraction of charge that collects on V (non-transparency) when charge drifts over the comb holding V wires
-  float fFractUUMiss;       // fraction of charge that gets missed on U when charge drifts over the comb holding U
-  float fFractUVMiss;       // fraction of charge that gets missed on U when charge drifts over the comb holding V
-  float fFractVUMiss;       // fraction of charge that gets missed on V when charge drifts over the comb holding U
-  float fFractVVMiss;       // fraction of charge that gets missed on V when charge drifts over the comb holding V
-  float fFractZUMiss;       // fraction of charge that gets missed on Z (collection)  when charge drifts over the comb holding U
-  float fFractZVMiss;       // fraction of charge that gets missed on Z (collection)  when charge drifts over the comb holding V
-  float fFractHorizGapUMiss;     // fraction of charge in the horizontal gap that is missing on U (and not collected)
-  float fFractVertGapUMiss;     // fraction of charge in the horizontal gaps that is missing on U
-  float fFractHorizGapVMiss;     // fraction of charge in the horizontal gap that is missing on V
-  float fFractVertGapVMiss;     // fraction of charge in the horizontal gaps that is missing on V
-  float fFractHorizGapZMiss;     // fraction of charge in the horizontal gap that is missing on Z (collection)
-  float fFractVertGapZMiss;     // fraction of charge in the horizontal gaps that is missing on Z (collection
-  float fFractHorizGapUCollect;     // fraction of charge in the horizontal gap that collects on U
-  float fFractVertGapUCollect;     // fraction of charge in the horizontal gaps that collects on U
-  float fFractHorizGapVCollect;     // fraction of charge in the horizontal gap that collects on V
-  float fFractVertGapVCollect;     // fraction of charge in the horizontal gaps that collects on V
+  std::vector<float> fFractUUCollect;    // fraction of charge that collects on U (non-transparency) when charge drifts over the comb holding U wires
+  std::vector<float> fFractUVCollect;    // fraction of charge that collects on U (non-transparency) when charge drifts over the comb holding V wires
+  std::vector<float> fFractVUCollect;    // fraction of charge that collects on V (non-transparency) when charge drifts over the comb holding U wires
+  std::vector<float> fFractVVCollect;    // fraction of charge that collects on V (non-transparency) when charge drifts over the comb holding V wires
+  std::vector<float> fFractUUMiss;       // fraction of charge that gets missed on U when charge drifts over the comb holding U
+  std::vector<float> fFractUVMiss;       // fraction of charge that gets missed on U when charge drifts over the comb holding V
+  std::vector<float> fFractVUMiss;       // fraction of charge that gets missed on V when charge drifts over the comb holding U
+  std::vector<float> fFractVVMiss;       // fraction of charge that gets missed on V when charge drifts over the comb holding V
+  std::vector<float> fFractZUMiss;       // fraction of charge that gets missed on Z (collection)  when charge drifts over the comb holding U
+  std::vector<float> fFractZVMiss;       // fraction of charge that gets missed on Z (collection)  when charge drifts over the comb holding V
+  std::vector<float> fFractHorizGapUMiss;     // fraction of charge in the horizontal gap that is missing on U (and not collected)
+  std::vector<float> fFractVertGapUMiss;     // fraction of charge in the horizontal gaps that is missing on U
+  std::vector<float> fFractHorizGapVMiss;     // fraction of charge in the horizontal gap that is missing on V
+  std::vector<float> fFractVertGapVMiss;     // fraction of charge in the horizontal gaps that is missing on V
+  std::vector<float> fFractHorizGapZMiss;     // fraction of charge in the horizontal gap that is missing on Z (collection)
+  std::vector<float> fFractVertGapZMiss;     // fraction of charge in the horizontal gaps that is missing on Z (collection
+  std::vector<float> fFractHorizGapUCollect;     // fraction of charge in the horizontal gap that collects on U
+  std::vector<float> fFractVertGapUCollect;     // fraction of charge in the horizontal gaps that collects on U
+  std::vector<float> fFractHorizGapVCollect;     // fraction of charge in the horizontal gap that collects on V
+  std::vector<float> fFractVertGapVCollect;     // fraction of charge in the horizontal gaps that collects on V
 
   // boundaries of the combs -- cached here for speed
   double zcomb1,zcomb2,zcomb3,zcomb4,zcomb5,zcomb6;

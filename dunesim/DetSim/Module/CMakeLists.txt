@@ -14,6 +14,7 @@ art_make( BASENAME_ONLY
                         DetSim
                         TimeService_service
                         SignalShapingServiceDUNE10kt_service
+			SignalShapingServiceDUNEDPhase_service
                         SignalShapingServiceDUNE35t_service
                         ${SEEDSERVICE_SERVICE} # artextensions
                         ${ART_FRAMEWORK_CORE}
