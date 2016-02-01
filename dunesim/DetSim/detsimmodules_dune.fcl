@@ -310,7 +310,7 @@ dune35t_simcounter:
     TriggerEfficiency:     1.0
 # below changed on Feb. 1 2016 to match data . . 
 #    ClockSpeedCounter:     31.25 # MHz
-    ClockSpeedCounter:     15.625 # MHz
+    ClockSpeedCounter:     64.0 # MHz
     CombinedTimeDelay:     160 # ns. cable length delay + various electronics delays
 }
 
