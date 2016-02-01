@@ -124,7 +124,7 @@ detsim::SimCounter35t::SimCounter35t(fhicl::ParameterSet const & p)
   fBSUTriggerThreshold(p.get<double>("BSUTriggerThreshold",0.5)),// MeV
   fTSUTriggerThreshold(p.get<double>("TSUTriggerThreshold",0.25)),// MeV
   fTriggerEfficiency(p.get<double>("TriggerEfficiency",1.)),
-  fClockSpeedCounter(p.get<double>("ClockSpeedCounter",31.25)), // MHz
+  fClockSpeedCounter(p.get<double>("ClockSpeedCounter",64)), // MHz
   fCombinedTimeDelay(p.get<double>("CombinedTimeDelay",160)) // ns
 {
   art::ServiceHandle<artext::SeedService>()->createEngine(*this, "HepJamesRandom", "rand");
