@@ -105,6 +105,13 @@ cmpreplace: {
   Zero: 0
 }
 
+cmphuffman: {
+  service_provider: "LarsoftHuffmanCompressService"
+  UseBlock:         "true"
+  UseHuffman:       "true"
+}
+
+
 #***********************************************************************
 
 pedlegacy: {
