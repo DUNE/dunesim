@@ -7,20 +7,29 @@
 
 using std::string;
 using std::ostream;
+using std::cout;
 using std::endl;
 
 //**********************************************************************
 
 LarsoftHuffmanCompressService::
-LarsoftHuffmanCompressService(bool useBlock, bool useHuffman)
-: m_UseBlock(useBlock), m_UseHuffman(useHuffman) { }
+LarsoftHuffmanCompressService(bool useBlock, bool useHuffman, int logLevel)
+: m_UseBlock(useBlock), m_UseHuffman(useHuffman), m_LogLevel(logLevel) { }
 
 //**********************************************************************
 
 LarsoftHuffmanCompressService::
-LarsoftHuffmanCompressService(const fhicl::ParameterSet& pset, art::ActivityRegistry&) {
+LarsoftHuffmanCompressService(const fhicl::ParameterSet& pset, art::ActivityRegistry&)
+: m_LogLevel(1) {
+  const string myname = "LarsoftHuffmanCompressService::ctor: ";
   m_UseBlock   = pset.get<bool>("UseBlock");
   m_UseHuffman = pset.get<bool>("UseHuffman");
+  pset.get_if_present<int>("LogLevel", m_LogLevel);
+  if ( m_LogLevel > 0 ) {
+    cout << myname << "   UseBlock: " << m_UseBlock << endl;
+    cout << myname << " UseHuffman: " << m_UseHuffman << endl;
+    cout << myname << "   LogLevel: " << m_LogLevel << endl;
+  }
 }
   
 //**********************************************************************
@@ -39,8 +48,46 @@ compress(AdcCountVector& sigs, const AdcFilterVector& keep, AdcCount offset,
     ReplaceCompressService repsvc;
     repsvc.compress(sigs, keep, offset, comp);
   }
+  unsigned int insize = sigs.size();
   if  ( m_UseHuffman ) {
+    if ( m_LogLevel > 1 ) cout << myname << "Size before Huffman: " << insize << endl;
+    if ( m_LogLevel > 2 ) {
+      for ( unsigned int isig=0; isig<sigs.size(); ++isig ) {
+        cout << myname << "  Before sigs[" << isig << "]: " << sigs[isig] << endl;
+        if ( m_LogLevel<5 && isig > 50 ) {
+          cout << myname << "  ..." << endl;
+          break;
+        }
+      }
+    }
     raw::CompressHuffman(sigs);
+    if ( m_LogLevel > 1 ) cout << myname << "Size  after Huffman: " << sigs.size() << endl;
+    if ( m_LogLevel > 2 ) {
+      for ( unsigned int isig=0; isig<sigs.size(); ++isig ) {
+        cout << myname << "   After sigs[" << isig << "]: " << sigs[isig] << endl;
+        if ( m_LogLevel<4 && isig > 50 ) {
+          cout << myname << "  ..." << endl;
+          break;
+        }
+      }
+    }
+#if 1
+    // Uncompress as test.
+    if ( m_LogLevel > 1 ) {
+      AdcCountVector usgs(insize, 0);
+      raw::UncompressHuffman(sigs, usgs);
+      cout << myname << "Size  after uncompress: " << usgs.size() << endl;
+      if ( m_LogLevel > 2 ) {
+        for ( unsigned int isig=0; isig<usgs.size(); ++isig ) {
+          cout << myname << "  Uncomp usgs[" << isig << "]: " << usgs[isig] << endl;
+          if ( m_LogLevel<5 && isig > 50 ) {
+            cout << myname << "  ..." << endl;
+            break;
+          }
+        }
+      }
+    }
+#endif
     if ( m_UseBlock ) comp = raw::kZeroHuffman;
     else              comp = raw::kHuffman;
   }
