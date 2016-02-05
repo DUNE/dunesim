@@ -106,3 +106,5 @@ simple_plugin(StuckBitAdcDistortionService   "service"
                 ${ROOT_BASIC_LIB_LIST}
                 BASENAME_ONLY
              )
+
+add_subdirectory(test)
