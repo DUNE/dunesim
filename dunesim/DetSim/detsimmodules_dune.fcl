@@ -100,21 +100,11 @@ zsonline_nhi2: {
 
 #***********************************************************************
 
-# Compression that replaces suppressed entries with zero.
 cmpreplace: {
   service_provider: ReplaceCompressService
   Zero: 0
 }
 
-# Compression that uses the larsoft block format.
-cmpblock: {
-  service_provider: "LarsoftHuffmanCompressService"
-  UseBlock:         "true"
-  UseHuffman:       "false"
-}
-
-# Compression that uses the larsoft block format and Huffman encoding.
-# Note that the decompression for this is broken in v0_35_00 aned earlier.
 cmphuffman: {
   service_provider: "LarsoftHuffmanCompressService"
   UseBlock:         "true"
