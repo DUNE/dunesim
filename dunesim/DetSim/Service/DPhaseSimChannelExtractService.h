@@ -1,13 +1,8 @@
 // DPhaseSimChannelExtractService.h
-
 //
-// David Adams
-// December 2015
+// Vyacheslav Galymov
+// February 2016
 //
-// Interface for a service that extracts charge from
-// a SimChannel object and assigns it to ticks.
-//
-// vgalymov@ipnl.in2p3.fr
 // Simulate signals from dual-phase detector:
 //      - charge amplification in gas
 //      - charge collection in two views

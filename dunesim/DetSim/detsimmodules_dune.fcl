@@ -105,6 +105,13 @@ cmpreplace: {
   Zero: 0
 }
 
+cmphuffman: {
+  service_provider: "LarsoftHuffmanCompressService"
+  UseBlock:         "true"
+  UseHuffman:       "true"
+}
+
+
 #***********************************************************************
 
 pedlegacy: {
@@ -308,7 +315,9 @@ dune35t_simcounter:
     BSUTriggerThreshold:   0.5 # MeV
     TSUTriggerThreshold:   0.25 # MeV
     TriggerEfficiency:     1.0
-    ClockSpeedCounter:     31.25 # MHz
+# below changed on Feb. 1 2016 to match data . . 
+#    ClockSpeedCounter:     31.25 # MHz
+    ClockSpeedCounter:     64.0 # MHz
     CombinedTimeDelay:     160 # ns. cable length delay + various electronics delays
 }
 

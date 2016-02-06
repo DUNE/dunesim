@@ -180,7 +180,7 @@ namespace filt{
         //Got a requested PDG,  now check that the energy matches the requested range
         TLorentzVector mom4 = particle.Momentum();
         if (mom4.T() > fParticleMinEnergy && mom4.T() < fParticleMaxEnergy){
-          std::cout<<"FOUND INTERESTING PARTICLE"<<std::endl;
+          //std::cout<<"FOUND INTERESTING PARTICLE"<<std::endl;
           return true;
         }
       }
