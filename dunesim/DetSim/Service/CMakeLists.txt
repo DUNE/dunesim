@@ -107,4 +107,4 @@ simple_plugin(StuckBitAdcDistortionService   "service"
                 BASENAME_ONLY
              )
 
-#add_subdirectory(test)
+add_subdirectory(test)
