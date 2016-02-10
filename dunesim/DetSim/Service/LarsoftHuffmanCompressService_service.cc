@@ -7,20 +7,52 @@
 
 using std::string;
 using std::ostream;
+using std::cout;
 using std::endl;
 
+namespace {
+
+// Display signal array.
+//  logLevel >= 3: Show # entries
+//              4: Show at least 50 entries
+//              alllevel: Show all entries
+// All elements if logLevel >= alllevel
+template<class C>
+void logsigs(const C& sigs, int logLevel, int alllevel, string myname) {
+  if ( logLevel > 2 ) cout << myname << " size: " << sigs.size() << endl;
+  if ( logLevel > 2 ) {
+    for ( unsigned int isig=0; isig<sigs.size(); ++isig ) {
+      if ( logLevel<alllevel && isig > 50 ) {
+        cout << myname << "  ..." << endl;
+        break;
+      }
+      cout << myname << "   sigs[" << isig << "]: " << sigs[isig] << endl;
+    }
+  }
+}
+
+} // end unnamed namespace
+
 //**********************************************************************
 
 LarsoftHuffmanCompressService::
-LarsoftHuffmanCompressService(bool useBlock, bool useHuffman)
-: m_UseBlock(useBlock), m_UseHuffman(useHuffman) { }
+LarsoftHuffmanCompressService(bool useBlock, bool useHuffman, int logLevel)
+: m_UseBlock(useBlock), m_UseHuffman(useHuffman), m_LogLevel(logLevel) { }
 
 //**********************************************************************
 
 LarsoftHuffmanCompressService::
-LarsoftHuffmanCompressService(const fhicl::ParameterSet& pset, art::ActivityRegistry&) {
+LarsoftHuffmanCompressService(const fhicl::ParameterSet& pset, art::ActivityRegistry&)
+: m_LogLevel(1) {
+  const string myname = "LarsoftHuffmanCompressService::ctor: ";
   m_UseBlock   = pset.get<bool>("UseBlock");
   m_UseHuffman = pset.get<bool>("UseHuffman");
+  pset.get_if_present<int>("LogLevel", m_LogLevel);
+  if ( m_LogLevel > 0 ) {
+    cout << myname << "   UseBlock: " << m_UseBlock << endl;
+    cout << myname << " UseHuffman: " << m_UseHuffman << endl;
+    cout << myname << "   LogLevel: " << m_LogLevel << endl;
+  }
 }
   
 //**********************************************************************
@@ -29,8 +61,20 @@ int LarsoftHuffmanCompressService::
 compress(AdcCountVector& sigs, const AdcFilterVector& keep, AdcCount offset,
          raw::Compress_t& comp) const {
   const string myname = "LarsoftHuffmanCompressService::compress: ";
+  if ( keep.size() != sigs.size() ) {
+    cout << "ERROR: Filter and ADC have different sizes: " << keep.size()
+         << " != " << sigs.size() << endl;
+    return 1;
+  }
   AdcCountVector newsigs;
   comp = raw::kNone;
+  logsigs(sigs, m_LogLevel, 6, myname + "Before compression");
+  logsigs(keep, m_LogLevel, 6, myname + "Filter");
+  if ( m_LogLevel > 1 ) {
+    int nkeep = 0;
+    for ( bool val : keep ) if ( val ) ++nkeep;
+    cout << myname << "Keeping " << nkeep << "/" << keep.size() << " ticks" << endl;
+  }
   if  ( m_UseBlock ) {
     block(sigs, keep, newsigs);
     sigs = newsigs;
@@ -44,6 +88,7 @@ compress(AdcCountVector& sigs, const AdcFilterVector& keep, AdcCount offset,
     if ( m_UseBlock ) comp = raw::kZeroHuffman;
     else              comp = raw::kHuffman;
   }
+  logsigs(sigs, m_LogLevel, 5, myname + "After compression");
   return 0;
 }
 
@@ -73,7 +118,7 @@ block(const AdcCountVector& sigsin, const AdcFilterVector& keep, AdcCountVector&
   unsigned int zerosuppressedsize = 0;
   bool inblock = false;
   for ( unsigned int i=0; i<adcsize; ++i ) {
-    if ( keep[i] ){
+    if ( keep[i] ) {
       if ( ! inblock ) {
         blockbegin[nblocks] = i;
         blocksize[nblocks] = 0;

@@ -12,6 +12,12 @@
 // FCL parameters:
 //    UseBlock - Put the data in larsoft block format
 //    UseHuffman - Do Huffman encoding
+//    LogLevel - Log messaging level
+//               0 - no messages
+//               1 - Initialization only
+//               2 - Short message for each event
+//               3 - Long message for each event
+//               4 - Very long message for each event
 
 #ifndef LarsoftHuffmanCompressService_H
 #define LarsoftHuffmanCompressService_H
@@ -30,7 +36,7 @@ class LarsoftHuffmanCompressService : public AdcCompressService {
 public:
 
   // Ctor from parameters that characterize the algorithm.
-  LarsoftHuffmanCompressService(bool useBlock, bool useHuffman);
+  LarsoftHuffmanCompressService(bool useBlock, bool useHuffman, int logLevel);
 
   // Ctor from fcl.
   LarsoftHuffmanCompressService(fhicl::ParameterSet const& pset, art::ActivityRegistry&);
@@ -54,6 +60,7 @@ private:
 
   bool m_UseBlock;
   bool m_UseHuffman;
+  int m_LogLevel;
 
 };
 
