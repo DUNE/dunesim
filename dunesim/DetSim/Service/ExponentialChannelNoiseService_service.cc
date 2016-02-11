@@ -10,6 +10,7 @@
 #include "CLHEP/Random/RandFlat.h"
 #include "TH1F.h"
 
+using std::cout;
 using std::ostream;
 using std::endl;
 using std::string;
@@ -19,9 +20,11 @@ using std::string;
 //**********************************************************************
 
 ExponentialChannelNoiseService::
-ExponentialChannelNoiseService(fhicl::ParameterSet const& pset, art::ActivityRegistry&):
+ExponentialChannelNoiseService(fhicl::ParameterSet const& pset)
+: fRandomSeed(-1), fLogLevel(1),
   fNoiseHist(nullptr), fNoiseChanHist(nullptr),
   m_pran(nullptr) {
+  const string myname = "ExponentialChannelNoiseService::ctor: ";
   fNoiseFactZ        = pset.get<double>("NoiseFactZ");
   fNoiseWidthZ       = pset.get<double>("NoiseWidthZ");
   fLowCutoffZ        = pset.get<double>("LowCutoffZ");
@@ -33,14 +36,22 @@ ExponentialChannelNoiseService(fhicl::ParameterSet const& pset, art::ActivityReg
   fLowCutoffV        = pset.get<double>("LowCutoffV");
   fNoiseArrayPoints  = pset.get<unsigned int>("NoiseArrayPoints");
   fOldNoiseIndex     = pset.get<bool>("OldNoiseIndex");
+  bool haveSeed = pset.get_if_present<int>("RandomSeed", fRandomSeed);
+  pset.get_if_present<int>("LogLevel", fLogLevel);
   fNoiseZ.resize(fNoiseArrayPoints);
   fNoiseU.resize(fNoiseArrayPoints);
   fNoiseV.resize(fNoiseArrayPoints);
-  art::ServiceHandle<artext::SeedService> seedSvc;
+  int seed = fRandomSeed;
 #ifdef UseSeedService
+  art::ServiceHandle<artext::SeedService> seedSvc;
   int seed = seedSvc->getSeed("ExponentialChannelNoiseService");
 #else
-  int seed = 1005;
+  if ( ! haveSeed ) {
+    cout << myname << "WARNING: Using hardwired seed." << endl;
+    seed = 1005;
+  } else {
+    cout << myname << "WARNING: Using seed from FCL." << endl;
+  }
 #endif
   art::ServiceHandle<art::TFileService> tfs;
   fNoiseHist     = tfs->make<TH1F>("Noise", ";Noise  (ADC);", 1000,   -10., 10.);
@@ -52,7 +63,16 @@ ExponentialChannelNoiseService(fhicl::ParameterSet const& pset, art::ActivityReg
     generateNoise(fNoiseFactU, fNoiseWidthU, fLowCutoffU, fNoiseU[isam]);
     generateNoise(fNoiseFactV, fNoiseWidthV, fLowCutoffV, fNoiseV[isam]);
   }
+  if ( fLogLevel > 0 ) {
+    cout << myname << "    NoiseFactZ: " << fNoiseFactZ << endl;
+  }
 }
+
+//**********************************************************************
+
+ExponentialChannelNoiseService::
+ExponentialChannelNoiseService(fhicl::ParameterSet const& pset, art::ActivityRegistry&)
+: ExponentialChannelNoiseService(pset) { }
 
 //**********************************************************************
 
