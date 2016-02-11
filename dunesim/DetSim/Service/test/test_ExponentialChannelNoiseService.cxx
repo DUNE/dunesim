@@ -13,10 +13,10 @@
 #include "dune/ArtSupport/ArtServiceHelper.h"
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "art/Framework/Services/Optional/RandomNumberGenerator.h"
-#include "Utilities/DetectorProperties.h"
-#include "Utilities/TimeService.h"
-#include "Utilities/LArFFT.h"
-#include "RawData/raw.h"
+#include "lardata/Utilities/DetectorProperties.h"
+#include "lardata/Utilities/TimeService.h"
+#include "lardata/Utilities/LArFFT.h"
+#include "lardata/RawData/raw.h"
 
 using std::string;
 using std::cout;

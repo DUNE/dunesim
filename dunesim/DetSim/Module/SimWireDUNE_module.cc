@@ -19,12 +19,12 @@
 #include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
-#include "RawData/raw.h"
-#include "Geometry/Geometry.h"
-#include "Simulation/sim.h"
-#include "Simulation/SimChannel.h"
-#include "RawData/RawDigit.h"
-#include "Utilities/DetectorProperties.h"
+#include "lardata/RawData/raw.h"
+#include "larcore/Geometry/Geometry.h"
+#include "larsim/Simulation/sim.h"
+#include "larsim/Simulation/SimChannel.h"
+#include "lardata/RawData/RawDigit.h"
+#include "lardata/Utilities/DetectorProperties.h"
 
 #include "dune/DuneInterface/AdcTypes.h"
 #include "dune/DuneInterface/AdcSuppressService.h"

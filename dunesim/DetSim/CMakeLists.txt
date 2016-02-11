@@ -1,4 +1,4 @@
-# dunetpc/dune/DetSim/CMakeLists.txt
+# dunetpc/dune/larsim_DetSim/CMakeLists.txt
 
 # David Adams
 # December 2015
@@ -8,16 +8,16 @@
 # removed.
 
 art_make( BASENAME_ONLY
-          LIBRARY_NAME DetSim
+          LIBRARY_NAME larsim_DetSim
           LIB_LIBRARIES
-          MODULE_LIBRARIES Geometry
+          MODULE_LIBRARIES larcore_Geometry
 	                dune_Geometry
-			Geometry_service
-			Simulation
-	                Utilities
-			Filters
-			RawData
-			TimeService_service
+			larcore_Geometry_Geometry_service
+			larsim_Simulation
+	                lardata_Utilities
+			larevt_Filters
+			lardata_RawData
+			lardata_Utilities_TimeService_service
                         SignalShapingServiceDUNE10kt_service
 			SignalShapingServiceDUNEDPhase_service
 			SignalShapingServiceDUNE35t_service

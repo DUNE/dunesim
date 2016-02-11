@@ -1,8 +1,8 @@
 // ProvidedPedestalAdditionService.cxx
 
 #include "dune/DetSim/Service/ProvidedPedestalAdditionService.h"
-#include "CalibrationDBI/Interface/IDetPedestalService.h"
-#include "CalibrationDBI/Interface/IDetPedestalProvider.h"
+#include "larevt/CalibrationDBI/Interface/IDetPedestalService.h"
+#include "larevt/CalibrationDBI/Interface/IDetPedestalProvider.h"
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "art/Framework/Services/Optional/RandomNumberGenerator.h"
 #include "artextensions/SeedService/SeedService.hh"

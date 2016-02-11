@@ -1,9 +1,9 @@
 // ExponentialChannelNoiseService.cxx
 
 #include "dune/DetSim/Service/ExponentialChannelNoiseService.h"
-#include "Utilities/DetectorProperties.h"
-#include "Utilities/LArFFT.h"
-#include "Geometry/Geometry.h"
+#include "lardata/Utilities/DetectorProperties.h"
+#include "lardata/Utilities/LArFFT.h"
+#include "larcore/Geometry/Geometry.h"
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "art/Framework/Services/Optional/RandomNumberGenerator.h"
 #include "artextensions/SeedService/SeedService.hh"

@@ -1,7 +1,7 @@
 // WhiteChannelNoiseService.cxx
 
 #include "dune/DetSim/Service/WhiteChannelNoiseService.h"
-#include "Geometry/Geometry.h"
+#include "larcore/Geometry/Geometry.h"
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "art/Framework/Services/Optional/RandomNumberGenerator.h"
 #include "artextensions/SeedService/SeedService.hh"

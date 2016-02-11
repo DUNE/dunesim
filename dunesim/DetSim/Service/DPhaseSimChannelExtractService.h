@@ -15,7 +15,7 @@
 #include "dune/DuneInterface/SimChannelExtractService.h"
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h"
-#include "Utilities/LArFFT.h"
+#include "lardata/Utilities/LArFFT.h"
 #include "dune/Utilities/SignalShapingServiceDUNEDPhase.h"
 
 //namespace CLHEP {
