@@ -24,7 +24,7 @@ using std::ostringstream;
 ExponentialChannelNoiseService::
 ExponentialChannelNoiseService(fhicl::ParameterSet const& pset)
 : fRandomSeed(-1), fLogLevel(1),
-  fNoiseHist(nullptr),
+  fNoiseHistZ(nullptr), fNoiseHistU(nullptr), fNoiseHistV(nullptr),
   fNoiseChanHist(nullptr),
   m_pran(nullptr) {
   const string myname = "ExponentialChannelNoiseService::ctor: ";
@@ -57,7 +57,9 @@ ExponentialChannelNoiseService(fhicl::ParameterSet const& pset)
   }
 #endif
   art::ServiceHandle<art::TFileService> tfs;
-  fNoiseHist  = tfs->make<TH1F>("Noise", ";Noise  (ADC);", 1000,   -10., 10.);
+  fNoiseHistZ = tfs->make<TH1F>("znoise", ";Z Noise [ADC counts];", 1000,   -10., 10.);
+  fNoiseHistU = tfs->make<TH1F>("unoise", ";U Noise [ADC counts];", 1000,   -10., 10.);
+  fNoiseHistV = tfs->make<TH1F>("vnoise", ";V Noise [ADC counts];", 1000,   -10., 10.);
   fNoiseChanHist = tfs->make<TH1F>("NoiseChan", ";Noise channel;", fNoiseArrayPoints, 0, fNoiseArrayPoints);
   art::EngineCreator ecr;
   // Assign a unique name for the random number engine for each instance of this class.
@@ -84,9 +86,9 @@ ExponentialChannelNoiseService(fhicl::ParameterSet const& pset)
     }
   }
   for ( unsigned int isam=0; isam<fNoiseArrayPoints; ++isam ) {
-    generateNoise(fNoiseNormZ, fNoiseWidthZ, fLowCutoffZ, fNoiseZ[isam]);
-    generateNoise(fNoiseNormU, fNoiseWidthU, fLowCutoffU, fNoiseU[isam]);
-    generateNoise(fNoiseNormV, fNoiseWidthV, fLowCutoffV, fNoiseV[isam]);
+    generateNoise(fNoiseNormZ, fNoiseWidthZ, fLowCutoffZ, fNoiseZ[isam], fNoiseHistZ);
+    generateNoise(fNoiseNormU, fNoiseWidthU, fLowCutoffU, fNoiseU[isam], fNoiseHistU);
+    generateNoise(fNoiseNormV, fNoiseWidthV, fLowCutoffV, fNoiseV[isam], fNoiseHistV);
   }
   if ( fLogLevel > 0 ) print();
 }
@@ -148,7 +150,8 @@ ostream& ExponentialChannelNoiseService::print(ostream& out, string prefix) cons
 //**********************************************************************
 
 void ExponentialChannelNoiseService::
-generateNoise(float aNoiseNorm, float aNoiseWidth, float aLowCutoff, AdcSignalVector& noise) const {
+generateNoise(float aNoiseNorm, float aNoiseWidth, float aLowCutoff,
+              AdcSignalVector& noise, TH1* aNoiseHist) const {
   // Fetch sampling rate.
   art::ServiceHandle<util::DetectorProperties> detprop;
   float sampleRate = detprop->SamplingRate();
@@ -200,7 +203,7 @@ generateNoise(float aNoiseNorm, float aNoiseWidth, float aLowCutoff, AdcSignalVe
     noise[itck] = sqrt(ntick)*tmpnoise[itck];
   }
   for ( unsigned int itck=0; itck<noise.size(); ++itck ) {
-    fNoiseHist->Fill(noise[itck]);
+    aNoiseHist->Fill(noise[itck]);
   }
 }
 
@@ -211,9 +214,9 @@ void ExponentialChannelNoiseService::generateNoise() {
   fNoiseU.resize(fNoiseArrayPoints);
   fNoiseV.resize(fNoiseArrayPoints);
   for ( unsigned int inch=0; inch<fNoiseArrayPoints; ++inch ) {
-    generateNoise(fNoiseNormZ, fNoiseWidthZ, fLowCutoffZ, fNoiseZ[inch]);
-    generateNoise(fNoiseNormU, fNoiseWidthU, fLowCutoffU, fNoiseZ[inch]);
-    generateNoise(fNoiseNormV, fNoiseWidthV, fLowCutoffV, fNoiseZ[inch]);
+    generateNoise(fNoiseNormZ, fNoiseWidthZ, fLowCutoffZ, fNoiseZ[inch], fNoiseHistZ);
+    generateNoise(fNoiseNormU, fNoiseWidthU, fLowCutoffU, fNoiseZ[inch], fNoiseHistU);
+    generateNoise(fNoiseNormV, fNoiseWidthV, fLowCutoffV, fNoiseZ[inch], fNoiseHistV);
   }
 }
 
