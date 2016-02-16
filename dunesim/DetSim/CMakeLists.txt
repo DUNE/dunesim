@@ -17,7 +17,6 @@ art_make( BASENAME_ONLY
 	                lardata_Utilities
 			larevt_Filters
 			lardata_RawData
-			lardata_Utilities_TimeService_service
                         SignalShapingServiceDUNE10kt_service
 			SignalShapingServiceDUNEDPhase_service
 			SignalShapingServiceDUNE35t_service
@@ -48,4 +47,3 @@ add_subdirectory(Module)
 install_headers()
 install_fhicl()
 install_source()
-

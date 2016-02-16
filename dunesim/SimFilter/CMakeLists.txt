@@ -5,8 +5,6 @@ simple_plugin(GenExtCounterFilter "module"
 		        larcore_Geometry
 			larcore_Geometry_Geometry_service
 			lardata_Utilities
-			lardata_Utilities_DetectorProperties_service
-			lardata_Utilities_LArProperties_service
 			${SIMULATIONBASE}
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}
@@ -30,8 +28,6 @@ simple_plugin(LArG4ExtCounterFilter "module"
 		        larcore_Geometry
 			larcore_Geometry_Geometry_service
 			lardata_Utilities
-			lardata_Utilities_DetectorProperties_service
-			lardata_Utilities_LArProperties_service
 			${SIMULATIONBASE}
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}
@@ -55,8 +51,6 @@ simple_plugin(LArG4ParticleFilter "module"
 		        larcore_Geometry
 			larcore_Geometry_Geometry_service
 			lardata_Utilities
-			lardata_Utilities_DetectorProperties_service
-			lardata_Utilities_LArProperties_service
 			${SIMULATIONBASE}
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}

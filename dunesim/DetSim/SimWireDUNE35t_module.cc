@@ -35,14 +35,14 @@ extern "C" {
 
 #include "lardata/Utilities/LArFFT.h"
 #include "lardata/RawData/raw.h"
-#include "lardata/Utilities/LArProperties.h"
+#include "lardata/DetectorInfoServices/LArPropertiesService.h"
 #include "dune/Utilities/SignalShapingServiceDUNE35t.h"
 #include "larcore/Geometry/Geometry.h"
 
 #include "larsim/Simulation/sim.h"
 #include "larsim/Simulation/SimChannel.h"
 #include "lardata/RawData/RawDigit.h"
-#include "lardata/Utilities/DetectorProperties.h"
+#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 
 #include "TMath.h"
 #include "TComplex.h"
@@ -256,7 +256,7 @@ namespace detsim {
     fInductionCalibPed     = p.get< float                >("InductionCalibPed");
     fInductionCalibPedRMS  = p.get< float                >("InductionCalibPedRMS");
     fPedestalOn       = p.get< bool                 >("PedestalOn");  
-    art::ServiceHandle<util::DetectorProperties> detprop;
+    auto const *detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
     fSampleRate       = detprop->SamplingRate();
     fNSamplesReadout  = detprop->ReadOutWindowSize();
     fNTimeSamples  = detprop->NumberTimeSamples();

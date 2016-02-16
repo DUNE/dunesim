@@ -1,7 +1,7 @@
 // ExponentialChannelNoiseService.cxx
 
 #include "dune/DetSim/Service/ExponentialChannelNoiseService.h"
-#include "lardata/Utilities/DetectorProperties.h"
+#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "lardata/Utilities/LArFFT.h"
 #include "larcore/Geometry/Geometry.h"
 #include "art/Framework/Services/Optional/TFileService.h"
@@ -125,7 +125,7 @@ ostream& ExponentialChannelNoiseService::print(ostream& out, string prefix) cons
 void ExponentialChannelNoiseService::
 generateNoise(float aNoiseFact, float aNoiseWidth, float aLowCutoff, AdcSignalVector& noise) const {
   // Fetch sampling rate.
-  art::ServiceHandle<util::DetectorProperties> detprop;
+  auto const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
   float sampleRate = detprop->SamplingRate();
   // Fetch FFT service and # ticks.
   art::ServiceHandle<util::LArFFT> pfft;

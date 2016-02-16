@@ -12,7 +12,6 @@ art_make( BASENAME_ONLY
                         larevt_Filters
                         lardata_RawData
                         larsim_DetSim
-                        lardata_Utilities_TimeService_service
                         SignalShapingServiceDUNE10kt_service
 			SignalShapingServiceDUNEDPhase_service
                         SignalShapingServiceDUNE35t_service
