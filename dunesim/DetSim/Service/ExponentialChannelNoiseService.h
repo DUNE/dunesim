@@ -1,8 +1,14 @@
 // ExponentialChannelNoiseService
 
+// David Adams
+// January 2016
+//
 // Implementation of TPC channel noise model with an exponential
 // shape in frequency.
 // Same as the nose model 1 in SimWireDUNE35t, e.g. from dunetpc v04_29_01.
+//
+// DLA Feb 2016: Change normalization so RMS does not vary with FFT size.
+// See https://cdcvs.fnal.gov/redmine/issues/11470.
 
 #ifndef ExponentialChannelNoiseService_H
 #define ExponentialChannelNoiseService_H
@@ -35,7 +41,8 @@ public:
   // Fill a noise vector.
   // Input vector contents are lost.
   // The size of the vector is obtained from the FFT service.
-  void generateNoise(float aNoiseFact, float aNoiseWidth, float aLowCutoff, AdcSignalVector& noise) const;
+  void generateNoise(float aNoiseNorm, float aNoiseWidth, float aLowCutoff,
+                     AdcSignalVector& noise, TH1* aNoiseHist) const;
 
 private:
  
@@ -43,13 +50,13 @@ private:
   void generateNoise();
 
   // Parameters.
-  float        fNoiseFactZ;        ///< noise scale factor for Z (collection) plane
+  float        fNoiseNormZ;        ///< noise scale factor for Z (collection) plane
   float        fNoiseWidthZ;       ///< exponential noise width (kHz)  for Z (collection) plane
   float        fLowCutoffZ;        ///< low frequency filter cutoff (kHz) for Z (collection) plane
-  float        fNoiseFactU;        ///< noise scale factor  for U plane
+  float        fNoiseNormU;        ///< noise scale factor  for U plane
   float        fNoiseWidthU;       ///< exponential noise width (kHz)   for U plane
   float        fLowCutoffU;        ///< low frequency filter cutoff (kHz)  for U plane
-  float        fNoiseFactV;        ///< noise scale factor   for V plane
+  float        fNoiseNormV;        ///< noise scale factor   for V plane
   float        fNoiseWidthV;       ///< exponential noise width (kHz)   for V plane
   float        fLowCutoffV;        ///< low frequency filter cutoff (kHz)  for V plane
   unsigned int fNoiseArrayPoints;  ///< number of points in randomly generated noise array
@@ -64,6 +71,9 @@ private:
 
   // Histograms.
   TH1* fNoiseHist;      ///< distribution of noise counts
+  TH1* fNoiseHistZ;     ///< distribution of noise counts for Z
+  TH1* fNoiseHistU;     ///< distribution of noise counts for U
+  TH1* fNoiseHistV;     ///< distribution of noise counts for V
   TH1* fNoiseChanHist;  ///< distribution of accessed noise samples
 
   CLHEP::HepRandomEngine* m_pran;
