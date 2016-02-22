@@ -1,8 +1,8 @@
 // ProvidedPedestalAdditionService.cxx
 
 #include "dune/DetSim/Service/ProvidedPedestalAdditionService.h"
-#include "CalibrationDBI/Interface/IDetPedestalService.h"
-#include "CalibrationDBI/Interface/IDetPedestalProvider.h"
+#include "larevt/CalibrationDBI/Interface/DetPedestalService.h"
+#include "larevt/CalibrationDBI/Interface/DetPedestalProvider.h"
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "art/Framework/Services/Optional/RandomNumberGenerator.h"
 #include "artextensions/SeedService/SeedService.hh"
@@ -20,7 +20,7 @@ using std::string;
 ProvidedPedestalAdditionService::
 ProvidedPedestalAdditionService(fhicl::ParameterSet const& pset, art::ActivityRegistry&)
 : m_PedNoiseHist(nullptr),
-  m_PedestalProvider(art::ServiceHandle<lariov::IDetPedestalService>()->GetPedestalProvider()) {
+  m_PedestalProvider(art::ServiceHandle<lariov::DetPedestalService>()->GetPedestalProvider()) {
   m_NoiseScale = pset.get<float>("NoiseScale");
 #ifdef UseSeedService
   art::ServiceHandle<artext::SeedService> seedSvc;

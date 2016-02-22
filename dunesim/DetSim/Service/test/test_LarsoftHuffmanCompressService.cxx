@@ -5,7 +5,7 @@
 //
 // Test LarsoftHuffmanCompressService.
 
-#include "RawData/raw.h"
+#include "lardata/RawData/raw.h"
 #include "../LarsoftHuffmanCompressService.h"
 #include <string>
 #include <iostream>

@@ -1,35 +1,35 @@
-# dunetpc/dune/DetSim/Service/CMakeLists.txt
+# dunetpc/dune/larsim_DetSim/Service/CMakeLists.txt
 #
 # David Adams
 # December 2015
 #
-# CMake instructions for DetSim services.
+# CMake instructions for larsim_DetSim services.
 
 # Add plugin for each service.
 
 simple_plugin(Dune35tSimChannelExtractService   "service"
-                DetSim
-                Geometry
-                Simulation
-                Utilities
+                larsim_DetSim
+                larcore_Geometry
+                larsim_Simulation
+                lardata_Utilities
                 SignalShapingServiceDUNE35t_service
                 ${ART_UTILITIES}
                 ${ROOT_BASIC_LIB_LIST}
              )
 
 simple_plugin(GenericSimChannelExtractService   "service"
-                DetSim
-                Simulation
-                Utilities
+                larsim_DetSim
+                larsim_Simulation
+                lardata_Utilities
                 SignalShapingServiceDUNE35t_service
                 ${ART_UTILITIES}
                 ${ROOT_BASIC_LIB_LIST}
              )
 
 simple_plugin(DPhaseSimChannelExtractService   "service"
-                DetSim
-                Simulation
-                Utilities
+                larsim_DetSim
+                larsim_Simulation
+                lardata_Utilities
                 SignalShapingServiceDUNEDPhase_service
                 ${ART_UTILITIES}
 		${ART_FRAMEWORK_CORE}
@@ -38,7 +38,7 @@ simple_plugin(DPhaseSimChannelExtractService   "service"
 		${CLHEP}
              )
 simple_plugin(ExponentialChannelNoiseService   "service"
-                Geometry
+                larcore_Geometry
                 SignalShapingServiceDUNE35t_service
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL}
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
@@ -51,7 +51,7 @@ simple_plugin(ExponentialChannelNoiseService   "service"
              )
 
 simple_plugin(WhiteChannelNoiseService   "service"
-                Geometry
+                larcore_Geometry
                 SignalShapingServiceDUNE35t_service
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL}
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
@@ -75,11 +75,11 @@ simple_plugin(ProvidedPedestalAdditionService "service"
              )
 
 simple_plugin(Dune35tZeroSuppressService        "service"
-                DetSim
+                larsim_DetSim
 )
 
 simple_plugin(Legacy35tZeroSuppressService  "service"
-                DetSim
+                larsim_DetSim
 )
 
 simple_plugin(FixedZeroSuppressService      "service"
@@ -89,12 +89,12 @@ simple_plugin(ReplaceCompressService        "service"
 )
 
 simple_plugin(LarsoftHuffmanCompressService "service"
-                RawData
+                lardata_RawData
                 dune_DetSim_Service_ReplaceCompressService_service
 )
 
 simple_plugin(StuckBitAdcDistortionService   "service"
-                Geometry
+                larcore_Geometry
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL}
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
                 ${SEEDSERVICE_SERVICE}

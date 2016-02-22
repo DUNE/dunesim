@@ -21,7 +21,7 @@ namespace CLHEP {
 class HepRandomEngine;
 }
 namespace lariov {
-class IDetPedestalProvider;
+class DetPedestalProvider;
 }
 
 class ProvidedPedestalAdditionService : public PedestalAdditionService {
@@ -44,7 +44,7 @@ private:
 
   CLHEP::HepRandomEngine* m_pran;
 
-  const lariov::IDetPedestalProvider& m_PedestalProvider;
+  const lariov::DetPedestalProvider& m_PedestalProvider;
 
 };
 

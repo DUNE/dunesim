@@ -17,7 +17,7 @@
 #include "art/Utilities/InputTag.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
-#include "Simulation/AuxDetSimChannel.h"
+#include "larsim/Simulation/AuxDetSimChannel.h"
 #include "TTree.h"
 #include <iostream>
 

@@ -171,9 +171,9 @@ peddplegacy: {
 
 chnoiseold: {
   service_provider: ExponentialChannelNoiseService
-  NoiseFactU: 0.05
-  NoiseFactV: 0.05
-  NoiseFactZ: 0.05
+  NoiseNormU: 3.16
+  NoiseNormV: 3.16
+  NoiseNormZ: 3.16
   NoiseWidthU: 2000
   NoiseWidthV: 2000
   NoiseWidthZ: 2000

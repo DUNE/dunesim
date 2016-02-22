@@ -2,8 +2,8 @@
 
 #include "Dune35tSimChannelExtractService.h"
 #include <string>
-#include "Geometry/Geometry.h"
-#include "Simulation/SimChannel.h"
+#include "larcore/Geometry/Geometry.h"
+#include "larsim/Simulation/SimChannel.h"
 
 using std::string;
 

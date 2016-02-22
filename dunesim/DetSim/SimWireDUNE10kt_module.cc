@@ -35,16 +35,16 @@ extern "C" {
 // art extensions
 #include "artextensions/SeedService/SeedService.hh"
 
-#include "Utilities/LArFFT.h"
-#include "RawData/raw.h"
-#include "Utilities/LArProperties.h"
+#include "lardata/Utilities/LArFFT.h"
+#include "lardata/RawData/raw.h"
+#include "lardata/DetectorInfoServices/LArPropertiesService.h"
 #include "dune/Utilities/SignalShapingServiceDUNE10kt.h"
-#include "Geometry/Geometry.h"
+#include "larcore/Geometry/Geometry.h"
 
-#include "Simulation/sim.h"
-#include "Simulation/SimChannel.h"
-#include "RawData/RawDigit.h"
-#include "Utilities/DetectorProperties.h"
+#include "larsim/Simulation/sim.h"
+#include "larsim/Simulation/SimChannel.h"
+#include "lardata/RawData/RawDigit.h"
+#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 
 #include "TMath.h"
 #include "TComplex.h"
@@ -184,7 +184,7 @@ namespace detsim {
     fNoiseModel           = p.get< unsigned int       >("NoiseModel");
     fCollectionPed    = p.get< float               >("CollectionPed");
     fInductionPed     = p.get< float               >("InductionPed");
-    art::ServiceHandle<util::DetectorProperties> detprop;
+    auto const *detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
     fSampleRate       = detprop->SamplingRate();
     fNSamplesReadout  = detprop->ReadOutWindowSize();
     fNTimeSamples  = detprop->NumberTimeSamples();

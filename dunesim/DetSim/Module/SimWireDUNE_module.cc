@@ -19,12 +19,12 @@
 #include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
-#include "RawData/raw.h"
-#include "Geometry/Geometry.h"
-#include "Simulation/sim.h"
-#include "Simulation/SimChannel.h"
-#include "RawData/RawDigit.h"
-#include "Utilities/DetectorProperties.h"
+#include "lardata/RawData/raw.h"
+#include "larcore/Geometry/Geometry.h"
+#include "larsim/Simulation/sim.h"
+#include "larsim/Simulation/SimChannel.h"
+#include "lardata/RawData/RawDigit.h"
+#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 
 #include "dune/DuneInterface/AdcTypes.h"
 #include "dune/DuneInterface/AdcSuppressService.h"
@@ -159,7 +159,7 @@ void SimWireDUNE::produce(art::Event& evt) {
   std::unique_ptr<std::vector<raw::RawDigit>>  digcol(new std::vector<raw::RawDigit>);
           
   // Fetch the number of ticks to write out for each channel.
-  art::ServiceHandle<util::DetectorProperties> detprop;
+  auto const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
   unsigned int nTickReadout  = detprop->ReadOutWindowSize();
 
   // Loop over channels.

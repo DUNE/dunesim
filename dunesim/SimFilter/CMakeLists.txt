@@ -1,12 +1,10 @@
 simple_plugin(GenExtCounterFilter "module"
-		      RawData
-		      RecoBase
+		      lardata_RawData
+		      lardata_RecoBase
 		      dune_Geometry
-		        Geometry
-			Geometry_service
-			Utilities
-			DetectorProperties_service
-			LArProperties_service
+		        larcore_Geometry
+			larcore_Geometry_Geometry_service
+			lardata_Utilities
 			${SIMULATIONBASE}
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}
@@ -24,14 +22,12 @@ simple_plugin(GenExtCounterFilter "module"
 )
 
 simple_plugin(LArG4ExtCounterFilter "module"
-		      RawData
-		      RecoBase
+		      lardata_RawData
+		      lardata_RecoBase
 		      dune_Geometry
-		        Geometry
-			Geometry_service
-			Utilities
-			DetectorProperties_service
-			LArProperties_service
+		        larcore_Geometry
+			larcore_Geometry_Geometry_service
+			lardata_Utilities
 			${SIMULATIONBASE}
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}
@@ -49,14 +45,12 @@ simple_plugin(LArG4ExtCounterFilter "module"
 )
 
 simple_plugin(LArG4ParticleFilter "module"
-		      RawData
-		      RecoBase
+		      lardata_RawData
+		      lardata_RecoBase
 		      dune_Geometry
-		        Geometry
-			Geometry_service
-			Utilities
-			DetectorProperties_service
-			LArProperties_service
+		        larcore_Geometry
+			larcore_Geometry_Geometry_service
+			lardata_Utilities
 			${SIMULATIONBASE}
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}
