@@ -105,6 +105,12 @@ cmpreplace: {
   Zero: 0
 }
 
+cmpblock: {
+  service_provider: "LarsoftHuffmanCompressService"
+  UseBlock:         "true"
+  UseHuffman:       "false"
+}
+
 cmphuffman: {
   service_provider: "LarsoftHuffmanCompressService"
   UseBlock:         "true"
