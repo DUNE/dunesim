@@ -104,7 +104,12 @@ simple_plugin(StuckBitAdcDistortionService   "service"
                 ${MF_UTILITIES}
                 ${CLHEP}
                 ${ROOT_BASIC_LIB_LIST}
-                BASENAME_ONLY
              )
+
+simple_plugin(FixedDetPedestalService "service"
+                larcore_Geometry
+                ${ART_UTILITIES}
+                ${ROOT_BASIC_LIB_LIST}
+)
 
 add_subdirectory(test)
