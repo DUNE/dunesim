@@ -35,6 +35,8 @@ public:
 
   int extract(const sim::SimChannel* psc, AdcSignalVector& sig) const;
 
+  std::ostream& print(std::ostream& out =std::cout, std::string prefix ="") const;
+
 private:
   
   // standard larsoft FFT service

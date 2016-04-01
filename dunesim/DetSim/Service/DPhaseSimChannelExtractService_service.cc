@@ -78,6 +78,13 @@ extract(const sim::SimChannel* psc, AdcSignalVector& sigs) const {
 
 //**********************************************************************
 
+std::ostream& DPhaseSimChannelExtractService::print(std::ostream& out, std::string prefix) const {
+  out << prefix << "DPhaseSimChannelExtractService";
+  return out;
+}
+
+//**********************************************************************
+
 DEFINE_ART_SERVICE_INTERFACE_IMPL(DPhaseSimChannelExtractService, SimChannelExtractService)
 
 //**********************************************************************

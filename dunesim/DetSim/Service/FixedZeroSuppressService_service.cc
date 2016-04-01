@@ -31,7 +31,7 @@ filter(const AdcCountVector& sigs, Channel, AdcPedestal&, AdcFilterVector& keep)
 //**********************************************************************
 
 ostream& FixedZeroSuppressService::print(ostream& out, string prefix) const {
-  out << prefix << "FixedZeroSuppressService" << endl;
+  out << prefix << "FixedZeroSuppressService";
   return out;
 }
 

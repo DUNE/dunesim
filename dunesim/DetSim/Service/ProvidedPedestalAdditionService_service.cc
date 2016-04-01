@@ -61,7 +61,7 @@ addPedestal(Channel chan, AdcSignalVector& sigs, float& ped, float& pedrms) cons
 
 ostream& ProvidedPedestalAdditionService::print(ostream& out, string prefix) const {
   out << prefix << "ProvidedPedestalAdditionService:" << endl;
-  out << prefix << "  Noise scale: " << m_NoiseScale << endl;
+  out << prefix << "  Noise scale: " << m_NoiseScale;
   return out;
 }
 
