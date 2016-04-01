@@ -120,58 +120,10 @@ cmphuffman: {
 
 #***********************************************************************
 
-pedlegacy: {
-  service_provider: SIOVDetPedestalService
-  DetPedestalRetrievalAlg: {
-    AlgName:            "DetPedestalRetrievalAlg"
-    DatabaseRetrievalAlg: {
-      AlgName: "DatabaseRetrievalAlg"
-      DBFolderName:  ""
-      DBUrl: ""
-      DBTag: ""
-    }
-    UseDB: false
-    UseFile: false
-    DefaultCollMean:  500.0
-    DefaultCollRms:     0.01
-    DefaultIndMean:  1800.0
-    DefaultIndRms:      0.01
-    DefaultMeanErr:     0.0
-    DefaultRmsErr:      0.0
-  }
-}
-
-pedlegacynorms: @local::pedlegacy
-pedlegacynorms.DetPedestalRetrievalAlg.DefaultCollRms: 0.0
-pedlegacynorms.DetPedestalRetrievalAlg.DefaultIndRms: 0.0
-
 padprovided: {
   service_provider: ProvidedPedestalAdditionService
   NoiseScale: 1.0
 }
-
-# pedestal for dual-phase collection views
-peddplegacy: {
-  service_provider: SIOVDetPedestalService
-  DetPedestalRetrievalAlg: {
-    AlgName:            "DetPedestalRetrievalAlg"
-    DatabaseRetrievalAlg: {
-      AlgName: "DatabaseRetrievalAlg"
-      DBFolderName:  ""
-      DBUrl: ""
-      DBTag: ""
-    }
-    UseDB: false
-    UseFile: false
-    DefaultCollMean:  5.0
-    DefaultCollRms:   0.0
-    DefaultIndMean:   5.0
-    DefaultIndRms:    0.0
-    DefaultMeanErr:   0.0
-    DefaultRmsErr:    0.0
-  }
-}
-
 
 #***********************************************************************
 
