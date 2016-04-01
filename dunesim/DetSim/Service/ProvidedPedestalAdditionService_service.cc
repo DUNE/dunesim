@@ -29,7 +29,7 @@ ProvidedPedestalAdditionService(fhicl::ParameterSet const& pset, art::ActivityRe
   int seed = 1007;
 #endif
   art::ServiceHandle<art::TFileService> tfs;
-  m_PedNoiseHist  = tfs->make<TH1F>("PedNoise", ";Pedestal noise  (ADC);", 1000,   -1., 1.);
+  m_PedNoiseHist  = tfs->make<TH1F>("PedNoise", ";Pedestal noise  (ADC);", 1000,  -10., 10.);
   art::EngineCreator ecr;
   m_pran = &ecr.createEngine(seed, "HepJamesRandom", "ProvidedPedestalAdditionService");
 }
