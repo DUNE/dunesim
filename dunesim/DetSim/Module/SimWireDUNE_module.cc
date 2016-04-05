@@ -36,6 +36,7 @@
 
 using std::ostringstream;
 using std::endl;
+using std::string;
 
 //**********************************************************************
 
@@ -90,42 +91,47 @@ SimWireDUNE::~SimWireDUNE() { }
 //**********************************************************************
 
 void SimWireDUNE::reconfigure(fhicl::ParameterSet const& p) {
+  string myname = "SimWireDUNE::reconfigure: ";
+  string myprefix = myname + "    ";
   fSimChannelLabel = p.get<std::string>("SimChannelLabel");
   fNoiseOn         = p.get<bool>("NoiseOn");
   fPedestalOn      = p.get<bool>("PedestalOn");  
   fDistortOn       = p.get<bool>("DistortOn");  
   fSuppressOn      = p.get<bool>("SuppressOn");  
-
   ostringstream out;
-  out << "  Compression service:";
-  m_pcmp->print(out, "    ");
+  out << myname << "Accessed services:" << endl;
+  out << myname << "  SimChannel extraction service:" << endl;
+  m_pscx->print(out, myprefix) << endl;
   if ( fNoiseOn ) {
-    out << "  Channel noise service:" << endl;;
-    m_pcns->print(out, "    ");
+    out << myname << "  Channel noise service:" << endl;;
+    m_pcns->print(out, myprefix);
   } else {
-    out << "  Channel noise is off.";
+    out << myname << "  Channel noise is off.";
   }
   out << endl;
   if ( fPedestalOn ) {
-    out << "  Pedestal addition service:" << endl;;
-    m_ppad->print(out, "    ");
+    out << myname << "  Pedestal addition service:" << endl;;
+    m_ppad->print(out, myprefix);
   } else {
-    out << "  Pedestal addition is off.";
-  }
-  out << endl;
-  if ( fSuppressOn ) {
-    out << "  ADC suppression service:" << endl;
-    m_pzs->print(out, "    ");
-  } else {
-    out << "ADC suppression is off.";
+    out << myname << "  Pedestal addition is off.";
   }
   out << endl;
   if ( fDistortOn ) {
-    out << "  ADC distortion service:" << endl;;
-    m_pdis->print(out, "    ");
+    out << myname << "  ADC distortion service:" << endl;;
+    m_pdis->print(out, myprefix);
   } else {
-    out << "  ADC distortion bits is off.";
+    out << myname << "  ADC distortion is off.";
   }
+  out << endl;
+  if ( fSuppressOn ) {
+    out << myname << "  ADC suppression service:" << endl;
+    m_pzs->print(out, myprefix);
+  } else {
+    out << myname << "  ADC suppression is off.";
+  }
+  out << endl;
+  out << myname << "  Compression service:" << endl;
+  m_pcmp->print(out, myprefix);
   mf::LogInfo("SimWireDUNE::reconfigure") << out.str();
 
   return;

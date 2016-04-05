@@ -6,6 +6,24 @@
 #include "larsim/Simulation/SimChannel.h"
 
 using std::string;
+using std::endl;
+
+//**********************************************************************
+
+namespace {
+
+std::ostream& operator<<(std::ostream& out, const std::vector<float>& vals) {
+  out << "[";
+  unsigned int nval = 0;
+  for ( float val : vals ) {
+    out << val;
+    if ( ++nval < vals.size() ) out << ", ";
+  }
+  out << "]";
+  return out;
+}
+
+}  // end unnamed namespace
 
 //**********************************************************************
 
@@ -151,6 +169,33 @@ extract(const sim::SimChannel* psc, AdcSignalVector& fChargeWork) const {
     fChargeWork[itck] += fChargeWorkCollInd[itck];
   }
   return 0;
+}
+
+//**********************************************************************
+
+std::ostream& Dune35tSimChannelExtractService::print(std::ostream& out, std::string prefix) const {
+  out << prefix << "Dune35tSimChannelExtractService";
+  out << prefix << "         FractUUCollect: " << fFractUUCollect << endl;
+  out << prefix << "         FractUVCollect: " << fFractUVCollect << endl;
+  out << prefix << "         FractVUCollect: " << fFractVUCollect << endl;
+  out << prefix << "         FractVVCollect: " << fFractVVCollect << endl;
+  out << prefix << "            FractUUMiss: " << fFractUUMiss << endl;
+  out << prefix << "            FractUVMiss: " << fFractUVMiss << endl;
+  out << prefix << "            FractVUMiss: " << fFractVUMiss << endl;
+  out << prefix << "            FractVVMiss: " << fFractVVMiss << endl;
+  out << prefix << "            FractZUMiss: " << fFractZUMiss << endl;
+  out << prefix << "            FractZVMiss: " << fFractZVMiss << endl;
+  out << prefix << "     FractHorizGapUMiss: " << fFractHorizGapUMiss << endl;
+  out << prefix << "      FractVertGapUMiss: " << fFractVertGapUMiss << endl;
+  out << prefix << "     FractHorizGapVMiss: " << fFractHorizGapVMiss << endl;
+  out << prefix << "      FractVertGapVMiss: " << fFractVertGapVMiss << endl;
+  out << prefix << "     FractHorizGapZMiss: " << fFractHorizGapZMiss << endl;
+  out << prefix << "      FractVertGapZMiss: " << fFractVertGapZMiss << endl;
+  out << prefix << "  FractHorizGapUCollect: " << fFractHorizGapUCollect << endl;
+  out << prefix << "   FractVertGapUCollect: " << fFractVertGapUCollect << endl;
+  out << prefix << "  FractHorizGapVCollect: " << fFractHorizGapVCollect << endl;
+  out << prefix << "   FractVertGapVCollect: " << fFractVertGapVCollect;
+  return out;
 }
 
 //**********************************************************************

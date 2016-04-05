@@ -45,7 +45,7 @@ Legacy35tZeroSuppressService(float aAdcThreshold,
 //**********************************************************************
 
 int Legacy35tZeroSuppressService::
-filter(const AdcCountVector& sigs, Channel, AdcPedestal& ped, AdcFilterVector& keep) const {
+filter(const AdcCountVector& sigs, Channel, AdcPedestal ped, AdcFilterVector& keep) const {
   const unsigned int nsig = sigs.size();
   keep.clear();
   keep.resize(nsig, false);

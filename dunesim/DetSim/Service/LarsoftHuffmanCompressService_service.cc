@@ -95,7 +95,7 @@ compress(AdcCountVector& sigs, const AdcFilterVector& keep, AdcCount offset,
 //**********************************************************************
 
 ostream& LarsoftHuffmanCompressService::print(ostream& out, string prefix) const {
-  out << prefix << "LarsoftHuffmanCompressService:" << endl;
+  out << prefix << "LarsoftHuffmanCompressService";
   return out;
 }
 

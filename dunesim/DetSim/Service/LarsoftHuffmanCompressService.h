@@ -1,7 +1,7 @@
 // LarsoftHuffmanCompressService.h
 //
 // David Adams
-// Februrary 2016
+// February 2016
 //
 // Service to compress an ADC vector using the LArSoft
 // conventions in larsoft/lardata/RawData/raw.cxx.

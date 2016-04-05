@@ -129,21 +129,21 @@ int ExponentialChannelNoiseService::addNoise(Channel chan, AdcSignalVector& sigs
 //**********************************************************************
 
 ostream& ExponentialChannelNoiseService::print(ostream& out, string prefix) const {
-  string myprefix = prefix + "  ";
-  out << myprefix << "       NoiseNormZ: " << fNoiseNormZ   << endl;
-  out << myprefix << "      NoiseWidthZ: " << fNoiseWidthZ  << endl;
-  out << myprefix << "       LowCutoffZ: " << fLowCutoffZ << endl;
-  out << myprefix << "       NoiseNormU: " << fNoiseNormU   << endl;
-  out << myprefix << "      NoiseWidthU: " << fNoiseWidthU  << endl;
-  out << myprefix << "       LowCutoffU: " << fLowCutoffU << endl;
-  out << myprefix << "       NoiseNormV: " << fNoiseNormV   << endl;
-  out << myprefix << "      NoiseWidthV: " << fNoiseWidthV  << endl;
-  out << myprefix << "       LowCutoffV: " << fLowCutoffV << endl;
-  out << myprefix << " NoiseArrayPoints: " << fNoiseArrayPoints << endl;
-  out << myprefix << "    OldNoiseIndex: " << fOldNoiseIndex << endl;
-  out << myprefix << "       RandomSeed: " <<  fRandomSeed << endl;
-  out << myprefix << "         LogLevel: " <<  fLogLevel << endl;
-  out << myprefix << " Actual random seed: " << m_pran->getSeed() << endl;
+  out << prefix << "ExponentialChannelNoiseService: " << endl;
+  out << prefix << "        NoiseNormZ: " << fNoiseNormZ   << endl;
+  out << prefix << "       NoiseWidthZ: " << fNoiseWidthZ  << endl;
+  out << prefix << "        LowCutoffZ: " << fLowCutoffZ << endl;
+  out << prefix << "        NoiseNormU: " << fNoiseNormU   << endl;
+  out << prefix << "       NoiseWidthU: " << fNoiseWidthU  << endl;
+  out << prefix << "        LowCutoffU: " << fLowCutoffU << endl;
+  out << prefix << "        NoiseNormV: " << fNoiseNormV   << endl;
+  out << prefix << "       NoiseWidthV: " << fNoiseWidthV  << endl;
+  out << prefix << "        LowCutoffV: " << fLowCutoffV << endl;
+  out << prefix << "  NoiseArrayPoints: " << fNoiseArrayPoints << endl;
+  out << prefix << "     OldNoiseIndex: " << fOldNoiseIndex << endl;
+  out << prefix << "        RandomSeed: " <<  fRandomSeed << endl;
+  out << prefix << "          LogLevel: " <<  fLogLevel << endl;
+  out << prefix << "  Actual random seed: " << m_pran->getSeed();
   return out;
 }
 
