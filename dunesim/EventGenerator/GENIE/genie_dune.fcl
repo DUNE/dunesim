@@ -53,7 +53,7 @@ dune_fd_genie_nu_simple_flux_1x2x6_window.TopVolume: "volCryostat"
 
 dune_fd_genie_nu_simple_flux_1x2x6_window_rotated_tpc: @local::dune_fd_genie_nu_simple_flux_1x2x6_window
 dune_fd_genie_nu_simple_flux_1x2x6_window_rotated_tpc.FluxSearchPaths: "/pnfs/dune/persistent/TaskForce_Flux/ref_02/neutrino/gsimple/far/Rotate90Degrees/"
-dune_fd_genie_nu_simple_flux_1x2x6_window_rotated_tpc.FluxFiles: ["gsimple_dune10kt_v1_1x2x6_Rotate90Degrees_g4lbne_v3r3p9_QGSP_BERT_Nominal_neutrino_*root "]
+dune_fd_genie_nu_simple_flux_1x2x6_window_rotated_tpc.FluxFiles: ["gsimple_dune10kt_v1_1x2x6_Rotate90Degrees_g4lbne_v3r3p9_QGSP_BERT_Nominal_neutrino_*root"]
 
 dune_fd_genie_anu_simple_flux_1x2x6_window: @local::dune_fd_genie_nu_simple_flux_1x2x6_window
 dune_fd_genie_anu_simple_flux_1x2x6_window.FluxSearchPaths: "/pnfs/dune/persistent/TaskForce_Flux/ref_02/antineutrino/gsimple/far/nominal/"
