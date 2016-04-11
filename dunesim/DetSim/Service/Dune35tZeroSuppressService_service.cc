@@ -95,7 +95,7 @@ Dune35tZeroSuppressService(const fhicl::ParameterSet& pset, art::ActivityRegistr
 //**********************************************************************
 
 int Dune35tZeroSuppressService::
-filter(const AdcCountVector& sigs, Channel chan, AdcPedestal& ped, AdcFilterVector& keep) const {
+filter(const AdcCountVector& sigs, Channel chan, AdcPedestal ped, AdcFilterVector& keep) const {
   const string myname = "ZeroSuppress35t::filter: ";
   if ( m_dbg ) cout << "Filtering signal array of size " << sigs.size() << endl;
   bool m_skipStuck = false;
