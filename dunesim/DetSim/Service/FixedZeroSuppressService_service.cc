@@ -22,7 +22,7 @@ FixedZeroSuppressService::FixedZeroSuppressService() { }
 //**********************************************************************
 
 int FixedZeroSuppressService::
-filter(const AdcCountVector& sigs, Channel, AdcPedestal&, AdcFilterVector& keep) const {
+filter(const AdcCountVector& sigs, Channel, AdcPedestal, AdcFilterVector& keep) const {
   keep.clear();
   keep.resize(sigs.size(), true);
   return 0;
@@ -31,7 +31,7 @@ filter(const AdcCountVector& sigs, Channel, AdcPedestal&, AdcFilterVector& keep)
 //**********************************************************************
 
 ostream& FixedZeroSuppressService::print(ostream& out, string prefix) const {
-  out << prefix << "FixedZeroSuppressService" << endl;
+  out << prefix << "FixedZeroSuppressService";
   return out;
 }
 

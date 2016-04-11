@@ -29,7 +29,7 @@ ProvidedPedestalAdditionService(fhicl::ParameterSet const& pset, art::ActivityRe
   int seed = 1007;
 #endif
   art::ServiceHandle<art::TFileService> tfs;
-  m_PedNoiseHist  = tfs->make<TH1F>("PedNoise", ";Pedestal noise  (ADC);", 1000,   -1., 1.);
+  m_PedNoiseHist  = tfs->make<TH1F>("PedNoise", ";Pedestal noise  (ADC);", 1000,  -10., 10.);
   art::EngineCreator ecr;
   m_pran = &ecr.createEngine(seed, "HepJamesRandom", "ProvidedPedestalAdditionService");
 }
@@ -61,7 +61,7 @@ addPedestal(Channel chan, AdcSignalVector& sigs, float& ped, float& pedrms) cons
 
 ostream& ProvidedPedestalAdditionService::print(ostream& out, string prefix) const {
   out << prefix << "ProvidedPedestalAdditionService:" << endl;
-  out << prefix << "  Noise scale: " << m_NoiseScale << endl;
+  out << prefix << "  Noise scale: " << m_NoiseScale;
   return out;
 }
 

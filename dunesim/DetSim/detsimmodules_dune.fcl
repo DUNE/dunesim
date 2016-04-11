@@ -1,3 +1,16 @@
+# detsimmodules_dune.fcl
+#
+#
+# David Adams
+# April 2016
+#
+# This FCL prolog file holds a minimal default configuration for the
+# DetSim module and configuration options for the services used by that
+# module.
+#
+# See dunetpc/fcl/dune35t/detsim/standard_detsim_dune35t for top-level
+# FCL that uses this configuration.
+
 #include "detsimmodules.fcl"
 
 BEGIN_PROLOG
@@ -17,16 +30,21 @@ dune_detsim: {
 
 #***********************************************************************
 
+# SimChannelExtractService converts GEANT output to TPC signals.
+
+# Simple single-phase extractor.
 scxgeneric: {
   service_provider: GenericSimChannelExtractService
 }
 
-# signal extractor service for dune dual-phase detector
+# Signal extractor service for dune dual-phase detector
 scxdp: {
   service_provider: DPhaseSimChannelExtractService
   DPGainPerView: 10.0
 }
 
+# Single-phase extractor with special handling of signal near and beyond
+# TPC active boundaries.
 scx35t: {
   service_provider: Dune35tSimChannelExtractService
   FractHorizGapUCollect: [ 0.1, 0.0 ]
@@ -53,80 +71,9 @@ scx35t: {
 
 #***********************************************************************
 
-zsnone: {
-  service_provider: FixedZeroSuppressService
-}
+# ChannelNoiseService adds noise to channel-tick bins.
 
-zslegacy: {
-  service_provider: Legacy35tZeroSuppressService
-  AdcThreshold: 10.0
-  TickRange: 10
-  MinTickGap: 2
-  SuppressStickyBits: true
-}
-
-zsonline: {
-  service_provider: Dune35tZeroSuppressService
-  NS:  5
-  NL: 15
-  ND:  5
-  NT:  3
-  TS:  3
-  TL:  7
-  TD:  5
-}
-
-zsonline_nhi: {
-  service_provider: Dune35tZeroSuppressService
-  NS:  5
-  NL: 15
-  ND:  5
-  NT:  3
-  TS:  6
-  TL: 14
-  TD: 10
-}
-
-zsonline_nhi2: {
-  service_provider: Dune35tZeroSuppressService
-  NS:  5
-  NL: 15
-  ND:  5
-  NT:  3
-  TS:  6
-  TL: 10
-  TD: 10
-}
-
-#***********************************************************************
-
-cmpreplace: {
-  service_provider: ReplaceCompressService
-  Zero: 0
-}
-
-cmpblock: {
-  service_provider: "LarsoftHuffmanCompressService"
-  UseBlock:         "true"
-  UseHuffman:       "false"
-}
-
-cmphuffman: {
-  service_provider: "LarsoftHuffmanCompressService"
-  UseBlock:         "true"
-  UseHuffman:       "true"
-}
-
-
-#***********************************************************************
-
-padprovided: {
-  service_provider: ProvidedPedestalAdditionService
-  NoiseScale: 1.0
-}
-
-#***********************************************************************
-
+# Option 1 from the old DetSim module.
 chnoiseold: {
   service_provider: ExponentialChannelNoiseService
   NoiseNormU: 3.16
@@ -142,12 +89,72 @@ chnoiseold: {
   OldNoiseIndex: true
 }
 
+# Option 2 from the old DetSim module.
 chnoisewhite: {
   service_provider: WhiteChannelNoiseService
 }
 
 #***********************************************************************
 
+# PedestalAdditionService adds pedestals to signals.
+
+# Takes pedestal mean and RMS and from the DetPedestalService provider.
+# Incoherent noise is added with Gaussian sigma = NoiseScale*RMS.
+padprovided: {
+  service_provider: ProvidedPedestalAdditionService
+  NoiseScale: 0.0
+}
+
+#***********************************************************************
+
+# AdcSuppressService indicates which channel-tick bins should be
+# ignored (i.e. zero-suppressed).
+
+# No suppression.
+zsnone: {
+  service_provider: FixedZeroSuppressService
+}
+
+# Simple window supression. Same as the old module.
+zslegacy: {
+  service_provider: Legacy35tZeroSuppressService
+  AdcThreshold: 10.0
+  TickRange: 10
+  MinTickGap: 2
+  SuppressStickyBits: true
+}
+
+# Algorithm developed for use with the 35-ton detector with original
+# (low) thresholds.
+zsonline: {
+  service_provider: Dune35tZeroSuppressService
+  NS:  5
+  NL: 15
+  ND:  5
+  NT:  3
+  TS:  3
+  TL:  7
+  TD:  5
+}
+
+# Algorithm developed for use with the 35-ton detector with high
+# thresholds.
+zsonline_nhi: {
+  service_provider: Dune35tZeroSuppressService
+  NS:  5
+  NL: 15
+  ND:  5
+  NT:  3
+  TS:  6
+  TL: 10
+  TD: 10
+}
+
+#***********************************************************************
+
+# AdcDistortService adds distortions to the digitized signals.
+
+# Add 35-ton stuck bits.
 stuckbits: {
   service_provider: StuckBitAdcDistortionService
   StuckBitsOverflowProbHistoName: "pCorrFracOverflowVsInputLsbCell"
@@ -156,9 +163,34 @@ stuckbits: {
 }
 
 #***********************************************************************
-# Everything below is left over from before the merge with dunezs and can
-# be removed when the old modules SimWireDUNE35t_module.cc and
-# SimWireDUNE10kt_module.cc are dropped.
+
+# AdcCompressService applies supression and converts digititzed signals
+# to the final raw data format.
+
+# Replaces suppressed bins with value Zero.
+cmpreplace: {
+  service_provider: ReplaceCompressService
+  Zero: 0
+}
+
+# Larsoft block formatting. This removes the suppressed bins.
+cmpblock: {
+  service_provider: "LarsoftHuffmanCompressService"
+  UseBlock:         "true"
+  UseHuffman:       "false"
+}
+
+# Larsoft block formatting with Larsoft Huffman compression.
+cmphuffman: {
+  service_provider: "LarsoftHuffmanCompressService"
+  UseBlock:         "true"
+  UseHuffman:       "true"
+}
+
+#***********************************************************************
+# Below are configurations for the old (and soon to be obsolete) DetSim
+# modules. These can be removed when the old modules
+# SimWireDUNE35t_module.cc and SimWireDUNE10kt_module.cc are dropped.
 #***********************************************************************
 
 dunefd_simwire:  

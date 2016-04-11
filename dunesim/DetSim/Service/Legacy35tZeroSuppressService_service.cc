@@ -45,7 +45,7 @@ Legacy35tZeroSuppressService(float aAdcThreshold,
 //**********************************************************************
 
 int Legacy35tZeroSuppressService::
-filter(const AdcCountVector& sigs, Channel, AdcPedestal& ped, AdcFilterVector& keep) const {
+filter(const AdcCountVector& sigs, Channel, AdcPedestal ped, AdcFilterVector& keep) const {
   const unsigned int nsig = sigs.size();
   keep.clear();
   keep.resize(nsig, false);
@@ -102,7 +102,7 @@ ostream& Legacy35tZeroSuppressService::print(ostream& out, string prefix) const 
   out << prefix << "       AdcThreshold: " << m_AdcThreshold       << endl;
   out << prefix << "         MinTickGap: " << m_MinTickGap         << endl;
   out << prefix << "          TickRange: " << m_TickRange          << endl;
-  out << prefix << " SuppressStickyBits: " << sbool(m_SuppressStickyBits) << endl;
+  out << prefix << " SuppressStickyBits: " << sbool(m_SuppressStickyBits);
   return out;
 }
 

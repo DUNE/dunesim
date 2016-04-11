@@ -34,6 +34,14 @@ extract(const sim::SimChannel* psc, AdcSignalVector& sigs) const {
 
 //**********************************************************************
 
+std::ostream& GenericSimChannelExtractService::
+print(std::ostream& out, std::string prefix) const {
+  out << prefix << "GenericSimChannelExtractService";
+  return out;
+}
+
+//**********************************************************************
+
 DEFINE_ART_SERVICE_INTERFACE_IMPL(GenericSimChannelExtractService, SimChannelExtractService)
 
 //**********************************************************************

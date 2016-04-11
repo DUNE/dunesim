@@ -35,7 +35,7 @@ public:
   FixedZeroSuppressService();
 
   // Filter an array of signals. Result is written to keep.
-  int filter(const AdcCountVector& sigs, Channel chan, AdcPedestal& ped, AdcFilterVector& keep) const;
+  int filter(const AdcCountVector& sigs, Channel chan, AdcPedestal ped, AdcFilterVector& keep) const;
 
   // Print the configuration.
   std::ostream& print(std::ostream& out =std::cout, std::string prefix ="") const;
