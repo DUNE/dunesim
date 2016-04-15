@@ -10,6 +10,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <iostream>
 
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Core/EDProducer.h"
@@ -35,6 +36,7 @@
 #include "dune/DuneInterface/AdcDistortionService.h"
 
 using std::ostringstream;
+using std::cout;
 using std::endl;
 using std::string;
 
@@ -148,6 +150,7 @@ void SimWireDUNE::endJob() { }
 //**********************************************************************
 
 void SimWireDUNE::produce(art::Event& evt) {
+  const string myname = "SimWireDUNE::produce: ";
 
   // Make a vector of const sim::SimChannel* that has same number
   // of entries as the number of channels in the detector
@@ -188,6 +191,16 @@ void SimWireDUNE::produce(art::Event& evt) {
     // Add noise to each tick in the channel.
     if ( fNoiseOn ) {              
       m_pcns->addNoise(chan, fChargeWork);
+    }
+
+    // Option to display signals before adding pedestals.
+    // E.g. logsig = chan==1000.
+    bool logsig = false;
+    if ( logsig ) {
+      cout << myname << "Signals after noise:" << endl;
+      for ( unsigned int itck=0; itck<fChargeWork.size(); ++itck ) {
+        cout << myname << " " << itck << ": chg=" << fChargeWork[itck] << endl;
+      }
     }
 
     // Add pedestal.
