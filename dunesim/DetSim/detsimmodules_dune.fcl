@@ -24,8 +24,8 @@ dune_detsim: {
   SimChannelLabel:  "largeant"
   NoiseOn:          false
   PedestalOn:       false
-  SuppressOn:       false
   DistortOn:        false
+  SuppressOn:       false
 }
 
 #***********************************************************************
@@ -107,6 +107,18 @@ padprovided: {
 
 #***********************************************************************
 
+# AdcDistortService adds distortions to the digitized signals.
+
+# Add 35-ton stuck bits.
+stuckbits: {
+  service_provider: StuckBitAdcDistortionService
+  StuckBitsOverflowProbHistoName: "pCorrFracOverflowVsInputLsbCell"
+  StuckBitsProbabilitiesFname: "ADCStuckCodeProbabilities35t/output_produceDcScanSummaryPlots_20150827_coldTest_0p1to1p4_step0p0010.root"
+  StuckBitsUnderflowProbHistoName: "pCorrFracUnderflowVsInputLsbCell"
+}
+
+#***********************************************************************
+
 # AdcSuppressService indicates which channel-tick bins should be
 # ignored (i.e. zero-suppressed).
 
@@ -121,7 +133,7 @@ zslegacy: {
   AdcThreshold: 10.0
   TickRange: 10
   MinTickGap: 2
-  SuppressStickyBits: true
+  SuppressStickyBits: false
 }
 
 # Algorithm developed for use with the 35-ton detector with original
@@ -148,18 +160,6 @@ zsonline_nhi: {
   TS:  6
   TL: 10
   TD: 10
-}
-
-#***********************************************************************
-
-# AdcDistortService adds distortions to the digitized signals.
-
-# Add 35-ton stuck bits.
-stuckbits: {
-  service_provider: StuckBitAdcDistortionService
-  StuckBitsOverflowProbHistoName: "pCorrFracOverflowVsInputLsbCell"
-  StuckBitsProbabilitiesFname: "ADCStuckCodeProbabilities35t/output_produceDcScanSummaryPlots_20150827_coldTest_0p1to1p4_step0p0010.root"
-  StuckBitsUnderflowProbHistoName: "pCorrFracUnderflowVsInputLsbCell"
 }
 
 #***********************************************************************
