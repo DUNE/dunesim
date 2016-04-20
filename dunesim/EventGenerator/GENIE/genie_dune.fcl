@@ -66,9 +66,19 @@ dune_fd_genie_anu_simple_flux_1x2x6_window_rotated_tpc.FluxFiles: ["gsimple_dune
 
 #changes from LARSIM for atm nu
 
-dune_fd_genie_atmo_flux:            @local::standard_genie_atmo_flux
-dune_fd_genie_atmo_flux.TopVolume:  "volCryostat"
-dune_fd_genie_atmo_simple_flux.FluxSearchPaths: "/dune/app/users/santucci/dunetpc/jobs/outputs/atmnu/"
-dune_fd_genie_atmo_flux.FluxFiles: ["fmin10_0401z.sou_nue.txt","fmin10_0401z.sou_num.txt","fmin10_0401z.sou_nbe.txt","fmin10_0401z.sou_nbm.txt"]
+dune_fd_genie_atmo_min_flux:            @local::standard_genie_atmo_flux
+dune_fd_genie_atmo_min_flux.TopVolume:  "volCryostat"
+dune_fd_genie_atmo_min_flux.FluxSearchPaths: "/pnfs/dune/persistent/TaskForce_Flux/atmos/Bartol/"
+dune_fd_genie_atmo_min_flux.FluxFiles: ["fmin10_0401z.sou_nue.txt","fmin10_0401z.sou_num.txt","fmin10_0401z.sou_nbe.txt","fmin10_0401z.sou_nbm.txt"]
+
+dune_fd_genie_atmo_max_flux:            @local::standard_genie_atmo_flux
+dune_fd_genie_atmo_max_flux.TopVolume:  "volCryostat"
+dune_fd_genie_atmo_max_flux.FluxSearchPaths: "/pnfs/dune/persistent/TaskForce_Flux/atmos/Bartol/"
+dune_fd_genie_atmo_max_flux.FluxFiles: ["fmax10_0401z.sou_nue.txt","fmax10_0401z.sou_num.txt","fmax10_0401z.sou_nbe.txt","fmax10_0401z.sou_nbm.txt"]
+
+dune_fd_genie_atmo_hondaflux:            @local::standard_genie_atmo_flux
+dune_fd_genie_atmo_hondaflux.TopVolume:  "volCryostat"
+dune_fd_genie_atmo_simple_hondaflux.FluxSearchPaths: "/dune/app/users/santucci/dunetpc/jobs/outputs/honda_flux/"
+dune_fd_genie_atmo_hondaflux.FluxFiles: ["hms-ally-20-01-solmax.d"]
 
 END_PROLOG
