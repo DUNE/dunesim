@@ -6,7 +6,7 @@
 #include "art/Framework/Services/Optional/RandomNumberGenerator.h"
 #include "artextensions/SeedService/SeedService.hh"
 #include "art/Framework/Core/EngineCreator.h"
-#include "dune/Utilities/SignalShapingServiceDUNE35t.h"
+#include "dune/Utilities/SignalShapingServiceDUNE.h"
 #include "CLHEP/Random/RandGaussQ.h"
 #include "TH1F.h"
 
@@ -36,7 +36,7 @@ WhiteChannelNoiseService(fhicl::ParameterSet const& pset, art::ActivityRegistry&
 //**********************************************************************
 
 int WhiteChannelNoiseService::addNoise(Channel chan, AdcSignalVector& sigs) const {
-  art::ServiceHandle<util::SignalShapingServiceDUNE35t> sss;
+  art::ServiceHandle<util::SignalShapingServiceDUNE> sss;
   float fASICGain      = sss->GetASICGain(chan);
   double fShapingTime   = sss->GetShapingTime(chan);
   std::map< double, int > fShapingTimeOrder;
