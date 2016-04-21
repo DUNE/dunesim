@@ -19,7 +19,7 @@
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "lardata/Utilities/LArFFT.h"
-#include "dune/Utilities/SignalShapingServiceDUNE35t.h"
+#include "dune/Utilities/SignalShapingServiceDUNE.h"
 
 namespace sim {
 class SimChannel;
@@ -38,7 +38,7 @@ public:
 private:
 
   art::ServiceHandle<util::LArFFT> m_pfft;
-  art::ServiceHandle<util::SignalShapingServiceDUNE35t> m_psss;
+  art::ServiceHandle<util::SignalShapingServiceDUNE> m_psss;
   unsigned int m_ntick;
 
 };
