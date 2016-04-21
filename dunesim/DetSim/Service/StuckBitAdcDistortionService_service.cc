@@ -3,6 +3,7 @@
 #include "dune/DetSim/Service/StuckBitAdcDistortionService.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "art/Framework/Services/Optional/RandomNumberGenerator.h"
+#include "art/Framework/Core/EngineCreator.h"
 #include "artextensions/SeedService/SeedService.hh"
 #include "CLHEP/Random/RandFlat.h"
 #include "TFile.h"

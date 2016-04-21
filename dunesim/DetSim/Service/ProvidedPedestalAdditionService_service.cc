@@ -6,6 +6,7 @@
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "art/Framework/Services/Optional/RandomNumberGenerator.h"
 #include "artextensions/SeedService/SeedService.hh"
+#include "art/Framework/Core/EngineCreator.h"
 #include "CLHEP/Random/RandGaussQ.h"
 #include "TH1F.h"
 
