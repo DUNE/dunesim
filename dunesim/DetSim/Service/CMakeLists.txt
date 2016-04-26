@@ -12,7 +12,7 @@ simple_plugin(Dune35tSimChannelExtractService   "service"
                 larcore_Geometry
                 larsim_Simulation
                 lardata_Utilities
-                SignalShapingServiceDUNE35t_service
+                SignalShapingServiceDUNE_service
                 ${ART_UTILITIES}
                 ${ROOT_BASIC_LIB_LIST}
              )
@@ -21,7 +21,7 @@ simple_plugin(GenericSimChannelExtractService   "service"
                 larsim_DetSim
                 larsim_Simulation
                 lardata_Utilities
-                SignalShapingServiceDUNE35t_service
+                SignalShapingServiceDUNE_service
                 ${ART_UTILITIES}
                 ${ROOT_BASIC_LIB_LIST}
              )
@@ -39,7 +39,7 @@ simple_plugin(DPhaseSimChannelExtractService   "service"
              )
 simple_plugin(ExponentialChannelNoiseService   "service"
                 larcore_Geometry
-                SignalShapingServiceDUNE35t_service
+                SignalShapingServiceDUNE_service
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL}
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
@@ -52,7 +52,7 @@ simple_plugin(ExponentialChannelNoiseService   "service"
 
 simple_plugin(WhiteChannelNoiseService   "service"
                 larcore_Geometry
-                SignalShapingServiceDUNE35t_service
+                SignalShapingServiceDUNE_service
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL}
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}

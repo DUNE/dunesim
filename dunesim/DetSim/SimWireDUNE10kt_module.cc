@@ -38,7 +38,7 @@ extern "C" {
 #include "lardata/Utilities/LArFFT.h"
 #include "lardata/RawData/raw.h"
 #include "lardata/DetectorInfoServices/LArPropertiesService.h"
-#include "dune/Utilities/SignalShapingServiceDUNE10kt.h"
+#include "dune/Utilities/SignalShapingServiceDUNE.h"
 #include "larcore/Geometry/Geometry.h"
 
 #include "larsim/Simulation/sim.h"
@@ -279,7 +279,7 @@ namespace detsim {
     evt.getView(fDriftEModuleLabel,chanHandle);
 
     //Get fIndShape and fColShape from SignalShapingService, on the fly
-    art::ServiceHandle<util::SignalShapingServiceDUNE10kt> sss;
+    art::ServiceHandle<util::SignalShapingServiceDUNE> sss;
 
     // make a vector of const sim::SimChannel* that has same number
     // of entries as the number of channels in the detector

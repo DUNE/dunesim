@@ -1,0 +1,13 @@
+#include "supernova.fcl"
+
+BEGIN_PROLOG
+
+dunefd_workspace_supernova: @local::standard_supernova
+dunefd_workspace_supernova.GeneratorAlg.EnergySpectrumFileName: "gvkm_xscn_weighted_nue_spectrum.root"
+
+dunefd_1x2x6_supernova: @local::dunefd_workspace_supernova
+dunefd_1x2x6_supernova.GeneratorAlg.ActiveVolume0: [ -363.376, -607.829,  -0.876 ] # In cm
+dunefd_1x2x6_supernova.GeneratorAlg.ActiveVolume1: [  363.376,  607.829, 1393.46 ] # In cm
+
+
+END_PROLOG
