@@ -197,13 +197,13 @@ dunefd_simwire:
 { 
  module_type:        "SimWireDUNE10kt"
  DriftEModuleLabel:  "largeant"
- NoiseFactU:          0.05       #Noise Scale for U plane
+ NoiseFactU:          0.0349     # Noise Scale for U plane. Reset by DLA 26apr16.
  NoiseWidthU:         2000         #Exponential Noise width (kHz) for U plane
  LowCutoffU:          7.5          #Low frequency filter cutoff (kHz) for U plane
- NoiseFactV:          0.05       #Noise Scale for V plane, should produce RMS of 2.5 ADC counts
+ NoiseFactV:          0.0349     #Noise Scale for V plane, should produce RMS of 2.5 ADC counts. Reset by DLA 26apr16.
  NoiseWidthV:         2000         #Exponential Noise width (kHz) for V plane, should produce RMS of 2.5 ADC counts
  LowCutoffV:          7.5          #Low frequency filter cutoff (kHz) for V plane
- NoiseFactZ:          0.05       #Noise Scale for Z plane, should produce RMS of 2.5 ADC counts
+ NoiseFactZ:          0.0349     #Noise Scale for Z plane, should produce RMS of 2.5 ADC counts. Reset by DLA 26apr16.
  NoiseWidthZ:         2000         #Exponential Noise width (kHz) for Z plane
  LowCutoffZ:          7.5          #Low frequency filter cutoff (kHz) for Z plane
  CompressionType:    "ZeroSuppression"       #could also be none
