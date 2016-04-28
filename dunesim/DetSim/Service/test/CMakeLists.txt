@@ -19,5 +19,6 @@ cet_test(test_FixedDetPedestalService SOURCES test_FixedDetPedestalService.cxx
 cet_test(test_ExponentialChannelNoiseService SOURCES test_ExponentialChannelNoiseService.cxx
   LIBRARIES
     dune_DetSim_Service_ExponentialChannelNoiseService_service
+    larsim_RandomUtils_LArSeedService_service
     dune_ArtSupport
 )

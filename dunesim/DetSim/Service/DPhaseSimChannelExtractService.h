@@ -18,11 +18,6 @@
 #include "lardata/Utilities/LArFFT.h"
 #include "dune/Utilities/SignalShapingServiceDUNEDPhase.h"
 
-//namespace CLHEP {
-//class HepRandomEngine;
-//class RandGaussQ;
-//}
-
 namespace sim {
 class SimChannel;
 }
@@ -46,7 +41,6 @@ private:
   art::ServiceHandle<util::SignalShapingServiceDUNEDPhase> m_psss;
   
   unsigned int m_ntick;
-  //CLHEP::HepRandomEngine* m_pran;
   
   float fDPGainPerView; // gain in dual-phase
   float fRedENC;       // ENC noise, set to 0 to disable
@@ -55,4 +49,3 @@ private:
 DECLARE_ART_SERVICE_INTERFACE_IMPL(DPhaseSimChannelExtractService, SimChannelExtractService, LEGACY)
 
 #endif
-
