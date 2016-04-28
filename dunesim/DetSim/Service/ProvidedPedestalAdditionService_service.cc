@@ -3,7 +3,7 @@
 #include "dune/DetSim/Service/ProvidedPedestalAdditionService.h"
 #include "larevt/CalibrationDBI/Interface/DetPedestalService.h"
 #include "larevt/CalibrationDBI/Interface/DetPedestalProvider.h"
-#include "larsim/larsim/RandomUtils/LArSeedService.h"
+#include "larsim/RandomUtils/LArSeedService.h"
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "CLHEP/Random/JamesRandom.h"
 #include "CLHEP/Random/RandGaussQ.h"
