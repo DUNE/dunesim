@@ -3,36 +3,56 @@
 #include "dune/DetSim/Service/ProvidedPedestalAdditionService.h"
 #include "larevt/CalibrationDBI/Interface/DetPedestalService.h"
 #include "larevt/CalibrationDBI/Interface/DetPedestalProvider.h"
+#include "larsim/larsim/RandomUtils/LArSeedService.h"
 #include "art/Framework/Services/Optional/TFileService.h"
-#include "art/Framework/Services/Optional/RandomNumberGenerator.h"
-#include "artextensions/SeedService/SeedService.hh"
-#include "art/Framework/Core/EngineCreator.h"
+#include "CLHEP/Random/JamesRandom.h"
 #include "CLHEP/Random/RandGaussQ.h"
 #include "TH1F.h"
 
 using std::ostream;
+using std::cout;
 using std::endl;
 using std::string;
-
-#undef UseSeedService
+using sim::LArSeedService;
+using CLHEP::HepJamesRandom;
 
 //**********************************************************************
 
 ProvidedPedestalAdditionService::
 ProvidedPedestalAdditionService(fhicl::ParameterSet const& pset, art::ActivityRegistry&)
-: m_PedNoiseHist(nullptr),
+: m_RandomSeed(0), m_LogLevel(1),
+  m_PedNoiseHist(nullptr),
+  m_pran(nullptr),
   m_PedestalProvider(art::ServiceHandle<lariov::DetPedestalService>()->GetPedestalProvider()) {
+  const string myname = "ProvidedPedestalAdditionService::ctor: ";
   m_NoiseScale = pset.get<float>("NoiseScale");
-#ifdef UseSeedService
-  art::ServiceHandle<artext::SeedService> seedSvc;
-  int seed = seedSvc->getSeed("ProvidedPedestalAdditionService");
-#else
-  int seed = 1007;
-#endif
+  bool haveSeed = pset.get_if_present<int>("RandomSeed", m_RandomSeed);
+  pset.get_if_present<int>("LogLevel", m_LogLevel);
+  if ( m_RandomSeed == 0 ) haveSeed = false;
+  if ( haveSeed ) {
+    if ( m_LogLevel > 0 ) cout << myname << "WARNING: Using hardwired seed." << endl;
+    m_pran = new HepJamesRandom(m_RandomSeed);
+  } else {
+    string rname = "ProvidedPedestalAdditionService";
+    if ( m_LogLevel > 0 ) cout << myname << "Using LArSeedService." << endl;
+    art::ServiceHandle<LArSeedService> seedSvc;
+    m_pran = new HepJamesRandom;
+    if ( m_LogLevel > 0 ) cout << myname << "    Initial seed: " << m_pran->getSeed() << endl;
+    seedSvc->registerEngine(LArSeedService::CLHEPengineSeeder(m_pran), rname);
+  }
+  if ( m_LogLevel > 0 ) cout << myname << "  Registered seed: " << m_pran->getSeed() << endl;
   art::ServiceHandle<art::TFileService> tfs;
   m_PedNoiseHist  = tfs->make<TH1F>("PedNoise", ";Pedestal noise  (ADC);", 1000,  -10., 10.);
-  art::EngineCreator ecr;
-  m_pran = &ecr.createEngine(seed, "HepJamesRandom", "ProvidedPedestalAdditionService");
+}
+
+//**********************************************************************
+
+ProvidedPedestalAdditionService::~ProvidedPedestalAdditionService() {
+  const string myname = "ProvidedPedestalAdditionService::dtor: ";
+  if ( m_LogLevel > 0 ) {
+    cout << myname << "Deleting random engine with seed " << m_pran->getSeed() << endl;
+  }
+  delete m_pran;
 }
 
 //**********************************************************************

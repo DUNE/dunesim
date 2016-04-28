@@ -2,35 +2,57 @@
 
 #include "dune/DetSim/Service/WhiteChannelNoiseService.h"
 #include "larcore/Geometry/Geometry.h"
+#include "larsim/larsim/RandomUtils/LArSeedService.h"
 #include "art/Framework/Services/Optional/TFileService.h"
-#include "art/Framework/Services/Optional/RandomNumberGenerator.h"
-#include "artextensions/SeedService/SeedService.hh"
-#include "art/Framework/Core/EngineCreator.h"
 #include "dune/Utilities/SignalShapingServiceDUNE.h"
+#include "CLHEP/Random/JamesRandom.h"
 #include "CLHEP/Random/RandGaussQ.h"
 #include "TH1F.h"
 
 using std::ostream;
+using std::cout;
 using std::endl;
 using std::string;
-
-#undef UseSeedService
+using sim::LArSeedService;
+using CLHEP::HepJamesRandom;
 
 //**********************************************************************
 
 WhiteChannelNoiseService::
-WhiteChannelNoiseService(fhicl::ParameterSet const& pset, art::ActivityRegistry&):
+WhiteChannelNoiseService(fhicl::ParameterSet const& pset, art::ActivityRegistry&)
+: m_RandomSeed(0), m_LogLevel(1),
   fNoiseHist(nullptr),
   m_pran(nullptr) {
-#ifdef UseSeedService
-  int seed = seedSvc->getSeed("WhiteChannelNoiseService");
-#else
-  int seed = 1005;
-#endif
+  const string myname = "WhiteChannelNoiseService::ctor: ";
+  // Fetch parameters.
+  bool haveSeed = pset.get_if_present<int>("RandomSeed", m_RandomSeed);
+  pset.get_if_present<int>("LogLevel", m_LogLevel);
+  if ( m_RandomSeed == 0 ) haveSeed = false;
+  // Create random number engine.
+  if ( haveSeed ) {
+    if ( m_LogLevel > 0 ) cout << myname << "WARNING: Using hardwired seed." << endl;
+    m_pran = new HepJamesRandom(m_RandomSeed);
+  } else {
+    string rname = "WhiteChannelNoiseService";
+    if ( m_LogLevel > 0 ) cout << myname << "Using LArSeedService." << endl;
+    art::ServiceHandle<LArSeedService> seedSvc;
+    m_pran = new HepJamesRandom;
+    if ( m_LogLevel > 0 ) cout << myname << "    Initial seed: " << m_pran->getSeed() << endl;
+    seedSvc->registerEngine(LArSeedService::CLHEPengineSeeder(m_pran), rname);
+  }
+  if ( m_LogLevel > 0 ) cout << myname << "  Registered seed: " << m_pran->getSeed() << endl;
   art::ServiceHandle<art::TFileService> tfs;
   fNoiseHist     = tfs->make<TH1F>("Noise", ";Noise  (ADC);", 1000,   -10., 10.);
-  art::EngineCreator ecr;
-  m_pran = &ecr.createEngine(seed, "HepJamesRandom", "WhiteChannelNoiseService");
+}
+
+//**********************************************************************
+
+WhiteChannelNoiseService::~WhiteChannelNoiseService() {
+  const string myname = "WhiteChannelNoiseService::dtor: ";
+  if ( m_LogLevel > 0 ) {
+    cout << myname << "Deleting random engine with seed " << m_pran->getSeed() << endl;
+  }
+  delete m_pran;
 }
 
 //**********************************************************************

@@ -5,26 +5,26 @@
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "lardata/Utilities/LArFFT.h"
 #include "larcore/Geometry/Geometry.h"
+#include "larsim/larsim/RandomUtils/LArSeedService.h"
 #include "art/Framework/Services/Optional/TFileService.h"
-#include "art/Framework/Services/Optional/RandomNumberGenerator.h"
-#include "artextensions/SeedService/SeedService.hh"
-#include "art/Framework/Core/EngineCreator.h"
+#include "CLHEP/Random/JamesRandom.h"
 #include "CLHEP/Random/RandFlat.h"
 #include "TH1F.h"
+#include "TRandom3.h"
 
 using std::cout;
 using std::ostream;
 using std::endl;
 using std::string;
 using std::ostringstream;
-
-#undef UseSeedService
+using sim::LArSeedService;
+using CLHEP::HepJamesRandom;
 
 //**********************************************************************
 
 ExponentialChannelNoiseService::
 ExponentialChannelNoiseService(fhicl::ParameterSet const& pset)
-: fRandomSeed(-1), fLogLevel(1),
+: fRandomSeed(0), fLogLevel(1),
   fNoiseHistZ(nullptr), fNoiseHistU(nullptr), fNoiseHistV(nullptr),
   fNoiseChanHist(nullptr),
   m_pran(nullptr) {
@@ -41,57 +41,37 @@ ExponentialChannelNoiseService(fhicl::ParameterSet const& pset)
   fNoiseArrayPoints  = pset.get<unsigned int>("NoiseArrayPoints");
   fOldNoiseIndex     = pset.get<bool>("OldNoiseIndex");
   bool haveSeed = pset.get_if_present<int>("RandomSeed", fRandomSeed);
+  if ( fRandomSeed == 0 ) haveSeed = false;
   pset.get_if_present<int>("LogLevel", fLogLevel);
   fNoiseZ.resize(fNoiseArrayPoints);
   fNoiseU.resize(fNoiseArrayPoints);
   fNoiseV.resize(fNoiseArrayPoints);
   int seed = fRandomSeed;
-#ifdef UseSeedService
-  art::ServiceHandle<artext::SeedService> seedSvc;
-  int seed = seedSvc->getSeed("ExponentialChannelNoiseService");
-#else
-  if ( ! haveSeed ) {
-    cout << myname << "WARNING: Using hardwired seed." << endl;
-    seed = 1005;
-  } else {
-    cout << myname << "WARNING: Using seed from FCL." << endl;
-  }
-#endif
   art::ServiceHandle<art::TFileService> tfs;
   fNoiseHistZ = tfs->make<TH1F>("znoise", ";Z Noise [ADC counts];", 1000,   -10., 10.);
   fNoiseHistU = tfs->make<TH1F>("unoise", ";U Noise [ADC counts];", 1000,   -10., 10.);
   fNoiseHistV = tfs->make<TH1F>("vnoise", ";V Noise [ADC counts];", 1000,   -10., 10.);
   fNoiseChanHist = tfs->make<TH1F>("NoiseChan", ";Noise channel;", fNoiseArrayPoints, 0, fNoiseArrayPoints);
-  art::EngineCreator ecr;
-  // Assign a unique name for the random number engine for each instance of this class.
-  string basename = "ExponentialChannelNoiseService";
-  for ( unsigned int itry=0; itry<1000; ++itry ) {
-    try {
-      ostringstream ssnam;
-      ssnam << basename;
-      if ( itry ) {
-        ssnam << "V";
-        if ( itry < 10 ) ssnam << 0;
-        if ( itry < 100 ) ssnam << 0;
-        if ( itry < 1000 ) ssnam << 0;
-        ssnam << itry;
-      }
-      m_pran = &ecr.createEngine(seed, "HepJamesRandom", ssnam.str());
-      break;
-    } catch (...) {
-      if ( ++itry >= 1000 ) {
-        cout << myname << "Too many random number engines." << endl;
-        m_pran = &ecr.createEngine(seed, "HepJamesRandom", basename);
-        abort();  // Preceding should raise an exception.
-      }
-    }
+  // Assign a unique name for the random number engine ExponentialChannelNoiseServiceVIII
+  // III = for each instance of this class.
+  string rname = "ExponentialChannelNoiseService";
+  if ( haveSeed ) {
+    if ( fLogLevel > 0 ) cout << myname << "WARNING: Using hardwired seed." << endl;
+    m_pran = new HepJamesRandom(seed);
+  } else {
+    if ( fLogLevel > 0 ) cout << myname << "Using LArSeedService." << endl;
+    art::ServiceHandle<LArSeedService> seedSvc;
+    m_pran = new HepJamesRandom;
+    if ( fLogLevel > 0 ) cout << myname << "    Initial seed: " << m_pran->getSeed() << endl;
+    seedSvc->registerEngine(LArSeedService::CLHEPengineSeeder(m_pran), rname);
   }
+  if ( fLogLevel > 0 ) cout << myname << "  Registered seed: " << m_pran->getSeed() << endl;
   for ( unsigned int isam=0; isam<fNoiseArrayPoints; ++isam ) {
     generateNoise(fNoiseNormZ, fNoiseWidthZ, fLowCutoffZ, fNoiseZ[isam], fNoiseHistZ);
     generateNoise(fNoiseNormU, fNoiseWidthU, fLowCutoffU, fNoiseU[isam], fNoiseHistU);
     generateNoise(fNoiseNormV, fNoiseWidthV, fLowCutoffV, fNoiseV[isam], fNoiseHistV);
   }
-  if ( fLogLevel > 0 ) print();
+  if ( fLogLevel > 1 ) print() << endl;
 }
 
 //**********************************************************************
@@ -102,9 +82,18 @@ ExponentialChannelNoiseService(fhicl::ParameterSet const& pset, art::ActivityReg
 
 //**********************************************************************
 
+ExponentialChannelNoiseService::~ExponentialChannelNoiseService() {
+  const string myname = "ExponentialChannelNoiseService::dtor: ";
+  if ( fLogLevel > 0 ) {
+    cout << myname << "Deleting random engine with seed " << m_pran->getSeed() << endl;
+  }
+  delete m_pran;
+}
+
+//**********************************************************************
+
 int ExponentialChannelNoiseService::addNoise(Channel chan, AdcSignalVector& sigs) const {
-  CLHEP::HepRandomEngine& engine = *m_pran;
-  CLHEP::RandFlat flat(engine);
+  CLHEP::RandFlat flat(*m_pran);
   unsigned int noisechan = 0;
   if ( fOldNoiseIndex ) {
     // Keep this strange way of choosing noise channel to be consistent with old results.
@@ -153,20 +142,23 @@ ostream& ExponentialChannelNoiseService::print(ostream& out, string prefix) cons
 void ExponentialChannelNoiseService::
 generateNoise(float aNoiseNorm, float aNoiseWidth, float aLowCutoff,
               AdcSignalVector& noise, TH1* aNoiseHist) const {
+  const string myname = "ExponentialChannelNoiseService::generateNoise: ";
+  if ( fLogLevel > 1 ) {
+    cout << myname << "Generating noise." << endl;
+    if ( fLogLevel > 2 ) {
+      cout << myname << "    Norm: " << aNoiseNorm << endl;
+      cout << myname << "   Width: " << aNoiseWidth << endl;
+      cout << myname << "  Cutoff: " << aLowCutoff << endl;
+      cout << myname << "    Seed: " << m_pran->getSeed() << endl;
+    }
+  }
   // Fetch sampling rate.
   auto const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
   float sampleRate = detprop->SamplingRate();
   // Fetch FFT service and # ticks.
   art::ServiceHandle<util::LArFFT> pfft;
   unsigned int ntick = pfft->FFTSize();
-  // Fetch random number engine.
-#ifdef UseSeedService
-  art::ServiceHandle<art::RandomNumberGenerator> rng;
-  CLHEP::HepRandomEngine& engine = rng->getEngine("ExponentialChannelNoiseService");
-#else
-  CLHEP::HepRandomEngine& engine = *m_pran;
-#endif
-  CLHEP::RandFlat flat(engine);
+  CLHEP::RandFlat flat(*m_pran);
   // Create noise spectrum in frequency.
   unsigned nbin = ntick/2 + 1;
   std::vector<TComplex> noiseFrequency(nbin, 0.);
