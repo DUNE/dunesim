@@ -24,8 +24,8 @@ dune_detsim: {
   SimChannelLabel:  "largeant"
   NoiseOn:          false
   PedestalOn:       false
-  SuppressOn:       false
   DistortOn:        false
+  SuppressOn:       false
 }
 
 #***********************************************************************
@@ -107,6 +107,18 @@ padprovided: {
 
 #***********************************************************************
 
+# AdcDistortService adds distortions to the digitized signals.
+
+# Add 35-ton stuck bits.
+stuckbits: {
+  service_provider: StuckBitAdcDistortionService
+  StuckBitsOverflowProbHistoName: "pCorrFracOverflowVsInputLsbCell"
+  StuckBitsProbabilitiesFname: "ADCStuckCodeProbabilities35t/output_produceDcScanSummaryPlots_20150827_coldTest_0p1to1p4_step0p0010.root"
+  StuckBitsUnderflowProbHistoName: "pCorrFracUnderflowVsInputLsbCell"
+}
+
+#***********************************************************************
+
 # AdcSuppressService indicates which channel-tick bins should be
 # ignored (i.e. zero-suppressed).
 
@@ -121,7 +133,7 @@ zslegacy: {
   AdcThreshold: 10.0
   TickRange: 10
   MinTickGap: 2
-  SuppressStickyBits: true
+  SuppressStickyBits: false
 }
 
 # Algorithm developed for use with the 35-ton detector with original
@@ -148,18 +160,6 @@ zsonline_nhi: {
   TS:  6
   TL: 10
   TD: 10
-}
-
-#***********************************************************************
-
-# AdcDistortService adds distortions to the digitized signals.
-
-# Add 35-ton stuck bits.
-stuckbits: {
-  service_provider: StuckBitAdcDistortionService
-  StuckBitsOverflowProbHistoName: "pCorrFracOverflowVsInputLsbCell"
-  StuckBitsProbabilitiesFname: "ADCStuckCodeProbabilities35t/output_produceDcScanSummaryPlots_20150827_coldTest_0p1to1p4_step0p0010.root"
-  StuckBitsUnderflowProbHistoName: "pCorrFracUnderflowVsInputLsbCell"
 }
 
 #***********************************************************************
@@ -197,13 +197,13 @@ dunefd_simwire:
 { 
  module_type:        "SimWireDUNE10kt"
  DriftEModuleLabel:  "largeant"
- NoiseFactU:          0.05       #Noise Scale for U plane
+ NoiseFactU:          0.0349     # Noise Scale for U plane. Reset by DLA 26apr16.
  NoiseWidthU:         2000         #Exponential Noise width (kHz) for U plane
  LowCutoffU:          7.5          #Low frequency filter cutoff (kHz) for U plane
- NoiseFactV:          0.05       #Noise Scale for V plane, should produce RMS of 2.5 ADC counts
+ NoiseFactV:          0.0349     #Noise Scale for V plane, should produce RMS of 2.5 ADC counts. Reset by DLA 26apr16.
  NoiseWidthV:         2000         #Exponential Noise width (kHz) for V plane, should produce RMS of 2.5 ADC counts
  LowCutoffV:          7.5          #Low frequency filter cutoff (kHz) for V plane
- NoiseFactZ:          0.05       #Noise Scale for Z plane, should produce RMS of 2.5 ADC counts
+ NoiseFactZ:          0.0349     #Noise Scale for Z plane, should produce RMS of 2.5 ADC counts. Reset by DLA 26apr16.
  NoiseWidthZ:         2000         #Exponential Noise width (kHz) for Z plane
  LowCutoffZ:          7.5          #Low frequency filter cutoff (kHz) for Z plane
  CompressionType:    "ZeroSuppression"       #could also be none
