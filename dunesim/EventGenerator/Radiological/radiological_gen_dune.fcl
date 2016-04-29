@@ -34,6 +34,12 @@ dune4apa_radiogen:
  T1:                    [  3200000. ] # ending time in ns
 }
 
+dunefd_workspace_ar39: @local::dune4apa_radiogen
+
+dunefd_1x2x6_ar39:     @local::dune4apa_radiogen
+duenfd_1x2x6_ar39.Z0:   [  -55. ]     # in cm in world coordinates, bottom corner of box
+duenfd_1x2x6_ar39.Z1:   [ 1500. ]     # in cm in world coordinates, top corner of box
+
 dune4apa_radiogen_rn222: @local::dune4apa_radiogen
 dune4apa_radiogen_rn222.Nuclide: [ "222Rn" ]
 dune4apa_radiogen_rn222.BqPercc: [ 0.0141  ] # Don't know this activity yet: try 10x 39Ar for now

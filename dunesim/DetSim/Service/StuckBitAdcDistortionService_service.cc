@@ -2,37 +2,48 @@
 
 #include "dune/DetSim/Service/StuckBitAdcDistortionService.h"
 #include "fhiclcpp/ParameterSet.h"
-#include "art/Framework/Services/Optional/RandomNumberGenerator.h"
-#include "art/Framework/Core/EngineCreator.h"
-#include "artextensions/SeedService/SeedService.hh"
+#include "larsim/RandomUtils/LArSeedService.h"
+#include "art/Framework/Services/Registry/ServiceHandle.h"
+#include "CLHEP/Random/JamesRandom.h"
 #include "CLHEP/Random/RandFlat.h"
 #include "TFile.h"
 #include "TString.h"
 #include "TProfile.h"
 
 using std::string;
+using std::cout;
 using std::ostream;
 using std::endl;
-
-#undef UseSeedService
+using sim::LArSeedService;
+using CLHEP::HepJamesRandom;
 
 //**********************************************************************
 
 StuckBitAdcDistortionService::
 StuckBitAdcDistortionService(const fhicl::ParameterSet& pset, art::ActivityRegistry&)
-: m_pran(nullptr) {
-  // Fetch the random engine.
-#ifdef UseSeedService
-  int seed = seedSvc->getSeed("StuckBitAdcDistortionService");
-#else
-  int seed = 1009;
-#endif
-  art::EngineCreator ecr;
-  m_pran = &ecr.createEngine(seed, "HepJamesRandom", "StuckBitsNoiseService");
+: m_RandomSeed(0), m_LogLevel(1),
+  m_pran(nullptr) {
+  const string myname = "StuckBitAdcDistortionService::ctor: ";
   // Fetch parameters.
   fStuckBitsProbabilitiesFname = pset.get<string>("StuckBitsProbabilitiesFname");
   fStuckBitsOverflowProbHistoName = pset.get<string>("StuckBitsOverflowProbHistoName");
   fStuckBitsUnderflowProbHistoName = pset.get<string>("StuckBitsUnderflowProbHistoName");
+  bool haveSeed = pset.get_if_present<int>("RandomSeed", m_RandomSeed);
+  pset.get_if_present<int>("LogLevel", m_LogLevel);
+  if ( m_RandomSeed == 0 ) haveSeed = false;
+  // Create random number engine.
+  if ( haveSeed ) {
+    if ( m_LogLevel > 0 ) cout << myname << "WARNING: Using hardwired seed." << endl;
+    m_pran = new HepJamesRandom(m_RandomSeed);
+  } else {
+    string rname = "StuckBitAdcDistortionService";
+    if ( m_LogLevel > 0 ) cout << myname << "Using LArSeedService." << endl;
+    art::ServiceHandle<LArSeedService> seedSvc;
+    m_pran = new HepJamesRandom;
+    if ( m_LogLevel > 0 ) cout << myname << "    Initial seed: " << m_pran->getSeed() << endl;
+    seedSvc->registerEngine(LArSeedService::CLHEPengineSeeder(m_pran), rname);
+  }
+  if ( m_LogLevel > 0 ) cout << myname << "  Registered seed: " << m_pran->getSeed() << endl;
   // Fetch the probabilities.
   mf::LogInfo("SimWireDUNE") << " using ADC stuck code probabilities from .root file " ;
   std::string fname;
@@ -67,6 +78,16 @@ StuckBitAdcDistortionService(const fhicl::ParameterSet& pset, art::ActivityRegis
   fin->Close();
 }
   
+//**********************************************************************
+
+StuckBitAdcDistortionService::~StuckBitAdcDistortionService() {
+  const string myname = "StuckBitAdcDistortionService:dtor: ";
+  if ( m_LogLevel > 0 ) {
+    cout << myname << "Deleting random engine with seed " << m_pran->getSeed() << endl;
+  }
+  delete m_pran;
+}
+
 //**********************************************************************
 
 int StuckBitAdcDistortionService::modify(Channel, AdcCountVector& adcvec) const {

@@ -9,6 +9,8 @@
 // for each tick with sigma = NoiseScale*RMS
 // Parameters:
 //    NoiseScale - The above noise scale. (<= 0 for no pedestal noise).
+//    RandomSeed - Overrides SeedService if set nonzero.
+//    LogLevel - (0=none, 1=init only, ...)
 
 #ifndef ProvidedPedestalAdditionService_H
 #define ProvidedPedestalAdditionService_H
@@ -30,6 +32,8 @@ public:
 
   ProvidedPedestalAdditionService(fhicl::ParameterSet const& pset, art::ActivityRegistry&);
 
+  ~ProvidedPedestalAdditionService();
+
   // Add pedestals and pedestal noise to a signal array.
   int addPedestal(Channel chan, AdcSignalVector& sigs, float& ped, float& pedrms) const;
 
@@ -38,7 +42,10 @@ public:
 
 private:
 
-  float m_NoiseScale;    ///< Noise is obtained by scaling RMS by this value.
+  // Configuration.
+  float m_NoiseScale;
+  int m_RandomSeed;
+  int m_LogLevel;
 
   TH1* m_PedNoiseHist;   ///< Histogram of pedestal noise counts
 

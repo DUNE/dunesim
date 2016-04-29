@@ -17,9 +17,8 @@ art_make( BASENAME_ONLY
 	                lardata_Utilities
 			larevt_Filters
 			lardata_RawData
-                        SignalShapingServiceDUNE10kt_service
+                        SignalShapingServiceDUNE_service
 			SignalShapingServiceDUNEDPhase_service
-			SignalShapingServiceDUNE35t_service
                         ${SEEDSERVICE_SERVICE} # artextensions
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}
