@@ -14,8 +14,6 @@
 #include "dune/ArtSupport/ArtServiceHelper.h"
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "art/Framework/Services/Optional/RandomNumberGenerator.h"
-//#include "lardata/DetectorInfo/DetectorProperties.h"
-//#include "lardata/DetectorInfoServices/DetectorClocksService.h"
 #include "lardata/Utilities/LArFFT.h"
 #include "larcore/Geometry/Geometry.h"
 #include "lardata/RawData/raw.h"
@@ -58,12 +56,6 @@ void load_services(int fftsize =0) {
   assert( ash.addService("TFileService", scfg) == 0 );
 
   cout << myname << line << endl;
-  cout << myname << "Add RandomNumberGenerator service." << endl;
-  scfg = "";
-  cout << myname << "Configuration: " << scfg << endl;
-  assert( ash.addService("RandomNumberGenerator", scfg) == 0 );
-  
-  cout << myname << line << endl;
   string gname = "dune35t4apa_v5";
   cout << myname << "Add Geometry service." << endl;
   scfg = "DisableWiresInG4: true GDML: \"dune35t4apa_v5.gdml\" Name: \"" + gname +
@@ -86,7 +78,6 @@ void load_services(int fftsize =0) {
 
   cout << myname << line << endl;
   cout << myname << "Add DetectorPropertiesService service." << endl;
-//  scfg = "ElectronsToADC: 6.8906513e-3 NumberTimeSamples: 3200 ReadOutWindowSize: 3200 TimeOffsetU: 0 TimeOffsetV: 0 TimeOffsetZ: 0 service_provider: \"DetectorPropertiesServiceStandard\"";
   scfg = DetectorPropertiesServiceConfigurationString;
   cout << myname << "Configuration: " << scfg << endl;
   assert( ash.addService("DetectorPropertiesService", scfg) == 0 );
@@ -96,25 +87,6 @@ void load_services(int fftsize =0) {
   scfg = "ClockSpeedExternal: 3.125e1 ClockSpeedOptical: 128 ClockSpeedTPC: 2 ClockSpeedTrigger: 16 DefaultBeamTime: 0 DefaultTrigTime: 0 FramePeriod: 1600 G4RefTime: 0 InheritClockConfig: false TrigModuleName: \"\" TriggerOffsetTPC: 0 service_type: \"DetectorClocksService\" service_provider: \"DetectorClocksServiceStandard\" ";
   cout << myname << "Configuration: " << scfg << endl;
   assert( ash.addService("DetectorClocksService", scfg) == 0 );
-
-#if 0
-  cout << myname << line << endl;
-  cout << myname << "Add the signal shaping service." << endl;
-  // This doesn't work because defn is in a PROLOG.
-  scfg = "services_dune.fcl";
-  // This doesn't work because text must be preprocessed.
-  scfg = "#include \"services_dune.fcl\"\n";
-  scfg += "services: {\n";
-  scfg += "user: @local::dune35t_services\n";
-  scfg += "}";
-  {
-    ofstream ofile("test_SignalShapingServiceDUNE35t_services.fcl");
-    ofile << scfg << endl;
-  }
-  // This works if the file contains something like the above text.
-  scfg = "test_SignalShapingServiceDUNE35t_services.fcl";
-  isFile = true;
-#endif
 
   // Work around defect in larsoft: https://cdcvs.fnal.gov/redmine/issues/10618.
   TH1::AddDirectory(kFALSE);
@@ -159,6 +131,7 @@ int test_ExponentialChannelNoiseService(unsigned int ntick, unsigned int maxchan
   pset.put("LowCutoffV",     7.5);
   pset.put("NoiseArrayPoints", 1000);
   pset.put("OldNoiseIndex", true);
+  pset.put("RandomSeed", 54321);
   ExponentialChannelNoiseService noisvc(pset);
 
   ServiceHandle<LArFFT> hfftsvc;

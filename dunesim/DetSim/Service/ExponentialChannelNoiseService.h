@@ -32,6 +32,9 @@ public:
   // Ctor.
   ExponentialChannelNoiseService(fhicl::ParameterSet const& pset, art::ActivityRegistry&);
 
+  // Dtor.
+  ~ExponentialChannelNoiseService();
+
   // Add noise to a signal array.
   int addNoise(Channel chan, AdcSignalVector& sigs) const;
 
@@ -61,7 +64,7 @@ private:
   float        fLowCutoffV;        ///< low frequency filter cutoff (kHz)  for V plane
   unsigned int fNoiseArrayPoints;  ///< number of points in randomly generated noise array
   bool         fOldNoiseIndex;     ///< Use old selection of noise array index
-  int          fRandomSeed;        ///< Seed for random number service. If absent, use SeedSvc.
+  int          fRandomSeed;        ///< Seed for random number service. If absent or zero, use SeedSvc.
   int          fLogLevel;          ///< Log message level: 0=quiet, 1=init only, 2+=every event
 
   // Noise arrays.
