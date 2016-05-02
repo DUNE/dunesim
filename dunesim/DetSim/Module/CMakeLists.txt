@@ -14,7 +14,7 @@ art_make( BASENAME_ONLY
                         larsim_DetSim
                         SignalShapingServiceDUNE_service
 			SignalShapingServiceDUNEDPhase_service
-                        ${SEEDSERVICE_SERVICE} # artextensions
+                        larsim_RandomUtils_LArSeedService_service
                         ${ART_FRAMEWORK_CORE}
                         ${ART_FRAMEWORK_PRINCIPAL}
                         ${ART_FRAMEWORK_SERVICES_REGISTRY}
