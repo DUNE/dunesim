@@ -65,6 +65,7 @@ private:
   bool fPedestalOn;        ///< switch for simulation of nonzero pedestals
   bool fDistortOn;         ///< switch for simulation of stuck bits
   bool fSuppressOn;        ///< switch for simulation of zero suppression
+  bool fKeepEmptyChannels; ///< Write out empty channels iff true.
 
   // Services.
   art::ServiceHandle<geo::Geometry> m_pgeo;
@@ -95,11 +96,12 @@ SimWireDUNE::~SimWireDUNE() { }
 void SimWireDUNE::reconfigure(fhicl::ParameterSet const& p) {
   string myname = "SimWireDUNE::reconfigure: ";
   string myprefix = myname + "    ";
-  fSimChannelLabel = p.get<std::string>("SimChannelLabel");
-  fNoiseOn         = p.get<bool>("NoiseOn");
-  fPedestalOn      = p.get<bool>("PedestalOn");  
-  fDistortOn       = p.get<bool>("DistortOn");  
-  fSuppressOn      = p.get<bool>("SuppressOn");  
+  fSimChannelLabel   = p.get<std::string>("SimChannelLabel");
+  fNoiseOn           = p.get<bool>("NoiseOn");
+  fPedestalOn        = p.get<bool>("PedestalOn");  
+  fDistortOn         = p.get<bool>("DistortOn");  
+  fSuppressOn        = p.get<bool>("SuppressOn");  
+  fKeepEmptyChannels = p.get<bool>("KeepEmptyChannels");  
   ostringstream out;
   out << myname << "Accessed services:" << endl;
   out << myname << "  SimChannel extraction service:" << endl;
@@ -134,7 +136,9 @@ void SimWireDUNE::reconfigure(fhicl::ParameterSet const& p) {
   }
   out << endl;
   out << myname << "  Compression service:" << endl;
+  out << endl;
   m_pcmp->print(out, myprefix);
+  out << myname << "  KeepEmptyChannels:" << fKeepEmptyChannels << endl;
   mf::LogInfo("SimWireDUNE::reconfigure") << out.str();
 
   return;
@@ -229,13 +233,18 @@ void SimWireDUNE::produce(art::Event& evt) {
       m_pdis->modify(chan, adcvec);
     }
     
-    // Zero suppress and compress.
+    // Zero suppress.
     AdcFilterVector keep(adcvec.size(), true);
     if ( fSuppressOn ) {
       m_pzs->filter(adcvec, chan, pedval, keep);
     }
     int nkeep = 0;
     for ( bool kept : keep ) if ( kept ) ++nkeep;
+
+    // If flag is not set and channel is empty, skip it.
+    if ( ! fKeepEmptyChannels && nkeep==0 ) continue;
+
+    // Compress.
     raw::Compress_t comp = raw::kNone;
     m_pcmp->compress(adcvec, keep, pedval, comp);
 

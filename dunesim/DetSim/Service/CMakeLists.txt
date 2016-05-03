@@ -67,6 +67,7 @@ simple_plugin(ProvidedPedestalAdditionService "service"
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
                 ${ART_FRAMEWORK_CORE}
                 ${ART_UTILITIES}
+                MF_MessageLogger
                 ${CLHEP}
                 ${ROOT_BASIC_LIB_LIST}
              )
