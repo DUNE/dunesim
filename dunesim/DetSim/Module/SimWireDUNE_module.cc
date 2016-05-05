@@ -234,19 +234,19 @@ void SimWireDUNE::produce(art::Event& evt) {
     }
     
     // Zero suppress.
-    AdcFilterVector keep(adcvec.size(), true);
+    AdcCountSelection acs(adcvec, chan, pedval);
     if ( fSuppressOn ) {
-      m_pzs->filter(adcvec, chan, pedval, keep);
+      m_pzs->filter(acs);
     }
     int nkeep = 0;
-    for ( bool kept : keep ) if ( kept ) ++nkeep;
+    for ( bool kept : acs.filter ) if ( kept ) ++nkeep;
 
     // If flag is not set and channel is empty, skip it.
     if ( ! fKeepEmptyChannels && nkeep==0 ) continue;
 
     // Compress.
     raw::Compress_t comp = raw::kNone;
-    m_pcmp->compress(adcvec, keep, pedval, comp);
+    m_pcmp->compress(adcvec, acs.filter, pedval, comp);
 
     // Create and store raw digit.
     raw::RawDigit rd(chan, nTickReadout, adcvec, comp);
