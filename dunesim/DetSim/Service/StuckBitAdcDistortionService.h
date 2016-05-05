@@ -9,7 +9,7 @@
 //    StuckBitsProbabilitiesFname - Input file name
 //    StuckBitsOverflowProbHistoName  - Name of histogram with overflow probablilities
 //    StuckBitsUnderflowProbHistoName - Name of histogram with underflow probablilities
-//    RandomSeed - Overrides SeedService if set nonzero.
+//    RandomSeed - Overrides LArSeedService if set nonzero.
 //    LogLevel - (0=none, 1=init only, ...)
 
 #ifndef StuckBitAdcDistortionService_H
