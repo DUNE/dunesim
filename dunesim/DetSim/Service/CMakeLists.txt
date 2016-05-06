@@ -34,7 +34,7 @@ simple_plugin(DPhaseSimChannelExtractService   "service"
                 ${ART_UTILITIES}
 		${ART_FRAMEWORK_CORE}
                 ${ROOT_BASIC_LIB_LIST}
-		${SEEDSERVICE_SERVICE}
+		larsim_RandomUtils_LArSeedService_service
 		${CLHEP}
              )
 simple_plugin(ExponentialChannelNoiseService   "service"
