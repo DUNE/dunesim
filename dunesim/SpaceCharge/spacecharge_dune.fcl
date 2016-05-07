@@ -2,14 +2,14 @@
 
 BEGIN_PROLOG
 
-dunefd_spacecharge:  @local::standard_spacecharge
+dunefd_spacecharge:   @local::standard_spacecharge
 
-dunefddphase_spacecharge:  @local::standard_spacecharge
+dunefddphase_spacecharge:   @local::standard_spacecharge
 
-protodune_spacecharge:  @local::standard_spacecharge
-protodune_spacecharge.InputFilename:  SCEoffsets_ProtoDUNE_E500.root
+protodune_spacecharge:   @local::standard_spacecharge
+protodune_spacecharge.InputFilename:  "SCEoffsets_ProtoDUNE_E500.root"
 protodune_spacecharge.service_provider:  SpaceChargeServiceProtoDUNE
 
-dune35t_spacecharge:  @local::standard_spacecharge
+dune35t_spacecharge:   @local::standard_spacecharge
 
 END_PROLOG
