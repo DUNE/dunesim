@@ -9,7 +9,7 @@
 // for each tick with sigma = NoiseScale*RMS
 // Parameters:
 //    NoiseScale - The above noise scale. (<= 0 for no pedestal noise).
-//    RandomSeed - Overrides SeedService if set nonzero.
+//    RandomSeed - Overrides LArSeedService if set nonzero.
 //    LogLevel - (0=none, 1=init only, ...)
 
 #ifndef ProvidedPedestalAdditionService_H
