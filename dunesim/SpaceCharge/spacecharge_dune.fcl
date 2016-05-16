@@ -11,5 +11,7 @@ protodune_spacecharge.InputFilename:  "SCEoffsets_ProtoDUNE_E500.root"
 protodune_spacecharge.service_provider:  SpaceChargeServiceProtoDUNE
 
 dune35t_spacecharge:   @local::standard_spacecharge
+dune35t_spacecharge.InputFilename:  "SCEoffsets_DUNE35t_E500.root"
+dune35t_spacecharge.service_provider:  SpaceChargeServiceDUNE35t
 
 END_PROLOG
