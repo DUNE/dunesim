@@ -20,12 +20,13 @@ BEGIN_PROLOG
 # DetSim module
 
 dune_detsim: {
-  module_type:      "SimWireDUNE"
-  SimChannelLabel:  "largeant"
-  NoiseOn:          false
-  PedestalOn:       false
-  DistortOn:        false
-  SuppressOn:       false
+  module_type:       "SimWireDUNE"
+  SimChannelLabel:   "largeant"
+  NoiseOn:           false
+  PedestalOn:        false
+  DistortOn:         false
+  SuppressOn:        false
+  KeepEmptyChannels: false
 }
 
 #***********************************************************************
