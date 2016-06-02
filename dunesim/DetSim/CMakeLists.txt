@@ -1,4 +1,4 @@
-# dunetpc/dune/larsim_DetSim/CMakeLists.txt
+# dunetpc/dune/DetSim/CMakeLists.txt
 
 # David Adams
 # December 2015
