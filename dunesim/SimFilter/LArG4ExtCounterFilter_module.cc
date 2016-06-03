@@ -8,7 +8,7 @@
 #include "art/Framework/Principal/Event.h" 
 #include "larcore/Geometry/Geometry.h"
 #include "larsim/Simulation/AuxDetSimChannel.h"
-#include "SimulationBase/MCTruth.h"
+#include "nusimdata/SimulationBase/MCTruth.h"
 #include "lardata/RawData/RawDigit.h"
 #include "lardata/RawData/raw.h"
 #include "lardata/RecoBase/Wire.h"
