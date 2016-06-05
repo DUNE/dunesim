@@ -1,6 +1,6 @@
 simple_plugin(GenExtCounterFilter "module"
-		      lardata_RawData
-		      lardata_RecoBase
+		      lardataobj_RawData
+		      lardataobj_RecoBase
 		      dune_Geometry
 		        larcore_Geometry
 			larcore_Geometry_Geometry_service
@@ -22,8 +22,8 @@ simple_plugin(GenExtCounterFilter "module"
 )
 
 simple_plugin(LArG4ExtCounterFilter "module"
-		      lardata_RawData
-		      lardata_RecoBase
+		      lardataobj_RawData
+		      lardataobj_RecoBase
 		      dune_Geometry
 		        larcore_Geometry
 			larcore_Geometry_Geometry_service
@@ -45,8 +45,8 @@ simple_plugin(LArG4ExtCounterFilter "module"
 )
 
 simple_plugin(LArG4ParticleFilter "module"
-		      lardata_RawData
-		      lardata_RecoBase
+		      lardataobj_RawData
+		      lardataobj_RecoBase
 		      dune_Geometry
 		        larcore_Geometry
 			larcore_Geometry_Geometry_service
