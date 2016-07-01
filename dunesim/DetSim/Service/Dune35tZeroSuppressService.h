@@ -58,9 +58,7 @@ private:
   Index m_nl;
   Index m_nd;
   Index m_nt;
-
-  // Debug flag.
-  bool m_dbg;
+  int m_LogLevel;
 
 };
 
