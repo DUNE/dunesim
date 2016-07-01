@@ -76,13 +76,14 @@ Dune35tZeroSuppressService::
 Dune35tZeroSuppressService(AdcCount ts, AdcCount tl, AdcCount td,
                        Index ns, Index nl, Index nd, Index nt)
 : m_ts(ts), m_tl(tl), m_td(td), m_ns(ns), m_nl(nl), m_nd(nd), m_nt(nt),
-  m_dbg(false) { }
+  m_LogLevel(1) { }
 
 //**********************************************************************
 
 Dune35tZeroSuppressService::
 Dune35tZeroSuppressService(const fhicl::ParameterSet& pset, art::ActivityRegistry&)
-: m_dbg(false) {
+: m_LogLevel(1) {
+  const string myname = "Dune35tZeroSuppressService(::ctor: ";
   m_ts = pset.get<AdcCount>("TS");
   m_tl = pset.get<AdcCount>("TL");
   m_td = pset.get<AdcCount>("TD");
@@ -90,6 +91,8 @@ Dune35tZeroSuppressService(const fhicl::ParameterSet& pset, art::ActivityRegistr
   m_nl = pset.get<Index>("NL");
   m_nd = pset.get<Index>("ND");
   m_nt = pset.get<Index>("NT");
+  pset.get_if_present<int>("LogLevel", m_LogLevel);
+  if ( m_LogLevel >= 1 ) print(cout, myname);
 }
   
 //**********************************************************************
@@ -97,7 +100,7 @@ Dune35tZeroSuppressService(const fhicl::ParameterSet& pset, art::ActivityRegistr
 int Dune35tZeroSuppressService::
 filter(const AdcCountVector& sigs, Channel chan, AdcPedestal ped, AdcFilterVector& keep) const {
   const string myname = "ZeroSuppress35t::filter: ";
-  if ( m_dbg ) cout << "Filtering signal array of size " << sigs.size() << endl;
+  if ( m_LogLevel >= 2 ) cout << myname << "Filtering channel " << chan << " with tick count " << sigs.size() << endl;
   bool m_skipStuck = false;
   AdcCount m_ts = 0; 
   unsigned int nsig = sigs.size();
@@ -111,14 +114,17 @@ filter(const AdcCountVector& sigs, Channel chan, AdcPedestal ped, AdcFilterVecto
     // Evaluate a running signal sum of the preceding m_nl signals.
     RunningSum rs(sigs, ped, isig, m_ns, m_ts, m_skipStuck);
     AdcCount asigsum = std::abs(rs.sigsum);
-    if ( m_dbg ) cout << setw(3) << isig << setw(6) << sig << setw(5) << sstate(state);
+    if ( m_LogLevel >= 3 ) cout << myname << setw(6) << isig << setw(6) << sig << setw(5) << sstate(state) << endl;
     // Last tick is outside a signal.
     if ( state == OUT || state == END ) {
       // If this tick is above TL, we are in the live region of a signal.
       // Keep the NL preceding signals.
       AdcCount sumthresh = m_tl*rs.count;
-      if ( m_dbg ) cout << " RS sum/thresh=" << setw(3) << rs.sigsum << "/" << setw(3) << sumthresh;
-      if ( asigsum > sumthresh ) {
+      bool keepit = asigsum > sumthresh;
+      if ( m_LogLevel >= 3 ) cout << myname << " RS sum/thresh=" << setw(3) << rs.sigsum << "/" << setw(3) << sumthresh << endl;
+      if ( keepit ) {
+        if ( m_LogLevel == 2 ) cout << myname << setw(6) << isig << ": RS sum/thresh=" << setw(3) << rs.sigsum
+                                    << "/" << setw(3) << sumthresh << endl;
         state = LIVE;
         unsigned int jsig1 = 0;
         if ( isig > m_nl ) jsig1 = isig - m_nl;
@@ -132,7 +138,7 @@ filter(const AdcCountVector& sigs, Channel chan, AdcPedestal ped, AdcFilterVecto
     } else {
       // Last tick is is in the live region of a signal.
       AdcCount sumthresh = m_td*rs.count;
-      if ( m_dbg ) cout << " RS sum/thresh=" << setw(3) << rs.sigsum << "/" << setw(3) << sumthresh;
+      if ( m_LogLevel >= 3 ) cout << myname << " RS sum/thresh=" << setw(3) << rs.sigsum << "/" << setw(3) << sumthresh << endl;
         if ( state == LIVE ) {
         // If this tick is below TD, we are in the dead region of a signal.
         if ( asigsum <= sumthresh ) {
@@ -171,21 +177,21 @@ filter(const AdcCountVector& sigs, Channel chan, AdcPedestal ped, AdcFilterVecto
 //**********************************************************************
 
 ostream& Dune35tZeroSuppressService::print(ostream& out, string prefix) const {
-  out << prefix << "TS = " << m_ts << endl;
-  out << prefix << "TL = " << m_tl << endl;
-  out << prefix << "TD = " << m_td << endl;
-  out << prefix << "NS = " << m_ns << endl;
-  out << prefix << "NL = " << m_nl << endl;
-  out << prefix << "ND = " << m_nd << endl;
-  out << prefix << "NT = " << m_nt << endl;
-  out << prefix << "Debug level: " << m_dbg << endl;
+  out << prefix << "    TS = " << m_ts << endl;
+  out << prefix << "    TL = " << m_tl << endl;
+  out << prefix << "    TD = " << m_td << endl;
+  out << prefix << "    NS = " << m_ns << endl;
+  out << prefix << "    NL = " << m_nl << endl;
+  out << prefix << "    ND = " << m_nd << endl;
+  out << prefix << "    NT = " << m_nt << endl;
+  out << prefix << "LogLevel: " << m_LogLevel << endl;
   return out;
 }
 
 //**********************************************************************
 
 void Dune35tZeroSuppressService::setDebug(int dbg) {
-  m_dbg = dbg;
+  m_LogLevel = dbg;
 }
 
 //**********************************************************************
