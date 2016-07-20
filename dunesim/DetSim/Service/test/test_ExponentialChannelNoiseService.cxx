@@ -16,7 +16,7 @@
 #include "art/Framework/Services/Optional/RandomNumberGenerator.h"
 #include "lardata/Utilities/LArFFT.h"
 #include "larcore/Geometry/Geometry.h"
-#include "lardata/RawData/raw.h"
+#include "lardataobj/RawData/raw.h"
 
 using std::string;
 using std::cout;
