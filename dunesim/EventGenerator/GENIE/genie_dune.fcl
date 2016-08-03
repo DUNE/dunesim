@@ -5,6 +5,7 @@ BEGIN_PROLOG
 dunefd_genie:                         @local::standard_genie
 dunefd_genie.BeamName:                "lbnf"
 dunefd_genie.GlobalTimeOffset:        0
+dunefd_genie.EventGeneratorList:      "DefaultPlusCCMEC"
 
 dunefd_genie_hist:                    @local::dunefd_genie
 dunefd_genie_hist.FluxType:           "histogram"
