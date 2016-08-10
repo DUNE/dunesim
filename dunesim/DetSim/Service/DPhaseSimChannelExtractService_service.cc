@@ -5,7 +5,7 @@
 #include "DPhaseSimChannelExtractService.h"
 #include <string>
 #include "larcore/Geometry/Geometry.h"
-#include "larsim/Simulation/SimChannel.h"
+#include "larsimobj/Simulation/SimChannel.h"
 
 //#include "art/Framework/Services/Optional/RandomNumberGenerator.h"
 //#include "larsim/RandomUtils/LArSeedService.h"

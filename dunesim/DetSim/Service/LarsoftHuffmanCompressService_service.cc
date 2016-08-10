@@ -2,7 +2,7 @@
 
 #include "dune/DetSim/Service/LarsoftHuffmanCompressService.h"
 #include "fhiclcpp/ParameterSet.h"
-#include "lardata/RawData/raw.h"
+#include "lardataobj/RawData/raw.h"
 #include "dune/DetSim/Service/ReplaceCompressService.h"
 
 using std::string;
