@@ -16,16 +16,16 @@
 #include "art/Framework/Principal/Run.h"
 #include "art/Framework/Principal/SubRun.h"
 #include "art/Framework/Services/Optional/TFileService.h"
-#include "art/Utilities/InputTag.h"
+#include "canvas/Utilities/InputTag.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 #include "larsim/RandomUtils/LArSeedService.h"
 
-#include "lardata/RawData/raw.h"
-#include "lardata/RawData/ExternalTrigger.h"
+#include "lardataobj/RawData/raw.h"
+#include "lardataobj/RawData/ExternalTrigger.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "lardata/DetectorInfoServices/DetectorClocksService.h"
-#include "larsim/Simulation/AuxDetSimChannel.h"
+#include "larsimobj/Simulation/AuxDetSimChannel.h"
 
 #include "CLHEP/Random/RandFlat.h"
 

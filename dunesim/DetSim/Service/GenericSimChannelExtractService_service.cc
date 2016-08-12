@@ -3,7 +3,7 @@
 #include "GenericSimChannelExtractService.h"
 #include <string>
 #include "larcore/Geometry/Geometry.h"
-#include "larsim/Simulation/SimChannel.h"
+#include "larsimobj/Simulation/SimChannel.h"
 
 using std::string;
 

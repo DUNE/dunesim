@@ -37,8 +37,8 @@ dune4apa_radiogen:
 dunefd_workspace_ar39: @local::dune4apa_radiogen
 
 dunefd_1x2x6_ar39:     @local::dune4apa_radiogen
-duenfd_1x2x6_ar39.Z0:   [  -55. ]     # in cm in world coordinates, bottom corner of box
-duenfd_1x2x6_ar39.Z1:   [ 1500. ]     # in cm in world coordinates, top corner of box
+dunefd_1x2x6_ar39.Z0:   [  -55. ]     # in cm in world coordinates, bottom corner of box
+dunefd_1x2x6_ar39.Z1:   [ 1500. ]     # in cm in world coordinates, top corner of box
 
 dune4apa_radiogen_rn222: @local::dune4apa_radiogen
 dune4apa_radiogen_rn222.Nuclide: [ "222Rn" ]
