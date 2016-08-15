@@ -83,7 +83,7 @@ Dune35tZeroSuppressService(AdcCount ts, AdcCount tl, AdcCount td,
 Dune35tZeroSuppressService::
 Dune35tZeroSuppressService(const fhicl::ParameterSet& pset, art::ActivityRegistry&)
 : m_LogLevel(1) {
-  const string myname = "Dune35tZeroSuppressService(::ctor: ";
+  const string myname = "Dune35tZeroSuppressService::ctor: ";
   m_ts = pset.get<AdcCount>("TS");
   m_tl = pset.get<AdcCount>("TL");
   m_td = pset.get<AdcCount>("TD");
