@@ -5,7 +5,8 @@ BEGIN_PROLOG
 protodune_corsika_p:                  @local::standard_CORSIKAGen_protons
 protodune_corsika_p.SampleTime:       6.45e-3   #0.2 ms (g4 rise time) + 2.25 ms (1 full drift window) + 4.0 ms (readout)
 protodune_corsika_p.TimeOffset:       -3.325e-3 #4.0 ms readout should start at -0.875 ms to match data
-protodune_corsika_p.BufferBox:        [ -250.0,250.0,-250.0,250.0,-250.0,250.0 ]   #in cm
+protodune_corsika_p.BufferBox:        [ -300.0,300.0,-300.0,300.0,-300.0,300.0 ]   #in cm
+protodune_corsika_cmc.ShowerAreaExtension: 2000
 protodune_corsika_p.ProjectToHeight:  865  #height to which particles are projected in cm
 protodune_corsika_p.ShowerInputFiles: [
             "/pnfs/dune/persistent/users/mibass/corsika/sqShowers/DAT1*.db"
@@ -14,7 +15,8 @@ protodune_corsika_p.ShowerInputFiles: [
 protodune_corsika_cmc:                @local::standard_CORSIKAGen_CMC
 protodune_corsika_cmc.SampleTime:     6.45e-3   #0.2 ms (g4 rise time) + 2.25 ms (1 full drift window) + 4.0 ms (readout)
 protodune_corsika_cmc.TimeOffset:     -3.325e-3 #4.0 ms readout should start at -0.875 ms to match data
-protodune_corsika_cmc.BufferBox:      [ -250.0,250.0,-250.0,250.0,-250.0,250.0 ]
+protodune_corsika_cmc.BufferBox:      [ -300.0,300.0,-300.0,300.0,-300.0,300.0 ]
+protodune_corsika_cmc.ShowerAreaExtension: 2000
 protodune_corsika_cmc.ProjectToHeight:  865  #height to which particles are projected in cm
 protodune_corsika_cmc.ShowerInputFiles: [
             "/pnfs/dune/persistent/users/mibass/corsika/sqShowers/DAT2*.db",
