@@ -124,7 +124,7 @@ dune_marley_monoenergetic:
 }
 
 dune_marley_nue_spectrum: @local::dune_marley_monoenergetic
-dune_marley_nue_spectrum.source:
+dune_marley_nue_spectrum.marley_parameters.source:
 {
   type:      "tgraph"
   neutrino:  "ve"
