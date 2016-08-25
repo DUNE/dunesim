@@ -13,47 +13,40 @@
 #include "lardataobj/RawData/raw.h"
 #include "lardataobj/RecoBase/Wire.h"
 
-// for the CounterPositionMapFunction
-#include "dune/daqinput35t/PennToOffline.h"
-
-
 namespace filt{
 
   class GenFilter : public art::EDFilter {
-  public:
-    explicit GenFilter(fhicl::ParameterSet const & pset);
-    virtual ~GenFilter() {};
-    virtual bool filter(art::Event& e);
-    void reconfigure(fhicl::ParameterSet const& pset);
-    void beginJob() ;
+    public:
+      explicit GenFilter(fhicl::ParameterSet const & pset);
+      virtual ~GenFilter() {};
+      virtual bool filter(art::Event& e);
+      void reconfigure(fhicl::ParameterSet const& pset);
+      void beginJob() ;
 
-  private:
+    private:
 
-    struct CounterSetPair{
-      bool isRequested;
-      std::vector<geo::AuxDetGeo*> setA;
-      std::vector<geo::AuxDetGeo*> setB;
-      double normalVec[3];
-      double setA_centre[3];
-      double setB_centre[3];
-    };
-    std::vector<CounterSetPair> fCounterSetPairs;
+      struct CounterSetPair{
+        bool isRequested;
+        std::vector<geo::AuxDetGeo*> setA;
+        std::vector<geo::AuxDetGeo*> setB;
+        double normalVec[3];
 
-    //Adjustable parameters
-    bool fUseExternalLocationFile;
-    std::string fCounterLocationFile;
-    bool fUseEWCounterPair; //Use the EW counter pair
-    bool fUseNupSdownCounterPair; //Use North (up) South (down) counter pair
-    bool fUseNdownSupCounterPair; //Use the North (down) South (up) counter pair
-    std::vector<int> fInterestingPDGs; //A vector of particle PDGs which want to be filtered on
-    double fParticleMinEnergy;  //The minimum energy of a particle to be filtered
-    double fParticleMaxEnergy;  //The maximum energy of a particle to be filtered
-    double fCounterSizeScaleFactor; //The scaling factor to increase/decrease thedimensions of the counter
+      };
+      std::vector<CounterSetPair> fCounterSetPairs;
+
+      //Adjustable parameters
+      bool fUseEWCounterPair; //Use the EW counter pair
+      bool fUseNupSdownCounterPair; //Use North (up) South (down) counter pair
+      bool fUseNdownSupCounterPair; //Use the North (down) South (up) counter pair
+      std::vector<int> fInterestingPDGs; //A vector of particle PDGs which want to be filtered on
+      double fParticleMinEnergy;  //The minimum energy of a particle to be filtered
+      double fParticleMaxEnergy;  //The maximum energy of a particle to be filtered
+      double fCounterSizeScaleFactor; //The scaling factor to increase/decrease thedimensions of the counter
  
 
-    bool IsInterestingParticle(const simb::MCParticle &particle);
-    bool ParticleHitsCounterSetPairs(const simb::MCParticle &particle, const CounterSetPair &CSP);
-    bool ParticleHitsCounterSet(const simb::MCParticle &particle, const std::vector<geo::AuxDetGeo*> &counters, const TVector3 &counter_norm);
+      bool IsInterestingParticle(const simb::MCParticle &particle);
+      bool ParticleHitsCounterSetPairs(const simb::MCParticle &particle, const CounterSetPair &CSP);
+      bool ParticleHitsCounterSet(const simb::MCParticle &particle, const std::vector<geo::AuxDetGeo*> &counters, const TVector3 &counter_norm);
   
   };
 
@@ -64,10 +57,6 @@ namespace filt{
   }
 
   void GenFilter::reconfigure(fhicl::ParameterSet const& pset){
-    fUseExternalLocationFile = pset.get<bool>("UseExternalLocationFile",true);
-    fCounterLocationFile = pset.get<std::string>("CounterLocationFile","counterInformation.txt");
-    if (fUseExternalLocationFile) std::cout << "Using external file " << fCounterLocationFile << " to get counter centres." << std::endl;
-    else std::cout << "Using geometry service to get AuxDet centres." << std::endl;
     fUseEWCounterPair = pset.get<bool>("UseEWCounterPair",1);
     std::cout<<"Use EW counter pair: " << fUseEWCounterPair<<std::endl;
     fUseNupSdownCounterPair = pset.get<bool>("UseNupSdownCounterPair",1);
@@ -109,24 +98,24 @@ namespace filt{
               return true;
             }
             /*
-	      TVector3 counter_norm(fCounterSetPairs[i].normalVec[0],fCounterSetPairs[i].normalVec[1],fCounterSetPairs[i].normalVec[2]);
-	      double counter_pos_array[3];
-	      fCounterSetPairs[CSP_i].setA.front()->GetCenter(counter_pos_array);
-	      TVector3 counter_pos(counter_pos_array[0], counter_pos_array[1], counter_pos_array[2]);
-	      double scale_factor = counter_norm.Dot(counter_pos - particle_pos)/(counter_norm.Dot(particle_dir));
-	      TVector3 particle_pos_in_plane = particle_pos + scale_factor * particle_dir;
-	      std::cout<<"Particle pos: " << "("<<particle_pos_in_plane.X()<<","<<particle_pos_in_plane.Y()<<","<<particle_pos_in_plane.Z()<<")"<<std::endl;
-	      std::cout<<"Counter pos: " << "("<<counter_pos.X()<<","<<counter_pos.Y()<<","<<counter_pos.Z()<<")"<<std::endl;
+            TVector3 counter_norm(fCounterSetPairs[i].normalVec[0],fCounterSetPairs[i].normalVec[1],fCounterSetPairs[i].normalVec[2]);
+            double counter_pos_array[3];
+            fCounterSetPairs[CSP_i].setA.front()->GetCenter(counter_pos_array);
+            TVector3 counter_pos(counter_pos_array[0], counter_pos_array[1], counter_pos_array[2]);
+            double scale_factor = counter_norm.Dot(counter_pos - particle_pos)/(counter_norm.Dot(particle_dir));
+            TVector3 particle_pos_in_plane = particle_pos + scale_factor * particle_dir;
+            std::cout<<"Particle pos: " << "("<<particle_pos_in_plane.X()<<","<<particle_pos_in_plane.Y()<<","<<particle_pos_in_plane.Z()<<")"<<std::endl;
+            std::cout<<"Counter pos: " << "("<<counter_pos.X()<<","<<counter_pos.Y()<<","<<counter_pos.Z()<<")"<<std::endl;
             */
 
           }
           /*
-	    geo::AuxDetGeo *counter = fCounterSetPairs.front().setA.front();
-	    std::cout<<"Length: " << counter->Length() << std::endl;
-	    std::cout<<"HalfWidth1: " << counter->HalfWidth1() << std::endl;
-	    std::cout<<"HalfWidth2: " << counter->HalfWidth2() << std::endl;
+          geo::AuxDetGeo *counter = fCounterSetPairs.front().setA.front();
+          std::cout<<"Length: " << counter->Length() << std::endl;
+          std::cout<<"HalfWidth1: " << counter->HalfWidth1() << std::endl;
+          std::cout<<"HalfWidth2: " << counter->HalfWidth2() << std::endl;
 
-	    std::cout<<"HalfHeight: " << counter->HalfHeight() << std::endl;
+          std::cout<<"HalfHeight: " << counter->HalfHeight() << std::endl;
           */
         }
       }
@@ -136,7 +125,6 @@ namespace filt{
   }
 
   void GenFilter::beginJob() {
-    
     art::ServiceHandle<geo::Geometry> geom;
 
     CounterSetPair EWCounterSetPair;
@@ -229,11 +217,11 @@ namespace filt{
       TVector3 particle_dir = particle.Momentum().Vect().Unit();
 
       /*
-	Length: 62.992
-	HalfWidth1: 16.2814
-	HalfWidth2: 13.5255
-	HalfHeight: 0.475
-      */
+          Length: 62.992
+          HalfWidth1: 16.2814
+          HalfWidth2: 13.5255
+          HalfHeight: 0.475
+          */
 
       double scale_factor = counter_norm.Dot(counter_pos - particle_pos)/(counter_norm.Dot(particle_dir));
 
@@ -277,9 +265,9 @@ namespace filt{
       //We don't know by default which way round the corners are oriented, but that doesn't matter as we can take abs, max and min
       //We are going to take abs of the particle position, the pos corner and the neg corner first
       /*
-	pos_corner.SetXYZ(std::abs(pos_corner.X()),std::abs(pos_corner.Y()),std::abs(pos_corner.Z()));
-	neg_corner.SetXYZ(std::abs(neg_corner.X()),std::abs(neg_corner.Y()),std::abs(neg_corner.Z()));
-	particle_pos_in_plane.SetXYZ(std::abs(particle_pos_in_plane.X()),std::abs(particle_pos_in_plane.Y()),std::abs(particle_pos_in_plane.Z()));
+      pos_corner.SetXYZ(std::abs(pos_corner.X()),std::abs(pos_corner.Y()),std::abs(pos_corner.Z()));
+      neg_corner.SetXYZ(std::abs(neg_corner.X()),std::abs(neg_corner.Y()),std::abs(neg_corner.Z()));
+      particle_pos_in_plane.SetXYZ(std::abs(particle_pos_in_plane.X()),std::abs(particle_pos_in_plane.Y()),std::abs(particle_pos_in_plane.Z()));
       */
 
       /*
