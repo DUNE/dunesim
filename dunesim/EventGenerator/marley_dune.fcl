@@ -1,0 +1,10 @@
+#include "marley.fcl"
+
+BEGIN_PROLOG
+
+# DUNE-specific MARLEY configurations
+dune_marley_monoenergetic: @local::standard_marley_monoenergetic
+dune_marley_nue_spectrum: @local::standard_marley_nue_spectrum
+dune_marley_fermi_dirac: @local::standard_marley_fermi_dirac
+
+END_PROLOG

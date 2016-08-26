@@ -3,13 +3,20 @@
 BEGIN_PROLOG
 
 dune35t_cry:              @local::standard_cry
-dune35t_cry.TimeOffset:   -1.6e-3               #pre-readout window (s)
-dune35t_cry.SampleTime:   3.2e-3                #pre-readout + readout (s)
 dune35t_cry.Latitude:     "latitude 41.8 "
 dune35t_cry.SubBoxLength: "subboxLength 75 "
+#### Full field - 500 V cm-1
+#dune35t_cry.TimeOffset:   -1.6e-3               #pre-readout window (s)
+#dune35t_cry.SampleTime:   3.2e-3                #pre-readout + readout (s)
+#### Half field - 250 V cm-1
+dune35t_cry.TimeOffset:   -2.6e-3               #pre-readout window (s)
+dune35t_cry.SampleTime:   5.2e-3                #pre-readout + readout (s)
 
 dune35t_milliblock_cry:    @local::dune35t_cry
-dune35t_milliblock_cry.SampleTime: 1.76e-2   #11*3200 ticks. 11 so have 1 drift window before T = 0, and 10 after.
+#### Full field - 500 V cm-1
+#dune35t_milliblock_cry.SampleTime: 1.76e-2   #11*3200 ticks. 11 so have 1 drift window before T = 0, and 10 after.
+#### Half field - 250 V cm-1
+dune35t_milliblock_cry.SampleTime: 1.01e-2   #1500+5200 ticks. 15000 (payload length) + 5200 (1 drift window before T = 0).
 
 dunefd_cry:               @local::standard_cry
 dunefd_cry.SampleTime:    1.47e-3               #the maximum time it would take an electron to drift through the volume is 2.4 ms
