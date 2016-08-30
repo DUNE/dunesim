@@ -17,7 +17,7 @@ dunefd_genie_hist.TopVolume:          "volCryostat"
 dunefddphase_genie_hist:             @local::dunefd_genie_hist
 dunefddphase_genie_hist.BeamCenter:         [0., 0., -1.] 
 dunefddphase_genie_hist.BeamRadius:         7. 
-
+dunefddphase_genie_hist.FiducialCut:  "mbox:-610,-160,-10,610,160,610"
 
 dunefd_genie_simple_neutrino:         @local::dunefd_genie
 dunefd_genie_simple_neutrino.TopVolume:        "volDetEnclosure"
