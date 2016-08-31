@@ -41,8 +41,8 @@ extern "C" {
 #include "dune/Utilities/SignalShapingServiceDUNE.h"
 #include "larcore/Geometry/Geometry.h"
 
-#include "larsimobj/Simulation/sim.h"
-#include "larsimobj/Simulation/SimChannel.h"
+#include "lardataobj/Simulation/sim.h"
+#include "lardataobj/Simulation/SimChannel.h"
 #include "lardataobj/RawData/RawDigit.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 

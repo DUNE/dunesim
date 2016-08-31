@@ -3,7 +3,7 @@
 #include "Dune35tSimChannelExtractService.h"
 #include <string>
 #include "larcore/Geometry/Geometry.h"
-#include "larsimobj/Simulation/SimChannel.h"
+#include "lardataobj/Simulation/SimChannel.h"
 
 using std::string;
 using std::endl;

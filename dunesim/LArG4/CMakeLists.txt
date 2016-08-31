@@ -2,7 +2,7 @@
 art_make( BASENAME_ONLY
           MODULE_LIBRARIES larcore_Geometry
 			larcore_Geometry_Geometry_service
-			larsim_Simulation larsimobj_Simulation
+			larsim_Simulation lardataobj_Simulation
 			nusimdata_SimulationBase
 			${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}

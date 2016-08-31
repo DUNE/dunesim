@@ -25,7 +25,7 @@
 #include "lardataobj/RawData/ExternalTrigger.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "lardata/DetectorInfoServices/DetectorClocksService.h"
-#include "larsimobj/Simulation/AuxDetSimChannel.h"
+#include "lardataobj/Simulation/AuxDetSimChannel.h"
 
 #include "CLHEP/Random/RandFlat.h"
 
