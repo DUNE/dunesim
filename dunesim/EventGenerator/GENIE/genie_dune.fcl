@@ -8,14 +8,17 @@ dunefd_genie.GlobalTimeOffset:        0
 
 dunefd_genie_hist:                    @local::dunefd_genie
 dunefd_genie_hist.FluxType:           "histogram"
-dunefd_genie_hist.FluxFiles:          ["GenieFluxFiles/g4lbne_v3r2p4b_FHC_FD_RIK.root"]
+dunefd_genie_hist.FluxFiles:          ["g4lbne_v3r2p4b_FHC_FD_RIK.root"]
+dunefd_genie_hist.FluxCopyMethod:     "IFDH"
+dunefd_genie_hist.FluxSearchPaths:    "/pnfs/dune/persistent/TaskForce_Flux/GenieHistFluxFiles/"
 dunefd_genie_hist.BeamCenter:         [0., 0., -1.] 
-dunefd_genie_hist.BeamDirection:      [0., 0.101, 0.995] # beam angle is 101mrad
+dunefd_genie_hist.BeamDirection:      [0, 0.101, 0.995] # beam angle is 101mrad
 dunefd_genie_hist.BeamRadius:         7. #sqrt(pow(3.6,2)+pow(6,2)
 dunefd_genie_hist.TopVolume:          "volCryostat"
 
 dunefddphase_genie_hist:             @local::dunefd_genie_hist
 dunefddphase_genie_hist.BeamCenter:         [0., 0., -1.] 
+dunefddphase_genie_hist.BeamDirection:      [0.101, 0, 0.995] # beam angle is 101mrad
 dunefddphase_genie_hist.BeamRadius:         7. 
 dunefddphase_genie_hist.FiducialCut:  "mbox:-610,-160,-10,610,160,610"
 
