@@ -10,7 +10,7 @@
 simple_plugin(Dune35tSimChannelExtractService   "service"
                 larsim_DetSim
                 larcore_Geometry
-                larsim_Simulation larsimobj_Simulation
+                larsim_Simulation lardataobj_Simulation
                 lardata_Utilities
                 SignalShapingServiceDUNE_service
                 art_Utilities canvas_Utilities
@@ -19,7 +19,7 @@ simple_plugin(Dune35tSimChannelExtractService   "service"
 
 simple_plugin(GenericSimChannelExtractService   "service"
                 larsim_DetSim
-                larsim_Simulation larsimobj_Simulation
+                larsim_Simulation lardataobj_Simulation
                 lardata_Utilities
                 SignalShapingServiceDUNE_service
                 art_Utilities canvas_Utilities
@@ -28,7 +28,7 @@ simple_plugin(GenericSimChannelExtractService   "service"
 
 simple_plugin(DPhaseSimChannelExtractService   "service"
                 larsim_DetSim
-                larsim_Simulation larsimobj_Simulation
+                larsim_Simulation lardataobj_Simulation
                 lardata_Utilities
                 SignalShapingServiceDUNEDPhase_service
                 art_Utilities canvas_Utilities
