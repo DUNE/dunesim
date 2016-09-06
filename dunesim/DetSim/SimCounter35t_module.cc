@@ -25,7 +25,7 @@
 #include "lardataobj/RawData/ExternalTrigger.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "lardata/DetectorInfoServices/DetectorClocksService.h"
-#include "larsimobj/Simulation/AuxDetSimChannel.h"
+#include "lardataobj/Simulation/AuxDetSimChannel.h"
 
 #include "CLHEP/Random/RandFlat.h"
 
@@ -199,7 +199,7 @@ void detsim::SimCounter35t::produce(art::Event & e)
       // calculate the time length of one window
       double triggerOffsetTPC = ts->TriggerOffsetTPC()*1.e3; // ns
       double readoutWindowSizeTPC = detprop->ReadOutWindowSize(); // tpc ticks
-      double clockSpeedTPC = ts->TPCClock().Frequency()/1.e6; // MHz
+      double clockSpeedTPC = ts->TPCClock().Frequency(); // MHz
       double windowLength = readoutWindowSizeTPC/clockSpeedTPC; // us
 
       // get information from AuxDetIDE
@@ -208,7 +208,7 @@ void detsim::SimCounter35t::produce(art::Event & e)
 	++skippedHitsOutRange;
 	continue;
       }
-      uint32_t tickIDE = time*fClockSpeedCounter/1000;
+      uint32_t tickIDE = time*fClockSpeedCounter/1000; // PTB ticks
       double edepIDE = setOfIDEs[j].energyDeposited*1000;//MeV
       
       // loop over tickv to add eDep
