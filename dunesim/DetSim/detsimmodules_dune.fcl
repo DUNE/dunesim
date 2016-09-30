@@ -95,6 +95,9 @@ chnoisewhite: {
   service_provider: WhiteChannelNoiseService
 }
 
+chnoiseexpowhite: @local::chnoiseold
+chnoiseexpowhite.service_provider: ExpoWhiteChannelNoiseService
+
 #***********************************************************************
 
 # PedestalAdditionService adds pedestals to signals.
