@@ -38,22 +38,27 @@ namespace spacecharge {
       bool Configure(fhicl::ParameterSet const& pset);
       bool Update(uint64_t ts=0);
       
-      bool EnableSimulationSCE() const override;
-      bool EnableCorrectionsSCE() const override;
+      bool EnableSimSpatialSCE() const override;
+      bool EnableSimEfieldSCE() const override;
+      bool EnableCorrSCE() const override;
       std::vector<double> GetPosOffsets(double xVal, double yVal, double zVal) const override;
+      std::vector<double> GetEfieldOffsets(double xVal, double yVal, double zVal) const override;
  
     private:
     protected:
 
       std::vector<double> GetPosOffsetsParametric(double xVal, double yVal, double zVal) const;
       double GetOnePosOffsetParametric(double xVal, double yVal, double zVal, std::string axis) const;
+      std::vector<double> GetEfieldOffsetsParametric(double xVal, double yVal, double zVal) const;
+      double GetOneEfieldOffsetParametric(double xVal, double yVal, double zVal, std::string axis) const;
       double TransformX(double xVal) const;
       double TransformY(double yVal) const;
       double TransformZ(double zVal) const;
       bool IsInsideBoundaries(double xVal, double yVal, double zVal) const;
 
-      bool fEnableSimulationSCE;
-      bool fEnableCorrectionsSCE;
+      bool fEnableSimSpatialSCE;
+      bool fEnableSimEfieldSCE;
+      bool fEnableCorrSCE;
       
       std::string fRepresentationType;
       std::string fInputFilename;
@@ -96,6 +101,45 @@ namespace spacecharge {
       TF1 *f3_z = new TF1("f3_z","pol4");
       TF1 *f4_z = new TF1("f4_z","pol4");
       TF1 *fFinal_z = new TF1("fFinal_z","pol3");
+
+      TGraph **g1_Ex = new TGraph*[7];
+      TGraph **g2_Ex = new TGraph*[7];
+      TGraph **g3_Ex = new TGraph*[7];
+      TGraph **g4_Ex = new TGraph*[7];
+      TGraph **g5_Ex = new TGraph*[7];
+      
+      TGraph **g1_Ey = new TGraph*[7];
+      TGraph **g2_Ey = new TGraph*[7];
+      TGraph **g3_Ey = new TGraph*[7];
+      TGraph **g4_Ey = new TGraph*[7];
+      TGraph **g5_Ey = new TGraph*[7];
+      TGraph **g6_Ey = new TGraph*[7];
+      
+      TGraph **g1_Ez = new TGraph*[7];
+      TGraph **g2_Ez = new TGraph*[7];
+      TGraph **g3_Ez = new TGraph*[7];
+      TGraph **g4_Ez = new TGraph*[7];
+      
+      TF1 *f1_Ex = new TF1("f1_Ex","pol6");
+      TF1 *f2_Ex = new TF1("f2_Ex","pol6");
+      TF1 *f3_Ex = new TF1("f3_Ex","pol6");
+      TF1 *f4_Ex = new TF1("f4_Ex","pol6");
+      TF1 *f5_Ex = new TF1("f5_Ex","pol6");
+      TF1 *fFinal_Ex = new TF1("fFinal_Ex","pol4");
+      
+      TF1 *f1_Ey = new TF1("f1_Ey","pol5");
+      TF1 *f2_Ey = new TF1("f2_Ey","pol5");
+      TF1 *f3_Ey = new TF1("f3_Ey","pol5");
+      TF1 *f4_Ey = new TF1("f4_Ey","pol5");
+      TF1 *f5_Ey = new TF1("f5_Ey","pol5");
+      TF1 *f6_Ey = new TF1("f6_Ey","pol5");
+      TF1 *fFinal_Ey = new TF1("fFinal_Ey","pol5");
+      
+      TF1 *f1_Ez = new TF1("f1_Ez","pol4");
+      TF1 *f2_Ez = new TF1("f2_Ez","pol4");
+      TF1 *f3_Ez = new TF1("f3_Ez","pol4");
+      TF1 *f4_Ez = new TF1("f4_Ez","pol4");
+      TF1 *fFinal_Ez = new TF1("fFinal_Ez","pol3");
     
   }; // class SpaceChargeProtoDUNE
 } //namespace spacecharge
