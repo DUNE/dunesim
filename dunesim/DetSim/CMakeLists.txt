@@ -13,7 +13,7 @@ art_make( BASENAME_ONLY
           MODULE_LIBRARIES larcore_Geometry
 	                dune_Geometry
 			larcore_Geometry_Geometry_service
-			larsim_Simulation lardataobj_Simulation
+			larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
 	                lardata_Utilities
 			larevt_Filters
 			lardataobj_RawData
