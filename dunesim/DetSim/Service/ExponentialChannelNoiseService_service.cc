@@ -9,6 +9,7 @@
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "CLHEP/Random/JamesRandom.h"
 #include "CLHEP/Random/RandFlat.h"
+#include "CLHEP/Random/RandGauss.h"
 #include "TH1F.h"
 #include "TRandom3.h"
 
@@ -38,6 +39,9 @@ ExponentialChannelNoiseService(fhicl::ParameterSet const& pset)
   fNoiseNormV        = pset.get<double>("NoiseNormV");
   fNoiseWidthV       = pset.get<double>("NoiseWidthV");
   fLowCutoffV        = pset.get<double>("LowCutoffV");
+  fWhiteNoiseZ       = pset.get<double>("WhiteNoiseZ");
+  fWhiteNoiseU       = pset.get<double>("WhiteNoiseU");
+  fWhiteNoiseV       = pset.get<double>("WhiteNoiseV");
   fNoiseArrayPoints  = pset.get<unsigned int>("NoiseArrayPoints");
   fOldNoiseIndex     = pset.get<bool>("OldNoiseIndex");
   bool haveSeed = pset.get_if_present<int>("RandomSeed", fRandomSeed);
@@ -94,6 +98,7 @@ ExponentialChannelNoiseService::~ExponentialChannelNoiseService() {
 
 int ExponentialChannelNoiseService::addNoise(Channel chan, AdcSignalVector& sigs) const {
   CLHEP::RandFlat flat(*m_pran);
+  CLHEP::RandGauss gaus(*m_pran);
   unsigned int noisechan = 0;
   if ( fOldNoiseIndex ) {
     // Keep this strange way of choosing noise channel to be consistent with old results.
@@ -108,9 +113,18 @@ int ExponentialChannelNoiseService::addNoise(Channel chan, AdcSignalVector& sigs
   const geo::View_t view = geo->View(chan);
   for ( unsigned int itck=0; itck<sigs.size(); ++itck ) {
     double tnoise = 0.0;
-    if      ( view==geo::kU ) tnoise = fNoiseU[noisechan][itck];
-    else if ( view==geo::kV ) tnoise = fNoiseV[noisechan][itck];
-    else                      tnoise = fNoiseZ[noisechan][itck];
+    double wnoise = 0.0;
+    if ( view==geo::kU ) {
+      tnoise = fNoiseU[noisechan][itck];
+      wnoise = fWhiteNoiseU;
+    } else if ( view==geo::kV ) {
+      tnoise = fNoiseV[noisechan][itck];
+      wnoise = fWhiteNoiseV;
+    } else {
+      tnoise = fNoiseZ[noisechan][itck];
+      wnoise = fWhiteNoiseZ;
+    }
+    if ( wnoise != 0.0 ) tnoise += wnoise*gaus.fire();
     sigs[itck] += tnoise;
   }
   return 0;
@@ -131,6 +145,9 @@ ostream& ExponentialChannelNoiseService::print(ostream& out, string prefix) cons
   out << prefix << "        LowCutoffV: " << fLowCutoffV << endl;
   out << prefix << "  NoiseArrayPoints: " << fNoiseArrayPoints << endl;
   out << prefix << "     OldNoiseIndex: " << fOldNoiseIndex << endl;
+  out << prefix << "       WhiteNoiseZ: " << fWhiteNoiseZ << endl;
+  out << prefix << "       WhiteNoiseU: " << fWhiteNoiseU << endl;
+  out << prefix << "       WhiteNoiseV: " << fWhiteNoiseV << endl;
   out << prefix << "        RandomSeed: " <<  fRandomSeed << endl;
   out << prefix << "          LogLevel: " <<  fLogLevel << endl;
   out << prefix << "  Actual random seed: " << m_pran->getSeed();

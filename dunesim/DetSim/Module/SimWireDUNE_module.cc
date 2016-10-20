@@ -109,7 +109,6 @@ void SimWireDUNE::reconfigure(fhicl::ParameterSet const& p) {
   if ( fNoiseOn ) {
     out << myname << "  Channel noise service:" << endl;;
     m_pcns->print(out, myprefix);
-    out << endl << "Hello!";
   } else {
     out << myname << "  Channel noise is off.";
   }
