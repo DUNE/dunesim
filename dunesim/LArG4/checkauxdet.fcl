@@ -10,7 +10,7 @@ services:
   TimeTracker:       {}
   SimpleMemoryCheck:     { ignoreTotal: 1 }     #default is one
   RandomNumberGenerator: {}                     #ART native random number generator
-  user:         @local::dune35t_services
+                @table::dune35t_services
   message:      @local::standard_info
 }
 
