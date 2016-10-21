@@ -12,7 +12,7 @@ services:
   TimeTracker:       {}
   SimpleMemoryCheck:     { ignoreTotal: 1 } # default is one
   RandomNumberGenerator: {} #ART native random number generator
-  user:         @local::dunefd_simulation_services
+                @table::dunefd_simulation_services
 }
 
 #Start each new event with an empty event.

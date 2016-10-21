@@ -11,12 +11,12 @@ services:
   TFileService: { fileName: "single35t_hist.root" }
   TimeTracker:       {}
   RandomNumberGenerator: {} #ART native random number generator
-  user:         @local::dune35t_simulation_services
+                @table::dune35t_simulation_services
 }
-#services.user.ExptGeoHelperInterface: @local::dune_geometry_helper
-#services.user.Geometry.GDML: "dune35t4apa_v3.gdml"
-#services.user.Geometry.ROOT: "dune35t4apa_v3.gdml"
-#services.user.Geometry.SortingParameters.DetectorVersion: "dune35t4apa_v3"
+#services.ExptGeoHelperInterface: @local::dune_geometry_helper
+#services.Geometry.GDML: "dune35t4apa_v3.gdml"
+#services.Geometry.ROOT: "dune35t4apa_v3.gdml"
+#services.Geometry.SortingParameters.DetectorVersion: "dune35t4apa_v3"
 
 
 #Start each new event with an empty event.
