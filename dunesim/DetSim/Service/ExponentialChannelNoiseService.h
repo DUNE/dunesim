@@ -64,6 +64,9 @@ private:
   float        fLowCutoffV;        ///< low frequency filter cutoff (kHz)  for V plane
   unsigned int fNoiseArrayPoints;  ///< number of points in randomly generated noise array
   bool         fOldNoiseIndex;     ///< Use old selection of noise array index
+  float        fWhiteNoiseZ;       ///< Level (per freq bin) for white noise for Z.
+  float        fWhiteNoiseU;       ///< Level (per freq bin) for white noise for U.
+  float        fWhiteNoiseV;       ///< Level (per freq bin) for white noise for V.
   int          fRandomSeed;        ///< Seed for random number service. If absent or zero, use SeedSvc.
   int          fLogLevel;          ///< Log message level: 0=quiet, 1=init only, 2+=every event
 
