@@ -32,10 +32,4 @@ dune35t_cry_single.PionSetting:     "returnPions     0 "
 dune35t_cry_single.NeutronSetting:  "returnNeutrons  0 "
 dune35t_cry_single.ProtonSetting:   "returnProtons   0 "
 
-### BELOW: MASSIVE FUDGE. but in cryhelper, there is no fhicl option for configuring nParticlesMin/Max, but is allowed by the cry setup/generator.
-### if in future, you want to include these particle settings with "returnPions 1 " or "returnNeutrons 1 ", then probably should change
-### the CRYHelper.cxx file in larsim to accept more configurations
-dune35t_cry_single.PionSetting:     "nParticlesMin 1 "
-dune35t_cry_single.NeutronSetting:  "nParticlesMax 1 "
-
 END_PROLOG
