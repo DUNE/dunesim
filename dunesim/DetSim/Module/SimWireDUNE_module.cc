@@ -5,7 +5,22 @@
 //
 // SimWireDUNE class designed to simulate signal on a wire in the TPC
 //
-// Developed from  SimWireDUNE35t_module.cc.
+// Developed from the now-obsolete SimWireDUNE35t_module.cc. This implementation
+// follows the TSI model where most of the algorithmic code is moved to
+// services accessed via service interfaces.
+//
+// For configuration parameters, see the "Flags" block in the module class
+// definition below. Remove the leading "f" to get the parameter name.
+//
+// There is no flag for compression because this must always be invoked
+// to apply zero suppression. Use ReplaceCompressService (prolog cmpreplace)
+// to effectively skip the compression while retaining the supression.
+//
+// The interface names for the accessed services are listed in the "Services"
+// block in the header below.
+//
+// Some useful module and service configurations may be found in
+// detsimmodules_dune.fcl, e.g. cmpreplace to skip compression.
 
 #include <vector>
 #include <string>

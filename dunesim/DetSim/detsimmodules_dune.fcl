@@ -193,6 +193,7 @@ zsonline_nhi: {
 # to the final raw data format.
 
 # Replaces suppressed bins with value Zero.
+# Use this to effectively skip compression.
 cmpreplace: {
   service_provider: ReplaceCompressService
   Zero: 0
