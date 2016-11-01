@@ -23,4 +23,13 @@ dunefd_cry.SampleTime:    1.47e-3               #the maximum time it would take 
 dune1fdcry.Latitude:      "latitude 44.35 "
 dunefd_cry.SubBoxLength:  "subboxLength 75 "
 
+dune35t_cry_single: @local::dune35t_cry
+dune35t_cry_single.GenSingleEvents: true
+dune35t_cry_single.GammaSetting:    "returnGammas    0 "
+dune35t_cry_single.ElectronSetting: "returnElectrons 0 "
+dune35t_cry_single.MuonSetting:     "returnMuons     1 "
+dune35t_cry_single.PionSetting:     "returnPions     0 "
+dune35t_cry_single.NeutronSetting:  "returnNeutrons  0 "
+dune35t_cry_single.ProtonSetting:   "returnProtons   0 "
+
 END_PROLOG
