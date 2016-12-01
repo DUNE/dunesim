@@ -20,7 +20,7 @@ dunefddphase_genie_hist:             @local::dunefd_genie_hist
 dunefddphase_genie_hist.BeamCenter:         [0., 0., -1.] 
 dunefddphase_genie_hist.BeamDirection:      [0.101, 0, 0.995] # beam angle is 101mrad
 dunefddphase_genie_hist.BeamRadius:         7. 
-dunefddphase_genie_hist.FiducialCut:  "mbox:-610,-160,-10,610,160,610"
+dunefddphase_genie_hist.FiducialCut:  "mbox:-6.10,-1.60,-0.10,6.10,1.60,6.10"
 
 dunefd_genie_simple_neutrino:         @local::dunefd_genie
 dunefd_genie_simple_neutrino.TopVolume:        "volDetEnclosure"
@@ -53,6 +53,7 @@ dune_fd_genie_anu_simple_flux_workspace_window_rotated_tpc.FluxFiles: ["gsimple_
 
 #Configurations for 1x2x6 geometry
 dune_fd_genie_nu_simple_flux_1x2x6_window: @local::dunefd_genie
+dune_fd_genie_nu_simple_flux_1x2x6_window.FiducialCut:  "mbox:-3.70,-6.10,-0.10,3.70,6.10,14.10"
 dune_fd_genie_nu_simple_flux_1x2x6_window.FluxType: "simple_flux"
 dune_fd_genie_nu_simple_flux_1x2x6_window.FluxSearchPaths: "/pnfs/dune/persistent/TaskForce_Flux/opt_03/neutrino/gsimple/far/nominal/"
 dune_fd_genie_nu_simple_flux_1x2x6_window.FluxFiles: ["gsimple_dune10kt_v1_1x2x6_g4lbne_v3r4p2_QGSP_BERT_CP_run15_12388_80GeV_neutrino_*root"]
