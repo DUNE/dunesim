@@ -5,7 +5,7 @@
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "lardata/Utilities/LArFFT.h"
 #include "larcore/Geometry/Geometry.h"
-#include "larsim/RandomUtils/LArSeedService.h"
+#include "nutools/RandomUtils/NuRandomService.h"
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "CLHEP/Random/JamesRandom.h"
 #include "CLHEP/Random/RandFlat.h"
@@ -18,7 +18,7 @@ using std::ostream;
 using std::endl;
 using std::string;
 using std::ostringstream;
-using sim::LArSeedService;
+using rndm::NuRandomService;
 using CLHEP::HepJamesRandom;
 
 //**********************************************************************
@@ -63,11 +63,11 @@ ExponentialChannelNoiseService(fhicl::ParameterSet const& pset)
     if ( fLogLevel > 0 ) cout << myname << "WARNING: Using hardwired seed." << endl;
     m_pran = new HepJamesRandom(seed);
   } else {
-    if ( fLogLevel > 0 ) cout << myname << "Using LArSeedService." << endl;
-    art::ServiceHandle<LArSeedService> seedSvc;
+    if ( fLogLevel > 0 ) cout << myname << "Using NuRandomService." << endl;
+    art::ServiceHandle<NuRandomService> seedSvc;
     m_pran = new HepJamesRandom;
     if ( fLogLevel > 0 ) cout << myname << "    Initial seed: " << m_pran->getSeed() << endl;
-    seedSvc->registerEngine(LArSeedService::CLHEPengineSeeder(m_pran), rname);
+    seedSvc->registerEngine(NuRandomService::CLHEPengineSeeder(m_pran), rname);
   }
   if ( fLogLevel > 0 ) cout << myname << "  Registered seed: " << m_pran->getSeed() << endl;
   for ( unsigned int isam=0; isam<fNoiseArrayPoints; ++isam ) {
