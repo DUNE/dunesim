@@ -5,6 +5,7 @@ BEGIN_PROLOG
 dunefd_genie:                         @local::standard_genie
 dunefd_genie.BeamName:                "lbnf"
 dunefd_genie.GlobalTimeOffset:        0
+dunefd_genie.EventGeneratorList:      "Default+MEC"
 
 dunefd_genie_hist:                    @local::dunefd_genie
 dunefd_genie_hist.FluxType:           "histogram"
@@ -53,6 +54,7 @@ dune_fd_genie_anu_simple_flux_workspace_window_rotated_tpc.FluxFiles: ["gsimple_
 
 #Configurations for 1x2x6 geometry
 dune_fd_genie_nu_simple_flux_1x2x6_window: @local::dunefd_genie
+dune_fd_genie_nu_simple_flux_1x2x6_window.FiducialCut:  "mbox:-380,-620,-20,380,620,1420"
 dune_fd_genie_nu_simple_flux_1x2x6_window.FluxType: "simple_flux"
 dune_fd_genie_nu_simple_flux_1x2x6_window.FluxSearchPaths: "/pnfs/dune/persistent/TaskForce_Flux/opt_03/neutrino/gsimple/far/nominal/"
 dune_fd_genie_nu_simple_flux_1x2x6_window.FluxFiles: ["gsimple_dune10kt_v1_1x2x6_g4lbne_v3r4p2_QGSP_BERT_CP_run15_12388_80GeV_neutrino_*root"]
