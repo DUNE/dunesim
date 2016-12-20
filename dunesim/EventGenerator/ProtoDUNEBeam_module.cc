@@ -277,7 +277,7 @@ void evgen::ProtoDUNEBeam::OpenInputFile()
 	
 	std::pair<std::string, long> f = flist.front();
 	
-	mf::LogInfo("ProtoDUNEBeam") << "For "<<fFileName<<"\n";
+	mf::LogInfo("ProtoDUNEBeam") << "For "<< fFileName <<"\n";
 	
 	// Do the fetching, store local filepaths in locallist
 	
@@ -285,6 +285,8 @@ void evgen::ProtoDUNEBeam::OpenInputFile()
         << "Fetching: " << f.first << " " << f.second <<"\n";       
 	std::string fetchedfile(fIFDH->fetchInput(f.first));
 	LOG_DEBUG("ProtoDUNEBeam") << " Fetched; local path: " << fetchedfile;
+	
+	fFileName = fetchedfile;
 }
 
 TLorentzVector evgen::ProtoDUNEBeam::ConvertCoordinates(float x, float y, float z, float t){
