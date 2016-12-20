@@ -14,6 +14,7 @@
 #include "art/Framework/Principal/Run.h"
 #include "art/Framework/Principal/SubRun.h"
 #include "canvas/Utilities/InputTag.h"
+#include "fhiclcpp/ParameterSetRegistry.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
@@ -123,7 +124,15 @@ evgen::ProtoDUNEBeam::ProtoDUNEBeam(fhicl::ParameterSet const & pset)
   fTreeName = pset.get< std::string>("TreeName");
 
   // See if the user wants to start at an event other than zero.
-  fStartEvent= pset.get<int>("StartEvent");
+  fStartEvent = pset.get<int>("StartEvent");
+
+  // Or maybe there was --nskip specified in the command line or skipEvents in FHiCL?
+  auto const & p0 = fhicl::ParameterSetRegistry::get().begin()->second;
+  if (p0.has_key("source.skipEvents"))
+  {
+    fStartEvent += p0.get<int>("source.skipEvents");
+  }
+
   fEventNumber = fStartEvent;
 
   // Coordinate transform
