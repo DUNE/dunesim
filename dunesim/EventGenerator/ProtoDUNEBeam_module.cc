@@ -135,6 +135,16 @@ evgen::ProtoDUNEBeam::ProtoDUNEBeam(fhicl::ParameterSet const & pset)
       break; // take the first occurence
     } // no "else", if parameter not found, then just don't change anything
   }
+  // ...and if there is -e option or firstEvent in FHiCL, this add up to the no. of events to skip.
+  for (auto const & p : fhicl::ParameterSetRegistry::get())
+  {
+    if (p.second.has_key("source.firstEvent"))
+    {
+      int fe = p.second.get<int>("source.firstEvent") - 1; // events base index is 1
+      if (fe > 0) fStartEvent += fe;
+      break; // take the first occurence
+    } // no "else", if parameter not found, then just don't change anything
+  }
   mf::LogInfo("ProtoDUNEBeam") << "Skip " << fStartEvent << " first events from the input file.";
 
   fEventNumber = fStartEvent;
