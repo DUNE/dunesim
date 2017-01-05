@@ -5,6 +5,7 @@ BEGIN_PROLOG
 dunefd_genie:                         @local::standard_genie
 dunefd_genie.BeamName:                "lbnf"
 dunefd_genie.GlobalTimeOffset:        0
+dunefd_genie.EventGeneratorList:      "Default+MEC"
 
 dunefd_genie_hist:                    @local::dunefd_genie
 dunefd_genie_hist.FluxType:           "histogram"
@@ -53,6 +54,7 @@ dune_fd_genie_anu_simple_flux_workspace_window_rotated_tpc.FluxFiles: ["gsimple_
 
 #Configurations for 1x2x6 geometry
 dune_fd_genie_nu_simple_flux_1x2x6_window: @local::dunefd_genie
+dune_fd_genie_nu_simple_flux_1x2x6_window.FiducialCut:  "mbox:-380,-620,-20,380,620,1420"
 dune_fd_genie_nu_simple_flux_1x2x6_window.FluxType: "simple_flux"
 dune_fd_genie_nu_simple_flux_1x2x6_window.FluxSearchPaths: "/pnfs/dune/persistent/TaskForce_Flux/opt_03/neutrino/gsimple/far/nominal/"
 dune_fd_genie_nu_simple_flux_1x2x6_window.FluxFiles: ["gsimple_dune10kt_v1_1x2x6_g4lbne_v3r4p2_QGSP_BERT_CP_run15_12388_80GeV_neutrino_*root"]
@@ -76,19 +78,23 @@ dune_fd_genie_anu_simple_flux_1x2x6_window_rotated_tpc.FluxFiles: ["gsimple_dune
 
 dune_fd_genie_atmo_min_flux:            @local::standard_genie_atmo_flux
 dune_fd_genie_atmo_min_flux.TopVolume:  "volCryostat"
-dune_fd_genie_atmo_min_flux.FluxSearchPaths: "/pnfs/dune/persistent/TaskForce_Flux/atmos/Bartol/"
-dune_fd_genie_atmo_min_flux.FluxFiles: ["fmin10_0401z.sou_nue","fmin10_0401z.sou_num","fmin10_0401z.sou_nbe","fmin10_0401z.sou_nbm"]
+dune_fd_genie_atmo_min_flux.FluxSearchPaths: "/pnfs/dune/persistent/TaskForce_Flux/atmos/Honda/"
+dune_fd_genie_atmo_min_flux.FluxFiles: ["hms-ally-20-12-solmin.d"]
+#dune_fd_genie_atmo_min_flux.FluxSearchPaths: "/pnfs/dune/persistent/TaskForce_Flux/atmos/Bartol/"
+#dune_fd_genie_atmo_min_flux.FluxFiles: ["fmin10_0401z.sou_nue","fmin10_0401z.sou_num","fmin10_0401z.sou_nbe","fmin10_0401z.sou_nbm"]
 dune_fd_genie_atmo_min_flux.FluxCopyMethod: "IFDH"
 
 dune_fd_genie_atmo_max_flux:            @local::standard_genie_atmo_flux
 dune_fd_genie_atmo_max_flux.TopVolume:  "volCryostat"
-dune_fd_genie_atmo_max_flux.FluxSearchPaths: "/pnfs/dune/persistent/TaskForce_Flux/atmos/Bartol/"
-dune_fd_genie_atmo_max_flux.FluxFiles: ["fmax10_0401z.sou_nue","fmax10_0401z.sou_num","fmax10_0401z.sou_nbe","fmax10_0401z.sou_nbm"]
+dune_fd_genie_atmo_max_flux.FluxSearchPaths: "/pnfs/dune/persistent/TaskForce_Flux/atmos/Honda/"
+dune_fd_genie_atmo_max_flux.FluxFiles: ["hms-ally-20-12-solmax.d","hms-ally-20-12-solmax.d","hms-ally-20-12-solmax.d","hms-ally-20-12-solmax.d"]
+#dune_fd_genie_atmo_max_flux.FluxSearchPaths: "/pnfs/dune/persistent/TaskForce_Flux/atmos/Bartol/"
+#dune_fd_genie_atmo_max_flux.FluxFiles: ["fmax10_0401z.sou_nue","fmax10_0401z.sou_num","fmax10_0401z.sou_nbe","fmax10_0401z.sou_nbm"]
 dune_fd_genie_atmo_max_flux.FluxCopyMethod: "IFDH"
 
 dune_fd_genie_atmo_hondaflux:            @local::standard_genie_atmo_flux
 dune_fd_genie_atmo_hondaflux.TopVolume:  "volCryostat"
 dune_fd_genie_atmo_simple_hondaflux.FluxSearchPaths: "/dune/app/users/santucci/dunetpc/jobs/outputs/honda_flux/"
-dune_fd_genie_atmo_hondaflux.FluxFiles: ["hms-ally-20-01-solmax.d"]
+dune_fd_genie_atmo_hondaflux.FluxFiles: ["hms-ally-20-01-solmax.d","hms-ally-20-01-solmax.d","hms-ally-20-01-solmax.d","hms-ally-20-01-solmax.d"]
 
 END_PROLOG

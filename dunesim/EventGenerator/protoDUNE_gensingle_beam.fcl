@@ -1,0 +1,60 @@
+#include "services_dune.fcl"
+#include "protodunebeam.fcl"
+
+process_name: H4BeamGen
+
+services:
+{
+  # Load the service that manages root files for histograms.
+#  TFileService: { fileName: "gensingle_beam_protoDUNE_hist.root" }
+  TimeTracker:       {}
+  RandomNumberGenerator: {} #ART native random number generator
+  FileCatalogMetadata:  @local::art_file_catalog_mc
+  @table::protodune_simulation_services
+}
+
+#Start each new event with an empty event.
+source:
+{
+  module_type: EmptyEvent
+  timestampPlugin: { plugin_type: "GeneratedEventTimestamp" }
+  maxEvents:   100
+  firstRun:    1           # Run number to use for this file
+  firstEvent:  1           # number of first event in the file
+}
+
+physics:
+{
+ producers:
+ {
+   generator: @local::protodune_beam	  
+   rns:       { module_type: "RandomNumberSaver" }
+ }
+ simulate: [ rns, generator ]
+ stream1:  [ out1 ]
+ trigger_paths: [simulate] 
+ end_paths:     [stream1]  
+}
+
+outputs:
+{
+ out1:
+ {
+   module_type: RootOutput
+   fileName:    "genBeam_protoDUNE.root" #default file name, can override from command line with -o or --output
+   dataTier: "generated"
+   compressionLevel: 1
+ }
+}
+
+# Specific to the GEANT H4 Beam simulation by Nikos and paths at CERN
+physics.producers.generator.FileName: "/mnt/nas00/scratch/h4/H4_TILT22_APR_FTFP_BERT_1GeV_6M.root"
+physics.producers.generator.TreeName: "NTuples/GoodParticle"
+physics.producers.generator.StartEvent: 0
+# Set the beam position and direction to fire the particles in the desired way
+physics.producers.generator.BeamX: 118.106 # In cm, taken from protoDUNE_gensingle.fcl
+physics.producers.generator.BeamY: 395.649 
+physics.producers.generator.BeamZ: -196.113
+physics.producers.generator.RotateXZ: -8.189 # In degrees, taken from protoDUNE_gensingle.fcl
+physics.producers.generator.RotateYZ: 11.229
+

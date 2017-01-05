@@ -86,6 +86,9 @@ chnoiseold: {
   LowCutoffU: 7.5
   LowCutoffV: 7.5
   LowCutoffZ: 7.5
+  WhiteNoiseU: 0.0
+  WhiteNoiseV: 0.0
+  WhiteNoiseZ: 0.0
   NoiseArrayPoints: 1000
   OldNoiseIndex: true
 }
@@ -93,6 +96,27 @@ chnoiseold: {
 # Option 2 from the old DetSim module.
 chnoisewhite: {
   service_provider: WhiteChannelNoiseService
+}
+
+# Tune from October 2016.
+# See D. Adams talk at the 26oct 35t sim/reco meeting.
+# Option 1 from the old DetSim module.
+chnoise35t: {
+  service_provider: ExponentialChannelNoiseService
+  NoiseNormU:   30.0
+  NoiseNormV:   30.0
+  NoiseNormZ:   15.0
+  NoiseWidthU: 150.0
+  NoiseWidthV: 150.0
+  NoiseWidthZ: 150.0
+  LowCutoffU:    0.0
+  LowCutoffV:    0.0
+  LowCutoffZ:    0.0
+  WhiteNoiseU:   1.6
+  WhiteNoiseV:   1.6
+  WhiteNoiseZ:   1.6
+  NoiseArrayPoints: 1000
+  OldNoiseIndex: false
 }
 
 #***********************************************************************
@@ -169,6 +193,7 @@ zsonline_nhi: {
 # to the final raw data format.
 
 # Replaces suppressed bins with value Zero.
+# Use this to effectively skip compression.
 cmpreplace: {
   service_provider: ReplaceCompressService
   Zero: 0

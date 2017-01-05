@@ -7,14 +7,14 @@ art_make( BASENAME_ONLY
           MODULE_LIBRARIES larcore_Geometry
                         dune_Geometry
                         larcore_Geometry_Geometry_service
-                        larsim_Simulation lardataobj_Simulation
+                        larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
                         lardata_Utilities
                         larevt_Filters
                         lardataobj_RawData
                         larsim_DetSim
                         SignalShapingServiceDUNE_service
 			SignalShapingServiceDUNEDPhase_service
-                        larsim_RandomUtils_LArSeedService_service
+                        nutools_RandomUtils_NuRandomService_service
                         ${ART_FRAMEWORK_CORE}
                         ${ART_FRAMEWORK_PRINCIPAL}
                         ${ART_FRAMEWORK_SERVICES_REGISTRY}

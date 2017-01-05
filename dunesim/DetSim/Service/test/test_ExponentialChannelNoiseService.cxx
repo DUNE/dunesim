@@ -59,8 +59,10 @@ void load_services(int fftsize =0) {
   string gname = "dune35t4apa_v5";
   cout << myname << "Add Geometry service." << endl;
   scfg = "DisableWiresInG4: true GDML: \"dune35t4apa_v5.gdml\" Name: \"" + gname +
-         "\" ROOT: \"" + gname + "\" SortingParameters: { DetectorVersion: \"" + gname +
-         "\" } SurfaceY: 0";
+         "\" ROOT: \"" + gname + "\""
+         " SortingParameters: { DetectorVersion: \"" + gname + "\""
+         " ChannelsPerOpDet: 12" +
+         "} SurfaceY: 0";
   cout << myname << "Configuration: " << scfg << endl;
   assert( ash.addService("Geometry", scfg) == 0 );
 
@@ -129,6 +131,9 @@ int test_ExponentialChannelNoiseService(unsigned int ntick, unsigned int maxchan
   pset.put("LowCutoffZ",     7.5);
   pset.put("LowCutoffU",     7.5);
   pset.put("LowCutoffV",     7.5);
+  pset.put("WhiteNoiseZ",    0.0);
+  pset.put("WhiteNoiseU",    0.0);
+  pset.put("WhiteNoiseV",    0.0);
   pset.put("NoiseArrayPoints", 1000);
   pset.put("OldNoiseIndex", true);
   pset.put("RandomSeed", 54321);

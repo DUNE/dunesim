@@ -5,7 +5,7 @@
 // Implementation of TPC channel noise model with white noise.
 // Same as the nose model 2 in SimWireDUNE35t, e.g. from dunetpc v04_29_01.
 // FCL parameters:
-//    RandomSeed - Overrides LArSeedService if set nonzero.
+//    RandomSeed - Overrides NuRandomService if set nonzero.
 //    LogLevel - (0=none, 1=init only, ...)
 
 #ifndef WhiteChannelNoiseService_H

@@ -2,7 +2,7 @@
 
 #include "dune/DetSim/Service/StuckBitAdcDistortionService.h"
 #include "fhiclcpp/ParameterSet.h"
-#include "larsim/RandomUtils/LArSeedService.h"
+#include "nutools/RandomUtils/NuRandomService.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "CLHEP/Random/JamesRandom.h"
 #include "CLHEP/Random/RandFlat.h"
@@ -14,7 +14,7 @@ using std::string;
 using std::cout;
 using std::ostream;
 using std::endl;
-using sim::LArSeedService;
+using rndm::NuRandomService;
 using CLHEP::HepJamesRandom;
 
 //**********************************************************************
@@ -37,11 +37,11 @@ StuckBitAdcDistortionService(const fhicl::ParameterSet& pset, art::ActivityRegis
     m_pran = new HepJamesRandom(m_RandomSeed);
   } else {
     string rname = "StuckBitAdcDistortionService";
-    if ( m_LogLevel > 0 ) cout << myname << "Using LArSeedService." << endl;
-    art::ServiceHandle<LArSeedService> seedSvc;
+    if ( m_LogLevel > 0 ) cout << myname << "Using NuRandomService." << endl;
+    art::ServiceHandle<NuRandomService> seedSvc;
     m_pran = new HepJamesRandom;
     if ( m_LogLevel > 0 ) cout << myname << "    Initial seed: " << m_pran->getSeed() << endl;
-    seedSvc->registerEngine(LArSeedService::CLHEPengineSeeder(m_pran), rname);
+    seedSvc->registerEngine(NuRandomService::CLHEPengineSeeder(m_pran), rname);
   }
   if ( m_LogLevel > 0 ) cout << myname << "  Registered seed: " << m_pran->getSeed() << endl;
   // Fetch the probabilities.

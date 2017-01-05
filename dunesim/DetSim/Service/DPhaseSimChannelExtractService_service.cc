@@ -8,7 +8,7 @@
 #include "lardataobj/Simulation/SimChannel.h"
 
 //#include "art/Framework/Services/Optional/RandomNumberGenerator.h"
-//#include "larsim/RandomUtils/LArSeedService.h"
+//#include "nutools/RandomUtils/NuRandomService.h"
 //#include "CLHEP/Random/RandGaussQ.h"
 
 //#undef UseSeedService
@@ -36,7 +36,7 @@ DPhaseSimChannelExtractService(const fhicl::ParameterSet& pset, art::ActivityReg
   /*
   // for adding noise fluctuations
 #ifdef UseSeedService
-  art::ServiceHandle<sim::LArSeedService> seedSvc;
+  art::ServiceHandle<rndm::NuRandomService> seedSvc;
   int seed = seedSvc->getSeed("DPhaseSimChannelExtractService");
 #else
   int seed = 26012016;

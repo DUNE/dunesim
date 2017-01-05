@@ -31,7 +31,7 @@ extern "C" {
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
 // art extensions
-#include "larsim/RandomUtils/LArSeedService.h"
+#include "nutools/RandomUtils/NuRandomService.h"
 
 #include "lardata/Utilities/LArFFT.h"
 #include "lardataobj/RawData/raw.h"
@@ -202,9 +202,9 @@ namespace detsim {
     if(compression.Contains("Huffman",TString::kIgnoreCase)) fCompression = raw::kHuffman;    
     if(compression.Contains("ZeroSuppression",TString::kIgnoreCase)) fCompression = raw::kZeroSuppression;
 
-// create a default random engine; obtain the random seed from LArSeedService,
+// create a default random engine; obtain the random seed from NuRandomService,
 // unless overridden in configuration with key "Seed"
-    art::ServiceHandle<sim::LArSeedService>()
+    art::ServiceHandle<rndm::NuRandomService>()
       ->createEngine(*this, pset, "Seed");
 
   }
