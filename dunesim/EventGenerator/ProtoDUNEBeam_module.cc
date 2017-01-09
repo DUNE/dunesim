@@ -40,7 +40,8 @@
 #include "TSystem.h" 
 
 #include "CLHEP/Random/RandFlat.h"
-#include "ifdh.h" 
+#include "ifdh.h"
+#include <sys/stat.h> 
 
 namespace evgen{
   class ProtoDUNEBeam;
@@ -285,8 +286,8 @@ void evgen::ProtoDUNEBeam::OpenInputFile()
 	const char* ifdh_debug_env = std::getenv("IFDH_DEBUG_LEVEL");
 	if ( ifdh_debug_env ) 
 	{
-      mf::LogInfo("ProtoDUNEBeam") << "IFDH_DEBUG_LEVEL: " << ifdh_debug_env<<"\n";
-      fIFDH->set_debug(ifdh_debug_env);
+      		mf::LogInfo("ProtoDUNEBeam") << "IFDH_DEBUG_LEVEL: " << ifdh_debug_env<<"\n";
+      		fIFDH->set_debug(ifdh_debug_env);
 	}
 	
 	std::string path(gSystem->DirName(fFileName.c_str()));
@@ -295,21 +296,31 @@ void evgen::ProtoDUNEBeam::OpenInputFile()
 	auto flist = fIFDH->findMatchingFiles(path,pattern);
 	if (flist.empty())
 	{
-		throw cet::exception("ProtoDUNEBeam") << "No files returned for path:pattern: "<<path<<":"<<pattern<<std::endl;
+		struct stat buffer;
+		if (stat(fFileName.c_str(), &buffer) != 0) 
+		{
+			throw cet::exception("ProtoDUNEBeam") << "No files returned for path:pattern: "<<path<<":"<<pattern<<std::endl;
+		}
+		else
+		{
+			mf::LogInfo("ProtoDUNEBeam") << "For "<< fFileName <<"\n";
+		}
 	}
+	else
+	{
+		std::pair<std::string, long> f = flist.front();
 	
-	std::pair<std::string, long> f = flist.front();
+		mf::LogInfo("ProtoDUNEBeam") << "For "<< fFileName <<"\n";
 	
-	mf::LogInfo("ProtoDUNEBeam") << "For "<< fFileName <<"\n";
+		// Do the fetching, store local filepaths in locallist
 	
-	// Do the fetching, store local filepaths in locallist
+		mf::LogInfo("ProtoDUNEBeam")
+        	<< "Fetching: " << f.first << " " << f.second <<"\n";       
+		std::string fetchedfile(fIFDH->fetchInput(f.first));
+		LOG_DEBUG("ProtoDUNEBeam") << " Fetched; local path: " << fetchedfile;
 	
-	mf::LogInfo("ProtoDUNEBeam")
-        << "Fetching: " << f.first << " " << f.second <<"\n";       
-	std::string fetchedfile(fIFDH->fetchInput(f.first));
-	LOG_DEBUG("ProtoDUNEBeam") << " Fetched; local path: " << fetchedfile;
-	
-	fFileName = fetchedfile;
+		fFileName = fetchedfile;
+	}
 }
 
 TLorentzVector evgen::ProtoDUNEBeam::ConvertCoordinates(float x, float y, float z, float t){
