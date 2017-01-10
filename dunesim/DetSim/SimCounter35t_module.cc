@@ -19,7 +19,7 @@
 #include "canvas/Utilities/InputTag.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
-#include "larsim/RandomUtils/LArSeedService.h"
+#include "nutools/RandomUtils/NuRandomService.h"
 
 #include "lardataobj/RawData/raw.h"
 #include "lardataobj/RawData/ExternalTrigger.h"
@@ -127,7 +127,7 @@ detsim::SimCounter35t::SimCounter35t(fhicl::ParameterSet const & p)
   fClockSpeedCounter(p.get<double>("ClockSpeedCounter",64)), // MHz
   fCombinedTimeDelay(p.get<double>("CombinedTimeDelay",160)) // ns
 {
-  art::ServiceHandle<sim::LArSeedService>()->createEngine(*this, "HepJamesRandom", "rand");
+  art::ServiceHandle<rndm::NuRandomService>()->createEngine(*this, "HepJamesRandom", "rand");
  
   produces< std::vector< raw::ExternalTrigger > >();
 }

@@ -3,7 +3,7 @@
 #include "dune/DetSim/Service/ProvidedPedestalAdditionService.h"
 #include "larevt/CalibrationDBI/Interface/DetPedestalService.h"
 #include "larevt/CalibrationDBI/Interface/DetPedestalProvider.h"
-#include "larsim/RandomUtils/LArSeedService.h"
+#include "nutools/RandomUtils/NuRandomService.h"
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "CLHEP/Random/JamesRandom.h"
 #include "CLHEP/Random/RandGaussQ.h"
@@ -13,7 +13,7 @@ using std::ostream;
 using std::cout;
 using std::endl;
 using std::string;
-using sim::LArSeedService;
+using rndm::NuRandomService;
 using CLHEP::HepJamesRandom;
 
 //**********************************************************************
@@ -34,11 +34,11 @@ ProvidedPedestalAdditionService(fhicl::ParameterSet const& pset, art::ActivityRe
     m_pran = new HepJamesRandom(m_RandomSeed);
   } else {
     string rname = "ProvidedPedestalAdditionService";
-    if ( m_LogLevel > 0 ) cout << myname << "Using LArSeedService." << endl;
-    art::ServiceHandle<LArSeedService> seedSvc;
+    if ( m_LogLevel > 0 ) cout << myname << "Using NuRandomService." << endl;
+    art::ServiceHandle<NuRandomService> seedSvc;
     m_pran = new HepJamesRandom;
     if ( m_LogLevel > 0 ) cout << myname << "    Initial seed: " << m_pran->getSeed() << endl;
-    seedSvc->registerEngine(LArSeedService::CLHEPengineSeeder(m_pran), rname);
+    seedSvc->registerEngine(NuRandomService::CLHEPengineSeeder(m_pran), rname);
   }
   if ( m_LogLevel > 0 ) cout << myname << "  Registered seed: " << m_pran->getSeed() << endl;
   art::ServiceHandle<art::TFileService> tfs;
