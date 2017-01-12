@@ -313,7 +313,8 @@ void evgen::ProtoDUNEBeam::FillParticleMaps(){
     }
 
     // Track ID map
-    int trackID = (int)fTrackID; 
+    int trackID = (int)fTrackID;
+    std::cout << "GoodParticle: " << event << ", " << trackID << std::endl; 
     if(fGoodParticleTrackID.find(event) == fGoodParticleTrackID.end()){
       std::vector<int> tracks;
       tracks.push_back(trackID);
@@ -388,21 +389,29 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth){
     // We need to ignore nuclei for now...
     if(intPDG > 100000) continue;
 
-    // Get the position four vector, converting mm to cm 
-    TLorentzVector pos = ConvertCoordinates(fX/10.,fY/10.,fZ/10.,correctedTime);
-    // Get momentum four vector, remembering to convert MeV to GeV
-    TLorentzVector mom = MakeMomentumVector(fPx/1000.,fPy/1000.,fPz/1000.,intPDG);
-
-    // Create the particle and add the starting position and momentum
+    // Check to see if this should be a primary beam particle (good particle) or beam background
     std::string process="primary";
     // If this track is a "beam background", use a different tag, but still containing "primary"
     if(std::find(fGoodParticleTrackID[beamEvent].begin(),fGoodParticleTrackID[beamEvent].end(),int(fTrackID)) == fGoodParticleTrackID[beamEvent].end()){
       process="primaryBackground";
     }
+    // Sometimes it seems that there is a second match for the event and track ID pair. For now, just check any particle that claims to be good
+    // is actually good.
+    if(process == "primary"){
+      if(fabs(fX) > 250 || fabs(fY) > 250){
+        continue;
+      }
+    }
+
+    // Get the position four vector, converting mm to cm 
+    TLorentzVector pos = ConvertCoordinates(fX/10.,fY/10.,fZ/10.,correctedTime);
+    // Get momentum four vector, remembering to convert MeV to GeV
+    TLorentzVector mom = MakeMomentumVector(fPx/1000.,fPy/1000.,fPz/1000.,intPDG);
 
     // Track ID needs to be negative for primaries
     int trackID = -1*(mcTruth.NParticles() + 1);
 
+    // Create the particle and add the starting position and momentum
     simb::MCParticle newParticle(trackID,intPDG,process);
     newParticle.AddTrajectoryPoint(pos,mom);
 
