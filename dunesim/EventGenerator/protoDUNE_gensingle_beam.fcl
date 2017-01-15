@@ -48,8 +48,9 @@ outputs:
 }
 
 # Specific to the GEANT H4 Beam simulation by Nikos and paths at CERN
-physics.producers.generator.FileName: "/mnt/nas00/scratch/h4/H4_TILT22_APR_FTFP_BERT_1GeV_6M.root"
-physics.producers.generator.TreeName: "NTuples/GoodParticle"
+physics.producers.generator.FileName: "/mnt/nas00/scratch/h4/with_mu_halo_wo_shielding/H4_TILT22_APR_TARGSEC_ROTCENT_FTFP_BERT_7GeV_6M_reduced.root"
+physics.producers.generator.GoodParticleTreeName: "NTuples/GoodParticle"
+physics.producers.generator.AllParticlesTreeName: "VirtualDetector/Lag_ENTRY"
 physics.producers.generator.StartEvent: 0
 # Set the beam position and direction to fire the particles in the desired way
 physics.producers.generator.BeamX: 118.106 # In cm, taken from protoDUNE_gensingle.fcl
