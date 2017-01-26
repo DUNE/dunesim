@@ -3,7 +3,7 @@
 #include "dune/DetSim/Service/FixedZeroSuppressService.h"
 #include <cmath>
 #include "fhiclcpp/ParameterSet.h"
-#include "dune/DetSim/AdcCodeHelper.h"
+#include "dune/DetSim/Utility/AdcCodeHelper.h"
 
 using std::string;
 using std::ostream;

@@ -1,6 +1,6 @@
 // AdcCodeHelper.cxx
 
-#include "dune/DetSim/AdcCodeHelper.h"
+#include "dune/DetSim/Utility/AdcCodeHelper.h"
 #include <cmath>
 
 //**********************************************************************

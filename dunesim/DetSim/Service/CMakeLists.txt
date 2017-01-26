@@ -1,14 +1,14 @@
-# dunetpc/dune/larsim_DetSim/Service/CMakeLists.txt
+# dunetpc/dune/DetSim/Service/CMakeLists.txt
 #
 # David Adams
 # December 2015
 #
-# CMake instructions for larsim_DetSim services.
+# CMake instructions for DetSim services.
 
 # Add plugin for each service.
 
 simple_plugin(Dune35tSimChannelExtractService   "service"
-                larsim_DetSim
+                dune_DetSim
                 larcore_Geometry
                 larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
                 lardata_Utilities
@@ -18,7 +18,7 @@ simple_plugin(Dune35tSimChannelExtractService   "service"
              )
 
 simple_plugin(GenericSimChannelExtractService   "service"
-                larsim_DetSim
+                dune_DetSim
                 larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
                 lardata_Utilities
                 SignalShapingServiceDUNE_service
@@ -27,7 +27,7 @@ simple_plugin(GenericSimChannelExtractService   "service"
              )
 
 simple_plugin(DPhaseSimChannelExtractService   "service"
-                larsim_DetSim
+                dune_DetSim
                 larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
                 lardata_Utilities
                 SignalShapingServiceDUNEDPhase_service
@@ -73,11 +73,11 @@ simple_plugin(ProvidedPedestalAdditionService "service"
              )
 
 simple_plugin(Dune35tZeroSuppressService        "service"
-                larsim_DetSim
+                dune_DetSim
 )
 
 simple_plugin(Legacy35tZeroSuppressService  "service"
-                larsim_DetSim
+                dune_DetSim
 )
 
 simple_plugin(FixedZeroSuppressService      "service"

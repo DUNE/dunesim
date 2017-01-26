@@ -8,8 +8,6 @@
 # removed.
 
 art_make( BASENAME_ONLY
-          LIBRARY_NAME larsim_DetSim
-          LIB_LIBRARIES
           MODULE_LIBRARIES larcore_Geometry
 	                dune_Geometry
 			larcore_Geometry_Geometry_service
@@ -40,9 +38,9 @@ art_make( BASENAME_ONLY
 			${ROOT_BASIC_LIB_LIST}
         )
 
+add_subdirectory(Utility)
 add_subdirectory(Service)
 add_subdirectory(Module)
+add_subdirectory(fcl)
 
-install_headers()
-install_fhicl()
 install_source()
