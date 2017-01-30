@@ -8,11 +8,18 @@ protodune_beam:
  AllParticlesTreeName:  "VirtualDetector/Lag_ENTRY"
  StartEvent: 0
  # From protoDUNE_gensingle.fcl
- BeamX: 118.106 # In cm
- BeamY: 395.649 
- BeamZ: -196.113
- RotateXZ: -8.189 # In degrees
- RotateYZ: 11.229 
+ #BeamX: 118.106 # In cm
+ #BeamY: 395.649 
+ #BeamZ: -196.113
+ #RotateXZ: -8.189 # In degrees
+ #RotateYZ: 11.229 
+ # Updated geometry values:
+ BeamX: 8.0757 # In cm
+ BeamY: 461.06 
+ BeamZ: -196.11
+ RotateXZ: -11.844 # In degrees
+ RotateYZ: 11.107 
+
 }
 
 END_PROLOG
