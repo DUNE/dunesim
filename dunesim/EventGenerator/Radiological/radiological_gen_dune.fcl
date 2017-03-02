@@ -8,6 +8,7 @@ dune4apa_radiogen_apaexclude:
 {
  module_type:           "RadioGen"
  Nuclide:               [ "39Ar", "39Ar" ]       # list of nuclides to simulate, supported so far: 39Ar, 60Co, 85Kr, 40K, 232Th, 238U, 222Rn
+ Material:              [ "LAr",  "LAr"  ]       # list of regex's to match material names -- only generate decays in materials matching these strings
  BqPercc:               [ 0.00141, 0.00141 ]     # activity -- Becquerels per cc. 0.00141 assumes 1.01 Bq/kg (typical for 39Ar) and a density of 1.396 g/cc for LAr
  X0:                    [    0.,   -3. ]         # in cm in world coordinates, bottom corner of box
  X1:                    [  475., -475. ]         # in cm in world coordinates, top corner of box
@@ -23,6 +24,7 @@ dune4apa_radiogen:
 {
  module_type:           "RadioGen"
  Nuclide:               [ "39Ar" ]    # list of nuclides to simulate, supported so far: 39Ar, 60Co, 85Kr, 40K, 232Th, 238U, 222Rn
+ Material:              [ "LAr" ]      # list of regex's to match material names -- only generate decays in materials matching these strings
  BqPercc:               [ 0.00141 ]   # activity -- Becquerels per cc. 0.00141 assumes 1.01 Bq/kg (typical for 39Ar) and a density of 1.396 g/cc for LAr
  X0:                    [ -475. ]     # in cm in world coordinates, bottom corner of box
  X1:                    [  475. ]     # in cm in world coordinates, top corner of box
@@ -42,6 +44,7 @@ dunefd_1x2x6_ar39.Z1:   [ 1500. ]     # in cm in world coordinates, top corner o
 
 dune4apa_radiogen_rn222: @local::dune4apa_radiogen
 dune4apa_radiogen_rn222.Nuclide: [ "222Rn" ]
+dune4apa_radiogen_rn222.Nuclide: [ "LAr" ]   # only decay in LAr materials.  Rn daughters plating?
 dune4apa_radiogen_rn222.BqPercc: [ 0.0141  ] # Don't know this activity yet: try 10x 39Ar for now
 
 END_PROLOG
