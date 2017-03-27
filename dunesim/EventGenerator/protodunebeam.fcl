@@ -19,7 +19,13 @@ protodune_beam:
  BeamZ: -196.11
  RotateXZ: -11.844 # In degrees
  RotateYZ: 11.107 
-
+ # Intensity variables
+ Intensity: 1.e6 # Number of interactions on the secondary target in one spill
+ ReadoutWindow: 3.0 # In milliseconds
+ BeamSpillLength: 4.8 # In seconds
+ # Background particle cuts
+ BkgMomentumCut: 0.0 # Momentum cut in GeV/c on background particles as a crude shielding simulation
+ BkgRadiusCut: 20. # 20 cm radius to apply above cut to particles outside the beam pipe area
 }
 
 END_PROLOG
