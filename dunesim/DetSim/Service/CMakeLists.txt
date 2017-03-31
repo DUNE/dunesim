@@ -13,7 +13,8 @@ simple_plugin(Dune35tSimChannelExtractService   "service"
                 larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
                 lardata_Utilities
                 SignalShapingServiceDUNE_service
-                art_Utilities canvas_Utilities
+                art_Utilities canvas
+                cetlib cetlib_except
                 ${ROOT_BASIC_LIB_LIST}
              )
 
@@ -22,7 +23,8 @@ simple_plugin(GenericSimChannelExtractService   "service"
                 larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
                 lardata_Utilities
                 SignalShapingServiceDUNE_service
-                art_Utilities canvas_Utilities
+                art_Utilities canvas
+                cetlib cetlib_except
                 ${ROOT_BASIC_LIB_LIST}
              )
 
@@ -31,8 +33,9 @@ simple_plugin(DPhaseSimChannelExtractService   "service"
                 larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
                 lardata_Utilities
                 SignalShapingServiceDUNEDPhase_service
-                art_Utilities canvas_Utilities
+                art_Utilities canvas
 		${ART_FRAMEWORK_CORE}
+                cetlib cetlib_except
                 ${ROOT_BASIC_LIB_LIST}
 		nutools_RandomUtils_NuRandomService_service
 		${CLHEP}
@@ -44,7 +47,8 @@ simple_plugin(ExponentialChannelNoiseService   "service"
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
                 nutools_RandomUtils_NuRandomService_service
                 ${ART_FRAMEWORK_CORE}
-                art_Utilities canvas_Utilities
+                art_Utilities canvas
+                cetlib cetlib_except
                 ${CLHEP}
                 ${ROOT_BASIC_LIB_LIST}
              )
@@ -56,7 +60,8 @@ simple_plugin(WhiteChannelNoiseService   "service"
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL}
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
                 ${ART_FRAMEWORK_CORE}
-                art_Utilities canvas_Utilities
+                art_Utilities canvas
+                cetlib cetlib_except
                 ${CLHEP}
                 ${ROOT_BASIC_LIB_LIST}
              )
@@ -66,7 +71,8 @@ simple_plugin(ProvidedPedestalAdditionService "service"
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL}
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
                 ${ART_FRAMEWORK_CORE}
-                art_Utilities canvas_Utilities
+                art_Utilities canvas
+                cetlib cetlib_except
                 MF_MessageLogger
                 ${CLHEP}
                 ${ROOT_BASIC_LIB_LIST}
@@ -74,21 +80,26 @@ simple_plugin(ProvidedPedestalAdditionService "service"
 
 simple_plugin(Dune35tZeroSuppressService        "service"
                 dune_DetSim
+                cetlib cetlib_except
 )
 
 simple_plugin(Legacy35tZeroSuppressService  "service"
                 dune_DetSim
+                cetlib cetlib_except
 )
 
 simple_plugin(FixedZeroSuppressService      "service"
+                cetlib cetlib_except
 )
 
 simple_plugin(ReplaceCompressService        "service"
+                cetlib cetlib_except
 )
 
 simple_plugin(LarsoftHuffmanCompressService "service"
                 lardataobj_RawData
                 dune_DetSim_Service_ReplaceCompressService_service
+                cetlib cetlib_except
 )
 
 simple_plugin(StuckBitAdcDistortionService   "service"
@@ -96,16 +107,18 @@ simple_plugin(StuckBitAdcDistortionService   "service"
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL}
                 nutools_RandomUtils_NuRandomService_service
                 ${ART_FRAMEWORK_CORE}
-                art_Utilities canvas_Utilities
+                art_Utilities canvas
                 ${MF_MESSAGELOGGER}
                 ${MF_UTILITIES}
+                cetlib cetlib_except
                 ${CLHEP}
                 ${ROOT_BASIC_LIB_LIST}
              )
 
 simple_plugin(FixedDetPedestalService "service"
                 larcore_Geometry
-                art_Utilities canvas_Utilities
+                art_Utilities canvas
+                cetlib cetlib_except
                 ${ROOT_BASIC_LIB_LIST}
 )
 
