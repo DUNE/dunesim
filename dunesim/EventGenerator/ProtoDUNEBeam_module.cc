@@ -187,7 +187,7 @@ evgen::ProtoDUNEBeam::ProtoDUNEBeam(fhicl::ParameterSet const & pset)
   
   fCurrentGoodEvent = 0;
 
-//  OpenInputFile();
+  OpenInputFile();
 
 }
 
