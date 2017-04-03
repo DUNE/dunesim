@@ -218,7 +218,8 @@ evgen::ProtoDUNEBeam::ProtoDUNEBeam(fhicl::ParameterSet const & pset)
   
   fCurrentGoodEvent = 0;
 
-//  OpenInputFile();
+	// Make sure we use ifdh to open the beam input file.
+  OpenInputFile();
 
 	// Create the random number generator
 	std::string const instanceName = "protoDUNEBeam";
