@@ -369,7 +369,7 @@ void evgen::ProtoDUNEBeam::FillParticleMaps(){
 
     // Track ID map
     int trackID = (int)fTrackID;
-    std::cout << "GoodParticle: " << event << ", " << trackID << std::endl; 
+//    std::cout << "GoodParticle: " << event << ", " << trackID << std::endl; 
 /*    if(fGoodParticleTrackID.find(event) == fGoodParticleTrackID.end()){
       std::vector<int> tracks;
       tracks.push_back(trackID);
@@ -467,13 +467,15 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth){
   mcTruth.SetOrigin(simb::kSingleParticle);
 
 	// Find the entries that we are interested in.
-	std::cout << "Finding all particles associated with good particle event " << beamEvent << std::endl;
+//	std::cout << "Finding all particles associated with good particle event " << beamEvent << std::endl;
 	for(auto const e : fEventParticleMap[beamEvent]){
 		// Is this the event we would have triggered on?
 		bool trigEvent = (e.first == beamEvent);
 		float baseTime;
 		if(trigEvent){
-			baseTime = 0.0;
+			// Set the base time for the triggered event equal to the negative of the good particle time.
+			// This will be corrected later on to set the time to zero, but keep time offsets within the event.
+			baseTime = -1.0 * fGoodParticleTriggerTime[beamEvent];
 		}
 		else{
 			// Get a random time from -fReadoutWindow to +fReadoutWindow in ns (fReadoutWindow value is in ms).
@@ -507,7 +509,7 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth){
 				continue;
 			}
     	
-			if(process=="primary") std::cout << " - Got the good particle (" << intPDG << ", " << e.first << ", " << (int)fTrackID << ") with momentum = " << mom.Vect().Mag() << std::endl;
+//			if(process=="primary") std::cout << " - Got the good particle (" << intPDG << ", " << e.first << ", " << (int)fTrackID << ") with momentum = " << mom.Vect().Mag() << std::endl;
 
     	// Track ID needs to be negative for primaries
     	int trackID = -1*(mcTruth.NParticles() + 1);
@@ -522,7 +524,7 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth){
 		} // End loop over interesting tracks for each event
 	} // End loop over the vector of interesting events
 
-	std::cout << "Created event with " << mcTruth.NParticles() << " particles." << std::endl;
+	mf::LogInfo("ProtoDUNEBeam") << "Created event with " << mcTruth.NParticles() << " particles.";
 
 /*
   // Get the required particles
