@@ -661,13 +661,8 @@ TLorentzVector evgen::ProtoDUNEBeam::MakeMomentumVector(float px, float py, floa
 void evgen::ProtoDUNEBeam::CalculateNOverlays(){
 
 	// The number of events to overlay is as follows:
-	// N = Intensity * 2.0 * ReadoutWindow / BeamSpillLength
-	
+	// N = Intensity * 2.0 * ReadoutWindow / BeamSpillLength	
 	fOverlays = fIntensity * (2.0 * fReadoutWindow / 1000.) / fBeamSpillLength;
-
-	// Leigh: with old files, we have repeated event numbers. For 50 events, 
-	// we can probably just divide this number by three.
-	fOverlays = fOverlays;
 
 }
 
