@@ -2,6 +2,8 @@
 
 include(CetTest)
 
+cet_enable_asserts()
+
 MESSAGE( STATUS "CMAKE_LIBRARY_PATH: " ${CMAKE_LIBRARY_PATH} )
 
 cet_test(test_LarsoftHuffmanCompressService SOURCES test_LarsoftHuffmanCompressService.cxx
