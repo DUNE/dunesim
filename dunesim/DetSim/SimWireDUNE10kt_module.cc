@@ -573,16 +573,16 @@ namespace detsim {
 	  if ( tmpfv > adcsaturation - ped_mean)
 	    tmpfv = adcsaturation- ped_mean;
 	  //don't allow for "negative" saturation
-	  if ( tmpfv < 0 - ped_mean)
-	    tmpfv = 0- ped_mean;
+	  if ( tmpfv < 0 - ped_mean) {
+	    tmpfv = 0- ped_mean; }
             adcvecPreSpill_a[i] = (tmpfv >=0) ? (short) (tmpfv+0.5) : (short) (tmpfv-0.5); 
             tmpfv = fChargeWorkPostSpill_a[i];
 	    //allow for ADC saturation
 	  if ( tmpfv > adcsaturation - ped_mean)
 	    tmpfv = adcsaturation- ped_mean;
 	  //don't allow for "negative" saturation
-	  if ( tmpfv < 0 - ped_mean)
-	    tmpfv = 0- ped_mean;
+	  if ( tmpfv < 0 - ped_mean) {
+	    tmpfv = 0- ped_mean; }
             adcvecPostSpill_a[i] = (tmpfv >=0) ? (short) (tmpfv+0.5) : (short) (tmpfv-0.5); 
           }
         }
