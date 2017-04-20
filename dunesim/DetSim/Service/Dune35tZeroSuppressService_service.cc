@@ -2,7 +2,7 @@
 
 #include "dune/DetSim/Service/Dune35tZeroSuppressService.h"
 #include <iomanip>
-#include "dune/DetSim/SignalTypeConverter.h"
+#include "dune/DetSim/Utility/SignalTypeConverter.h"
 #include "fhiclcpp/ParameterSet.h"
 
 using std::string;

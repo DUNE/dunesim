@@ -1,11 +1,11 @@
-////////////////////////////////////////////////////////////////////////
-// Class:       SimCounter35t
-// Module Type: producer
-// File:        SimCounter35t_module.cc
+// SimCounter35t_module.cc
 //
-// Generated at Wed Mar 18 05:42:26 2015 by Matthew Thiesse using artmod
-// from cetpkgsupport v1_08_04.
-////////////////////////////////////////////////////////////////////////
+// Matthew Thiesse
+// March 2015
+//
+// This producer module is use in 35t simulation to convert sim IDEs
+// in muon counters to raw::ExternalTrigger data products in the same
+// format created by the data splitter
 
 // workaround for Mac build problem
 #define BOOST_SYSTEM_NO_DEPRICATED

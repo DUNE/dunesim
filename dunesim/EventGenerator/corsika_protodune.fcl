@@ -19,11 +19,11 @@ protodune_corsika_cmc.BufferBox:      [ -300.0,300.0,-300.0,300.0,-300.0,300.0 ]
 protodune_corsika_cmc.ShowerAreaExtension: 2000
 protodune_corsika_cmc.ProjectToHeight:  865  #height to which particles are projected in cm
 protodune_corsika_cmc.ShowerInputFiles: [
-            "/pnfs/dune/persistent/users/mibass/corsika/sqShowers/DAT2*.db",
-            "/pnfs/dune/persistent/users/mibass/corsika/sqShowers/DAT3*.db",
-            "/pnfs/dune/persistent/users/mibass/corsika/sqShowers/DAT4*.db",
-            "/pnfs/dune/persistent/users/mibass/corsika/sqShowers/DAT5*.db",
-            "/pnfs/dune/persistent/users/mibass/corsika/sqShowers/DAT6*.db"
+    "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/p_showers_*db",
+    "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/He_showers_*db",
+    "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/N_showers_*db",
+    "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/Mg_showers_*db",
+    "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/Fe_showers_*db"
          ]
 
 END_PROLOG

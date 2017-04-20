@@ -173,23 +173,23 @@ bool spacecharge::SpaceChargeDUNE35t::EnableCorrSCE() const
 //----------------------------------------------------------------------------
 /// Primary working method of service that provides position offsets to be
 /// used in ionization electron drift
-std::vector<double> spacecharge::SpaceChargeDUNE35t::GetPosOffsets(double xVal, double yVal, double zVal) const
+geo::Vector_t spacecharge::SpaceChargeDUNE35t::GetPosOffsets(geo::Point_t const& point) const
 {
   std::vector<double> thePosOffsets;
 
-  if(IsInsideBoundaries(xVal,yVal,zVal) == false)
+  if(IsInsideBoundaries(point.X(), point.Y(), point.Z()) == false)
   {
     thePosOffsets.resize(3,0.0);
   }
   else
   {
     if(fRepresentationType == "Parametric")
-      thePosOffsets = GetPosOffsetsParametric(xVal,yVal,zVal);
+      thePosOffsets = GetPosOffsetsParametric(point.X(), point.Y(), point.Z());
     else
       thePosOffsets.resize(3,0.0);
   }
 
-  return thePosOffsets;
+  return { thePosOffsets[0], thePosOffsets[1], thePosOffsets[2] };
 }
 
 //----------------------------------------------------------------------------
@@ -332,23 +332,23 @@ double spacecharge::SpaceChargeDUNE35t::GetOnePosOffsetParametric(double xValNew
 //----------------------------------------------------------------------------
 /// Primary working method of service that provides E field offsets to be
 /// used in charge/light yield calculation (e.g.)
-std::vector<double> spacecharge::SpaceChargeDUNE35t::GetEfieldOffsets(double xVal, double yVal, double zVal) const
+geo::Vector_t spacecharge::SpaceChargeDUNE35t::GetEfieldOffsets(geo::Point_t const& point) const
 {
   std::vector<double> theEfieldOffsets;
 
-  if(IsInsideBoundaries(xVal,yVal,zVal) == false)
+  if(IsInsideBoundaries(point.X(), point.Y(), point.Z()) == false)
   {
     theEfieldOffsets.resize(3,0.0);
   }
   else
   {
     if(fRepresentationType == "Parametric")
-      theEfieldOffsets = GetEfieldOffsetsParametric(xVal,yVal,zVal);
+      theEfieldOffsets = GetEfieldOffsetsParametric(point.X(), point.Y(), point.Z());
     else
       theEfieldOffsets.resize(3,0.0);
   }
 
-  return theEfieldOffsets;
+  return { theEfieldOffsets[0], theEfieldOffsets[1], theEfieldOffsets[2] };
 }
 
 //----------------------------------------------------------------------------
