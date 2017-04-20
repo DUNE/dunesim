@@ -56,9 +56,9 @@ void load_services(int fftsize =0) {
   assert( ash.addService("TFileService", scfg) == 0 );
 
   cout << myname << line << endl;
-  string gname = "dune35t4apa_v5";
+  string gname = "dune35t4apa_v6";
   cout << myname << "Add Geometry service." << endl;
-  scfg = "DisableWiresInG4: true GDML: \"dune35t4apa_v5.gdml\" Name: \"" + gname +
+  scfg = "DisableWiresInG4: true GDML: \"dune35t4apa_v6.gdml\" Name: \"" + gname +
          "\" ROOT: \"" + gname + "\""
          " SortingParameters: { DetectorVersion: \"" + gname + "\""
          " ChannelsPerOpDet: 12" +
