@@ -11,6 +11,7 @@ cet_enable_asserts()
 
 cet_test(test_IdealAdcSimulator SOURCES test_IdealAdcSimulator.cxx
   LIBRARIES
+    art_Utilities
     fhiclcpp
     cetlib
     cetlib_except

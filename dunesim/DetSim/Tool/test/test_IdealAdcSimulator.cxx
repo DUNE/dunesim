@@ -11,6 +11,8 @@
 #include "fhiclcpp/ParameterSet.h"
 #include "fhiclcpp/intermediate_table.h"
 #include "fhiclcpp/make_ParameterSet.h"
+#include "art/Utilities/make_tool.h"
+#include "dune/DuneInterface/AdcSimulator.h"
 
 #undef NDEBUG
 #include <cassert>
@@ -37,7 +39,7 @@ int test_IdealAdcSimulator(bool useExistingFcl) {
     cout << myname << "Creating top-level FCL." << endl;
     ofstream fout(fclfile.c_str());
     fout << "mytool: {" << endl;
-    fout << "  tool_provider: IdealAdcSimulator" << endl;
+    fout << "  tool_type: IdealAdcSimulator" << endl;
     fout << "}" << endl;
     fout.close();
   } else {
@@ -57,8 +59,16 @@ int test_IdealAdcSimulator(bool useExistingFcl) {
   cout << myname << line << endl;
   cout << myname << "Checking tool type." << endl;
   ParameterSet psTool = psTop.get<fhicl::ParameterSet>("mytool");
-  cout << "Tool type: " << psTool.get<string>("tool_provider") << endl;
-  assert( psTool.get<string>("tool_provider") == "IdealAdcSimulator" );
+  cout << "Tool type: " << psTool.get<string>("tool_type") << endl;
+  assert( psTool.get<string>("tool_type") == "IdealAdcSimulator" );
+
+  cout << myname << line << endl;
+  cout << myname << "Instantiate tool." << endl;
+  std::unique_ptr<AdcSimulator> ptool = art::make_tool<AdcSimulator>(psTool);
+  assert( ptool != nullptr );
+  double vin = 1200;
+  cout << "ADC count is " << ptool->count(vin) << endl;
+  assert( ptool->count(vin) == 1234 );
 
   cout << myname << line << endl;
   cout << myname << "Done." << endl;
