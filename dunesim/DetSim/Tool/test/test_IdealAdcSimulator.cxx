@@ -22,6 +22,24 @@ using std::cout;
 using std::endl;
 using std::ofstream;
 using fhicl::ParameterSet;
+using ToolPtr = std::unique_ptr<AdcSimulator>;
+using Count = AdcSimulator::Count;
+
+//**********************************************************************
+
+template<class T1, class T2>
+void checkEqual(T1 x1, T2 x2, string msg ="Assert failed") {
+  if ( x1 != x2 ) {
+    cout << msg << ": " << x1 << " != " << x2 << endl;
+    assert(false);
+  }
+}
+
+void checkCount(const ToolPtr& ptool, double vin, Count countExpected) {
+  Count countActual = ptool->count(vin);
+  cout << "  ADC(" << vin << ") = " << countActual << endl;
+  checkEqual(countActual, countExpected);
+}
 
 //**********************************************************************
 
@@ -40,6 +58,8 @@ int test_IdealAdcSimulator(bool useExistingFcl) {
     ofstream fout(fclfile.c_str());
     fout << "mytool: {" << endl;
     fout << "  tool_type: IdealAdcSimulator" << endl;
+    fout << "  Vsen: 2.0" << endl;
+    fout << "  Nbit: 12" << endl;
     fout << "}" << endl;
     fout.close();
   } else {
@@ -68,7 +88,17 @@ int test_IdealAdcSimulator(bool useExistingFcl) {
   assert( ptool != nullptr );
   double vin = 1200;
   cout << "ADC count is " << ptool->count(vin) << endl;
-  assert( ptool->count(vin) == 1234 );
+  checkCount(ptool, -999.0, 0);
+  checkCount(ptool, -999.0, 0 );
+  checkCount(ptool, -0.01, 0 );
+  checkCount(ptool, 1.0, 1);
+  checkCount(ptool, 201.0, 101 );
+  checkCount(ptool, 2001.0, 1001 );
+  checkCount(ptool, 8187.0, 4094 );
+  checkCount(ptool, 8189.0, 4095 );
+  checkCount(ptool, 8190.0, 4095 );
+  checkCount(ptool, 8191.0, 4095 );
+  checkCount(ptool, 999999.0, 4095 );
 
   cout << myname << line << endl;
   cout << myname << "Done." << endl;

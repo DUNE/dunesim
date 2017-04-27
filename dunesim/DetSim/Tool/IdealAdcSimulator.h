@@ -23,11 +23,20 @@ class IdealAdcSimulator : public AdcSimulator {
 
 public:
 
-  // Ctor.
+  // Ctor from params.
+  explicit IdealAdcSimulator(double vsen, unsigned int nbit =12);
+
+  // Ctor for  art tool.
   explicit IdealAdcSimulator(fhicl::ParameterSet const& ps);
 
   // Evaluate an ADC count.
-  Count count(double vin, Channel chan =0, Tick tick =0) const;
+  Count count(double vin, Channel chan =0, Tick tick =0) const override;
+
+private:
+
+  double m_vsen;
+  double m_vmax;
+  Count m_adcmax;
 
 };
 
