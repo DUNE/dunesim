@@ -201,7 +201,7 @@ evgen::ProtoDUNEBeam::ProtoDUNEBeam(fhicl::ParameterSet const & pset)
   }
   mf::LogInfo("ProtoDUNEBeam") << "Skip " << fStartEvent << " first events from the input file.";
 
-  fEventNumber = fStartEvent;
+  fEventNumber = 0;
 
   // Coordinate transform
   fBeamX = pset.get<float>("BeamX");
