@@ -232,12 +232,17 @@ void SimWireDUNE::produce(art::Event& evt) {
     // Convert floating ADC to integral ADC count.
     std::vector<short> adcvec(fChargeWork.size(), 0);        
     const short adcmax = 4095;
+    int ndump = 1000;
     for ( unsigned int itck=0; itck<fChargeWork.size(); ++itck ) {
       AdcSignal adcsig = fChargeWork[itck];
       short adc = 0;
       if ( adcsig > 0 ) adc = (short) (adcsig + 0.5);
       if ( adc > adcmax ) adc = adcmax;
       adcvec[itck] = adc;
+      if ( ndump ) {
+        cout << myname << "  ADC: " << adc << endl;
+        --ndump;
+      }
     }
     // Resize to the correct number of time samples, dropping extra samples.
     adcvec.resize(nTickReadout);
