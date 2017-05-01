@@ -91,6 +91,8 @@ int test_IdealAdcSimulator(bool useExistingFcl) {
   checkCount(ptool, -999.0, 0);
   checkCount(ptool, -999.0, 0 );
   checkCount(ptool, -0.01, 0 );
+  checkCount(ptool, 0.0, 0 );
+  checkCount(ptool, 0.2, 0 );
   checkCount(ptool, 1.0, 1);
   checkCount(ptool, 201.0, 101 );
   checkCount(ptool, 2001.0, 1001 );

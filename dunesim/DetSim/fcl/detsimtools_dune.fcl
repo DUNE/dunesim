@@ -10,5 +10,5 @@
 tools.adcsim_ideal: {
   tool_type: IdealAdcSimulator
   Vsen: 1.0
-  Nbin: 12
+  Nbit: 12
 }
