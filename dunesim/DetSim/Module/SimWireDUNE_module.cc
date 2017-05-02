@@ -208,10 +208,6 @@ void SimWireDUNE::produce(art::Event& evt) {
 
     // Get the SimChannel for this channel
     const sim::SimChannel* psc = simChannels[chan];
-    const geo::View_t view = m_pgeo->View(chan);
-    if (view != geo::kU && view != geo::kV && view != geo::kZ) {
-      mf::LogError("SimWireDUNE") << "ERROR: CHANNEL NUMBER " << chan << " OUTSIDE OF PLANE";
-    }
 
     // Create vector that holds the floating ADC count for each tick.
     std::vector<AdcSignal> fChargeWork;
