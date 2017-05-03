@@ -27,6 +27,7 @@ dune_detsim: {
   DistortOn:         false
   SuppressOn:        false
   KeepEmptyChannels: false
+  AdcSimulator:      "adcsim_ideal"
 }
 
 #***********************************************************************
