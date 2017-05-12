@@ -1,0 +1,14 @@
+# destimtools_dune.fcl
+
+# David Adams
+# Aprils 2017
+
+# Tool definitions for DUNE DetSim.
+
+# Ideal ADC simulator with a gain of 1.0.
+# For use where the input voltage is already converte dot ADC counts.
+tools.adcsim_ideal: {
+  tool_type: IdealAdcSimulator
+  Vsen: 1.0
+  Nbit: 12
+}
