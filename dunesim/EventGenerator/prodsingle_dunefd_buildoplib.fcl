@@ -40,7 +40,6 @@ services.PhotonVisibilityService.NY: 75
 services.PhotonVisibilityService.NZ: 400
 
 
-services.BackTracker: ""
 services.LArFFT: ""
 
 #Start each new event with an empty event.
