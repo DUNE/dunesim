@@ -6,6 +6,7 @@
 art_make(
   BASENAME_ONLY
   MODULE_LIBRARIES
+    dune_ArtSupport
     dune_DetSim
     dune_Geometry
     larcore_Geometry_Geometry_service

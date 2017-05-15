@@ -39,6 +39,7 @@ art_make( BASENAME_ONLY
         )
 
 add_subdirectory(Utility)
+add_subdirectory(Tool)
 add_subdirectory(Service)
 add_subdirectory(Module)
 add_subdirectory(fcl)
