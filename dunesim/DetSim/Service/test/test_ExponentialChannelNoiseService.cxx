@@ -347,6 +347,18 @@ extern const std::string LArPropertiesServiceConfigurationString { R"cfg(
  ReflectiveSurfaceNames:            [ "STEEL_STAINLESS_Fe7Cr2Ni" ]  
  ReflectiveSurfaceReflectances:     [ [ 0.25, 0.25, 0.25 ] ]        
  ReflectiveSurfaceDiffuseFractions: [ [ 0.5,  0.5,  0.5  ] ]        
+
+ # Information related with the simulation of the Wavelength Shifter (TPB)
+ LoadExtraMatProperties: false
+
+ # TPB - WLS
+ TpbTimeConstant: 2.5 #wls time constant in s J. Lumin 81(1999) 285
+
+ # WLS - TPB properties original tpb [0.0, 0.0, 0.0, 0.0588,0.235, 0.853, 1.0,1.0,0.9259,0.704,0.0296,0.011, 0.0,0.0, 0.]
+ TpbEmmisionEnergies: [0.05,1.0,1.5, 2.25, 2.481, 2.819, 2.952,2.988,3.024, 3.1, 3.14,3.1807, 3.54, 5.5, 50.39]
+ TpbEmmisionSpectrum: [0.0, 0.0, 0.0, 0.0588,0.235, 0.853, 1.0,1.0,0.9259,0.704,0.0296,0.011, 0.0,0.0, 0.]
+ TpbAbsorptionEnergies: [0.05,1.77,2.0675, 7.42, 7.75, 8.16, 8.73, 9.78,10.69, 50.39]
+ TpbAbsorptionSpectrum: [100000.0,100000.0, 100000.0,0.001,0.00000000001,0.00000000001, 0.00000000001, 0.00000000001, 0.00000000001, 0.00000000001]
 )cfg"};
 
 

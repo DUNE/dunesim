@@ -122,4 +122,11 @@ simple_plugin(FixedDetPedestalService "service"
                 ${ROOT_BASIC_LIB_LIST}
 )
 
+simple_plugin(DPhaseFixedDetPedestalService "service"
+                larcore_Geometry
+                art_Utilities canvas
+                cetlib cetlib_except
+                ${ROOT_BASIC_LIB_LIST}
+)
+
 add_subdirectory(test)
