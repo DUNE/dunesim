@@ -1,0 +1,174 @@
+#include "services_dune.fcl"
+
+BEGIN_PROLOG
+
+# parameters for a radiological generation generator.  Currently, it generates radiologicals within rectangular prisms
+# with sides parallel to the x, y, and z axes, and within a specified time window.  The parameters Nuclide through
+# T1 are arrays, so that many volumes can be specified to be radioactive with different nuclides.
+
+# remove excluded volume inside APA because we will have 39Ar there too!
+# -JReichenbacher (01/11/2017)
+#  v2.01/JS: use only generator and not also arGen
+#  v2.1-02142017/JR: moved photon paddles by (0.5+0.476+0.001) cm in x
+#  v2.2-02222017/JR: cut out LAr volume inside APA around PDs (-0.477,...,0.477) cm in x
+#  v2.3-03212017/JR: include neutrons emitted from concrete of membrane cryostat structure (temporarily placed at aluminum field cage positions in sim.)
+#  v2.4-05122017/JS: Removed the LAr cut out. Added in the 210po generation near the PDs. Disabled FC (Until Neutrons can be pushed to LArData.)
+#  v2.5-05252017/JS: Added in 85Kr as a background in LAr using the WARP collaboration rates. https://arxiv.org/pdf/astro-ph/0603131.pdf
+#
+#
+
+dune10kt_1x2x6_39ar:
+{
+ module_type:           "RadioGen"
+ Nuclide:               [ "39Ar" ]    # list of nuclides to simulate, supported so far: 39Ar, 60Co, 85Kr, 40K, 232Th, 238U, 222Rn
+ Material:              [".*"]
+ BqPercc:               [ 0.00141 ]   # activity -- Becquerels per cc. 0.00141 assumes 1.01 Bq/kg (typical for 39Ar) and a density of 1.396 g/cc for LAr
+ X0:                    [ -475. ]     # in cm in world coordinates, bottom corner of box
+ X1:                    [  475. ]     # in cm in world coordinates, top corner of box
+ Y0:                    [ -750. ]     # in cm in world coordinates, bottom corner of box
+ Y1:                    [  800. ]     # in cm in world coordinates, top corner of box
+ Z0:                    [  -55. ]     # in cm in world coordinates, bottom corner of box
+ Z1:                    [  1500. ]     # in cm in world coordinates, top corner of box
+ T0:                    [ -1600000. ] # starting time in ns
+ T1:                    [  1600000. ] # ending time in ns
+}
+
+dune10kt_1x2x6_APA:{
+ module_type:           "RadioGen"
+ Nuclide:               [ "60Co" ]    # list of nuclides to simulate, supported so far: 39Ar, 60Co, 85Kr, 40K, 232Th, 238U, 222Rn
+ Material:              [".*"]
+ BqPercc:               [ 0.000082 ]   # activity -- Becquerels per cc. 0.000082 assumes 45.5 mBq/kg (MPIK 2008 high measurement for 60Co) and virtual steel density inside APA frame of 0.0018 kg/cc = 260kg/(6.3m x 2.3m x 1cm) -JReichenbacher (01/11/2017)
+ X0:                    [ -0.5  ]     # in cm in world coordinates, bottom corner of box
+ X1:                    [  0.5  ]     # in cm in world coordinates, top corner of box
+ Y0:                    [ -600. ]     # in cm in world coordinates, bottom corner of box
+ Y1:                    [  600. ]     # in cm in world coordinates, top corner of box
+ Z0:                    [  0    ]     # in cm in world coordinates, bottom corner of box
+ Z1:                    [  1395 ]     # in cm in world coordinates, top corner of box
+ T0:                    [ -1600000. ] # starting time in ns
+ T1:                    [  1600000. ] # ending time in ns
+}
+
+dune10kt_1x2x6_PDs:{
+ module_type:           "RadioGen"
+ Nuclide:               [ "222Rn" ]    # list of nuclides to simulate, supported so far: 39Ar, 60Co, 85Kr, 40K, 232Th, 238U, 222Rn
+ Material:              [".*"]
+ BqPercc:               [ 0.000005 ]   # activity -- Becquerels per cc. 0.000005 assumes 2x 12.5% PD coverage in APA frame and a surface alpha activity requirement of 0.2 Bq/m^2 -JReichenbacher (02/14/2017)
+ X0:                    [  0.477]     # in cm in world coordinates, bottom corner of box (moved it by 0.476 cm)
+ X1:                    [  1.477]     # in cm in world coordinates, top corner of box (moved it by 0.476 cm)
+ Y0:                    [ -600. ]     # in cm in world coordinates, bottom corner of box
+ Y1:                    [  600. ]     # in cm in world coordinates, top corner of box
+ Z0:                    [  0    ]     # in cm in world coordinates, bottom corner of box
+ Z1:                    [  1395 ]     # in cm in world coordinates, top corner of box
+ T0:                    [ -1600000. ] # starting time in ns
+ T1:                    [  1600000. ] # ending time in ns
+}
+
+dune10kt_1x2x6_CPA:{
+ module_type:           "RadioGen"
+ Nuclide:               [ "40K" ]    # list of nuclides to simulate, supported so far: 39Ar, 60Co, 85Kr, 40K, 232Th, 238U, 222Rn
+ Material:              [".*"]
+ BqPercc:               [ 0.0027195 ]   # activity -- Becquerels per cc. 0.0027195 assumes 4.9 Bq/kg (measured for 40K) and a density of 1.85 g/cc for 3 mm thick G10 -JReichenbacher (01/11/2017)
+ X0:                    [  349.5  ]     # in cm in world coordinates, bottom corner of box
+ X1:                    [  350.5  ]     # in cm in world coordinates, top corner of box
+ Y0:                    [ -600. ]     # in cm in world coordinates, bottom corner of box
+ Y1:                    [  600. ]     # in cm in world coordinates, top corner of box
+ Z0:                    [  0    ]     # in cm in world coordinates, bottom corner of box
+ Z1:                    [  1395 ]     # in cm in world coordinates, top corner of box
+ T0:                    [ -1600000. ] # starting time in ns
+ T1:                    [  1600000. ] # ending time in ns
+}
+
+dune10kt_1x2x6_85kr:     @local::dune10kt_1x2x6_39ar
+dune10kt_1x2x6_85kr.Nuclide: [ "85Kr" ]
+dune10kt_1x2x6_85kr.BqPercc: [ 0.00016 ] #Rate tied to LAr using rates established by the WARP collaboration. https://arxiv.org/pdf/astro-ph/0603131.pdf
+
+dune10kt_1x2x6_222rn: @local::dune10kt_1x2x6_39ar
+dune10kt_1x2x6_222rn.Nuclide: [ "222Rn" ]
+dune10kt_1x2x6_222rn.BqPercc: [ 0.00005584  ] # DUNE FD requirement of 10 mBq/kg times 4 (to emulate the 4 subsequent alpha decays in secular equilibrium)  -JReichenbacher (01/11/2017)
+
+#dune10kt_1x2x6_fc:    @local::dune10kt_1x2x6_fc
+dune10kt_1x2x6_222rn: @local::dune10kt_1x2x6_222rn
+dune10kt_1x2x6_CPA:   @local::dune10kt_1x2x6_CPA
+dune10kt_1x2x6_APA:   @local::dune10kt_1x2x6_APA
+dune10kt_1x2x6_210po  @local::dune10kt_1x2x6_PDs
+
+
+
+END_PROLOG
+process_name: BackgroundGen
+
+services:
+{
+  # Load the service that manages root files for histograms.
+  TFileService:          { fileName: "prodbackground_hist.root" }
+  TimeTracker:           {}
+  MemoryTracker:         { ignoreTotal: 1 } # default is one
+  RandomNumberGenerator: {}                 # ART native random number generator
+  FileCatalogMetadata:  @local::art_file_catalog_mc
+                        @table::dunefd_services
+}
+
+# Start each new event with an empty event.
+source:
+{
+  module_type: EmptyEvent
+  timestampPlugin: { plugin_type: "GeneratedEventTimestamp" }
+  maxEvents:   10          # Number of events to create
+  firstRun:    20000061    # Run number to use for this file
+  firstEvent:  1           # number of first event in the file
+}
+
+#######################################################################################################################################
+# Define and configure some modules to do work on each event.
+# First modules are defined; they are scheduled later.
+# Modules are grouped by type.
+
+
+services.Geometry: @local::dune10kt_1x2x6_geo
+
+physics:
+{
+ 
+  producers:
+  {
+    generator: @local::dune10kt_1x2x6_39ar
+    rnGen:     @local::dune10kt_1x2x6_222rn
+    apaGen:    @local::dune10kt_1x2x6_APA
+    cpaGen:    @local::dune10kt_1x2x6_CPA
+    poGen:     @local::dune10kt_1x2x6_210po
+    krGen:     @local::dune10kt_1x2x6_85kr
+    #fcGen:     @local::dune10kt_1x2x6_fc
+    
+    rns:       { module_type: "RandomNumberSaver" }
+  }
+ 
+  # Define the producer and filter modules for this path, order matters, 
+  simulate:      [ rns, generator, rnGen, krGen, poGen, cpaGen, apaGen ]
+  
+  # Define the output stream, there could be more than one if using filters 
+  stream1:       [ out1 ]
+ 
+  # Trigger_paths is a keyword and contains the paths that modify the art::event, 
+  # ie filters and producers
+  trigger_paths: [ simulate ] 
+ 
+  # end_paths is a keyword and contains the paths that do not modify the art::Event, 
+  # ie analyzers and output streams. These all run simultaneously
+  end_paths:     [ stream1 ]  
+}
+
+# Block to define where the output goes. If you defined a filter in the physics
+# block and put it in the trigger_paths then you need to put a SelectEvents: {SelectEvents: [XXX]}
+# entry in the output stream you want those to go to, where XXX is the label of the filter module(s)
+outputs:
+{
+  out1:
+  {
+    module_type: RootOutput
+    fileName:    "prodbackground_dune10kt_1x2x6_gen.root" # Default file name, can override from command line with -o or --output
+    dataTier:    "generated"
+    compressionLevel: 1
+  }
+}
+
+
