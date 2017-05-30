@@ -14,6 +14,7 @@ BEGIN_PROLOG
 #  v2.3-03212017/JR: include neutrons emitted from concrete of membrane cryostat structure (temporarily placed at aluminum field cage positions in sim.)
 #  v2.4-05122017/JS: Removed the LAr cut out. Added in the 210po generation near the PDs. Disabled FC (Until Neutrons can be pushed to LArData.)
 #  v2.5-05252017/JS: Added in 85Kr as a background in LAr using the WARP collaboration rates. https://arxiv.org/pdf/astro-ph/0603131.pdf
+#  v2.6-05302017/JS: Added fcGen back in, using the Concrete_DUNE1 spectrum (by JR). New spectrum will be in dune_pardata. 
 #
 #
 
@@ -46,6 +47,22 @@ dune10kt_1x2x6_APA:{
  Z1:                    [  1395 ]     # in cm in world coordinates, top corner of box
  T0:                    [ -1600000. ] # starting time in ns
  T1:                    [  1600000. ] # ending time in ns
+}
+
+dune10kt_1x2x6_radiogen_fc:
+{
+ module_type:           "RadioGen"
+ Nuclide:               ["Concrete_DUNE1", "Concrete_DUNE1", "Concrete_DUNE1", "Concrete_DUNE1" ]
+ Material:              [".*",".*",".*",".*"]
+ BqPercc:               [ 0.0000076, 0.0000076, 0.0000076, 0.0000076 ]   # activity -- Becquerels per cc. 0.0000076 assumes 10 neutrons/y/g per 10 ppm U-238 in concrete and a density of 2.40 g/cc for 10 cm mean depth in concrete -JReichenbacher (03/21/2017)
+ X0:                    [ 0.0,    0.0,    0.0,    0.0    ]     # in cm in world coordinates, bottom corner of box
+ X1:                    [  350.,  350.,   350.,   350.   ]     # in cm in world coordinates, top corner of box
+ Y0:                    [ -600.,  -600,  -600.,   600.   ]     # in cm in world coordinates, bottom corner of box
+ Y1:                    [  600. , 600,   -601.,   601.   ]     # in cm in world coordinates, top corner of box
+ Z0:                    [  -0.5,  1394.5, 0,      0      ]     # in cm in world coordinates, bottom corner of box
+ Z1:                    [  0.5,   1395.5, 1395,   1395   ]     # in cm in world coordinates, top corner of box
+ T0:                    [ -1600000., -1600000., -1600000., -1600000. ] # starting time in ns
+ T1:                    [  1600000., 1600000., 1600000., 1600000. ] # ending time in ns
 }
 
 dune10kt_1x2x6_PDs:{
@@ -86,7 +103,7 @@ dune10kt_1x2x6_222rn: @local::dune10kt_1x2x6_39ar
 dune10kt_1x2x6_222rn.Nuclide: [ "222Rn" ]
 dune10kt_1x2x6_222rn.BqPercc: [ 0.00005584  ] # DUNE FD requirement of 10 mBq/kg times 4 (to emulate the 4 subsequent alpha decays in secular equilibrium)  -JReichenbacher (01/11/2017)
 
-#dune10kt_1x2x6_fc:    @local::dune10kt_1x2x6_fc
+dune10kt_1x2x6_fc:    @local::dune10kt_1x2x6_fc
 dune10kt_1x2x6_222rn: @local::dune10kt_1x2x6_222rn
 dune10kt_1x2x6_CPA:   @local::dune10kt_1x2x6_CPA
 dune10kt_1x2x6_APA:   @local::dune10kt_1x2x6_APA
@@ -137,13 +154,13 @@ physics:
     cpaGen:    @local::dune10kt_1x2x6_CPA
     poGen:     @local::dune10kt_1x2x6_210po
     krGen:     @local::dune10kt_1x2x6_85kr
-    #fcGen:     @local::dune10kt_1x2x6_fc
+    fcGen:     @local::dune10kt_1x2x6_fc
     
     rns:       { module_type: "RandomNumberSaver" }
   }
  
   # Define the producer and filter modules for this path, order matters, 
-  simulate:      [ rns, generator, rnGen, krGen, poGen, cpaGen, apaGen ]
+  simulate:      [ rns, generator, fcGen, rnGen, krGen, poGen, cpaGen, apaGen ]
   
   # Define the output stream, there could be more than one if using filters 
   stream1:       [ out1 ]
