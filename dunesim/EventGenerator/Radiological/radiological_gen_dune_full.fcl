@@ -90,7 +90,7 @@ dune10kt_1x2x6_222rn.BqPercc: [ 0.00005584  ] # DUNE FD requirement of 10 mBq/kg
 dune10kt_1x2x6_222rn: @local::dune10kt_1x2x6_222rn
 dune10kt_1x2x6_CPA:   @local::dune10kt_1x2x6_CPA
 dune10kt_1x2x6_APA:   @local::dune10kt_1x2x6_APA
-dune10kt_1x2x6_210po  @local::dune10kt_1x2x6_PDs
+dune10kt_1x2x6_210po:  @local::dune10kt_1x2x6_PDs
 
 
 
