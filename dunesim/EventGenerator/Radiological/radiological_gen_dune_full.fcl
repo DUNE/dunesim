@@ -14,7 +14,8 @@ BEGIN_PROLOG
 #  v2.3-03212017/JR: include neutrons emitted from concrete of membrane cryostat structure (temporarily placed at aluminum field cage positions in sim.)
 #  v2.4-05122017/JS: Removed the LAr cut out. Added in the 210po generation near the PDs. Disabled FC (Until Neutrons can be pushed to LArData.)
 #  v2.5-05252017/JS: Added in 85Kr as a background in LAr using the WARP collaboration rates. https://arxiv.org/pdf/astro-ph/0603131.pdf
-#  v2.6-05302017/JS: Added fcGen back in, using the Concrete_DUNE1 spectrum (by JR). New spectrum will be in dune_pardata. 
+#  v2.6-05302017/JS: Added fcGen back in, using the Concrete_DUNE1 spectrum (by JR). New spectrum will be in dune_pardata.
+#  v2.7-v06062017/JS: Added material specific generation for LAr contaminants.
 #
 #
 
@@ -22,7 +23,7 @@ dune10kt_1x2x6_39ar:
 {
  module_type:           "RadioGen"
  Nuclide:               [ "39Ar" ]    # list of nuclides to simulate, supported so far: 39Ar, 60Co, 85Kr, 40K, 232Th, 238U, 222Rn
- Material:              [".*"]
+ Material:              ["LAr"]
  BqPercc:               [ 0.00141 ]   # activity -- Becquerels per cc. 0.00141 assumes 1.01 Bq/kg (typical for 39Ar) and a density of 1.396 g/cc for LAr
  X0:                    [ -475. ]     # in cm in world coordinates, bottom corner of box
  X1:                    [  475. ]     # in cm in world coordinates, top corner of box
@@ -49,7 +50,7 @@ dune10kt_1x2x6_APA:{
  T1:                    [  1600000. ] # ending time in ns
 }
 
-dune10kt_1x2x6_radiogen_fc:
+dune10kt_1x2x6_fc:
 {
  module_type:           "RadioGen"
  Nuclide:               ["Concrete_DUNE1", "Concrete_DUNE1", "Concrete_DUNE1", "Concrete_DUNE1" ]
