@@ -125,8 +125,8 @@ void SimWireDUNE::reconfigure(fhicl::ParameterSet const& p) {
   fSuppressOn        = p.get<bool>("SuppressOn");  
   fKeepEmptyChannels = p.get<bool>("KeepEmptyChannels");  
   fAdcSimulatorName = p.get<string>("AdcSimulator");
-  DuneToolManager& dtm = DuneToolManager::instance();
-  m_pads = dtm.getPrivate<AdcSimulator>(fAdcSimulatorName);
+  DuneToolManager* pdtm = DuneToolManager::instance();
+  m_pads = pdtm == nullptr ? nullptr : pdtm->getPrivate<AdcSimulator>(fAdcSimulatorName);
   ostringstream out;
   out << myname << "Tools:" << endl;
   out << "  AdcSimulator: " << bool(m_pads) << endl;
