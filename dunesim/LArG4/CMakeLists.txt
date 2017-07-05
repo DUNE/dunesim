@@ -1,6 +1,6 @@
 
 art_make( BASENAME_ONLY
-          MODULE_LIBRARIES larcore_Geometry
+          MODULE_LIBRARIES larcorealg_Geometry
 			larcore_Geometry_Geometry_service
 			larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
 			nusimdata_SimulationBase

@@ -13,7 +13,7 @@ art_make(
     larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
     lardata_Utilities
     larevt_Filters
-    larcore_Geometry
+    larcorealg_Geometry
     lardataobj_RawData
     SignalShapingServiceDUNE_service
     SignalShapingServiceDUNEDPhase_service
