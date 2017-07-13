@@ -2,7 +2,7 @@ art_make( NO_PLUGINS
           
           LIB_LIBRARIES
                         lardata_Utilities
-			larcore_Geometry
+			larcorealg_Geometry
                         ${MF_MESSAGELOGGER}
                         ${MF_UTILITIES}
                         cetlib cetlib_except
