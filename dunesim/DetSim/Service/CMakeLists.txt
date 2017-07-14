@@ -9,7 +9,7 @@
 
 simple_plugin(Dune35tSimChannelExtractService   "service"
                 dune_DetSim
-                larcore_Geometry
+                larcorealg_Geometry
                 larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
                 lardata_Utilities
                 SignalShapingServiceDUNE_service
@@ -41,7 +41,7 @@ simple_plugin(DPhaseSimChannelExtractService   "service"
 		${CLHEP}
              )
 simple_plugin(ExponentialChannelNoiseService   "service"
-                larcore_Geometry
+                larcorealg_Geometry
                 SignalShapingServiceDUNE_service
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL}
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
@@ -54,7 +54,7 @@ simple_plugin(ExponentialChannelNoiseService   "service"
              )
 
 simple_plugin(WhiteChannelNoiseService   "service"
-                larcore_Geometry
+                larcorealg_Geometry
                 SignalShapingServiceDUNE_service
                 nutools_RandomUtils_NuRandomService_service
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL}
@@ -103,7 +103,7 @@ simple_plugin(LarsoftHuffmanCompressService "service"
 )
 
 simple_plugin(StuckBitAdcDistortionService   "service"
-                larcore_Geometry
+                larcorealg_Geometry
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL}
                 nutools_RandomUtils_NuRandomService_service
                 ${ART_FRAMEWORK_CORE}
@@ -116,14 +116,14 @@ simple_plugin(StuckBitAdcDistortionService   "service"
              )
 
 simple_plugin(FixedDetPedestalService "service"
-                larcore_Geometry
+                larcorealg_Geometry
                 art_Utilities canvas
                 cetlib cetlib_except
                 ${ROOT_BASIC_LIB_LIST}
 )
 
 simple_plugin(DPhaseFixedDetPedestalService "service"
-                larcore_Geometry
+                larcorealg_Geometry
                 art_Utilities canvas
                 cetlib cetlib_except
                 ${ROOT_BASIC_LIB_LIST}
