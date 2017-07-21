@@ -383,4 +383,6 @@ TimeOffsetU:       0.
 TimeOffsetV:       0.
 TimeOffsetZ:       0.
 
+SimpleBoundaryProcess: true  #enable opticalBoundaryProcessSimple instead of G4 default
+
 )cfg"};
