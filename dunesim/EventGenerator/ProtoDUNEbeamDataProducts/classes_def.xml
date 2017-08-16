@@ -1,0 +1,32 @@
+
+<!--  EventGenerator/ProtoDUNEbeamDataProducts/classes_def.xml                        -->
+<!--  Caroline Zhang carolineligezhang@gmail.com                                      -->
+<!--  August 15, 2017                                                         	      -->
+<!--                                                                                  -->
+<!--  Include art::Wrapper lines for objects that we would like to put into the event -->
+<!--  Include the non-wrapper lines for all objects on the art::Wrapper lines and     -->
+<!--  for all objects that are data members of those objects.                         -->
+
+
+<lcgdict>
+ <class name="sim::ProtoDUNEbeamsim" ClassVersion="10">
+<version ClassVersion="10" checksum="4021958745"/>
+
+</class>
+ <class name="std::vector<sim::ProtoDUNEbeamsim>"                                />
+ <class name="std::pair< art::Ptr<sim::ProtoDUNEbeamsim>, art::Ptr<simb::MCTruth> >" />
+ <class name="std::pair< art::Ptr<simb::MCTruth>, art::Ptr<sim::ProtoDUNEbeamsim> >" />
+ <class name="art::Assns<sim::ProtoDUNEbeamsim, simb::MCTruth, void>" />
+ <class name="art::Assns<simb::MCTruth, sim::ProtoDUNEbeamsim, void>" />
+  <!-- art pointers and pointer vectors -->
+ <class name="art::Ptr< sim::ProtoDUNEbeamsim >"                      />
+ <class name="art::PtrVector< sim::ProtoDUNEbeamsim >"                />
+ <class name="std::vector< art::PtrVector< sim::ProtoDUNEbeamsim > >" />
+
+ <!-- vectors for data products -->
+
+ <class name="std::vector<std::vector<sim::ProtoDUNEbeamsim>>"                    />
+ <class name="art::Wrapper< std::vector<sim::ProtoDUNEbeamsim                   > >" />
+ <class name="art::Wrapper< art::Assns<sim::ProtoDUNEbeamsim, simb::MCTruth, void> >" />
+ <class name="art::Wrapper< art::Assns<simb::MCTruth, sim::ProtoDUNEbeamsim, void> >" />
+</lcgdict>

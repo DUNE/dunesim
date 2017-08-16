@@ -1,13 +1,14 @@
 include_directories( $ENV{IFDHC_FQ_DIR}/inc )
-
-art_make( 
- 				          MODULE_LIBRARIES 
-                        larcoreobj_SummaryData
+include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
+art_make( BASENAME_ONLY
+	  MODULE_LIBRARIES dune_EventGenerator_ProtoDUNEbeamDataProducts 
+                       # ProtoDUNEbeamDataProducts
+			larcoreobj_SummaryData
                         larcorealg_Geometry
                         larcore_Geometry_Geometry_service
                         nutools_RandomUtils_NuRandomService_service
                         larsim_Simulation lardataobj_Simulation
-                        nusimdata_SimulationBase
+       			nusimdata_SimulationBase
                         ${ART_FRAMEWORK_CORE}
                         ${ART_FRAMEWORK_PRINCIPAL}
                         ${ART_FRAMEWORK_SERVICES_REGISTRY}
@@ -26,7 +27,9 @@ art_make(
                         ${SQLITE3}
                         ${ROOT_EG}
                         ${IFDH}
-        )
+		
+			
+ )
 
 
 install_headers()
@@ -36,4 +39,4 @@ install_source()
 add_subdirectory(CRY)
 add_subdirectory(GENIE)
 add_subdirectory(Radiological)
-
+add_subdirectory(ProtoDUNEbeamDataProducts)
