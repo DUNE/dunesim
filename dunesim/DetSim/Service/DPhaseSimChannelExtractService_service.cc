@@ -4,6 +4,7 @@
 
 #include "DPhaseSimChannelExtractService.h"
 #include <string>
+#include <iostream>
 #include "larcore/Geometry/Geometry.h"
 #include "lardataobj/Simulation/SimChannel.h"
 
@@ -19,15 +20,15 @@ using std::string;
 
 DPhaseSimChannelExtractService::
 DPhaseSimChannelExtractService(const fhicl::ParameterSet& pset, art::ActivityRegistry&)
-: m_ntick(m_pfft->FFTSize()) 
+: m_ntick(m_pfft->FFTSize())
 {
-  
+
   if( !(m_ntick > 0 && !(m_ntick & (m_ntick-1))) )
     {
       throw cet::exception("DPhaseSimChannelExtractService")
 	<< "FFT size is not a power of 2. ";
     }
-      
+
   // get LEM gain per view
   fDPGainPerView  = pset.get<float> ("DPGainPerView");
   //fRedENC         = pset.get<float> ("RedENC");
@@ -55,24 +56,26 @@ extract(const sim::SimChannel* psc, AdcSignalVector& sigs) const {
   sigs.clear();
   sigs.resize(m_ntick, 0.0);
 
+
+  std::vector<double> sigs_original;
+  sigs_original.resize(m_ntick, 0.0);
+
   if ( psc == nullptr ) return 0;
 
-  // get the channel number 
+  // get the channel number
   unsigned int chan = psc->Channel();
-  
+
   //CLHEP::RandGaussQ rGauss(*m_pran, 0.0, fRedENC);
-  
-  for ( size_t itck=0; itck<sigs.size(); ++itck ) 
+
+  for ( size_t itck=0; itck<sigs.size(); ++itck )
     {
       sigs[itck] = fDPGainPerView * psc->Charge(itck);
-      //if(fRedENC > 0)
-      //sigs[itck] += rGauss.fire();
     }
-  
+
   // perform convolution
+
   m_psss->Convolute(chan, sigs);
-  
-  
+
   return 0;
 }
 
