@@ -27,8 +27,8 @@ namespace filt{
 
       struct CounterSetPair{
         bool isRequested;
-        std::vector<geo::AuxDetGeo*> setA;
-        std::vector<geo::AuxDetGeo*> setB;
+        std::vector<geo::AuxDetGeo const*> setA;
+        std::vector<geo::AuxDetGeo const*> setB;
         double normalVec[3];
 
       };
@@ -46,7 +46,7 @@ namespace filt{
 
       bool IsInterestingParticle(const simb::MCParticle &particle);
       bool ParticleHitsCounterSetPairs(const simb::MCParticle &particle, const CounterSetPair &CSP);
-      bool ParticleHitsCounterSet(const simb::MCParticle &particle, const std::vector<geo::AuxDetGeo*> &counters, const TVector3 &counter_norm);
+      bool ParticleHitsCounterSet(const simb::MCParticle &particle, const std::vector<geo::AuxDetGeo const*> &counters, const TVector3 &counter_norm);
   
   };
 
@@ -110,7 +110,7 @@ namespace filt{
 
           }
           /*
-          geo::AuxDetGeo *counter = fCounterSetPairs.front().setA.front();
+          geo::AuxDetGeo const*counter = fCounterSetPairs.front().setA.front();
           std::cout<<"Length: " << counter->Length() << std::endl;
           std::cout<<"HalfWidth1: " << counter->HalfWidth1() << std::endl;
           std::cout<<"HalfWidth2: " << counter->HalfWidth2() << std::endl;
@@ -131,9 +131,9 @@ namespace filt{
     CounterSetPair NupSdownCounterSetPair;
     CounterSetPair NdownSupCounterSetPair;
 
-    for (unsigned int i = 0; i < geom->AuxDetGeoVec().size(); i++){
+    for (unsigned int i = 0; i < geom->NAuxDets(); i++){
       //The WE counter pairs
-      geo::AuxDetGeo* counter = geom->AuxDetGeoVec()[i];
+      geo::AuxDetGeo const* counter = &(geom->AuxDet(i));
       if (i >=6 && i <= 15) EWCounterSetPair.setA.push_back(counter);
       else if (i >= 28 && i <=37) EWCounterSetPair.setB.push_back(counter);
       //The N (up) S (down) counter pairs
@@ -202,12 +202,12 @@ namespace filt{
     return false;
   }
 
-  bool GenFilter::ParticleHitsCounterSet(const simb::MCParticle &particle, const std::vector<geo::AuxDetGeo*> &counters, const TVector3 &counter_norm){
+  bool GenFilter::ParticleHitsCounterSet(const simb::MCParticle &particle, const std::vector<geo::AuxDetGeo const*> &counters, const TVector3 &counter_norm){
 
     //Loop through the counters
     for (unsigned int i = 0; i < counters.size(); i++){
       //First step is to push the particle to the counter plane
-      geo::AuxDetGeo *counter = counters[i];
+      geo::AuxDetGeo const*counter = counters[i];
 
       double counter_pos_array[3];
       //fCounterSetPairs[CSP_i].setA.front()->GetCenter(counter_pos_array);
