@@ -6,7 +6,7 @@
 // Simulate signals from dual-phase detector:
 //      - charge amplification in gas
 //      - charge collection in two views
-// 
+//
 
 #ifndef _DPhaseSimChannelExtractService_H_
 #define _DPhaseSimChannelExtractService_H_
@@ -32,16 +32,18 @@ public:
 
   std::ostream& print(std::ostream& out =std::cout, std::string prefix ="") const;
 
+  float GainPerView(){ return fDPGainPerView; };
+
 private:
-  
+
   // standard larsoft FFT service
   art::ServiceHandle<util::LArFFT> m_pfft;
 
   // dual-phase signal response service
   art::ServiceHandle<util::SignalShapingServiceDUNEDPhase> m_psss;
-  
+
   unsigned int m_ntick;
-  
+
   float fDPGainPerView; // gain in dual-phase
   float fRedENC;       // ENC noise, set to 0 to disable
 };

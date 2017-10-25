@@ -134,7 +134,7 @@ namespace filt{
     CounterSetPair NdownSupCounterSetPair;
     //A stupid way of storing the IDs of the counters, this REALLY needs changing
     //The code loops through all of the counters in the geomtry, and if the number matches a particular counter number e.g. one of the east counters, store it in the correct, pairwise set
-    for (unsigned int i = 0; i < geom->AuxDetGeoVec().size(); i++){
+    for (unsigned int i = 0; i < geom->NAuxDets(); i++){
       //The WE counter pairs
       if (i >=6 && i <= 15) EWCounterSetPair.setA.push_back(i);
       else if (i >= 28 && i <=37) EWCounterSetPair.setB.push_back(i);
