@@ -87,18 +87,18 @@ dune_fd_genie_atmo.EventGeneratorList:  "Default+CCMEC+NCMEC"
 
 dune_fd_genie_atmo_min_flux:            @local::dune_fd_genie_atmo
 dune_fd_genie_atmo_min_flux.TopVolume:  "volCryostat"
-dune_fd_genie_atmo_min_flux.FluxType:   "atmo_HONDA"
-dune_fd_genie_atmo_min_flux.FluxSearchPaths: "/pnfs/dune/persistent/TaskForce_Flux/atmos/Honda/"
-dune_fd_genie_atmo_min_flux.FluxFiles: ["hms-ally-20-12-solmin.d"]
+dune_fd_genie_atmo_min_flux.FluxType:   "atmo_BARTOL"
+dune_fd_genie_atmo_min_flux.FluxSearchPaths: "/pnfs/dune/persistent/TaskForce_Flux/atmos/Bartol/"
+dune_fd_genie_atmo_min_flux.FluxFiles: ["fmin20_0401z.sou_nue","fmin20_0401z.sou_num","fmin20_0401z.sou_nbe","fmin20_0401z.sou_nbm"]
 #dune_fd_genie_atmo_min_flux.FluxSearchPaths: "/pnfs/dune/persistent/TaskForce_Flux/atmos/Bartol/"
 #dune_fd_genie_atmo_min_flux.FluxFiles: ["fmin10_0401z.sou_nue","fmin10_0401z.sou_num","fmin10_0401z.sou_nbe","fmin10_0401z.sou_nbm"]
 dune_fd_genie_atmo_min_flux.FluxCopyMethod: "IFDH"
 
 dune_fd_genie_atmo_max_flux:            @local::dune_fd_genie_atmo
 dune_fd_genie_atmo_max_flux.TopVolume:  "volCryostat"
-dune_fd_genie_atmo_max_flux.FluxType:   "atmo_HONDA"
-dune_fd_genie_atmo_max_flux.FluxSearchPaths: "/pnfs/dune/persistent/TaskForce_Flux/atmos/Honda/"
-dune_fd_genie_atmo_max_flux.FluxFiles: ["hms-ally-20-12-solmax.d","hms-ally-20-12-solmax.d","hms-ally-20-12-solmax.d","hms-ally-20-12-solmax.d"]
+dune_fd_genie_atmo_max_flux.FluxType:   "atmo_BARTOL"
+dune_fd_genie_atmo_max_flux.FluxSearchPaths: "/pnfs/dune/persistent/TaskForce_Flux/atmos/Bartol/"
+dune_fd_genie_atmo_max_flux.FluxFiles: ["fmax20_0401z.sou_nue","fmax20_0401z.sou_num","fmax20_0401z.sou_nbe","fmax20_0401z.sou_nbm"]
 #dune_fd_genie_atmo_max_flux.FluxSearchPaths: "/pnfs/dune/persistent/TaskForce_Flux/atmos/Bartol/"
 #dune_fd_genie_atmo_max_flux.FluxFiles: ["fmax10_0401z.sou_nue","fmax10_0401z.sou_num","fmax10_0401z.sou_nbe","fmax10_0401z.sou_nbm"]
 dune_fd_genie_atmo_max_flux.FluxCopyMethod: "IFDH"
