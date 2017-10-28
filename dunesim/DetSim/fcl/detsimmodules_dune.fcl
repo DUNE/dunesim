@@ -120,6 +120,22 @@ chnoise35t: {
   OldNoiseIndex: false
 }
 
+chnoiseprotodune: {
+  service_provider: ProtoDUNEChannelNoiseService
+  LowCutoffU:    0.0
+  LowCutoffV:    0.0
+  LowCutoffZ:    0.0
+  WhiteNoiseU:   0.0
+  WhiteNoiseV:   0.0
+  WhiteNoiseZ:   0.0
+  NoiseArrayPoints: 1000
+  OldNoiseIndex: false
+  WireLengthZ:    598.39
+  WireLengthU:    740.06
+  WireLengthV:    737.36
+  EffectiveNBits: 10.6
+}
+
 #***********************************************************************
 
 # PedestalAdditionService adds pedestals to signals.
