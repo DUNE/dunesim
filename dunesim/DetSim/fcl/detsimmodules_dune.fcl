@@ -120,7 +120,28 @@ chnoise35t: {
   OldNoiseIndex: false
 }
 
+****************************************************
+
+#Configure realistic noise service for DP detectors based on the 311 data
+#A.Scarpelli andrea.scarpelli@cern.ch October 2017
+#
+#NB: Hardcoded unrotated geometry:
+
+
+dprealisticnoise:{
+  service_provider: DPhaseRealisticNoiseService
+  NoiseModel:    "$MRB_SOURCE/dunetpc/dune/DetSim/NoiseModels/fft_975-0.root"    #path to the noise model root file
+  RandomizeX:    0.1  #custom randomization of the average power spectrum at 10%
+  RandomizeY:    0.1  #custom randomisation of the average power spectrum at 10%
+  WhiteNoiseX:   1.6
+  WhiteNoiseY:   1.6
+  NoiseArrayPoints: 1000
+  OldNoiseIndex: false   #From ExponentialChannelNoiseService. Keep false
+}
+
+
 #***********************************************************************
+
 
 # PedestalAdditionService adds pedestals to signals.
 
@@ -220,8 +241,8 @@ cmphuffman: {
 # SimWireDUNE35t_module.cc and SimWireDUNE10kt_module.cc are dropped.
 #***********************************************************************
 
-dunefd_simwire:  
-{ 
+dunefd_simwire:
+{
  module_type:        "SimWireDUNE10kt"
  DriftEModuleLabel:  "largeant"
  NoiseFactU:          0.0349     # Noise Scale for U plane. Reset by DLA 26apr16.
@@ -234,7 +255,7 @@ dunefd_simwire:
  NoiseWidthZ:         2000         #Exponential Noise width (kHz) for Z plane
  LowCutoffZ:          7.5          #Low frequency filter cutoff (kHz) for Z plane
  CompressionType:    "ZeroSuppression"       #could also be none
- #CompressionType:    ""       #could also be none	
+ #CompressionType:    ""       #could also be none
  ZeroThreshold:       10        #Threshold for zero suppression
  NearestNeighbor:     10        #Maximum distance between hits above threshold before they are separated into different blocks
  NeighboringChannels: 0        #Number of neighboring channels on either side allowed to influence zero suppression
@@ -251,7 +272,7 @@ dunefd_simwire:
  CollectionCalibPed:  0         #Assumed measured value for coll plane pedestal RMS
  InductionCalibPed:   2048        #Assumed measured value for ind plane pedestal
  InductionCalibPed:   0        #Assumed measured value for ind plane pedestal RMS
- 
+
  PedestalOn:          true     #add pedestal value to ADC vector
 
  SimCombs:           false
@@ -285,7 +306,7 @@ dunefd_simwire:
  FractHorizGapVCollect: [ 0.1, 0 ]        # fraction of charge in the horizontal gap that collects on V
  FractVertGapUCollect:  [ 0.1, 0 ]        # fraction of charge in the vertical gap that collects on U
  FractVertGapVCollect:  [ 0.1, 0 ]        # fraction of charge in the vertical gap that collects on V
-}			     
+}
 
 dunefd_simwireana:            @local::standard_simwireana
 dunefd_wienerfilterana:       @local::standard_wienerfilterana
@@ -306,7 +327,7 @@ dune35t_simwire.InductionCalibPedRMS:   0.0        #Assumed measured value for i
 #dune35t_simwire.CompressionType:    "none"      #no data compression for noise test
 
 dune35t_simwire.ZeroThreshold:  5
-dune35t_simwire.NoiseModel:     1 
+dune35t_simwire.NoiseModel:     1
 dune35t_simwire.NoiseWidthU:  2000  # If turn NoiseModel to 1 use these numbers..
 dune35t_simwire.NoiseWidthV:  2000  # If turn NoiseModel to 1 use these numbers..
 dune35t_simwire.NoiseWidthZ:  2000  # If turn NoiseModel to 1 use these numbers..
@@ -317,8 +338,8 @@ dune35t_simwire.NoiseFactZ:   0.05  # Should produce RMS of 2.5 ADC counts
 #dune35t_simwire.NoiseFactV:   0.1  # Should produce RMS of 5 ADC counts
 #dune35t_simwire.NoiseFactZ:   0.1  # Should produce RMS of 5 ADC counts
 dune35t_simwire.LowCutoffU:    7.5  # If turn NoiseModel to 1 use these numbers..
-dune35t_simwire.LowCutoffV:    7.5  # If turn NoiseModel to 1 use these numbers..    
-dune35t_simwire.LowCutoffZ:    7.5  # If turn NoiseModel to 1 use these numbers..    
+dune35t_simwire.LowCutoffV:    7.5  # If turn NoiseModel to 1 use these numbers..
+dune35t_simwire.LowCutoffZ:    7.5  # If turn NoiseModel to 1 use these numbers..
 dune35t_simwire.SimStuckBits:    false   # Simulate stuck bits
 dune35t_simwireana:             @local::dunefd_simwireana
 dune35t_wienerfilterana:        @local::dunefd_wienerfilterana
@@ -332,7 +353,7 @@ dune35t_simcounter:
     BSUTriggerThreshold:   0.5 # MeV
     TSUTriggerThreshold:   0.25 # MeV
     TriggerEfficiency:     1.0
-# below changed on Feb. 1 2016 to match data . . 
+# below changed on Feb. 1 2016 to match data . .
 #    ClockSpeedCounter:     31.25 # MHz
     ClockSpeedCounter:     64.0 # MHz
     CombinedTimeDelay:     160 # ns. cable length delay + various electronics delays

@@ -53,6 +53,7 @@ simple_plugin(ExponentialChannelNoiseService   "service"
                 ${ROOT_BASIC_LIB_LIST}
              )
 
+
 simple_plugin(WhiteChannelNoiseService   "service"
                 larcorealg_Geometry
                 SignalShapingServiceDUNE_service
