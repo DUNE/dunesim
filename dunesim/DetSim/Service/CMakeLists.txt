@@ -52,6 +52,19 @@ simple_plugin(ExponentialChannelNoiseService   "service"
                 ${CLHEP}
                 ${ROOT_BASIC_LIB_LIST}
              )
+             
+simple_plugin(ProtoDUNEChannelNoiseService   "service"
+                larcorealg_Geometry
+                SignalShapingServiceDUNE_service
+                ${ART_FRAMEWORK_SERVICES_OPTIONAL}
+                ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
+                nutools_RandomUtils_NuRandomService_service
+                ${ART_FRAMEWORK_CORE}
+                art_Utilities canvas
+                cetlib cetlib_except
+                ${CLHEP}
+                ${ROOT_BASIC_LIB_LIST}
+             )
 
 simple_plugin(WhiteChannelNoiseService   "service"
                 larcorealg_Geometry
