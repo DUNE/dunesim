@@ -2,7 +2,7 @@
 // DPhaseRealisticNoiseService
 //
 // Andrea Scarpelli (andrea.scarpelli@cern.ch)
-// Ocotober 2017
+// October 2017
 //
 // Implementation of realistic noise from frequency spectrum in 3x1x1 data
 // using same logic of ExponentialChannelNoiseService
@@ -39,21 +39,21 @@ public:
   // Print the configuration.
   std::ostream& print(std::ostream& out =std::cout, std::string prefix ="") const;
 
-  //import a model of realistic noise fft from a root file
-  //Store it in an array for each view 
-  importNoiseModel(std::string noiseModel, std::vector<double> & frequencyArrayX,
-                                    std::vector<double> & frequencyArrayY) const
-
   // Fill a noise vector.
   // Input vector contents are lost.
   // The size of the vector is obtained from the FFT service.
-  void generateNoise(float aNoiseNorm, float aNoiseWidth, float aLowCutoff,
-                     AdcSignalVector& noise, TH1* aNoiseHist) const;
+  void generateNoise(std::vector<double> frequencyVector, AdcSignalVector& noise,
+                                    TH1* aNoiseHist, double customRandom) const;
 
 private:
 
   // Fill the noise vectors.
   void generateNoise();
+
+  //import a model of realistic noise fft from a root file
+  //Store it in an array for each view
+  void importNoiseModel(std::string noiseModel, std::vector<double> & frequencyArrayX,
+                                    std::vector<double> & frequencyArrayY) const;
 
   // Parameters.
   std::string  fNoiseModel;        ///< noise model root file
@@ -67,8 +67,8 @@ private:
   int          fLogLevel;          ///< Log message level: 0=quiet, 1=init only, 2+=every event
 
   //frequency arrays imported
-  std::vector<double> fNoiseModelFrequenciesX   ///< Array storing the frequencies imported from the model in kHz for plane kX (kZ)
-  std::vector<double> fNoiseModelFrequenciesY   ///< Array storing the frequencies imported from the model in kHz for plane kY (kZ)
+  std::vector<double> fNoiseModelFrequenciesX;   ///< Array storing the frequencies imported from the model in kHz for plane kX (kZ)
+  std::vector<double> fNoiseModelFrequenciesY;   ///< Array storing the frequencies imported from the model in kHz for plane kY (kZ)
 
   // Noise arrays.
   AdcSignalVectorVector fNoiseX;  ///< noise on each channel for each time for X plane

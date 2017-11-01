@@ -19,6 +19,7 @@
 
 #include "dune/DetSim/Service/DPhaseRealisticNoiseService.h"
 #include <sstream>
+#include <string>
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "lardata/Utilities/LArFFT.h"
 #include "larcore/Geometry/Geometry.h"
@@ -30,7 +31,7 @@
 #include "TH1F.h"
 #include "TFile.h"
 #include "TKey.h"
-#include "TH2D.h"
+#include "TH2F.h"
 #include "TProfile.h"
 #include "TRandom3.h"
 
@@ -44,8 +45,7 @@ using CLHEP::HepJamesRandom;
 
 //**********************************************************************
 
-DPhaseRealisticNoiseService::
-DPhaseRealisticNoiseService(fhicl::ParameterSet const& pset)
+DPhaseRealisticNoiseService::DPhaseRealisticNoiseService(fhicl::ParameterSet const& pset)
 : fRandomSeed(0), fLogLevel(1),
   fNoiseHistX(nullptr), fNoiseHistY(nullptr),
   fNoiseChanHist(nullptr),
@@ -65,8 +65,8 @@ DPhaseRealisticNoiseService(fhicl::ParameterSet const& pset)
   fNoiseY.resize(fNoiseArrayPoints);
   int seed = fRandomSeed;
   art::ServiceHandle<art::TFileService> tfs;
-  fNoiseHistX = tfs->make<TH1F>("unoise", ";X Noise [ADC counts];", 1000,   -10., 10.);
-  fNoiseHistY = tfs->make<TH1F>("vnoise", ";Y Noise [ADC counts];", 1000,   -10., 10.);
+  fNoiseHistX = tfs->make<TH1F>("xnoise", ";X Noise [ADC counts];", 1000,   -10., 10.);
+  fNoiseHistY = tfs->make<TH1F>("ynoise", ";Y Noise [ADC counts];", 1000,   -10., 10.);
   fNoiseChanHist = tfs->make<TH1F>("NoiseChan", ";Noise channel;", fNoiseArrayPoints, 0, fNoiseArrayPoints);
   // Assign a unique name for the random number engine ExponentialChannelNoiseServiceVIII
   // III = for each instance of this class.
@@ -87,8 +87,8 @@ DPhaseRealisticNoiseService(fhicl::ParameterSet const& pset)
 
   //pregenerated noise model waveforms based on the realistic noise frequency pattern
   for ( unsigned int isam=0; isam<fNoiseArrayPoints; ++isam ) {
-    generateNoise(fNoiseModelFrequenciesX, fRandomizeX, fNoiseX[isam], fNoiseHistX);
-    generateNoise(fNoiseModelFrequenciesY, fRandomizeY, fNoiseY[isam], fNoiseHistY);
+    generateNoise(fNoiseModelFrequenciesX,  fNoiseX[isam], fNoiseHistX, fRandomizeX);
+    generateNoise(fNoiseModelFrequenciesY,  fNoiseY[isam], fNoiseHistY, fRandomizeY);
   }
   if ( fLogLevel > 1 ) print() << endl;
 } //m_pran(nullptr)
@@ -147,46 +147,47 @@ int DPhaseRealisticNoiseService::addNoise(Channel chan, AdcSignalVector& sigs) c
 //**********************************************************************
 
 ostream& DPhaseRealisticNoiseService::print(ostream& out, string prefix) const {
-  out << prefix << "ExponentialChannelNoiseService: " << endl;
-
-  out << prefix << "        NoiseModel:     " << fNoiseNormZ   << endl;
-  out << prefix << "        RandomizationX: " << fRandomizeX   << endl;
-  out << prefix << "        RandomizationY: " << fRandomizeY   << endl;
-  out << prefix << "        WhiteNoiseU:    " << fWhiteNoiseX  << endl;
-  out << prefix << "        WhiteNoiseV:    " << fWhiteNoiseY  << endl;
-  out << prefix << "        RandomSeed:     " << fRandomSeed   << endl;
-  out << prefix << "        LogLevel:       " << fLogLevel     << endl;
-  out << prefix << "    Actual random seed: " << m_pran->getSeed();
+  out << prefix << "DPhaseRealisticNoiseService: " << fNoiseModel   << endl;
+  out << prefix << "    Noise model source file: " << fNoiseModel   << endl;
+  out << prefix << "        RandomizationX:      " << fRandomizeX   << endl;
+  out << prefix << "        RandomizationY:      " << fRandomizeY   << endl;
+  out << prefix << "         WhiteNoiseU:        " << fWhiteNoiseX  << endl;
+  out << prefix << "         WhiteNoiseV:        " << fWhiteNoiseY  << endl;
+  out << prefix << "          RandomSeed:        " << fRandomSeed   << endl;
+  out << prefix << "           LogLevel:         " << fLogLevel     << endl;
+  out << prefix << "      Actual random seed:    " << m_pran->getSeed();
 
   return out;
 }
 
 //**********************************************************************
 
-void DPhaseRealisticNoiseService::DPhaseRealisticNoiseService::
-importNoiseModel(std::string noiseModel, std::vector<double> & frequencyArrayX,
-                                  std::vector<double> & frequencyArrayY) const {
+void DPhaseRealisticNoiseService::importNoiseModel(std::string noiseModel,
+std::vector<double> & frequencyArrayX, std::vector<double> & frequencyArrayY) const {
   //Read TFile using the string. Not sure what is the best way to do it within larsoft
   TFile *fin = TFile::Open(noiseModel.c_str(), "READ");
   if(!fin->IsOpen()){
       cout << "ERROR!: Can't open file: " << noiseModel << endl;
-      return 0;
+      return;
   }
   else{
-    if(fLogLevel > 1)
       cout << "File: " << noiseModel << " successfully opened!" << endl;
   }
   //get the histogram
-  TIter next(fin->GetListOfKeys());
+  TIter next( fin->GetListOfKeys() );
   TKey *key;
-  while(key = (TKey*)next()){
-    if( key->GetClassName() == "TH2D"){
-      TH2D *inputHist = (TH1D*)key->Get(key->GetName());
-    }else if (key->GetClassName() == "TProfile2D" ){
-      TH2D *inputHist = (TH1D*)key->Get(key->GetName());
-    }else{
-      cout << "ERROR! Object: " << key->GetName() << " in file " << noiseModel
+  TH2F *inputHist = new TH2F(); //default initialisazion
+
+  while( (key = (TKey*)next()) ){
+    std::string keyName( key->GetClassName() ); //parse char to string
+    if( keyName == "TH2F"){
+      inputHist = (TH2F*)fin->Get(key->GetName());
+    }
+    else{
+      cout << "ERROR! Object: " << keyName << " in file " << noiseModel
                                         << "has not the right format!" << endl;
+      fin->Close();
+      return;
     }
   }
 
@@ -199,46 +200,51 @@ importNoiseModel(std::string noiseModel, std::vector<double> & frequencyArrayX,
   //sample freqency is 2.5 MHz
 
   art::ServiceHandle<geo::Geometry> geo;
-  const geo::View_t view;
 
-  frequencyArrayX.resize(h->GetNbinsY());
-  frequencyArrayY.resize(h->GetNbinsX());
+  //define array input as the same size of the frequency array of the model
+  frequencyArrayX.resize(inputHist->GetNbinsY());
+  frequencyArrayY.resize(inputHist->GetNbinsY());
 
-  double averagedFreq=0.;
+  for(size_t f =0; f < (size_t)inputHist->GetNbinsY(); f++){
+    double sumX =0.; double sumY =0.;
+    int countX =0; int countY=0;
+    for(size_t ch=0; ch < (size_t)inputHist->GetNbinsX(); ch++){
 
-  for(size_t f =0; f < h->GetNbinsY(); f++){
-    double sum =0.;
-    for(size_t ch =0; f< h->GetNbinsX(); ch++){
-      sum+=h->GetBinContent(ch, f);
-    }
-    averagedFreq = sum/h->GetNbinsX();
-    view = geo->View(ch);
-    if(view == geo::kZ){
-      frequencyArrayX.at(f) = avergatedFreq;
-    }else if(view == geo::kY){
-      frequencyArrayX.at(f) = avergatedFreq;
-    }else{
-      cout << "ERROR: invalid view " << view << endl;
-    }
-  }
+      const geo::View_t view = geo->View(ch);
+      //sort entries for view
+      if(view == geo::kZ){
+        sumX+=inputHist->GetBinContent(ch, f);
+        countX++;
+      }else if(view == geo::kY){
+        sumY+=inputHist->GetBinContent(ch, f);
+        countY++;
+     }else{
+       cout << "ERROR: invalid view " << view << endl;
+       fin->Close();
+       return;
+     }
 
+   }//end for channel
+
+   frequencyArrayX.at(f) = sumX/inputHist->GetNbinsX();
+   frequencyArrayY.at(f) = sumY/inputHist->GetNbinsY();
+  } //end for frequencies
 
   fin->Close();
-  return 0;
+  return;
 }
 
 //**********************************************************************
 
-void DPhaseRealisticNoiseService::
-generateNoise(std::vector<double> frequencyVector, AdcSignalVector& noise,
-                                  TH1* aNoiseHist, double customRandom) const {
+void DPhaseRealisticNoiseService::generateNoise(std::vector<double> frequencyVector,
+                AdcSignalVector& noise, TH1* aNoiseHist, double customRandom) const {
   const string myname = "ExponentialChannelNoiseService::generateNoise: ";
   if ( fLogLevel > 1 ) {
     cout << myname << "Generating noise." << endl;
   }
   // Fetch sampling rate.
-  auto const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
-  float sampleRate = detprop->SamplingRate();
+  //auto const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
+  //float sampleRate = detprop->SamplingRate();
   // Fetch FFT service and # ticks.
   art::ServiceHandle<util::LArFFT> pfft;
   unsigned int ntick = pfft->FFTSize();
@@ -247,7 +253,7 @@ generateNoise(std::vector<double> frequencyVector, AdcSignalVector& noise,
   unsigned nbin = ntick/2 + 1;
   std::vector<TComplex> noiseFrequency(nbin, 0.);
   double pval = 0.;
-  double lofilter = 0.;
+//  double lofilter = 0.;
   double phase = 0.;
   double rnd[2] = {0.};
 
@@ -255,7 +261,14 @@ generateNoise(std::vector<double> frequencyVector, AdcSignalVector& noise,
   //frequency domain
   //TODO: study the effect of padding
   //TODO: study the effect of normalisation
-  frequencyVector.resize(ntick/2+1, 0.);
+  if( frequencyVector.size() != (ntick/2+1) ){
+    if(fLogLevel > 1 ){
+      cout << "NB: frequency vector has size: " << frequencyVector.size() <<
+                   " and detector FFT frequecny size is: " << ntick/2+1 << endl;
+      cout << "Padding remaining array size" << endl;
+    }
+    frequencyVector.resize(ntick/2+1, 0.);
+  }
 
   for ( unsigned int i=0; i<ntick/2+1; ++i ) {
     //read noise spectrum
@@ -292,8 +305,8 @@ void DPhaseRealisticNoiseService::generateNoise() {
   fNoiseX.resize(fNoiseArrayPoints);
   fNoiseY.resize(fNoiseArrayPoints);
   for ( unsigned int inch=0; inch<fNoiseArrayPoints; ++inch ) {
-    generateNoise(fNoiseModelFrequencies, fNoiseX[inch], fNoiseHistX);
-    generateNoise(fNoiseModelFrequencies, fNoiseY[inch], fNoiseHistY);
+    generateNoise(fNoiseModelFrequenciesX, fNoiseX[inch], fNoiseHistX, fRandomizeX);
+    generateNoise(fNoiseModelFrequenciesY, fNoiseY[inch], fNoiseHistY, fRandomizeY);
   }
 }
 
