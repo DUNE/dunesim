@@ -38,7 +38,7 @@ physics:
   producers:
   {
     generator: @local::dune10kt_1x2x6_39ar
-    ar42Gen:   @local::duen10kt_1x2x6_42ar
+    ar42Gen:   @local::dune10kt_1x2x6_42ar
     rnGen:     @local::dune10kt_1x2x6_222rn
     apaGen:    @local::dune10kt_1x2x6_APA
     cpaGen:    @local::dune10kt_1x2x6_CPA
