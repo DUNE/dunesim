@@ -26,13 +26,15 @@ IdealAdcSimulator::IdealAdcSimulator(const fhicl::ParameterSet& ps)
 
 AdcSimulator::Count
 IdealAdcSimulator::count(double vin, Channel, Tick) const {
+  //std::cout << "v_sen " << m_vsen <<  " m_vmax " << m_vmax << " vin " << vin << std::endl;
   double halfsen = 0.5*m_vsen;
   if ( m_vsen <= 0.0 ) return 0;
   if ( vin < halfsen ) return 0;
   if ( vin > m_vmax - halfsen ) return m_adcmax;
   Count count = vin/m_vsen + 0.5;
   assert( count <= m_adcmax );
-  if ( count > m_adcmax ) return m_adcmax;
+  //std::cout << " count " << count << " m_adcmax " << m_adcmax << std::endl;
+  if ( count > m_adcmax ) return m_adcmax;//
   return count;
 }
 

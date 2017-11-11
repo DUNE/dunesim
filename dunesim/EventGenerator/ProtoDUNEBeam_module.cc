@@ -278,9 +278,18 @@ void evgen::ProtoDUNEBeam::beginJob(){
   fAllParticlesTree->SetBranchAddress("EventID",&fBeamEvent);
   fAllParticlesTree->SetBranchAddress("TrackID",&fTrackID);
 
+  std::string namePrefix = fAllParticlesTreeName.substr(fAllParticlesTreeName.find_last_of("\\/")+1,std::string::npos);
+  std::string goodEventIDName = namePrefix;
+  goodEventIDName.append("_EventID");
+  std::string goodTrackIDName = namePrefix;
+  goodTrackIDName.append("_TrackID");
+
+  fGoodParticleTree->SetBranchAddress(goodEventIDName.c_str(),&fBeamEvent);
+  fGoodParticleTree->SetBranchAddress(goodTrackIDName.c_str(),&fTrackID);
+
   // We only need the trigger time and event number from the good particle tree
-  fGoodParticleTree->SetBranchAddress("Lag_ENTRY_EventID",&fBeamEvent);
-  fGoodParticleTree->SetBranchAddress("Lag_ENTRY_TrackID",&fTrackID);
+//  fGoodParticleTree->SetBranchAddress("Lag_ENTRY_EventID",&fBeamEvent);
+//  fGoodParticleTree->SetBranchAddress("Lag_ENTRY_TrackID",&fTrackID);
   fGoodParticleTree->SetBranchAddress("TRIG2_t",&fTriggerT);
  
 	// Calculate the number of events to overlay

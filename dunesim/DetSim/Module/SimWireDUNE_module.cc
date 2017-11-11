@@ -60,14 +60,14 @@ using std::string;
 
 //**********************************************************************
 
-// Base class for creation of raw signals on wires. 
+// Base class for creation of raw signals on wires.
 class SimWireDUNE : public art::EDProducer {
-    
+
 public:
-        
-  explicit SimWireDUNE(fhicl::ParameterSet const& pset); 
+
+  explicit SimWireDUNE(fhicl::ParameterSet const& pset);
   virtual ~SimWireDUNE();
-    
+
   // read/write access to event
   void produce (art::Event& evt);
   void beginJob();
@@ -77,7 +77,7 @@ public:
 private:
 
   std::string fSimChannelLabel; ///< Data product holding the ionization electrons
-  
+
   // Flags.
   bool fNoiseOn;           ///< noise turned on or off for debugging; default is on
   bool fPedestalOn;        ///< switch for simulation of nonzero pedestals
@@ -120,10 +120,10 @@ void SimWireDUNE::reconfigure(fhicl::ParameterSet const& p) {
   string myprefix = myname + "    ";
   fSimChannelLabel   = p.get<std::string>("SimChannelLabel");
   fNoiseOn           = p.get<bool>("NoiseOn");
-  fPedestalOn        = p.get<bool>("PedestalOn");  
-  fDistortOn         = p.get<bool>("DistortOn");  
-  fSuppressOn        = p.get<bool>("SuppressOn");  
-  fKeepEmptyChannels = p.get<bool>("KeepEmptyChannels");  
+  fPedestalOn        = p.get<bool>("PedestalOn");
+  fDistortOn         = p.get<bool>("DistortOn");
+  fSuppressOn        = p.get<bool>("SuppressOn");
+  fKeepEmptyChannels = p.get<bool>("KeepEmptyChannels");
   fAdcSimulatorName = p.get<string>("AdcSimulator");
   DuneToolManager* pdtm = DuneToolManager::instance();
   m_pads = pdtm == nullptr ? nullptr : pdtm->getPrivate<AdcSimulator>(fAdcSimulatorName);
@@ -193,18 +193,18 @@ void SimWireDUNE::produce(art::Event& evt) {
   for ( size_t c=0; c<chanHandle.size(); ++c ) {
     simChannels[chanHandle[c]->Channel()] = chanHandle[c];
   }
-    
+
   // make an unique_ptr of sim::SimDigits that allows ownership of the produced
   // digits to be transferred to the art::Event after the put statement below
   std::unique_ptr<std::vector<raw::RawDigit>>  digcol(new std::vector<raw::RawDigit>);
-          
+
   // Fetch the number of ticks to write out for each channel.
   auto const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
   unsigned int nTickReadout  = detprop->ReadOutWindowSize();
 
   // Loop over channels.
-  std::map<int,double>::iterator mapIter;      
-  for ( unsigned int chan = 0; chan<m_pgeo->Nchannels(); ++chan ) {    
+  std::map<int,double>::iterator mapIter;
+  for ( unsigned int chan = 0; chan<m_pgeo->Nchannels(); ++chan ) {
 
     // Get the SimChannel for this channel
     const sim::SimChannel* psc = simChannels[chan];
@@ -216,7 +216,7 @@ void SimWireDUNE::produce(art::Event& evt) {
     m_pscx->extract(psc, fChargeWork);
 
     // Add noise to each tick in the channel.
-    if ( fNoiseOn ) {              
+    if ( fNoiseOn ) {
       m_pcns->addNoise(chan, fChargeWork);
     }
 
@@ -226,7 +226,8 @@ void SimWireDUNE::produce(art::Event& evt) {
     if ( logsig ) {
       cout << myname << "Signals after noise:" << endl;
       for ( unsigned int itck=0; itck<fChargeWork.size(); ++itck ) {
-        cout << myname << " " << itck << ": chg=" << fChargeWork[itck] << endl;
+        if(fChargeWork[itck] > 0 )
+          cout << myname << " " << itck << ": chg=" << fChargeWork[itck] << endl;
       }
     }
 
@@ -238,7 +239,7 @@ void SimWireDUNE::produce(art::Event& evt) {
     }
 
     // Convert floating ADC to integral ADC count.
-    std::vector<short> adcvec(fChargeWork.size(), 0);        
+    std::vector<short> adcvec(fChargeWork.size(), 0);
     const short adcmax = 4095;
     for ( unsigned int itck=0; itck<fChargeWork.size(); ++itck ) {
       AdcSignal adcin = fChargeWork[itck];
@@ -246,9 +247,11 @@ void SimWireDUNE::produce(art::Event& evt) {
       bool useOldAdc = false;
       // New ADC calculation (with tool).
       if ( m_pads ) {
+        if(adcin > 0)
+          //cout << " adcin " << adcin << endl;
         adc = m_pads->count(adcin, chan);
       } else {
-        cout << myname << "WARNING: AdcSimulator not found." << endl;
+        //cout << myname << "WARNING: AdcSimulator not found." << endl;
         useOldAdc = true;
       }
       // Old ADC calculation.
@@ -257,6 +260,7 @@ void SimWireDUNE::produce(art::Event& evt) {
         if ( adcin > 0 ) adc1 = (short) (adcin + 0.5);
         if ( adc1 > adcmax ) adc1 = adcmax;
         bool show = m_pads && adc1 != adc;
+
         static int ndump = 1000;
         if ( ndump && show ) {
           cout << myname << "  ADC: " << adc1 << " --> " << adc << " (" << adcin << ")" << endl;
@@ -269,12 +273,12 @@ void SimWireDUNE::produce(art::Event& evt) {
     }
     // Resize to the correct number of time samples, dropping extra samples.
     adcvec.resize(nTickReadout);
-    
+
     // Add stuck bits.
     if ( fDistortOn ) {
       m_pdis->modify(chan, adcvec);
     }
-    
+
     // Zero suppress.
     AdcCountSelection acs(adcvec, chan, pedval);
     if ( fSuppressOn ) {
@@ -295,8 +299,8 @@ void SimWireDUNE::produce(art::Event& evt) {
     rd.SetPedestal(pedval, pedrms);
     digcol->push_back(rd);            // add this digit to the collection
 
-  }  // end loop over channels      
+  }  // end loop over channels
 
   evt.put(std::move(digcol));
- 
+
 }
