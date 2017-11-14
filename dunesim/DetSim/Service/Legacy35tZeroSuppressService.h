@@ -8,8 +8,8 @@
 // Parameters:
 //   AdcThreshold - threshold
 //   TickRange - range
-//   SuppressStickyBits - treat sticky bits as below threhold
-// If a tick I has pedestal-corrected ADC > AdcThreshold, ticks
+//   SuppressStickyBits - treat sticky bits as below threshold
+// If a tick I has pedestal-corrected |ADC| > AdcThreshold, ticks
 // [i-TickRange, i+TickRange] are retained.
 // If tick I has sticky bits and has pedestal-corrected ADC < 64,
 // it is treated as though its pedstal-corrected ADC is zero.
