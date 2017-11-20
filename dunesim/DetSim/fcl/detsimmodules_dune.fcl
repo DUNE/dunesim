@@ -120,23 +120,20 @@ chnoise35t: {
   OldNoiseIndex: false
 }
 
-#****************************************************
-
 #Configure realistic noise service for DP detectors based on the 311 data
-#A.Scarpelli andrea.scarpelli@cern.ch October 2017
-#
+#A.Scarpelli andrea.scarpelli@cern.ch November 2017
 #NB: Hardcoded unrotated geometry:
-
 
 dprealisticnoise:{
   service_provider: DPhaseRealisticNoiseService
-  NoiseModel:    "$MRB_SOURCE/dunetpc/dune/DetSim/NoiseModels/fft_975-0.root"    #path to the noise model root file
-  RandomizeX:    0.0  #custom randomization of the average power spectrum at 10%
-  RandomizeY:    0.0  #custom randomisation of the average power spectrum at 10%
-  WhiteNoiseX:   0.0
-  WhiteNoiseY:   0.0
-  NoiseArrayPoints: 1000
-  OldNoiseIndex: false   #From ExponentialChannelNoiseService. Keep false
+  NoiseModel:       "$MRB_SOURCE/dunetpc/dune/DetSim/NoiseModels/729-0_fft_mirror.root"
+  RandomizeX:       15.0     #amplitude randomization sigma
+  RandomizeY:       15.0     #amplitude randomization sigma
+  Smooth:           1000      #smoothing factor when mirroring
+  SetFirst0:        false    #set first bin of the fft model to 0
+  SetBaseline:      false    #if true, baseline added to real noise model
+  NoiseArrayPoints: 1000     #number of pre-generated waveforms
+  OldNoiseIndex:    false    #From ExponentialChannelNoiseService. Keep false
 }
 
 chnoiseprotodune: {

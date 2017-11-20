@@ -43,12 +43,27 @@ public:
   // Input vector contents are lost.
   // The size of the vector is obtained from the FFT service.
   void generateNoise(std::vector<double> frequencyVector, AdcSignalVector& noise,
-                                    TH1* aNoiseHist, double customRandom) const;
+                                    TH1* aNoiseHist, double customRandom);
 
 private:
 
+  //tool getters for use the model size everywhere in the code
+  unsigned int GetModelSize() const;
+
+  //tool setter for use the model size everywhere in the code
+  void SetModelSize(unsigned int size);
+
+  // Tool function used  mirrorWaveform();
+  double GetShift(AdcSignalVector time_vector, int window_length) const;
+
+  // Tool producing associations between channels and semi-random phase;
+  void Chan2Phase(std::map<Channel, double> &PhaseChannelMap) const;
+
   // Fill the noise vectors.
   void generateNoise();
+
+  //Mirror the output waveform to match geometries dofferent from 3x1x1 geo
+  void mirrorWaveform(AdcSignalVector& noise, int TimeSamples) const;
 
   //import a model of realistic noise fft from a root file
   //Store it in an array for each view
@@ -60,9 +75,10 @@ private:
   unsigned int fNoiseArrayPoints;  ///< number of points in randomly generated noise array
   double       fRandomizeX;        ///< randomization of the average frequency spectrum  (on kX or kZ)
   double       fRandomizeY;        ///<< randomization of the average frequency spectrum (on kY)
+  double       fSmooth;
+  bool         fSetFirst0;         ///<< set the first bin of the frequency array to 0
+  bool         fSetBaseline;       ///<< Sum baseline model to the data
   bool         fOldNoiseIndex;     ///< Use old selection of noise array index
-  float        fWhiteNoiseX;       ///< Level (per freq bin) for white noise for X.
-  float        fWhiteNoiseY;       ///< Level (per freq bin) for white noise for Y.
   int          fRandomSeed;        ///< Seed for random number service. If absent or zero, use SeedSvc.
   int          fLogLevel;          ///< Log message level: 0=quiet, 1=init only, 2+=every event
 
@@ -79,6 +95,10 @@ private:
   TH1* fNoiseHistX;     ///< distribution of noise counts for X
   TH1* fNoiseHistY;     ///< distribution of noise counts for Y
   TH1* fNoiseChanHist;  ///< distribution of accessed noise samples
+
+  //more
+  double fPhase;
+  unsigned int fModelsize;
 
   CLHEP::HepRandomEngine* m_pran;
 
