@@ -12,7 +12,7 @@ physics.producers.generator.PosDist: 0             # Flat position dist.
 physics.producers.generator.X0: [ 150 ]
 physics.producers.generator.Y0: [ 150.0 ]
 physics.producers.generator.Z0: [ 650 ]
-physics.producers.generator.T0: [ 500.0 ]
+physics.producers.generator.T0: [ 000.0 ]
 physics.producers.generator.SigmaX: [ 0 ]     
 physics.producers.generator.SigmaY: [ 0 ]    
 physics.producers.generator.SigmaZ: [ 0 ]   
