@@ -56,7 +56,7 @@ simple_plugin(ExponentialChannelNoiseService   "service"
 
 simple_plugin(DPhaseRealisticNoiseService   "service"
                larcorealg_Geometry
-               SignalShapingServiceDUNE_service
+               SignalShapingServiceDUNEDPhase_service
                ${ART_FRAMEWORK_SERVICES_OPTIONAL}
                ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
                nutools_RandomUtils_NuRandomService_service

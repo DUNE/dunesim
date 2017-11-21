@@ -114,7 +114,7 @@ int DPhaseRealisticNoiseService::addNoise(Channel chan, AdcSignalVector& sigs) c
   //define the baseline fluctuations
   //done here because chan is needed to tune the phase
   auto const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
-  int ntick = detprop->NumberTimeSamples();
+  unsigned int ntick = detprop->NumberTimeSamples();
   double dt = 1./detprop->SamplingRate();
   unsigned int model_tick = GetModelSize();
   std::map<Channel, double>  fPhaseChannelMap;
@@ -144,18 +144,23 @@ int DPhaseRealisticNoiseService::addNoise(Channel chan, AdcSignalVector& sigs) c
   art::ServiceHandle<geo::Geometry> geo;
   const geo::View_t view = geo->View(chan);
 
-  sigs.resize( detprop->NumberTimeSamples() );
+  //sigs.resize( detprop->NumberTimeSamples() );
 
-  for ( unsigned int itck=0; itck<sigs.size(); ++itck ) {
+  for ( unsigned int itck=0; itck<ntick; ++itck ) {
     double tnoise = 0.0;
-    if ( view==geo::kZ ) {  //NB: Hardcoded geometry
-      tnoise = fNoiseX[noisechan][itck];
-    } else if ( view==geo::kY ) {
+    if ( view==geo::kY ) {
       tnoise = fNoiseY[noisechan][itck];
+    } else if ( view==geo::kZ ) {
+      tnoise = fNoiseX[noisechan][itck];
+    } else {
+      tnoise = fNoiseX[noisechan][itck];
     }
-    sigs[itck] += tnoise;
-    if(fSetBaseline)
+
+    if(fSetBaseline){
       sigs[itck] += _sin->Eval((double)itck*dt);
+    }
+    
+    sigs[itck] += tnoise;
   }
 
   return 0;
@@ -165,16 +170,16 @@ int DPhaseRealisticNoiseService::addNoise(Channel chan, AdcSignalVector& sigs) c
 
 ostream& DPhaseRealisticNoiseService::print(ostream& out, string prefix) const {
 
-  out << prefix << "DPhaseRealisticNoiseService: " << fNoiseModel   << endl;
-  out << prefix << "    Noise model source file: " << fNoiseModel   << endl;
-  out << prefix << "        RandomizationX:      " << fRandomizeX   << endl;
-  out << prefix << "        RandomizationY:      " << fRandomizeY   << endl;
-  out << prefix << "            Smooth           " << fSmooth       << endl;
-  out << prefix << "          fSetFirst0         " << fSetFirst0    << endl;
-  out << prefix << "         fSetBaseline        " << fSetBaseline  << endl;
-  out << prefix << "          RandomSeed:        " << fRandomSeed   << endl;
-  out << prefix << "           LogLevel:         " << fLogLevel     << endl;
-  out << prefix << "      Actual random seed:    " << m_pran->getSeed();
+  out << prefix << "DPhaseRealisticNoiseService:  " <<  endl;
+  out << prefix << " Noise model source file:     " << fNoiseModel   << endl;
+  out << prefix << " RandomizationX:              " << fRandomizeX   << endl;
+  out << prefix << " RandomizationY:              " << fRandomizeY   << endl;
+  out << prefix << " Smooth                       " << fSmooth       << endl;
+  out << prefix << " fSetFirst0                   " << fSetFirst0    << endl;
+  out << prefix << " fSetBaseline                 " << fSetBaseline  << endl;
+  out << prefix << " RandomSeed:                  " << fRandomSeed   << endl;
+  out << prefix << " LogLevel:                    " << fLogLevel     << endl;
+  out << prefix << " Actual random seed:          " << m_pran->getSeed();
 
   return out;
 }
@@ -221,25 +226,20 @@ std::vector<double> & frequencyArrayX, std::vector<double> & frequencyArrayY) co
     frequencyArrayY.resize( inputHist->GetNbinsX() );
 
     for(size_t f=0; f<(size_t)inputHist->GetNbinsX() ; f++){
-      if(geo->DetectorName() == "3x1x1dphase"){
         if (name.find("_0")!=string::npos){
+
+          //NB: use just the 3m strips view for Far Detector sim
           frequencyArrayY.at(f) = inputHist->GetBinContent(f);
+          frequencyArrayX.at(f) = inputHist->GetBinContent(f);
         }
         else if(name.find("_1")!=string::npos){
-          frequencyArrayX.at(f) = inputHist->GetBinContent(f);
+          //frequencyArrayX.at(f) = inputHist->GetBinContent(f);
+          continue;
         }
         else{
           cout << "not valid view " << endl;
           continue;
         }
-      }else{
-        if (name.find("_0")!=string::npos){
-          frequencyArrayY.at(f) = inputHist->GetBinContent(f);
-          frequencyArrayX.at(f) = inputHist->GetBinContent(f);
-        }else{
-          continue;
-        }
-      }
     } //end f loop
   } //end event loop
 
@@ -432,6 +432,9 @@ void DPhaseRealisticNoiseService::generateNoise(std::vector<double> frequencyVec
   for ( unsigned int itck=0; itck<noise.size(); ++itck ) {
     aNoiseHist->Fill(noise[itck]);
   }
+
+  //restore fft with the same number of points as it was before
+  pfft->ReinitializeFFT( ntick ," ", pfft->FFTFitBins() );
 
   return;
 }//end generateNoise
