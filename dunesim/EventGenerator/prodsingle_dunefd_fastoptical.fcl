@@ -41,7 +41,6 @@ physics:
    generator: @local::dunefd_singlep	  
    largeant:  @local::dunefd_largeant	  
    daq:       @local::dunefd_simwire  
-   #backtrack: @local::standard_backtrackerloader
    #opdigi:    @local::microboone_opdigi
  }
 

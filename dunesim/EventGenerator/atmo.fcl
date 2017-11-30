@@ -74,7 +74,7 @@ physics:
 
  #define the producer and filter modules for this path, order matters, 
 
- #simulate: [ generator, largeant, daq, backtrack, caldata, gaushit, hitcheat, apahit, rns ] 
+ #simulate: [ generator, largeant, daq, backtrack,  caldata, gaushit, hitcheat, apahit, rns ] 
 
   mode0: [ generator, largeant, daq, backtrack, caldata, gaushit, hitcheat, apahit, rns ] 
   mode1: [ generator, largeant, daq, backtrack, caldata, gaushit, hitcheat, apahit, rns, selectMode1 ] # 
