@@ -107,6 +107,10 @@ dune10kt_1x2x6_CPA:{
  T1:                    [  1600000. ] # ending time in ns
 }
 
+dune10kt_1x2x6_42ar:     @local::dune10kt_1x2x6_39ar
+dune10kt_1x2x6_42ar.Nuclide: [ "42Ar" ]
+dune10kt_1x2x6_42ar.BqPercc: [ 0.0000001283768 ] #Rate from paper by Barabash in conference proceding http://iopscience.iop.org/article/10.1088/1742-6596/718/6/062004/pdf
+
 dune10kt_1x2x6_85kr:     @local::dune10kt_1x2x6_39ar
 dune10kt_1x2x6_85kr.Nuclide: [ "85Kr" ]
 dune10kt_1x2x6_85kr.BqPercc: [ 0.00016 ] #Rate tied to LAr using rates established by the WARP collaboration. https://arxiv.org/pdf/astro-ph/0603131.pdf

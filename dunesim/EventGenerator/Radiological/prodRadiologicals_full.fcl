@@ -8,7 +8,7 @@ services:
   # Load the service that manages root files for histograms.
   TFileService:          { fileName: "prodbackground_hist.root" }
   TimeTracker:           {}
-  MemoryTracker:         { ignoreTotal: 1 } # default is one
+  #MemoryTracker:         { ignoreTotal: 1 } # default is one
   RandomNumberGenerator: {}                 # ART native random number generator
   FileCatalogMetadata:  @local::art_file_catalog_mc
                         @table::dunefd_services
@@ -38,6 +38,7 @@ physics:
   producers:
   {
     generator: @local::dune10kt_1x2x6_39ar
+    ar42Gen:   @local::dune10kt_1x2x6_42ar
     rnGen:     @local::dune10kt_1x2x6_222rn
     apaGen:    @local::dune10kt_1x2x6_APA
     cpaGen:    @local::dune10kt_1x2x6_CPA
