@@ -1,0 +1,8 @@
+#include "prod_CalibrationNi.fcl"
+
+outputs.out1.fileName: "prod_NiCalibration_isotropic_outside_dune10kt_1x2x6_gen.root"
+
+physics.producers.generator.X0: [ 150 ]
+physics.producers.generator.Y0: [ 150.0 ]
+physics.producers.generator.Z0: [ 650 ]
+physics.producers.generator.T0: [ 000.0 ]

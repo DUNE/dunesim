@@ -42,7 +42,7 @@ dune10kt_1x2x6_39ar:
  Y1:                    [  800. ]     # in cm in world coordinates, top corner of box
  Z0:                    [  -55. ]     # in cm in world coordinates, bottom corner of box
  Z1:                    [  1500. ]     # in cm in world coordinates, top corner of box
- T0:                    [ 0.0 ] # starting time in ns
+ T0:                    [ -1600000. ] # starting time in ns
  T1:                    [  1600000. ] # ending time in ns
 }
 
@@ -57,7 +57,7 @@ dune10kt_1x2x6_APA:{
  Y1:                    [  600. ]     # in cm in world coordinates, top corner of box
  Z0:                    [  0    ]     # in cm in world coordinates, bottom corner of box
  Z1:                    [  1395 ]     # in cm in world coordinates, top corner of box
- T0:                    [ 0.0 ] # starting time in ns
+ T0:                    [ -1600000. ] # starting time in ns
  T1:                    [  1600000. ] # ending time in ns
 }
 
@@ -73,7 +73,7 @@ dune10kt_1x2x6_fc:
  Y1:                    [  600. , 600,   -601.,   601.   ]     # in cm in world coordinates, top corner of box
  Z0:                    [  -0.5,  1394.5, 0,      0      ]     # in cm in world coordinates, bottom corner of box
  Z1:                    [  0.5,   1395.5, 1395,   1395   ]     # in cm in world coordinates, top corner of box
- T0:                    [ 0.0, 0.0, 0.0, 0.0 ] # starting time in ns
+ T0:                    [ -1600000., -1600000., -1600000., -1600000. ] # starting time in ns
  T1:                    [  1600000., 1600000., 1600000., 1600000. ] # ending time in ns
 }
 
@@ -88,7 +88,7 @@ dune10kt_1x2x6_PDs:{
  Y1:                    [  600. ]     # in cm in world coordinates, top corner of box
  Z0:                    [  0    ]     # in cm in world coordinates, bottom corner of box
  Z1:                    [  1395 ]     # in cm in world coordinates, top corner of box
- T0:                    [ 0.0 ] # starting time in ns
+ T0:                    [ -1600000. ] # starting time in ns
  T1:                    [  1600000. ] # ending time in ns
 }
 
@@ -103,7 +103,7 @@ dune10kt_1x2x6_CPA:{
  Y1:                    [  600. ]     # in cm in world coordinates, top corner of box
  Z0:                    [  0    ]     # in cm in world coordinates, bottom corner of box
  Z1:                    [  1395 ]     # in cm in world coordinates, top corner of box
- T0:                    [ 0.0 ] # starting time in ns
+ T0:                    [ -1600000. ] # starting time in ns
  T1:                    [  1600000. ] # ending time in ns
 }
 
