@@ -75,7 +75,7 @@ extract(const sim::SimChannel* psc, AdcSignalVector& sigs) const {
   // perform convolution
 
   m_psss->Convolute(chan, sigs);
-
+  
   return 0;
 }
 
