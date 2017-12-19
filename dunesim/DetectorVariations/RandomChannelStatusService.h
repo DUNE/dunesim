@@ -46,6 +46,7 @@ namespace detvar
     {
     }
 
+  protected:
     const lariov::ChannelStatusProvider* DoGetProviderPtr() const override
     {
       return &fProvider;
