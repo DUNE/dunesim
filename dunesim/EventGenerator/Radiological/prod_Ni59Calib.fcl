@@ -37,20 +37,34 @@ physics:
  
   producers:
   {
-    generator: @local::dune10kt_1x2x6_39ar
-    ar42Gen:   @local::dune10kt_1x2x6_42ar
+    generator: {
+         BqPercc:  [ 10000  ]
+         Material: [ ".*"   ]
+         Nuclide:  [ "59Ni" ]
+         T0:       [ 0.0 ]
+         T1:       [  1.6e6 ]
+         X0:       [  219.5 ]
+         X1:       [  220.5 ]
+         Y0:       [  299.5 ]
+         Y1:       [  300.5 ]
+         Z0:       [ -40.5  ]
+         Z1:       [ -39.5  ]
+         module_label: "apaGen"
+         module_type: "RadioGen"
+      }
+    
+    arGen:     @local::dune10kt_1x2x6_39ar
     rnGen:     @local::dune10kt_1x2x6_222rn
     apaGen:    @local::dune10kt_1x2x6_APA
     cpaGen:    @local::dune10kt_1x2x6_CPA
     poGen:     @local::dune10kt_1x2x6_210po
     krGen:     @local::dune10kt_1x2x6_85kr
     fcGen:     @local::dune10kt_1x2x6_fc
-    
     rns:       { module_type: "RandomNumberSaver" }
   }
  
   # Define the producer and filter modules for this path, order matters, 
-  simulate:      [ rns, generator, fcGen, rnGen, krGen, poGen, cpaGen, apaGen ]
+  simulate:      [ rns, generator ]
   
   # Define the output stream, there could be more than one if using filters 
   stream1:       [ out1 ]
