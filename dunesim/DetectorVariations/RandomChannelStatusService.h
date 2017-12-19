@@ -1,3 +1,5 @@
+// Chris Backhouse - c.backhouse@ucl.ac.uk Dec 2017
+
 #ifndef DETVAR_RANDOMCHANNELSTATUS_SERVICE
 #define DETVAR_RANDOMCHANNELSTATUS_SERVICE
 
@@ -10,23 +12,29 @@ namespace detvar
   public:
     bool IsBad(raw::ChannelID_t chan) const override
     {
-      return fChans.count(chan);
+      return fBadChans.count(chan);
     }
 
     bool IsPresent(raw::ChannelID_t) const override {return true;}
     bool IsNoisy(raw::ChannelID_t) const override {return false;}
 
-    // TODO (can geometry give us the full list of channels?)
-    std::set<raw::ChannelID_t>  GoodChannels() const override {return {};}
+    std::set<raw::ChannelID_t> GoodChannels() const override
+    {
+      return fGoodChans;
+    }
 
-    std::set<raw::ChannelID_t> BadChannels() const override {return fChans;}
-    std::set<raw::ChannelID_t>  NoisyChannels() const override {return {};}
+    std::set<raw::ChannelID_t> BadChannels() const override
+    {
+      return fBadChans;
+    }
+
+    std::set<raw::ChannelID_t> NoisyChannels() const override {return {};}
 
   protected:
     friend class RandomChannelStatusService;
     RandomChannelStatusProvider(const fhicl::ParameterSet& pset);
 
-    std::set<raw::ChannelID_t> fChans;
+    std::set<raw::ChannelID_t> fBadChans, fGoodChans;
   };
 
 
