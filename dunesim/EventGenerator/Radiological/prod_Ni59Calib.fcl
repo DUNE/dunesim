@@ -30,14 +30,14 @@ source:
 # Modules are grouped by type.
 
 
-services.Geometry: @local::dune10kt_1x2x6_geo
+services.Geometry: @local::dune10kt_1x2x6_v3_geo
 
 physics:
 {
  
   producers:
   {
-    generator: {
+    ni59Gen: {
          BqPercc:  [ 10000  ]
          Material: [ ".*"   ]
          Nuclide:  [ "59Ni" ]
@@ -64,7 +64,7 @@ physics:
   }
  
   # Define the producer and filter modules for this path, order matters, 
-  simulate:      [ rns, generator ]
+  simulate:      [ rns, ni59Gen ]
   
   # Define the output stream, there could be more than one if using filters 
   stream1:       [ out1 ]
