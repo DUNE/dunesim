@@ -7,3 +7,5 @@ simple_plugin(RandomChannelStatusService "service"
               ${ART_FRAMEWORK_SERVICES_BASIC}
               ${ART_FRAMEWORK_SERVICES_OPTIONAL}
               )
+
+install_fhicl()
