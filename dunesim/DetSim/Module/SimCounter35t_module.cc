@@ -236,7 +236,7 @@ void detsim::SimCounter35t::produce(art::Event & e)
   std::vector<chanTick>::iterator it,it2;
   int icount= 0;
   if (tickv.size()>1) {
-    std::vector<chanTick>::iterator myend=tickv.end()--;
+    //std::vector<chanTick>::iterator myend=tickv.end()--;
     for (it = tickv.begin(); it != tickv.end(); ++it) {
     chanTick ct = *it; 
     
