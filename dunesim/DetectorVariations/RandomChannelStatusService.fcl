@@ -3,23 +3,27 @@ BEGIN_PROLOG
 randomchannelservice_1pc:
 {
     service_provider: RandomChannelStatusService
+    Mode: "channels" # "channels", "APAs", or "chips"
     BadChanFrac: 0.01
 }
 
 randomchannelservice_2pc:
 {
     service_provider: RandomChannelStatusService
+    Mode: "channels"
     BadChanFrac: 0.02
 }
 
 randomchannelservice_5pc:
 {
     service_provider: RandomChannelStatusService
+    Mode: "channels"
     BadChanFrac: 0.05
 }
 
 randomchannelservice_10pc:{
     service_provider: RandomChannelStatusService
+    Mode: "channels"
     BadChanFrac: 0.10
 }
 

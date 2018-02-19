@@ -64,6 +64,14 @@ namespace detvar
   {
     const double badfrac = pset.get<double>("BadChanFrac");
 
+    enum{
+      kRandomChans, kRandomAPAs, kRandomChips
+    } mode;
+
+    if(pset.get<std::string>("Mode") == "channels") mode = kRandomChans;
+    if(pset.get<std::string>("Mode") == "APAs") mode = kRandomAPAs;
+    if(pset.get<std::string>("Mode") == "chips") mode = kRandomChips;
+
     art::ServiceHandle<geo::Geometry> geom;
 
     //    const unsigned int seed = pset.get<unsigned int>("Seed", sim::GetRandomNumberSeed());
@@ -86,11 +94,51 @@ namespace detvar
     // random sample with that probability). Should make results of studies
     // less noisy.
     while(fBadChans.size() < badfrac*N){
-      // Insert a random element. There will be duplicates, but the set will
-      // filter them out. Shouldn't be too inefficient for the low bad channel
-      // fractions we'll use in practice.
-      fBadChans.insert(vchans[r.shootInt(N)]);
-    }
+
+      if(mode == kRandomChans){
+        // Insert a random element. There will be duplicates, but the set will
+        // filter them out. Shouldn't be too inefficient for the low bad
+        // channel fractions we'll use in practice.
+        fBadChans.insert(vchans[r.shootInt(N)]);
+      }
+      else{ // by APAs or chips
+
+        // Pick a random cryostat
+        geo::CryostatID c0, c1;
+        geom->GetBeginID(c0);
+        geom->GetEndID(c1);
+        const geo::CryostatID c(r.shootInt(c1.Cryostat-c0.Cryostat)+c0.Cryostat);
+
+        // Pick a random TPC
+        const geo::TPCID t0 = geom->GetBeginTPCID(c);
+        const geo::TPCID t1 = geom->GetEndTPCID(c);
+        const geo::TPCID t(c, r.shootInt(t1.TPC-t0.TPC)+t0.TPC);
+
+        if(mode == kRandomAPAs){
+          // Mark all the channels in this TPC bad
+          for(geo::WireID wire: geom->IterateWireIDs(t)){
+            fBadChans.insert(geom->PlaneWireToChannel(wire));
+          }
+        }
+        else if(mode == kRandomChips){
+          const int chip = 1+r.shootInt(8); // One of 8 chips
+          // Knock out all the channels in this chip
+          for(int chan = 0; chan <= 15; ++chan){
+            geo::View_t view;
+            int wireNo;
+            ChipAndChannelToWire(chip, chan, view, wireNo);
+
+            for(geo::PlaneID plane: geom->IteratePlaneIDs(t)){
+              // Find the plane with the right view
+              if(geom->View(plane) != view) continue;
+
+              const geo::WireID wire(plane, geom->GetBeginWireID(plane).Wire+wireNo);
+              fBadChans.insert(geom->PlaneWireToChannel(wire));
+            } // end for plane
+          } // end for chan
+        } // end if chips
+      }
+    } // end while
 
     // goodchans = allchans - badchans
     std::set_difference(allchans.begin(), allchans.end(),
