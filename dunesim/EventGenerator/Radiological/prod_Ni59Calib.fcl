@@ -37,7 +37,7 @@ physics:
  
   producers:
   {
-    ni59Gen: {
+    generator: {
          BqPercc:  [ 10000  ]
          Material: [ ".*"   ]
          Nuclide:  [ "59Ni" ]
@@ -64,7 +64,7 @@ physics:
   }
  
   # Define the producer and filter modules for this path, order matters, 
-  simulate:      [ rns, ni59Gen ]
+  simulate:      [ rns, generator ]
   
   # Define the output stream, there could be more than one if using filters 
   stream1:       [ out1 ]
