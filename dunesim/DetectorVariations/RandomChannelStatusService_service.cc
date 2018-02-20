@@ -11,11 +11,14 @@
 
 namespace detvar
 {
-  // Implement Table 5 from dune docdb 4064
+  //......................................................................
+  // Implement Table 5 from dune docdb 4064v2
   void ChipAndChannelToWire(int chip, int chan,
                             geo::View_t& view,
                             int& wire)
   {
+    // Ultimately this logic should be contained in some ChannelMap service
+
     assert(chip >= 1 && chip <= 8);
     assert(chan >= 0 && chan <= 15);
 
@@ -33,22 +36,22 @@ namespace detvar
 
     if(chip == 3 || chip == 4){
       wireMin = 2; chipMin = 4; chipSign = -1; chanSign = +1;
-      /**/ if(chan <= 5 ){view = geo::kW; chanMin =  0; height = 6;}
+      /**/ if(chan <=  5){view = geo::kW; chanMin =  0; height = 6;}
       else if(chan <= 10){view = geo::kV; chanMin =  6; height = 5;}
       else/*           */{view = geo::kU; chanMin = 11; height = 5;}
     }
 
     if(chip == 5 || chip == 6){
       chipMin = 5; chipSign = +1; chanSign = -1;
-      /**/ if(chan <= 5){view = geo::kU; wireMin = 21; chanMin =  4; height = 5;}
+      /**/ if(chan <= 4){view = geo::kU; wireMin = 21; chanMin =  4; height = 5;}
       else if(chan <= 9){view = geo::kV; wireMin = 21; chanMin =  9; height = 5;}
       else/*          */{view = geo::kW; wireMin = 25; chanMin = 15; height = 6;}
     }
 
     if(chip == 7 || chip == 8){
       chipMin = 7; chipSign = +1; chanSign = +1;
-      /**/ if(chan <= 6 ){view = geo::kW; wireMin = 26; chanMin =  0; height = 6;}
-      else if(chan <= 11){view = geo::kV; wireMin = 22; chanMin =  6; height = 5;}
+      /**/ if(chan <=  5){view = geo::kW; wireMin = 26; chanMin =  0; height = 6;}
+      else if(chan <= 10){view = geo::kV; wireMin = 22; chanMin =  6; height = 5;}
       else/*           */{view = geo::kU; wireMin = 22; chanMin = 11; height = 5;}
     }
 
@@ -58,6 +61,7 @@ namespace detvar
     assert(wire >= 1 && wire <= 48);
   }
 
+  //......................................................................
   geo::CryostatID RandomCryostat(const geo::GeometryCore* geom)
   {
     // For whatever reason the iterators here can't be used to initialize a
@@ -68,6 +72,7 @@ namespace detvar
     return csv[gRandom->Integer(csv.size())];
   }
 
+  //......................................................................
   geo::TPCID RandomTPC(const geo::GeometryCore* geom, geo::CryostatID c)
   {
     // For whatever reason the iterators here can't be used to initialize a
@@ -77,6 +82,7 @@ namespace detvar
     return tsv[gRandom->Integer(tsv.size())];
   }
 
+  //......................................................................
   RandomChannelStatusProvider::
   RandomChannelStatusProvider(const fhicl::ParameterSet& pset)
   {
@@ -92,6 +98,8 @@ namespace detvar
 
     art::ServiceHandle<geo::Geometry> geom;
 
+    // TODO don't seem to be able to access the RandomNumberGenerator service
+    // from here, let alone anything to do with seeds.
     //    const unsigned int seed = pset.get<unsigned int>("Seed", sim::GetRandomNumberSeed());
     //    createEngine(seed);
     //    art::ServiceHandle<art::RandomNumberGenerator> rng;
@@ -103,7 +111,8 @@ namespace detvar
     for(geo::WireID wire: geom->IterateWireIDs())
       allchans.insert(geom->PlaneWireToChannel(wire));
 
-    // But a vector is much easier to pick from randomly
+    // But a vector is much easier to pick from randomly. This will be used for
+    // the random chans mode.
     const std::vector<raw::ChannelID_t> vchans(allchans.begin(),
                                                allchans.end());
     const int N = vchans.size();
@@ -131,22 +140,61 @@ namespace detvar
           }
         }
         else if(mode == kRandomChips){
+          // No good way of enumerating all the unique channels, or selecting
+          // them by index. Have to figure them out from the wires. Pull out of
+          // the loop below to make the bad channel generation less cripplingly
+          // slow.
+          std::set<raw::ChannelID_t> chans[3];
+          for(geo::WireID wire: geom->IterateWireIDs(t)){
+            const raw::ChannelID_t chan = geom->PlaneWireToChannel(wire);
+            chans[geom->View(chan)].insert(chan);
+          }
+          // Then we need to index by channel number within the APA. TODO: I
+          // have no idea if the sorting of the channel IDs that the set did is
+          // what we need. Maybe U and V get sorted in opposite order to each
+          // other etc?
+          std::vector<raw::ChannelID_t> chansV[3];
+          for(int i = 0; i < 3; ++i){
+            chansV[i] = std::vector<raw::ChannelID_t>(chans[i].begin(),
+                                                      chans[i].end());
+          }
+
           const int chip = 1+gRandom->Integer(8); // One of 8 chips
+          // Empirically we need to repeat the organization from the table 10
+          // times to readout the whole APA (480 W wires and 400+400 U+V
+          // wires).
+          const int board = gRandom->Integer(10);
+
           // Knock out all the channels in this chip
           for(int chan = 0; chan <= 15; ++chan){
+            // TODO the table we're using just says "view W" with no statement
+            // about which side of the APA it is, since it's a ProtoDUNE
+            // table. We ignore that complication and I think in practice
+            // render one side dead arbitrarily.
             geo::View_t view;
-            int wireNo;
-            ChipAndChannelToWire(chip, chan, view, wireNo);
+            // TODO the table calls this a "spot". We're using it as an index
+            // into the sorted list of channel IDs for this view. That could be
+            // wrong, but the Geometry doesn't seem to have any coresponding
+            // concept.
+            int spot;
+            ChipAndChannelToWire(chip, chan, view, spot);
+
+            // How many wires to add on between each board
+            const int stride = (view == geo::kW) ? 48 : 40;
 
             for(geo::PlaneID plane: geom->IteratePlaneIDs(t)){
               // Find the plane with the right view
               if(geom->View(plane) != view) continue;
 
-              const geo::WireID wire(plane, geom->GetBeginWireID(plane).Wire+wireNo);
-              fBadChans.insert(geom->PlaneWireToChannel(wire));
+              assert(spot+board*stride <= int(chansV[view].size()));
+              fBadChans.insert(chansV[view][spot+board*stride-1]);
             } // end for plane
           } // end for chan
         } // end if chips
+
+        // This procedure with all the enumerations and sets and so on is
+        // slow. Give the user some feedback, and an incentive to fix it.
+        std::cout << "RandomChannelStatusService: Generated " << fBadChans.size() << " bad channels of " << badfrac*N << " required" << std::endl;
       }
     } // end while
 
