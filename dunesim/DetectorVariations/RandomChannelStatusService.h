@@ -5,6 +5,8 @@
 
 #include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
 
+namespace geo{class GeometryCore;}
+
 namespace detvar
 {
   class RandomChannelStatusProvider: public lariov::ChannelStatusProvider
@@ -33,6 +35,13 @@ namespace detvar
   protected:
     friend class RandomChannelStatusService;
     RandomChannelStatusProvider(const fhicl::ParameterSet& pset);
+
+    void MarkBoardBad(int board,
+                      const std::vector<std::vector<raw::ChannelID_t>>& chans);
+
+    void MarkChipBad(int board, int chip,
+                     const geo::GeometryCore* geom,
+                     const std::vector<std::vector<raw::ChannelID_t>>& chans);
 
     std::set<raw::ChannelID_t> fBadChans, fGoodChans;
   };
