@@ -30,7 +30,7 @@ source:
 # Modules are grouped by type.
 
 
-services.Geometry: @local::dune10kt_1x2x6_geo
+services.Geometry: @local::dune10kt_1x2x6_v3_geo
 
 physics:
 {
