@@ -47,8 +47,8 @@ namespace detvar
 
     if(chip == 7 || chip == 8){
       chipMin = 7; chipSign = +1; chanSign = +1;
-      /**/ if(chan <= 6 ){view = geo::kW; wireMin = 26; chanMin = 0; height = 6;}
-      else if(chan <= 11){view = geo::kV; wireMin = 22; chanMin = 6; height = 5;}
+      /**/ if(chan <= 6 ){view = geo::kW; wireMin = 26; chanMin =  0; height = 6;}
+      else if(chan <= 11){view = geo::kV; wireMin = 22; chanMin =  6; height = 5;}
       else/*           */{view = geo::kU; wireMin = 22; chanMin = 11; height = 5;}
     }
 
@@ -76,8 +76,8 @@ namespace detvar
 
     //    const unsigned int seed = pset.get<unsigned int>("Seed", sim::GetRandomNumberSeed());
     //    createEngine(seed);
-    art::ServiceHandle<art::RandomNumberGenerator> rng;
-    CLHEP::RandFlat r(rng->getEngine());
+    //    art::ServiceHandle<art::RandomNumberGenerator> rng;
+    //    CLHEP::RandFlat r(rng->getEngine());
 
     // Geometry doesn't have a way to iterate directly over channels. Iterate
     // over the wires and convert them. Use a set to remove duplicates
@@ -99,7 +99,7 @@ namespace detvar
         // Insert a random element. There will be duplicates, but the set will
         // filter them out. Shouldn't be too inefficient for the low bad
         // channel fractions we'll use in practice.
-        fBadChans.insert(vchans[r.shootInt(N)]);
+        fBadChans.insert(vchans[gRandom->Integer(N)]);
       }
       else{ // by APAs or chips
 
@@ -107,12 +107,12 @@ namespace detvar
         geo::CryostatID c0, c1;
         geom->GetBeginID(c0);
         geom->GetEndID(c1);
-        const geo::CryostatID c(r.shootInt(c1.Cryostat-c0.Cryostat)+c0.Cryostat);
+        const geo::CryostatID c(gRandom->Integer(c1.Cryostat-c0.Cryostat)+c0.Cryostat);
 
         // Pick a random TPC
         const geo::TPCID t0 = geom->GetBeginTPCID(c);
         const geo::TPCID t1 = geom->GetEndTPCID(c);
-        const geo::TPCID t(c, r.shootInt(t1.TPC-t0.TPC)+t0.TPC);
+        const geo::TPCID t(c, gRandom->Integer(t1.TPC-t0.TPC)+t0.TPC);
 
         if(mode == kRandomAPAs){
           // Mark all the channels in this TPC bad
@@ -121,7 +121,7 @@ namespace detvar
           }
         }
         else if(mode == kRandomChips){
-          const int chip = 1+r.shootInt(8); // One of 8 chips
+          const int chip = 1+gRandom->Integer(8); // One of 8 chips
           // Knock out all the channels in this chip
           for(int chan = 0; chan <= 15; ++chan){
             geo::View_t view;
