@@ -20,10 +20,10 @@ namespace detvar
     assert(chip >= 1 && chip <= 8);
     assert(chan >= 0 && chan <= 15);
 
-    int wireMin; // smallest value in block
-    int chipMin, chanMin; // position of smallest value
-    int height; // height of block
-    int chipSign, chanSign; // which way the numbers count
+    int wireMin = -1; // smallest value in block
+    int chipMin = -1, chanMin = -1; // position of smallest value
+    int height = -1; // height of block
+    int chipSign = 0, chanSign = 0; // which way the numbers count
 
     if(chip == 1 || chip == 2){
       wireMin = 1; chipMin = 2; chipSign = -1; chanSign = -1;
@@ -52,6 +52,8 @@ namespace detvar
       else if(chan <= 10){view = geo::kV; wireMin = 22; chanMin =  6; height = 5;}
       else/*           */{view = geo::kU; wireMin = 22; chanMin = 11; height = 5;}
     }
+
+    assert(wireMin >= 0 && chipMin >= 0 && chanMin >= 0 && height >= 0 && chipSign != 0 && chanSign != 0);
 
     // Compute the wire number inside the block
     wire = wireMin+2*((chan-chanMin)*chanSign + (chip-chipMin)*height*chipSign);
