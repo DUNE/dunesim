@@ -81,6 +81,29 @@ namespace detvar
   }
 
   //......................................................................
+  // Three vectors, one for each view. Will be sorted by ID number
+  std::vector<std::vector<raw::ChannelID_t>>
+  ChannelsForTPC(const geo::GeometryCore* geom, geo::TPCID tpc)
+  {
+    // No good way of enumerating all the unique channels, or selecting them by
+    // index. Have to figure them out from the wires.
+    std::set<raw::ChannelID_t> chanset[3];
+    for(geo::WireID wire: geom->IterateWireIDs(tpc)){
+      const raw::ChannelID_t chan = geom->PlaneWireToChannel(wire);
+      chanset[geom->View(chan)].insert(chan);
+    }
+    // Then we need to index by channel number within the APA. TODO: I
+    // have no idea if the sorting of the channel IDs that the set did is
+    // what we need. Maybe U and V get sorted in opposite order to each
+    // other etc?
+    std::vector<std::vector<raw::ChannelID_t>> chans;
+    for(int i = 0; i < 3; ++i){
+      chans.emplace_back(chanset[i].begin(), chanset[i].end());
+    }
+    return chans;
+  }
+
+  //......................................................................
   RandomChannelStatusProvider::
   RandomChannelStatusProvider(const fhicl::ParameterSet& pset)
   {
@@ -90,10 +113,16 @@ namespace detvar
       kUnknown, kRandomChans, kRandomAPAs, kRandomBoards, kRandomChips
     } mode = kUnknown;
 
-    if(pset.get<std::string>("Mode") == "channels") mode = kRandomChans;
-    if(pset.get<std::string>("Mode") == "APAs") mode = kRandomAPAs;
-    if(pset.get<std::string>("Mode") == "boards") mode = kRandomBoards;
-    if(pset.get<std::string>("Mode") == "chips") mode = kRandomChips;
+    const std::string modestr = pset.get<std::string>("Mode");
+    if(modestr == "channels") mode = kRandomChans;
+    if(modestr == "APAs")     mode = kRandomAPAs;
+    if(modestr == "boards")   mode = kRandomBoards;
+    if(modestr == "chips")    mode = kRandomChips;
+    if(mode == kUnknown){
+      std::cout << "RandomChannelStatusService: unknown mode '"
+                << modestr << "'" << std::endl;
+      abort();
+    }
 
     art::ServiceHandle<geo::Geometry> geom;
 
@@ -139,34 +168,21 @@ namespace detvar
           }
         }
         else{ // boards or chips
-          // No good way of enumerating all the unique channels, or selecting
-          // them by index. Have to figure them out from the wires. Pull out of
-          // the loop below to make the bad channel generation less cripplingly
-          // slow.
-          std::set<raw::ChannelID_t> chans[3];
-          for(geo::WireID wire: geom->IterateWireIDs(t)){
-            const raw::ChannelID_t chan = geom->PlaneWireToChannel(wire);
-            chans[geom->View(chan)].insert(chan);
-          }
-          // Then we need to index by channel number within the APA. TODO: I
-          // have no idea if the sorting of the channel IDs that the set did is
-          // what we need. Maybe U and V get sorted in opposite order to each
-          // other etc?
-          std::vector<std::vector<raw::ChannelID_t>> chansV;
-          for(int i = 0; i < 3; ++i){
-            chansV.emplace_back(chans[i].begin(), chans[i].end());
-          }
+          // We need to index by channel number within the APA. TODO: I have no
+          // idea if the sorting by the channel IDs is what we need. Maybe U
+          // and V get sorted in opposite order to each other etc?
+          const std::vector<std::vector<raw::ChannelID_t>> chans = ChannelsForTPC(geom.get(), t);
 
           // Empirically we need to repeat the organization from the table 10
           // times to readout the whole APA (480 W wires and 400+400 U+V
           // wires).
           const int board = gRandom->Integer(10);
 
-          if(mode == kRandomBoards) MarkBoardBad(board, chansV);
+          if(mode == kRandomBoards) MarkBoardBad(board, chans);
 
           if(mode == kRandomChips){
             const int chip = 1+gRandom->Integer(8); // One of 8 chips
-            MarkChipBad(board, chip, geom.get(), chansV);
+            MarkChipBad(board, chip, geom.get(), chans);
           }
         }
 
@@ -185,18 +201,18 @@ namespace detvar
   //......................................................................
   void RandomChannelStatusProvider::
   MarkBoardBad(int board,
-               const std::vector<std::vector<raw::ChannelID_t>>& chansV)
+               const std::vector<std::vector<raw::ChannelID_t>>& chans)
   {
-    for(int i = 0; i < 48; ++i) fBadChans.insert(chansV[geo::kW][board*48+i]);
-    for(int i = 0; i < 40; ++i) fBadChans.insert(chansV[geo::kU][board*40+i]);
-    for(int i = 0; i < 40; ++i) fBadChans.insert(chansV[geo::kV][board*40+i]);
+    for(int i = 0; i < 48; ++i) fBadChans.insert(chans[geo::kW][board*48+i]);
+    for(int i = 0; i < 40; ++i) fBadChans.insert(chans[geo::kU][board*40+i]);
+    for(int i = 0; i < 40; ++i) fBadChans.insert(chans[geo::kV][board*40+i]);
   }
 
   //......................................................................
   void RandomChannelStatusProvider::
   MarkChipBad(int board, int chip,
               const geo::GeometryCore* geom,
-              const std::vector<std::vector<raw::ChannelID_t>>& chansV)
+              const std::vector<std::vector<raw::ChannelID_t>>& chans)
   {
     // Knock out all the channels in this chip
     for(int chan = 0; chan <= 15; ++chan){
@@ -215,8 +231,8 @@ namespace detvar
       // How many wires to add on between each board
       const int stride = (view == geo::kW) ? 48 : 40;
 
-      assert(spot+board*stride <= int(chansV[view].size()));
-      fBadChans.insert(chansV[view][spot+board*stride-1]);
+      assert(spot+board*stride <= int(chans[view].size()));
+      fBadChans.insert(chans[view][spot+board*stride-1]);
     } // end for chan
   }
 }
