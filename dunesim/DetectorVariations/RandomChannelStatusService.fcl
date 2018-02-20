@@ -3,7 +3,7 @@ BEGIN_PROLOG
 randomchannelservice_1pc:
 {
     service_provider: RandomChannelStatusService
-    Mode: "channels" # "channels", "APAs", or "chips"
+    Mode: "channels" # "channels", "APAs", "boards", or "chips"
     BadChanFrac: 0.01
 }
 

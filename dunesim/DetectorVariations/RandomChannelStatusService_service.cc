@@ -13,9 +13,7 @@ namespace detvar
 {
   //......................................................................
   // Implement Table 5 from dune docdb 4064v2
-  void ChipAndChannelToWire(int chip, int chan,
-                            geo::View_t& view,
-                            int& wire)
+  void ChipAndChannelToSpot(int chip, int chan, geo::View_t& view, int& wire)
   {
     // Ultimately this logic should be contained in some ChannelMap service
 
@@ -89,11 +87,12 @@ namespace detvar
     const double badfrac = pset.get<double>("BadChanFrac");
 
     enum{
-      kRandomChans, kRandomAPAs, kRandomChips
-    } mode;
+      kUnknown, kRandomChans, kRandomAPAs, kRandomBoards, kRandomChips
+    } mode = kUnknown;
 
     if(pset.get<std::string>("Mode") == "channels") mode = kRandomChans;
     if(pset.get<std::string>("Mode") == "APAs") mode = kRandomAPAs;
+    if(pset.get<std::string>("Mode") == "boards") mode = kRandomBoards;
     if(pset.get<std::string>("Mode") == "chips") mode = kRandomChips;
 
     art::ServiceHandle<geo::Geometry> geom;
@@ -128,7 +127,7 @@ namespace detvar
         // channel fractions we'll use in practice.
         fBadChans.insert(vchans[gRandom->Integer(N)]);
       }
-      else{ // by APAs or chips
+      else{ // by APAs, boards, or chips
 
         const geo::CryostatID c = RandomCryostat(geom.get());
         const geo::TPCID t = RandomTPC(geom.get(), c);
@@ -139,7 +138,7 @@ namespace detvar
             fBadChans.insert(geom->PlaneWireToChannel(wire));
           }
         }
-        else if(mode == kRandomChips){
+        else{ // boards or chips
           // No good way of enumerating all the unique channels, or selecting
           // them by index. Have to figure them out from the wires. Pull out of
           // the loop below to make the bad channel generation less cripplingly
@@ -153,44 +152,23 @@ namespace detvar
           // have no idea if the sorting of the channel IDs that the set did is
           // what we need. Maybe U and V get sorted in opposite order to each
           // other etc?
-          std::vector<raw::ChannelID_t> chansV[3];
+          std::vector<std::vector<raw::ChannelID_t>> chansV;
           for(int i = 0; i < 3; ++i){
-            chansV[i] = std::vector<raw::ChannelID_t>(chans[i].begin(),
-                                                      chans[i].end());
+            chansV.emplace_back(chans[i].begin(), chans[i].end());
           }
 
-          const int chip = 1+gRandom->Integer(8); // One of 8 chips
           // Empirically we need to repeat the organization from the table 10
           // times to readout the whole APA (480 W wires and 400+400 U+V
           // wires).
           const int board = gRandom->Integer(10);
 
-          // Knock out all the channels in this chip
-          for(int chan = 0; chan <= 15; ++chan){
-            // TODO the table we're using just says "view W" with no statement
-            // about which side of the APA it is, since it's a ProtoDUNE
-            // table. We ignore that complication and I think in practice
-            // render one side dead arbitrarily.
-            geo::View_t view;
-            // TODO the table calls this a "spot". We're using it as an index
-            // into the sorted list of channel IDs for this view. That could be
-            // wrong, but the Geometry doesn't seem to have any coresponding
-            // concept.
-            int spot;
-            ChipAndChannelToWire(chip, chan, view, spot);
+          if(mode == kRandomBoards) MarkBoardBad(board, chansV);
 
-            // How many wires to add on between each board
-            const int stride = (view == geo::kW) ? 48 : 40;
-
-            for(geo::PlaneID plane: geom->IteratePlaneIDs(t)){
-              // Find the plane with the right view
-              if(geom->View(plane) != view) continue;
-
-              assert(spot+board*stride <= int(chansV[view].size()));
-              fBadChans.insert(chansV[view][spot+board*stride-1]);
-            } // end for plane
-          } // end for chan
-        } // end if chips
+          if(mode == kRandomChips){
+            const int chip = 1+gRandom->Integer(8); // One of 8 chips
+            MarkChipBad(board, chip, geom.get(), chansV);
+          }
+        }
 
         // This procedure with all the enumerations and sets and so on is
         // slow. Give the user some feedback, and an incentive to fix it.
@@ -202,6 +180,44 @@ namespace detvar
     std::set_difference(allchans.begin(), allchans.end(),
                         fBadChans.begin(), fBadChans.end(),
                         std::inserter(fGoodChans, fGoodChans.begin()));
+  }
+
+  //......................................................................
+  void RandomChannelStatusProvider::
+  MarkBoardBad(int board,
+               const std::vector<std::vector<raw::ChannelID_t>>& chansV)
+  {
+    for(int i = 0; i < 48; ++i) fBadChans.insert(chansV[geo::kW][board*48+i]);
+    for(int i = 0; i < 40; ++i) fBadChans.insert(chansV[geo::kU][board*40+i]);
+    for(int i = 0; i < 40; ++i) fBadChans.insert(chansV[geo::kV][board*40+i]);
+  }
+
+  //......................................................................
+  void RandomChannelStatusProvider::
+  MarkChipBad(int board, int chip,
+              const geo::GeometryCore* geom,
+              const std::vector<std::vector<raw::ChannelID_t>>& chansV)
+  {
+    // Knock out all the channels in this chip
+    for(int chan = 0; chan <= 15; ++chan){
+      // TODO the table we're using just says "view W" with no statement about
+      // which side of the APA it is, since it's a ProtoDUNE table. We ignore
+      // that complication and I think in practice render one side dead
+      // arbitrarily.
+      geo::View_t view;
+      // TODO the table calls this a "spot". We're using it as an index
+      // into the sorted list of channel IDs for this view. That could be
+      // wrong, but the Geometry doesn't seem to have any coresponding
+      // concept.
+      int spot;
+      ChipAndChannelToSpot(chip, chan, view, spot);
+
+      // How many wires to add on between each board
+      const int stride = (view == geo::kW) ? 48 : 40;
+
+      assert(spot+board*stride <= int(chansV[view].size()));
+      fBadChans.insert(chansV[view][spot+board*stride-1]);
+    } // end for chan
   }
 }
 
