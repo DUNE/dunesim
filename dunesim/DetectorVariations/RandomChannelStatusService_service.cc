@@ -58,6 +58,24 @@ namespace detvar
     assert(wire >= 1 && wire <= 48);
   }
 
+  geo::CryostatID RandomCryostat(const geo::GeometryCore* geom)
+  {
+    // For whatever reason the iterators here can't be used to initialize a
+    // vector.
+    const std::set<geo::CryostatID> css(geom->begin_cryostat_id(),
+                                        geom->end_cryostat_id());
+    const std::vector<geo::CryostatID> csv(css.begin(), css.end());
+    return csv[gRandom->Integer(csv.size())];
+  }
+
+  geo::TPCID RandomTPC(const geo::GeometryCore* geom, geo::CryostatID c)
+  {
+    // For whatever reason the iterators here can't be used to initialize a
+    // vector.
+    const std::set<geo::TPCID> tss(geom->begin_TPC_id(c), geom->end_TPC_id(c));
+    const std::vector<geo::TPCID> tsv(tss.begin(), tss.end());
+    return tsv[gRandom->Integer(tsv.size())];
+  }
 
   RandomChannelStatusProvider::
   RandomChannelStatusProvider(const fhicl::ParameterSet& pset)
@@ -103,16 +121,8 @@ namespace detvar
       }
       else{ // by APAs or chips
 
-        // Pick a random cryostat
-        geo::CryostatID c0, c1;
-        geom->GetBeginID(c0);
-        geom->GetEndID(c1);
-        const geo::CryostatID c(gRandom->Integer(c1.Cryostat-c0.Cryostat)+c0.Cryostat);
-
-        // Pick a random TPC
-        const geo::TPCID t0 = geom->GetBeginTPCID(c);
-        const geo::TPCID t1 = geom->GetEndTPCID(c);
-        const geo::TPCID t(c, gRandom->Integer(t1.TPC-t0.TPC)+t0.TPC);
+        const geo::CryostatID c = RandomCryostat(geom.get());
+        const geo::TPCID t = RandomTPC(geom.get(), c);
 
         if(mode == kRandomAPAs){
           // Mark all the channels in this TPC bad
