@@ -86,6 +86,7 @@ DPhaseRealisticNoiseService::DPhaseRealisticNoiseService(fhicl::ParameterSet con
     generateNoise(fNoiseModelFrequenciesX,  fNoiseX[isam], fNoiseHistX, fRandomizeX);
     generateNoise(fNoiseModelFrequenciesY,  fNoiseY[isam], fNoiseHistY, fRandomizeY);
   }
+  
   if ( fLogLevel > 1 ) print() << endl;
 } //m_pran(nullptr)
 
@@ -330,9 +331,11 @@ void DPhaseRealisticNoiseService::mirrorWaveform(AdcSignalVector& noise,
   if(TimeSamples > 2*ArraySize){
 
     int n = ceil(TimeSamples/ArraySize);
-    int n_pass = ceil(log(n)/log(2));
+    int n_pass = ceil(log(n)/log(2))+1;
 
     for(int pass=1; pass<n_pass; pass++){
+
+      if(noise.size() > (size_t)TimeSamples){ break; } //no need for an extra pass
 
       shift = GetShift(noise, n_window);
 
@@ -369,7 +372,7 @@ void DPhaseRealisticNoiseService::mirrorWaveform(AdcSignalVector& noise,
 void DPhaseRealisticNoiseService::generateNoise(std::vector<double> frequencyVector,
                 AdcSignalVector& noise, TH1* aNoiseHist, double customRandom){
 
-  const string myname = "ExponentialChannelNoiseService::generateNoise: ";
+  const string myname = "DPRealisticNoiseService::generateNoise: ";
   if ( fLogLevel > 1 ) {
     cout << myname << "Generating noise." << endl;
   }
@@ -386,7 +389,7 @@ void DPhaseRealisticNoiseService::generateNoise(std::vector<double> frequencyVec
 
   art::ServiceHandle<util::LArFFT> pfft;
   pfft->ReinitializeFFT( pointFFT ," ", pfft->FFTFitBins() );
-
+  
   unsigned int model_tick = pfft->FFTSize(); //ticks of the time model
   unsigned nbin = model_tick/2 + 1;
   SetModelSize( model_tick );
