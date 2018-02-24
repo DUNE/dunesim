@@ -222,7 +222,7 @@ namespace detvar
       // which side of the APA it is, since it's a ProtoDUNE table. We ignore
       // that complication and I think in practice render one side dead
       // arbitrarily.
-      geo::View_t view;
+      geo::View_t view = geo::kUnknown;
       // TODO the table calls this a "spot". We're using it as an index
       // into the sorted list of channel IDs for this view. That could be
       // wrong, but the Geometry doesn't seem to have any coresponding
