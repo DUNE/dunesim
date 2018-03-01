@@ -61,36 +61,50 @@ namespace detvar
     assert(wire >= 1 && wire <= 48);
   }
 
-  //......................................................................
-  geo::CryostatID RandomCryostat(const geo::GeometryCore* geom)
+  /// For whatever reason the iterators in Geometry can't be used to initialize
+  /// a vector directly
+  template<class T, class It_t> std::vector<T> VectorViaSet(It_t begin,
+                                                            It_t end)
   {
-    // For whatever reason the iterators here can't be used to initialize a
-    // vector.
-    const std::set<geo::CryostatID> css(geom->begin_cryostat_id(),
-                                        geom->end_cryostat_id());
-    const std::vector<geo::CryostatID> csv(css.begin(), css.end());
-    return csv[gRandom->Integer(csv.size())];
+    const std::set<T> s(begin, end);
+    return std::vector<T>(s.begin(), s.end());
   }
 
-  //......................................................................
-  geo::TPCID RandomTPC(const geo::GeometryCore* geom, geo::CryostatID c)
+  class RandomTPC
   {
-    // For whatever reason the iterators here can't be used to initialize a
-    // vector.
-    const std::set<geo::TPCID> tss(geom->begin_TPC_id(c), geom->end_TPC_id(c));
-    const std::vector<geo::TPCID> tsv(tss.begin(), tss.end());
-    return tsv[gRandom->Integer(tsv.size())];
-  }
+  public:
+    RandomTPC(const geo::GeometryCore* geom)
+      : fCryos(VectorViaSet<geo::CryostatID>(geom->begin_cryostat_id(),
+                                             geom->end_cryostat_id()))
+    {
+      for(geo::CryostatID c: fCryos){
+        fTPCs[c] = VectorViaSet<geo::TPCID>(geom->begin_TPC_id(c),
+                                            geom->end_TPC_id(c));
 
-  //......................................................................
-  readout::TPCsetID RandomTPCset(const geo::GeometryCore* geom, geo::CryostatID c)
-  {
-    // For whatever reason the iterators here can't be used to initialize a
-    // vector.
-    const std::set<readout::TPCsetID> tss(geom->begin_TPCset_id(c), geom->end_TPCset_id(c));
-    const std::vector<readout::TPCsetID> tsv(tss.begin(), tss.end());
-    return tsv[gRandom->Integer(tsv.size())];
-  }
+        fTPCsets[c] = VectorViaSet<readout::TPCsetID>(geom->begin_TPCset_id(c),
+                                                      geom->end_TPCset_id(c));
+      }
+    }
+
+    geo::TPCID GetTPC() const
+    {
+      const geo::CryostatID c = fCryos[gRandom->Integer(fCryos.size())];
+      const std::vector<geo::TPCID>& ts = fTPCs.find(c)->second;
+      return ts[gRandom->Integer(ts.size())];
+    }
+
+    readout::TPCsetID GetTPCset() const
+    {
+      const geo::CryostatID c = fCryos[gRandom->Integer(fCryos.size())];
+      const std::vector<readout::TPCsetID>& ts = fTPCsets.find(c)->second;
+      return ts[gRandom->Integer(ts.size())];
+    }
+
+  protected:
+    std::vector<geo::CryostatID> fCryos;
+    std::map<geo::CryostatID, std::vector<geo::TPCID>> fTPCs;
+    std::map<geo::CryostatID, std::vector<readout::TPCsetID>> fTPCsets;
+  };
 
   //......................................................................
   // Three vectors, one for each view. Will be sorted by ID number
@@ -221,10 +235,11 @@ namespace detvar
       }
     }
 
+    RandomTPC tpcs(geom.get());
+
     while(fBadChans.size() < target){
-      const geo::CryostatID c = RandomCryostat(geom.get());
       // Mark all the channels in this TPCset (both sides of an APA) bad
-      const readout::TPCsetID t = RandomTPCset(geom.get(), c);
+      const readout::TPCsetID t = tpcs.GetTPCset();
       for(raw::ChannelID_t chan: tpcset_to_chans[t]){
         fBadChans.insert(chan);
       }
@@ -255,9 +270,10 @@ namespace detvar
       }
     }
 
+    RandomTPC tpcs(geom.get());
+
     while(fBadChans.size() < target){
-      const geo::CryostatID c = RandomCryostat(geom.get());
-      const geo::TPCID t = RandomTPC(geom.get(), c);
+      const geo::TPCID t = tpcs.GetTPC();
 
       // Mark all the channels in this TPC (ie APA side) bad
       for(raw::ChannelID_t chan: tpc_to_chans[t]){
@@ -276,12 +292,13 @@ namespace detvar
   {
     art::ServiceHandle<geo::Geometry> geom;
 
+    RandomTPC tpcs(geom.get());
+
     // Generate exactly the requested fraction of bad channels (rather than a
     // random sample with that probability). Should make results of studies
     // less noisy.
     while(fBadChans.size() < target){
-      const geo::CryostatID c = RandomCryostat(geom.get());
-      const geo::TPCID t = RandomTPC(geom.get(), c);
+      const geo::TPCID t = tpcs.GetTPC();
 
       // We need to index by channel number within the APA. TODO: I have no
       // idea if the sorting by the channel IDs is what we need. Maybe U
