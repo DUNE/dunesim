@@ -83,6 +83,16 @@ namespace detvar
   }
 
   //......................................................................
+  readout::TPCsetID RandomTPCset(const geo::GeometryCore* geom, geo::CryostatID c)
+  {
+    // For whatever reason the iterators here can't be used to initialize a
+    // vector.
+    const std::set<readout::TPCsetID> tss(geom->begin_TPCset_id(c), geom->end_TPCset_id(c));
+    const std::vector<readout::TPCsetID> tsv(tss.begin(), tss.end());
+    return tsv[gRandom->Integer(tsv.size())];
+  }
+
+  //......................................................................
   // Three vectors, one for each view. Will be sorted by ID number
   std::vector<std::vector<raw::ChannelID_t>>
   ChannelsForTPC(const geo::GeometryCore* geom, geo::TPCID tpc)
@@ -92,7 +102,12 @@ namespace detvar
     std::set<raw::ChannelID_t> chanset[3];
     for(geo::WireID wire: geom->IterateWireIDs(tpc)){
       const raw::ChannelID_t chan = geom->PlaneWireToChannel(wire);
-      chanset[geom->View(chan)].insert(chan);
+      // But this also gives us wires that are actually attached to the other
+      // face and just wrapped onto this face. So long as the order of the
+      // vector returned from this function is meaningful, this should work
+      // to keep just the ones we need.
+      if(geom->ChannelToWire(chan)[0] == wire)
+        chanset[geom->View(chan)].insert(chan);
     }
     // Then we need to index by channel number within the APA. TODO: I
     // have no idea if the sorting of the channel IDs that the set did is
@@ -112,12 +127,13 @@ namespace detvar
     const double badfrac = pset.get<double>("BadChanFrac");
 
     enum{
-      kUnknown, kRandomChans, kRandomAPAs, kRandomBoards, kRandomChips
+      kUnknown, kRandomChans, kRandomAPAs, kRandomAPAsides, kRandomBoards, kRandomChips
     } mode = kUnknown;
 
     const std::string modestr = pset.get<std::string>("Mode");
     if(modestr == "channels") mode = kRandomChans;
     if(modestr == "APAs")     mode = kRandomAPAs;
+    if(modestr == "APAsides") mode = kRandomAPAsides;
     if(modestr == "boards")   mode = kRandomBoards;
     if(modestr == "chips")    mode = kRandomChips;
     if(mode == kUnknown){
@@ -141,6 +157,33 @@ namespace detvar
     for(geo::WireID wire: geom->IterateWireIDs())
       allchans.insert(geom->PlaneWireToChannel(wire));
 
+    std::map<geo::TPCID, std::vector<raw::ChannelID_t>> tpc_to_chans;
+    for(const geo::TPCID& t: geom->IterateTPCIDs()){
+      // Geometry doesn't provide a way to directly iterate the channels in the
+      // TPC. Instead iterate the wires and convert to channels
+      for(const geo::WireID& wire: geom->IterateWireIDs(t)){
+        const raw::ChannelID_t chan = geom->PlaneWireToChannel(wire);
+        // But this also gives us wires that are actually attached to the other
+        // face and just wrapped onto this face. So long as the order of the
+        // vector returned from this function is meaningful, this should work
+        // to keep just the ones we need.
+        if(geom->ChannelToWire(chan)[0] == wire)
+          tpc_to_chans[t].push_back(chan);
+      }
+    }
+
+    std::map<readout::TPCsetID, std::set<raw::ChannelID_t>> tpcset_to_chans;
+    for(const readout::TPCsetID& ts: geom->IterateTPCsetIDs()){
+      // For some reason, calling IterateWireIDs directly on a TPCset seems to
+      // give all the wires in the detector. Use another layer of indirection.
+      for(geo::TPCID t: geom->TPCsetToTPCs(ts)){
+        for(const geo::WireID& wire: geom->IterateWireIDs(t)){
+          const raw::ChannelID_t chan = geom->PlaneWireToChannel(wire);
+          tpcset_to_chans[ts].insert(chan);
+        }
+      }
+    }
+
     // But a vector is much easier to pick from randomly. This will be used for
     // the random chans mode.
     const std::vector<raw::ChannelID_t> vchans(allchans.begin(),
@@ -161,23 +204,32 @@ namespace detvar
       else{ // by APAs, boards, or chips
 
         const geo::CryostatID c = RandomCryostat(geom.get());
-        const geo::TPCID t = RandomTPC(geom.get(), c);
 
         if(mode == kRandomAPAs){
-          // Mark all the channels in this TPC bad
-          for(geo::WireID wire: geom->IterateWireIDs(t)){
-            fBadChans.insert(geom->PlaneWireToChannel(wire));
+          // Mark all the channels in this TPCset (both sides of an APA) bad
+          const readout::TPCsetID t = RandomTPCset(geom.get(), c);
+          for(raw::ChannelID_t chan: tpcset_to_chans[t]){
+            fBadChans.insert(chan);
+          }
+        }
+        else if(mode == kRandomAPAsides){
+          const geo::TPCID t = RandomTPC(geom.get(), c);
+
+          // Mark all the channels in this TPC (since APA side) bad
+          for(raw::ChannelID_t chan: tpc_to_chans[t]){
+            fBadChans.insert(chan);
           }
         }
         else{ // boards or chips
+          const geo::TPCID t = RandomTPC(geom.get(), c);
+
           // We need to index by channel number within the APA. TODO: I have no
           // idea if the sorting by the channel IDs is what we need. Maybe U
           // and V get sorted in opposite order to each other etc?
           const std::vector<std::vector<raw::ChannelID_t>> chans = ChannelsForTPC(geom.get(), t);
 
-          // Empirically we need to repeat the organization from the table 10
-          // times to readout the whole APA (480 W wires and 400+400 U+V
-          // wires).
+          // An APA has 20 boards total, 10 on each side. ie a side has 480 W
+          // wires and 400+400 U+V wires.
           const int board = gRandom->Integer(10);
 
           if(mode == kRandomBoards) MarkBoardBad(board, chans);
@@ -205,9 +257,14 @@ namespace detvar
   MarkBoardBad(int board,
                const std::vector<std::vector<raw::ChannelID_t>>& chans)
   {
-    for(int i = 0; i < 48; ++i) fBadChans.insert(chans[geo::kW][board*48+i]);
+    // Check we succesfully got a single side of an APA
+    assert(chans[geo::kU].size() == 400);
+    assert(chans[geo::kV].size() == 400);
+    assert(chans[geo::kW].size() == 480);
+
     for(int i = 0; i < 40; ++i) fBadChans.insert(chans[geo::kU][board*40+i]);
     for(int i = 0; i < 40; ++i) fBadChans.insert(chans[geo::kV][board*40+i]);
+    for(int i = 0; i < 48; ++i) fBadChans.insert(chans[geo::kW][board*48+i]);
   }
 
   //......................................................................
@@ -216,12 +273,13 @@ namespace detvar
               const geo::GeometryCore* geom,
               const std::vector<std::vector<raw::ChannelID_t>>& chans)
   {
+    // Check we succesfully got a single side of an APA
+    assert(chans[geo::kU].size() == 400);
+    assert(chans[geo::kV].size() == 400);
+    assert(chans[geo::kW].size() == 480);
+
     // Knock out all the channels in this chip
     for(int chan = 0; chan <= 15; ++chan){
-      // TODO the table we're using just says "view W" with no statement about
-      // which side of the APA it is, since it's a ProtoDUNE table. We ignore
-      // that complication and I think in practice render one side dead
-      // arbitrarily.
       geo::View_t view;
       // TODO the table calls this a "spot". We're using it as an index
       // into the sorted list of channel IDs for this view. That could be
