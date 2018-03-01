@@ -106,6 +106,42 @@ namespace detvar
     std::map<geo::CryostatID, std::vector<readout::TPCsetID>> fTPCsets;
   };
 
+  class SortChansByZ
+  {
+  public:
+    bool operator()(const raw::ChannelID_t& a,
+                    const raw::ChannelID_t& b) const
+    {
+      return GetZ(a) < GetZ(b);
+    }
+  protected:
+    double GetZ(const raw::ChannelID_t& c) const
+    {
+      double z = 0;
+      double y = -1e9;
+
+      // Search through all the wires associated with this channel for the
+      // top-most position (where it attaches to the APA frame) and quote that
+      // Z position.
+      const std::vector<geo::WireID> wires = geom->ChannelToWire(c);
+      for(const geo::WireID& wire: wires){
+        const geo::WireGeo& wg = geom->Wire(wire);
+        if(wg.GetStart().Y() > y){
+          y = wg.GetStart().Y();
+          z = wg.GetStart().Z();
+        }
+        if(wg.GetEnd().Y() > y){
+          y = wg.GetEnd().Y();
+          z = wg.GetEnd().Z();
+        }
+      }
+
+      return z;
+    }
+
+    art::ServiceHandle<geo::Geometry> geom;
+  };
+
   //......................................................................
   // Three vectors, one for each view. Will be sorted by ID number
   std::vector<std::vector<raw::ChannelID_t>>
@@ -130,6 +166,8 @@ namespace detvar
     std::vector<std::vector<raw::ChannelID_t>> chans;
     for(int i = 0; i < 3; ++i){
       chans.emplace_back(chanset[i].begin(), chanset[i].end());
+      SortChansByZ scz;
+      std::sort(chans.back().begin(), chans.back().end(), scz);
     }
     return chans;
   }
@@ -225,8 +263,8 @@ namespace detvar
 
     std::map<readout::TPCsetID, std::set<raw::ChannelID_t>> tpcset_to_chans;
     for(const readout::TPCsetID& ts: geom->IterateTPCsetIDs()){
-      // For some reason, calling IterateWireIDs directly on a TPCset seems to
-      // give all the wires in the detector. Use another layer of indirection.
+      // There is no version of IterateWireIDs over a TPCset. Use another layer
+      // of indirection.
       for(geo::TPCID t: geom->TPCsetToTPCs(ts)){
         for(const geo::WireID& wire: geom->IterateWireIDs(t)){
           const raw::ChannelID_t chan = geom->PlaneWireToChannel(wire);
@@ -300,9 +338,6 @@ namespace detvar
     while(fBadChans.size() < target){
       const geo::TPCID t = tpcs.GetTPC();
 
-      // We need to index by channel number within the APA. TODO: I have no
-      // idea if the sorting by the channel IDs is what we need. Maybe U
-      // and V get sorted in opposite order to each other etc?
       const std::vector<std::vector<raw::ChannelID_t>> chans = ChannelsForTPC(geom.get(), t);
 
       // An APA has 20 boards total, 10 on each side. ie a side has 480 W wires
@@ -351,9 +386,9 @@ namespace detvar
     // Knock out all the channels in this chip
     for(int chan = 0; chan <= 15; ++chan){
       geo::View_t view;
-      // TODO the table calls this a "spot". We're using it as an index
-      // into the sorted list of channel IDs for this view. That could be
-      // wrong, but the Geometry doesn't seem to have any coresponding
+      // TODO the table calls this a "spot". We're using it as an index into
+      // the sorted list of channel IDs for this view (by Z coordinate). That
+      // could be wrong, but the Geometry doesn't seem to have any coresponding
       // concept.
       int spot;
       ChipAndChannelToSpot(chip, chan, view, spot);
