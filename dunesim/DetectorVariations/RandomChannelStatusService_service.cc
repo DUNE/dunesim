@@ -126,9 +126,7 @@ namespace detvar
   {
     const double badfrac = pset.get<double>("BadChanFrac");
 
-    enum{
-      kUnknown, kRandomChans, kRandomAPAs, kRandomAPAsides, kRandomBoards, kRandomChips
-    } mode = kUnknown;
+    EMode_t mode = kUnknown;
 
     const std::string modestr = pset.get<std::string>("Mode");
     if(modestr == "channels") mode = kRandomChans;
@@ -151,11 +149,96 @@ namespace detvar
     //    art::ServiceHandle<art::RandomNumberGenerator> rng;
     //    CLHEP::RandFlat r(rng->getEngine());
 
+    const unsigned int target = badfrac*geom->Nchannels();
+
+    switch(mode){
+    case kRandomChans:    MarkChansBad(target);    break;
+
+    case kRandomAPAs:     MarkAPAsBad(target);     break;
+
+    case kRandomAPAsides: MarkAPASidesBad(target); break;
+
+    case kRandomBoards:
+    case kRandomChips:
+      MarkBoardsOrChipsBad(mode, target);
+      break;
+
+    default:
+      abort(); // impossible
+    }
+
+    // goodchans = allchans - badchans
+    std::set<raw::ChannelID_t> allchans;
+    for(geo::WireID wire: geom->IterateWireIDs())
+      allchans.insert(geom->PlaneWireToChannel(wire));
+
+    std::set_difference(allchans.begin(), allchans.end(),
+                        fBadChans.begin(), fBadChans.end(),
+                        std::inserter(fGoodChans, fGoodChans.begin()));
+  }
+
+  //......................................................................
+  void RandomChannelStatusProvider::MarkChansBad(unsigned int target)
+  {
+    art::ServiceHandle<geo::Geometry> geom;
+
     // Geometry doesn't have a way to iterate directly over channels. Iterate
     // over the wires and convert them. Use a set to remove duplicates
     std::set<raw::ChannelID_t> allchans;
     for(geo::WireID wire: geom->IterateWireIDs())
       allchans.insert(geom->PlaneWireToChannel(wire));
+
+    // But a vector is much easier to pick from randomly. This will be used for
+    // the random chans mode.
+    const std::vector<raw::ChannelID_t> vchans(allchans.begin(),
+                                               allchans.end());
+
+    // Generate exactly the requested fraction of bad channels (rather than a
+    // random sample with that probability). Should make results of studies
+    // less noisy.
+    while(fBadChans.size() < target){
+      // Insert a random element. There will be duplicates, but the set will
+      // filter them out. Shouldn't be too inefficient for the low bad
+      // channel fractions we'll use in practice.
+      fBadChans.insert(vchans[gRandom->Integer(vchans.size())]);
+    } // end while
+  }
+
+  //......................................................................
+  void RandomChannelStatusProvider::MarkAPAsBad(unsigned int target)
+  {
+    art::ServiceHandle<geo::Geometry> geom;
+
+    std::map<readout::TPCsetID, std::set<raw::ChannelID_t>> tpcset_to_chans;
+    for(const readout::TPCsetID& ts: geom->IterateTPCsetIDs()){
+      // For some reason, calling IterateWireIDs directly on a TPCset seems to
+      // give all the wires in the detector. Use another layer of indirection.
+      for(geo::TPCID t: geom->TPCsetToTPCs(ts)){
+        for(const geo::WireID& wire: geom->IterateWireIDs(t)){
+          const raw::ChannelID_t chan = geom->PlaneWireToChannel(wire);
+          tpcset_to_chans[ts].insert(chan);
+        }
+      }
+    }
+
+    while(fBadChans.size() < target){
+      const geo::CryostatID c = RandomCryostat(geom.get());
+      // Mark all the channels in this TPCset (both sides of an APA) bad
+      const readout::TPCsetID t = RandomTPCset(geom.get(), c);
+      for(raw::ChannelID_t chan: tpcset_to_chans[t]){
+        fBadChans.insert(chan);
+      }
+
+      std::cout << "RandomChannelStatusService: Generated "
+                << fBadChans.size() << " bad channels of "
+                << target << " required" << std::endl;
+    }
+  }
+
+  //......................................................................
+  void RandomChannelStatusProvider::MarkAPASidesBad(unsigned int target)
+  {
+    art::ServiceHandle<geo::Geometry> geom;
 
     std::map<geo::TPCID, std::vector<raw::ChannelID_t>> tpc_to_chans;
     for(const geo::TPCID& t: geom->IterateTPCIDs()){
@@ -172,84 +255,54 @@ namespace detvar
       }
     }
 
-    std::map<readout::TPCsetID, std::set<raw::ChannelID_t>> tpcset_to_chans;
-    for(const readout::TPCsetID& ts: geom->IterateTPCsetIDs()){
-      // For some reason, calling IterateWireIDs directly on a TPCset seems to
-      // give all the wires in the detector. Use another layer of indirection.
-      for(geo::TPCID t: geom->TPCsetToTPCs(ts)){
-        for(const geo::WireID& wire: geom->IterateWireIDs(t)){
-          const raw::ChannelID_t chan = geom->PlaneWireToChannel(wire);
-          tpcset_to_chans[ts].insert(chan);
-        }
-      }
-    }
+    while(fBadChans.size() < target){
+      const geo::CryostatID c = RandomCryostat(geom.get());
+      const geo::TPCID t = RandomTPC(geom.get(), c);
 
-    // But a vector is much easier to pick from randomly. This will be used for
-    // the random chans mode.
-    const std::vector<raw::ChannelID_t> vchans(allchans.begin(),
-                                               allchans.end());
-    const int N = vchans.size();
+      // Mark all the channels in this TPC (ie APA side) bad
+      for(raw::ChannelID_t chan: tpc_to_chans[t]){
+        fBadChans.insert(chan);
+      }
+
+      std::cout << "RandomChannelStatusService: Generated "
+                << fBadChans.size() << " bad channels of "
+                << target << " required" << std::endl;
+    }
+  }
+
+  //......................................................................
+  void RandomChannelStatusProvider::
+  MarkBoardsOrChipsBad(EMode_t mode, unsigned int target)
+  {
+    art::ServiceHandle<geo::Geometry> geom;
 
     // Generate exactly the requested fraction of bad channels (rather than a
     // random sample with that probability). Should make results of studies
     // less noisy.
-    while(fBadChans.size() < badfrac*N){
+    while(fBadChans.size() < target){
+      const geo::CryostatID c = RandomCryostat(geom.get());
+      const geo::TPCID t = RandomTPC(geom.get(), c);
 
-      if(mode == kRandomChans){
-        // Insert a random element. There will be duplicates, but the set will
-        // filter them out. Shouldn't be too inefficient for the low bad
-        // channel fractions we'll use in practice.
-        fBadChans.insert(vchans[gRandom->Integer(N)]);
+      // We need to index by channel number within the APA. TODO: I have no
+      // idea if the sorting by the channel IDs is what we need. Maybe U
+      // and V get sorted in opposite order to each other etc?
+      const std::vector<std::vector<raw::ChannelID_t>> chans = ChannelsForTPC(geom.get(), t);
+
+      // An APA has 20 boards total, 10 on each side. ie a side has 480 W wires
+      // and 400+400 U+V wires.
+      const int board = gRandom->Integer(10);
+
+      if(mode == kRandomBoards) MarkBoardBad(board, chans);
+
+      if(mode == kRandomChips){
+        const int chip = 1+gRandom->Integer(8); // One of 8 chips
+        MarkChipBad(board, chip, geom.get(), chans);
       }
-      else{ // by APAs, boards, or chips
 
-        const geo::CryostatID c = RandomCryostat(geom.get());
-
-        if(mode == kRandomAPAs){
-          // Mark all the channels in this TPCset (both sides of an APA) bad
-          const readout::TPCsetID t = RandomTPCset(geom.get(), c);
-          for(raw::ChannelID_t chan: tpcset_to_chans[t]){
-            fBadChans.insert(chan);
-          }
-        }
-        else if(mode == kRandomAPAsides){
-          const geo::TPCID t = RandomTPC(geom.get(), c);
-
-          // Mark all the channels in this TPC (since APA side) bad
-          for(raw::ChannelID_t chan: tpc_to_chans[t]){
-            fBadChans.insert(chan);
-          }
-        }
-        else{ // boards or chips
-          const geo::TPCID t = RandomTPC(geom.get(), c);
-
-          // We need to index by channel number within the APA. TODO: I have no
-          // idea if the sorting by the channel IDs is what we need. Maybe U
-          // and V get sorted in opposite order to each other etc?
-          const std::vector<std::vector<raw::ChannelID_t>> chans = ChannelsForTPC(geom.get(), t);
-
-          // An APA has 20 boards total, 10 on each side. ie a side has 480 W
-          // wires and 400+400 U+V wires.
-          const int board = gRandom->Integer(10);
-
-          if(mode == kRandomBoards) MarkBoardBad(board, chans);
-
-          if(mode == kRandomChips){
-            const int chip = 1+gRandom->Integer(8); // One of 8 chips
-            MarkChipBad(board, chip, geom.get(), chans);
-          }
-        }
-
-        // This procedure with all the enumerations and sets and so on is
-        // slow. Give the user some feedback, and an incentive to fix it.
-        std::cout << "RandomChannelStatusService: Generated " << fBadChans.size() << " bad channels of " << badfrac*N << " required" << std::endl;
-      }
-    } // end while
-
-    // goodchans = allchans - badchans
-    std::set_difference(allchans.begin(), allchans.end(),
-                        fBadChans.begin(), fBadChans.end(),
-                        std::inserter(fGoodChans, fGoodChans.begin()));
+      std::cout << "RandomChannelStatusService: Generated "
+                << fBadChans.size() << " bad channels of "
+                << target << " required" << std::endl;
+    }
   }
 
   //......................................................................
