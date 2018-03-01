@@ -159,10 +159,8 @@ namespace detvar
       if(geom->ChannelToWire(chan)[0] == wire)
         chanset[geom->View(chan)].insert(chan);
     }
-    // Then we need to index by channel number within the APA. TODO: I
-    // have no idea if the sorting of the channel IDs that the set did is
-    // what we need. Maybe U and V get sorted in opposite order to each
-    // other etc?
+    // We'll want to index by channel number within the APAs. Sort spatially as
+    // our best guess as to that mapping.
     std::vector<std::vector<raw::ChannelID_t>> chans;
     for(int i = 0; i < 3; ++i){
       chans.emplace_back(chanset[i].begin(), chanset[i].end());
@@ -385,10 +383,11 @@ namespace detvar
 
     // Knock out all the channels in this chip
     for(int chan = 0; chan <= 15; ++chan){
-      geo::View_t view;
+      geo::View_t view = geo::kUnknown;
       // TODO the table calls this a "spot". We're using it as an index into
       // the sorted list of channel IDs for this view (by Z coordinate). That
       // could be wrong, but the Geometry doesn't seem to have any coresponding
+
       // concept.
       int spot;
       ChipAndChannelToSpot(chip, chan, view, spot);
