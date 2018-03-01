@@ -33,8 +33,26 @@ namespace detvar
     std::set<raw::ChannelID_t> NoisyChannels() const override {return {};}
 
   protected:
+    enum EMode_t{
+      kUnknown,
+      kRandomAPAs,     ///< "APAs"
+      kRandomAPAsides, ///< "APAsides"
+      kRandomBoards,   ///< "boards"
+      kRandomChips,    ///< "chips"
+      kRandomChans     ///< "channels"
+    };
+
+
     friend class RandomChannelStatusService;
     RandomChannelStatusProvider(const fhicl::ParameterSet& pset);
+
+    void MarkChansBad(unsigned int target);
+
+    void MarkAPAsBad(unsigned int target);
+
+    void MarkAPASidesBad(unsigned int target);
+
+    void MarkBoardsOrChipsBad(EMode_t mode, unsigned int target);
 
     void MarkBoardBad(int board,
                       const std::vector<std::vector<raw::ChannelID_t>>& chans);
