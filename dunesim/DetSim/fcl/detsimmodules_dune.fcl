@@ -280,10 +280,10 @@ dunefd_simwire:
  InductionPed:        2048        #ADC baseline for ind plane
  InductionPedRMS:     0        #ADC baseline RMS for ind plane
 
- CollectionCalibPed:  400         #Assumed measured value for coll plane pedestal
- CollectionCalibPed:  0         #Assumed measured value for coll plane pedestal RMS
- InductionCalibPed:   2048        #Assumed measured value for ind plane pedestal
- InductionCalibPed:   0        #Assumed measured value for ind plane pedestal RMS
+ CollectionCalibPed:     400      #Assumed measured value for coll plane pedestal
+ CollectionCalibPedRMS:  0        #Assumed measured value for coll plane pedestal RMS
+ InductionCalibPed:      2048     #Assumed measured value for ind plane pedestal
+ InductionCalibPedRMS:   0        #Assumed measured value for ind plane pedestal RMS
 
  PedestalOn:          true     #add pedestal value to ADC vector
 

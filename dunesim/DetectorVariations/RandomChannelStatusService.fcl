@@ -3,7 +3,7 @@ BEGIN_PROLOG
 randomchannelservice_1pc:
 {
     service_provider: RandomChannelStatusService
-    Mode: "channels" # "channels", "APAs", "boards", or "chips"
+    Mode: "channels" # "channels", "APAs", "APAsides", "boards", or "chips"
     BadChanFrac: 0.01
 }
 
@@ -21,10 +21,48 @@ randomchannelservice_5pc:
     BadChanFrac: 0.05
 }
 
-randomchannelservice_10pc:{
+randomchannelservice_10pc:
+{
     service_provider: RandomChannelStatusService
     Mode: "channels"
     BadChanFrac: 0.10
+}
+
+randomchannelservice_25pc:
+{
+    service_provider: RandomChannelStatusService
+    Mode: "channels"
+    BadChanFrac: 0.25
+}
+
+
+
+randomchannelservice_5pc_bychip:
+{
+    service_provider: RandomChannelStatusService
+    Mode: "chips"
+    BadChanFrac: 0.05
+}
+
+randomchannelservice_25pc_bychip:
+{
+    service_provider: RandomChannelStatusService
+    Mode: "chips"
+    BadChanFrac: 0.25
+}
+
+randomchannelservice_5pc_byboard:
+{
+    service_provider: RandomChannelStatusService
+    Mode: "boards"
+    BadChanFrac: 0.05
+}
+
+randomchannelservice_25pc_byboard:
+{
+    service_provider: RandomChannelStatusService
+    Mode: "boards"
+    BadChanFrac: 0.25
 }
 
 END_PROLOG
