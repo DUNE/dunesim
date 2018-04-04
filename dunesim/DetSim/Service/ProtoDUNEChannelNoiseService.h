@@ -74,7 +74,7 @@ private:
   AdcSignalVectorVector fNoiseV;  ///< noise on each channel for each time for V plane
 
   // Histograms.
-  TH1* fNoiseHist;      ///< distribution of noise counts
+  //TH1* fNoiseHist;      ///< distribution of noise counts // unused
   TH1* fNoiseHistZ;     ///< distribution of noise counts for Z
   TH1* fNoiseHistU;     ///< distribution of noise counts for U
   TH1* fNoiseHistV;     ///< distribution of noise counts for V
