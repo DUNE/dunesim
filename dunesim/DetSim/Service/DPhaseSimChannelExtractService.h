@@ -45,7 +45,7 @@ private:
   unsigned int m_ntick;
 
   float fDPGainPerView; // gain in dual-phase
-  float fRedENC;       // ENC noise, set to 0 to disable
+  //float fRedENC;       // ENC noise, set to 0 to disable // unused
 };
 
 DECLARE_ART_SERVICE_INTERFACE_IMPL(DPhaseSimChannelExtractService, SimChannelExtractService, LEGACY)
