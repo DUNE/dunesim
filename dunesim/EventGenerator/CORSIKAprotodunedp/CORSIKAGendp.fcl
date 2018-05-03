@@ -21,11 +21,11 @@ standard_CORSIKAGendp_CMC:
  TimeOffset:          -4.0e-3             #time in seconds before a spill to begin the interactions, -1.6e-3 (TPC Trig. offset) - 0.2e-3 (g4 rise time)
  ProjectToHeight:      856                 #height to which particles are projected [cm]
  ShowerInputFiles:     [
-                          "/pnfs/larsoft/persistent/physics/cosmics/CORSIKA/CERN/standard/p_showers_*db",
-                          "/pnfs/larsoft/persistent/physics/cosmics/CORSIKA/CERN/standard/He_showers_*db",
-                          "/pnfs/larsoft/persistent/physics/cosmics/CORSIKA/CERN/standard/N_showers_*db",
-                          "/pnfs/larsoft/persistent/physics/cosmics/CORSIKA/CERN/standard/Mg_showers_*db",
-                          "/pnfs/larsoft/persistent/physics/cosmics/CORSIKA/CERN/standard/Fe_showers_*db"
+                          "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/p_showers_*db",
+                          "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/He_showers_*db",
+                          "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/N_showers_*db",
+                          "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/Mg_showers_*db",
+                          "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/Fe_showers_*db"
                         ] #list of sqlite dbs with corsika showers
  ShowerFluxConstants:  [ 1.72e4, 9.2e3, 6.2e3, 9.2e3, 6.2e3] #list of flux constants per shower file
  BufferBox:            [ -300.0, 300.0, -300.0, 300.0, -300.0, 300.0 ] #list of buffer box extensions to cryo volume in each dimension/dir (-x,+x,-y,+y,-z,+z)
@@ -33,6 +33,28 @@ standard_CORSIKAGendp_CMC:
  RandomXZShift:        1000                 #amount to randomly shift shower start point in x & z [cm]
  DoRotation: 	         true
 
+}
+
+standard_311_trigger:
+{
+  module_type:        "Gen311"
+
+  SampleTime:           8.0e-3               #integration time in seconds
+  TimeOffset:          -4.0e-3             #time in seconds before a spill to begin the interactions, -1.6e-3 (TPC Trig. offset) - 0.2e-3 (g4 rise time)
+  ProjectToHeight:      856                 #height to which particles are projected [cm]
+  ShowerInputFiles:     [
+                           "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/p_showers_*db",
+                           "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/He_showers_*db",
+                           "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/N_showers_*db",
+                           "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/Mg_showers_*db",
+                           "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/Fe_showers_*db"
+                         ] #list of sqlite dbs with corsika showers
+  ShowerFluxConstants:  [ 1.72e4, 9.2e3, 6.2e3, 9.2e3, 6.2e3] #list of flux constants per shower file
+  BufferBox:            [ -300.0, 300.0, -300.0, 300.0, -300.0, 300.0 ] #list of buffer box extensions to cryo volume in each dimension/dir (-x,+x,-y,+y,-z,+z)
+  ShowerAreaExtension:  2000                 #amount to extend the shower area beyond the cryo dimensions
+  RandomXZShift:        1000                 #amount to randomly shift shower start point in x & z [cm]
+  Iterations:           20                   #number of iterations allowed in the randomization of the trigger particle
+  CryoBuffer:           [-200, 200, -200, 200, -200, 200 ]                   #Buffer size around the cryostat in cm (that will be the starting point for my trigger particle) 
 }
 
 END_PROLOG
