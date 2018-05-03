@@ -1,0 +1,93 @@
+<!--                                                                                  -->
+<!--  $Author:  $                                                                     -->
+<!--  $Date: 2010/04/12 18:12:28 $                                                    -->
+<!--                                                                                  -->
+<!--  Include art::Wrapper lines for objects that we would like to put into the event -->
+<!--  Include the non-wrapper lines for all objects on the art::Wrapper lines and     -->
+<!--  for all objects that are data members of those objects.                         -->
+
+
+<lcgdict>
+ <class name="sim::OnePhoton"                ClassVersion="13">
+  <version ClassVersion="13" checksum="3677597673"/>
+  <version ClassVersion="12" checksum="124883757"/>
+  <version ClassVersion="11" checksum="1948463887"/>
+ </class>
+ <class name="sim::SimPhotonsLite"           ClassVersion="10">
+  <version ClassVersion="10" checksum="4093907155"/>
+ </class>
+ <class name="sim::SimPhotons"               ClassVersion="12">
+  <version ClassVersion="12" checksum="3876354274"/>
+ </class>
+ <class name="sim::SimChannel"               ClassVersion="15">
+  <version ClassVersion="15" checksum="2427478114"/>
+  <version ClassVersion="14" checksum="2917495953"/>
+ </class>
+ <class name="sim::AuxDetSimChannel"         ClassVersion="12">
+  <version ClassVersion="12" checksum="3670394285"/>
+  <version ClassVersion="11" checksum="4004990893"/>
+  <version ClassVersion="10" checksum="999879376"/>
+ </class>
+ <class name="sim::AuxDetIDE"                ClassVersion="10">
+  <version ClassVersion="10" checksum="3594257473"/>
+ </class>
+ <class name="sim::IDE"                      ClassVersion="11">
+  <version ClassVersion="11" checksum="1123102836"/>
+  <version ClassVersion="10" checksum="3981386861"/>
+ </class>
+ <class name="sim::BeamGateInfo"             ClassVersion="12">
+  <version ClassVersion="12" checksum="2778107387"/>
+  <version ClassVersion="11" checksum="1122283400"/>
+  <version ClassVersion="10" checksum="2225942541"/>
+ </class>
+ <class name="sim::OpDetBacktrackerRecord" ClassVersion="11">
+  <version ClassVersion="11" checksum="1336777815"/>
+  <version ClassVersion="10" checksum="2389124613"/>
+ </class>
+ <class name="sim::ProtoDUNEbeamsim" ClassVersion="10">
+  <version ClassVersion="10" checksum="4021958745"/>
+ </class>
+ <enum name="sim::BeamType_t"                                      />
+ <class name="std::pair< art::Ptr<sim::ProtoDUNEbeamsim>, art::Ptr<simb::MCTruth> >" />
+ <class name="std::pair< art::Ptr<simb::MCTruth>, art::Ptr<sim::ProtoDUNEbeamsim> >" />
+ <class name="art::Assns<sim::ProtoDUNEbeamsim, simb::MCTruth, void>" />
+ <class name="art::Assns<simb::MCTruth, sim::ProtoDUNEbeamsim, void>" />
+
+ <class name="std::vector<sim::OnePhoton>"                         />
+ <class name="std::vector<sim::SimPhotonsLite>"                    />
+ <class name="std::vector<sim::SimPhotons  >" 		     		    	   />
+ <class name="std::vector<sim::SimChannel  >"                		   />
+ <class name="std::vector<sim::AuxDetSimChannel>"                  />
+ <class name="std::vector<sim::AuxDetIDE>"                         />
+ <class name="std::vector<sim::IDE>"                               />
+ <class name="std::vector<sim::BeamGateInfo>" 	    		    	     />
+ <class name="std::vector<sim::OpDetBacktrackerRecord>"                      />
+ <class name="std::vector<std::vector<sim::ProtoDUNEbeamsim>>"                    />
+ <class name="sim::TDCIDE"                                         />
+ <class name="std::vector<sim::TDCIDE>"            	               />
+ <class name="sim::SDP" />
+ <class name="std::vector<sim::SDP>" />
+ <class name="std::pair< double, std::vector<sim::SDP> >"/>
+ <class name="std::vector< std::pair < double, std::vector<sim::SDP> > >" />
+ <class name="art::Wrapper< std::vector<sim::SimPhotons>   >"		   />
+ <class name="art::Wrapper< std::vector<sim::SimPhotonsLite>   >"  />
+ <class name="art::Wrapper< std::vector<sim::SimChannel>   >"		   />
+ <class name="art::Wrapper< std::vector<sim::BeamGateInfo> >"		   />
+ <class name="art::Wrapper< std::vector<sim::AuxDetSimChannel>  >" />
+ <class name="art::Wrapper< std::vector<sim::OpDetBacktrackerRecord> >"      />
+ <class name="art::Wrapper< std::vector<sim::ProtoDUNEbeamsim                   > >" />
+ <class name="art::Wrapper< std::vector<art::PtrVector<sim::ProtoDUNEbeamsim>> >"      />
+ <class name="art::Wrapper< art::Assns<sim::ProtoDUNEbeamsim, simb::MCTruth, void> >" />
+ <class name="art::Wrapper< art::Assns<simb::MCTruth, sim::ProtoDUNEbeamsim, void> >" />
+
+ <ioread 
+    version="[-13]" 
+    sourceClass="sim::SimChannel" 
+    source="unsigned short fChannel" 
+    targetClass="sim::SimChannel" 
+    target="fChannel" 
+    include="lardataobj/Simulation/SimChannel.h">
+    <![CDATA[fChannel = onfile.fChannel;]]>
+</ioread> 
+
+</lcgdict>
