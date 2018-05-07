@@ -138,7 +138,7 @@ namespace filt{
       else if (i >= 28 && i <=37) EWCounterSetPair.setB.push_back(counter);
       //The N (up) S (down) counter pairs
       else if (i >= 22 && i <= 27) NupSdownCounterSetPair.setA.push_back(counter);
-      else if (i >= 0 && i <= 5) NupSdownCounterSetPair.setB.push_back(counter);
+      else if (i <= 5) NupSdownCounterSetPair.setB.push_back(counter);
       //The N (down) S (up) counter pairs
       else if (i >= 16 && i <= 21) NdownSupCounterSetPair.setA.push_back(counter);
       else if (i >= 38 && i <= 43) NdownSupCounterSetPair.setB.push_back(counter);

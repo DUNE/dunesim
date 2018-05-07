@@ -43,7 +43,7 @@ public:
 private:
 
   // Properties.
-  AdcCount m_SupresssedValue;
+  //AdcCount m_SupresssedValue; // unused
   AdcSignal m_SuppressedSignalMax;
 
 };

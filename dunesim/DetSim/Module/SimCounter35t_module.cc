@@ -240,8 +240,11 @@ void detsim::SimCounter35t::produce(art::Event & e)
     for (it = tickv.begin(); it != tickv.end(); ++it) {
     chanTick ct = *it; 
     
+    // for c2: auxDetID is always >= 0
+    //if ( (ct.auxDetID >= 44 && ct.auxDetID <= 91 && ct.eDep > fBSUTriggerThreshold) || 
+	// (ct.auxDetID >= 0 && ct.auxDetID <=43 && ct.eDep > fTSUTriggerThreshold) ||
     if ( (ct.auxDetID >= 44 && ct.auxDetID <= 91 && ct.eDep > fBSUTriggerThreshold) || 
-	 (ct.auxDetID >= 0 && ct.auxDetID <=43 && ct.eDep > fTSUTriggerThreshold) ||
+	 (ct.auxDetID <=43 && ct.eDep > fTSUTriggerThreshold) ||
 	 (ct.auxDetID >= 92 && ct.eDep > 1.e-6) ) 
       {
 	icount++;
@@ -264,9 +267,13 @@ void detsim::SimCounter35t::produce(art::Event & e)
 	if (start != tickv.end())  {
 	for (it2 = start; it2 != tickv.end(); ++it2) {
 	  chanTick ct2 = *it2;
+          // for c2: auxDetID is always >= 0
+	  //if ( (ct2.auxDetID >= 44 && ct2.auxDetID <= 91 
+		//&& ct2.eDep > fBSUTriggerThreshold) 
+	   //    || (ct2.auxDetID >= 0 && ct2.auxDetID <=43 
 	  if ( (ct2.auxDetID >= 44 && ct2.auxDetID <= 91 
 		&& ct2.eDep > fBSUTriggerThreshold) 
-	       || (ct2.auxDetID >= 0 && ct2.auxDetID <=43 
+	       || (ct2.auxDetID <=43 
 		   && ct2.eDep > fTSUTriggerThreshold) ||
 	       (ct2.auxDetID >= 92 && ct2.eDep > 1.e-6) )  {
 	    float t1 = ct.tick; float t2=ct2.tick;
@@ -332,8 +339,11 @@ void detsim::SimCounter35t::produce(art::Event & e)
   std::ostringstream out;
   for (std::vector<chanTick>::iterator it = tickv.begin(); it != tickv.end(); ++it) {
     chanTick ct = *it;
+    // for c2: auxDetID is always >= 0
+    //if ( (ct.auxDetID >= 44 && ct.auxDetID <= 91 && ct.eDep > fBSUTriggerThreshold) ||
+     //    (ct.auxDetID >= 0 && ct.auxDetID <=43 && ct.eDep > fTSUTriggerThreshold) ||
     if ( (ct.auxDetID >= 44 && ct.auxDetID <= 91 && ct.eDep > fBSUTriggerThreshold) ||
-         (ct.auxDetID >= 0 && ct.auxDetID <=43 && ct.eDep > fTSUTriggerThreshold) ||
+         (ct.auxDetID <=43 && ct.eDep > fTSUTriggerThreshold) ||
 	 (ct.auxDetID >= 92 && ct.eDep > 1.e-6) )  
       out << "AuxDet " << ct.auxDetID << " had " << ct.numHits << " hits at readout tick " << ct.tick << ". Total eDep = " << ct.eDep << " MeV.\n";
   }
