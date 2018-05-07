@@ -27,7 +27,7 @@ namespace spacecharge{
       
       SpaceChargeServiceDUNE35t(fhicl::ParameterSet const& pset, art::ActivityRegistry& reg);
 
-      virtual void   reconfigure(fhicl::ParameterSet const& pset) ;
+      virtual void   reconfigure(fhicl::ParameterSet const& pset) override;
       void   preBeginRun(const art::Run& run);
 
 
