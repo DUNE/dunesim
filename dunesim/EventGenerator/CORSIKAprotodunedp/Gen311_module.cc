@@ -3,7 +3,6 @@
 // Event generator for the 311 (Can be also used for ProtoDUNE) with realistic
 // muon trigger
 //
-// TODO: remove fIteration
 // TODO: what if no muons are in the list ?
 // TODO: how use a different particle as trigger  ?
 //
@@ -95,8 +94,8 @@ namespace evgendp{
       double fShowerAreaExtension=0.; ///< Extend distribution of corsika particles in x,z by this much (e.g. 1000 will extend 10 m in -x, +x, -z, and +z) [cm]
       sqlite3* fdb[5]; ///< Pointers to sqlite3 database object, max of 5
       double fRandomYZShift=0.; ///< Each shower will be shifted by a random amount in xz so that showers won't repeatedly sample the same space [cm]
-      int fIterations; ///< Maximun number of iterations allowed to generate my trigger
       std::vector<double> fCryoBuffer; ///< Buffer region around the cryostat
+      std::vector<double> fActiveVolumeCut; ///< Active volume cut
 
       int fRun;
       int fEvent;
@@ -136,7 +135,7 @@ namespace evgendp{
 
         //getters
         int GetTriggerId(){
-          return fTriggerMu.TrackId();
+          return fTriggerID;
         };
 
         double GetTriggerOffsetX(){
@@ -217,6 +216,9 @@ namespace evgendp{
         void SetCryoBuffer( std::vector<double> buffer ){
           for(int i=0; i<6; i++){ fCryoBuffer.assign( buffer.begin(), buffer.end() ); }
         }
+        void SetTPCBuffer( std::vector<double> buffer ){
+          for(int i=0; i<6; i++){ fTPCBuffer.assign( buffer.begin(), buffer.end() ); }
+        }
 
       private:
 
@@ -225,6 +227,7 @@ namespace evgendp{
         std::vector<simb::MCParticle>  fMuonList;
         simb::MCParticle fTriggerMu;
         TLorentzVector fTriggerPos;
+        double fTriggerID = -999;
         double fTriggerPosX;
         double fTriggerPosY;
         double fTriggerPosZ;
@@ -233,6 +236,7 @@ namespace evgendp{
         double fTriggerOffsetY;
         double fTriggerOffsetZ;
         double fTriggerOffsetT;
+        std::vector<double> fTPCBuffer;
         std::vector<double> fCryoBuffer;
     };
 
@@ -248,8 +252,8 @@ namespace evgendp{
       fBuffBox(p.get< std::vector< double > >("BufferBox",{0.0, 0.0, 0.0, 0.0, 0.0, 0.0})),
       fShowerAreaExtension(p.get< double >("ShowerAreaExtension",0.)),
       fRandomYZShift(p.get< double >("RandomXZShift",0.)),
-      fIterations(p.get< int >("Iterations",20.)),
-      fCryoBuffer(p.get< std::vector< double > >("CryoBuffer",{0.0, 0.0, 0.0, 0.0, 0.0, 0.0}))
+      fCryoBuffer(p.get< std::vector< double > >("CryoBuffer",{0.0, 0.0, 0.0, 0.0, 0.0, 0.0})),
+      fActiveVolumeCut(p.get< std::vector< double > >("ActiveVolumeCut"))
    {
 
     if(fShowerInputFiles.size() != fShowerFluxConstants.size() || fShowerInputFiles.size()==0 || fShowerFluxConstants.size()==0)
@@ -499,38 +503,6 @@ namespace evgendp{
     }
   }
 
-  /*
-  void evgendp::Gen311::GetWorldSize( double world[]){
-
-    //art::ServiceHandle<geo::Geometry> geom;
-    double x1, x2;
-    double y1, y2;
-    double z1, z2;
-    geom->WorldBox(&x1, &x2, &y1, &y2, &z1, &z2);
-
-    //avoid rounding errors in GEANT
-    //Hardcoded x as drift direction
-    double fBoxDelta=1.e-5;
-    y1 += fBoxDelta;
-    y2 -= fBoxDelta;
-    x1 += fBoxDelta;
-    //x2 =  fProjectToHeight;
-    x2 -= fBoxDelta;
-    z1 += fBoxDelta;
-    z2 -= fBoxDelta;
-
-
-    world[0]=x1;
-    world[1]=x2;
-    world[2]=y1;
-    world[3]=y2;
-    world[4]=z1;
-    world[5]=z2;
-
-    return;
-  }
-  */
-
   double evgendp::Gen311::wrapvar( const double var, const double low, const double high){
     //wrap variable so that it's always between low and high
     return (var - (high - low) * floor(var/(high-low))) + low;
@@ -560,7 +532,8 @@ namespace evgendp{
 
     //define the trigger object
     Trigger trg;
-    trg.SetCryoBuffer(fCryoBuffer);
+    trg.SetCryoBuffer( fCryoBuffer );
+    trg.SetTPCBuffer( fActiveVolumeCut );
 
     //TDatabasePDG is for looking up particle masses
     static TDatabasePDG* pdgt = TDatabasePDG::Instance();
@@ -702,37 +675,46 @@ namespace evgendp{
 
         simb::MCParticle particle(particleIt.TrackId(),particleIt.PdgCode(),"primary",-200,particleIt.Mass(),1);
 
+
+        double x0[3];
+        double xyzo[3];
+        double dx[3];
+
         if( particleIt.TrackId() == trg.GetTriggerId() ){
-          mf::LogInfo("Gen311") << "Trigger ID: " << trg.GetTriggerId();
-          particle.AddTrajectoryPoint( trg.GetTriggerPos(), trg.GetTriggerMom() );
+
+          x0[0]=trg.GetTriggerPos().X();
+          x0[1]=trg.GetTriggerPos().Y();
+          x0[2]=trg.GetTriggerPos().Z();
+          dx[0]= trg.GetTriggerMom().X();
+          dx[1]= trg.GetTriggerMom().Y();
+          dx[2]= trg.GetTriggerMom().Z();
+
+          trg.ProjectToBoxEdge(x0, dx, x1, x2, y1, y2, z1, z2, xyzo);
+
         }else{
 
-          //make sure to distinguish the trigger and the other particles here
           y = wrapvarBoxNo(particleIt.Position().Y()+showerYOffset,fShowerBounds[0],fShowerBounds[1],boxnoY);
           z =wrapvarBoxNo(particleIt.Position().Z()+showerZOffset,fShowerBounds[4],fShowerBounds[5],boxnoZ);
-          //time offset, includes propagation time from top of atmosphere
-          //actual particle time is particle surface arrival time
-          //+ shower start time
-          //+ global offset (fcl parameter, in s)
-          //- propagation time through atmosphere
-          //+ boxNo{X,Z} time offset to make grid boxes have different shower times
+
           t=particleIt.Position().T()+showerTime+(1e9*fToffset)-fToffset_corsika + showerTimey*boxnoY + showerTimez*boxnoZ;
-          //wrap surface arrival so that it's in the desired time window
           t=wrapvar(t,(1e9*fToffset),1e9*(fToffset+fSampleTime));
 
-          double x0[3];
-          double xyzo[3];
-          x0[0]=fShowerBounds[3];
-          x0[1]=y;
-          x0[2]=z;
-          double dx[3]={ particleIt.Momentum().X(), particleIt.Momentum().Y(), particleIt.Momentum().Z() };
+          x0[0]= fShowerBounds[3];
+          x0[1]= y;
+          x0[2]= z;
+          dx[0]= particleIt.Momentum().X();
+          dx[1]= particleIt.Momentum().Y();
+          dx[0]= particleIt.Momentum().Z();
 
           trg.ProjectToBoxEdge(x0, dx, x1, x2, y1, y2, z1, z2, xyzo);
 
           TLorentzVector pos(xyzo[0],xyzo[1],xyzo[2],t);
           particle.AddTrajectoryPoint( pos, particleIt.Momentum() );
         }
-        
+
+        TLorentzVector pos(xyzo[0],xyzo[1],xyzo[2],trg.GetTriggerPos().T());
+        particle.AddTrajectoryPoint( pos, particleIt.Momentum() );
+
         mctruth.Add( particle );
       } //end loop over particles
     }
@@ -897,8 +879,9 @@ void evgendp::Trigger::ProjectToBoxEdge(	const double 	xyz[],
 
 void evgendp::Trigger::MakeTrigger(){
 
-    //get the coordinates of the tpc
+    //get the coordinates of the tpc and an active volume arount it
     double tpc[6] ={0.}; this->GetTPCSize(tpc);
+    for(int i=0; i<6; i++){ tpc[i] += fTPCBuffer[i]; }
 
     //get the coordinates of the cryo + a buffer around it
     double cryo[6] ={0.}; this->GetCryoSize(cryo);
@@ -919,6 +902,7 @@ void evgendp::Trigger::MakeTrigger(){
     }
 
     fTriggerMu = fMuonList.at( (int)flat()*fMuonList.size() );
+
 
     px = fTriggerMu.Momentum().X();
     py = fTriggerMu.Momentum().Y();
@@ -963,7 +947,7 @@ void evgendp::Trigger::MakeTrigger(){
             for( int p=0; p<3; p++ ){  dot+=(corner[p]-xyz[p])*dxyz[p]; }
             for( int p=0; p<3; p++ ){  proj[p] = corner[p]-(dot*dxyz[p]); }
 
-            proj[0] -= 150; //NB: not really elegant...makes things work though
+            proj[0] -= (tpc[5]-tpc[4])/2; //NB: not really elegant...makes things work though
 
             //build the rotation matrix;
             double R[3][3];
@@ -999,7 +983,7 @@ void evgendp::Trigger::MakeTrigger(){
         //parse the correct direction of our reference system
         rdm_start[0] = (double)dir[1];
         rdm_start[1] = (double)dir[2];
-        rdm_start[2] = (double)dir[0]+150;
+        rdm_start[2] = (double)dir[0]+(tpc[5]-tpc[4])/2;
 
         double dx[3]={px,py,pz};
         this->ProjectToBoxEdge(rdm_start, dx, cryo[0], cryo[1], cryo[2], cryo[3], cryo[4], cryo[5], xyzo);
@@ -1013,14 +997,19 @@ void evgendp::Trigger::MakeTrigger(){
         }
     }//end while
 
-    fTriggerPosX = xyzo[0];
-    fTriggerPosY = xyzo[1];
-    fTriggerPosZ = xyzo[2];
+    if(iteration==0){
+      mf::LogInfo("Gen311") << "Trigger muon not found in 20 iterations. Only Background";
+    }
+
+    fTriggerID = fTriggerMu.TrackId();
+    fTriggerPosX = rdm_start[0];
+    fTriggerPosY = rdm_start[1];
+    fTriggerPosZ = rdm_start[2];
     fTriggerPosT = 0;
-    fTriggerPos.SetXYZT(xyzo[0],xyzo[1],xyzo[2],0);
-    fTriggerOffsetX = xyzo[0] - fTriggerMu.Position().X();
-    fTriggerOffsetY = xyzo[1] - fTriggerMu.Position().Y();
-    fTriggerOffsetZ = xyzo[2] - fTriggerMu.Position().Z();
+    fTriggerPos.SetXYZT(rdm_start[0],rdm_start[1],rdm_start[2],0);
+    fTriggerOffsetX = rdm_start[0] - fTriggerMu.Position().X();
+    fTriggerOffsetY = rdm_start[1] - fTriggerMu.Position().Y();
+    fTriggerOffsetZ = rdm_start[2] - fTriggerMu.Position().Z();
     fTriggerOffsetT = 0 - fTriggerMu.Position().T();
 
     return;
@@ -1099,11 +1088,6 @@ void evgendp::Trigger::MakeTrigger(){
         }
 
         if (intersects_cryo){
-
-          mf::LogInfo("Gen311") << "Particle ID" << particle.TrackId();
-          mf::LogInfo("Gen311") << particle.Position().X() << " " << particle.Position().Y() << " " << particle.Position().Z();
-          mf::LogInfo("Gen311") << particle.Momentum().X() << " " << particle.Momentum().Y() << " " << particle.Momentum().Z();
-
           truth.Add(particle);
           break; //leave loop over cryostats to avoid adding particle multiple times
         }// end if particle goes into a cryostat
