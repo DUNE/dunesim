@@ -94,7 +94,6 @@ namespace evgendp{
       double fShowerAreaExtension=0.; ///< Extend distribution of corsika particles in x,z by this much (e.g. 1000 will extend 10 m in -x, +x, -z, and +z) [cm]
       sqlite3* fdb[5]; ///< Pointers to sqlite3 database object, max of 5
       double fRandomYZShift=0.; ///< Each shower will be shifted by a random amount in xz so that showers won't repeatedly sample the same space [cm]
-      std::vector<double> fCryoBuffer; ///< Buffer region around the cryostat
       std::vector<double> fActiveVolumeCut; ///< Active volume cut
 
       int fRun;
@@ -252,7 +251,6 @@ namespace evgendp{
       fBuffBox(p.get< std::vector< double > >("BufferBox",{0.0, 0.0, 0.0, 0.0, 0.0, 0.0})),
       fShowerAreaExtension(p.get< double >("ShowerAreaExtension",0.)),
       fRandomYZShift(p.get< double >("RandomXZShift",0.)),
-      fCryoBuffer(p.get< std::vector< double > >("CryoBuffer",{0.0, 0.0, 0.0, 0.0, 0.0, 0.0})),
       fActiveVolumeCut(p.get< std::vector< double > >("ActiveVolumeCut"))
    {
 
@@ -532,7 +530,7 @@ namespace evgendp{
 
     //define the trigger object
     Trigger trg;
-    trg.SetCryoBuffer( fCryoBuffer );
+    trg.SetCryoBuffer( fBuffBox );
     trg.SetTPCBuffer( fActiveVolumeCut );
 
     //TDatabasePDG is for looking up particle masses
