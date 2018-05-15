@@ -197,6 +197,7 @@ namespace evgendp{
         void MakeTrigger();
 
         //geo utilities
+        double GetPhi( const double py, const double pz );
         void GetMatrix( double theta, double phi, double (*p_R)[3][3] );
         void DoRotation( double urv[], double dir[], double theta, double phi );
         bool Intersect(const double x0[], const double dx[], const double bounds[]);
@@ -218,6 +219,7 @@ namespace evgendp{
         void SetTPCBuffer( std::vector<double> buffer ){
           for(int i=0; i<6; i++){ fTPCBuffer.assign( buffer.begin(), buffer.end() ); }
         }
+
 
       private:
 
@@ -250,7 +252,7 @@ namespace evgendp{
       fToffset(p.get< double >("TimeOffset",0.)),
       fBuffBox(p.get< std::vector< double > >("BufferBox",{0.0, 0.0, 0.0, 0.0, 0.0, 0.0})),
       fShowerAreaExtension(p.get< double >("ShowerAreaExtension",0.)),
-      fRandomYZShift(p.get< double >("RandomXZShift",0.)),
+      fRandomYZShift(p.get< double >("RandomYZShift",0.)),
       fActiveVolumeCut(p.get< std::vector< double > >("ActiveVolumeCut"))
    {
 
@@ -441,22 +443,22 @@ namespace evgendp{
       }
     }
     //add on fShowerAreaExtension without being clever
-    fShowerBounds[0] = fShowerBounds[0] - fShowerAreaExtension;
-    fShowerBounds[1] = fShowerBounds[1] + fShowerAreaExtension;
+    fShowerBounds[2] = fShowerBounds[2] - fShowerAreaExtension;
+    fShowerBounds[3] = fShowerBounds[3] + fShowerAreaExtension;
     fShowerBounds[4] = fShowerBounds[4] - fShowerAreaExtension;
     fShowerBounds[5] = fShowerBounds[5] + fShowerAreaExtension;
 
-    double showersArea=(fShowerBounds[1]/100-fShowerBounds[0]/100)*(fShowerBounds[5]/100-fShowerBounds[4]/100);
+    double showersArea=(fShowerBounds[3]/100-fShowerBounds[2]/100)*(fShowerBounds[5]/100-fShowerBounds[4]/100);
 
     mf::LogInfo("Gen311")
       <<  "Area extended by : "<<fShowerAreaExtension
-      <<"\nShowers to be distributed betweeen: x="<<fShowerBounds[0]<<","<<fShowerBounds[1]
+      <<"\nShowers to be distributed betweeen: y="<<fShowerBounds[2]<<","<<fShowerBounds[3]
                              <<" & z="<<fShowerBounds[4]<<","<<fShowerBounds[5]
-      <<"\nShowers to be distributed with random XZ shift: "<<fRandomYZShift<<" cm"
+      <<"\nShowers to be distributed with random YZ shift: "<<fRandomYZShift<<" cm"
       <<"\nShowers to be distributed over area: "<<showersArea<<" m^2"
       <<"\nShowers to be distributed over time: "<<fSampleTime<<" s"
       <<"\nShowers to be distributed with time offset: "<<fToffset<<" s"
-      <<"\nShowers to be distributed at y: "<<fShowerBounds[3]<<" cm"
+      <<"\nShowers to be distributed at x: "<<fShowerBounds[1]<<" cm"
       ;
 
     //db variables
@@ -603,21 +605,16 @@ namespace evgendp{
               TParticlePDG* pdgp = pdgt->GetParticle(pdg);
               if (pdgp) m = pdgp->Mass();
 
-              //Note: position/momentum in db have north=-x and west=+z, rotate so that +z is north and +x is west
               //get momentum components
               py = sqlite3_column_double(statement,4);
               px = sqlite3_column_double(statement,3);
-              pz = sqlite3_column_double(statement,2);//uboone z=-Particlex
+              pz = -sqlite3_column_double(statement,2);//uboone z=-Particlex
               etot=sqlite3_column_double(statement,8);
               y = sqlite3_column_double(statement,6);
-              z = sqlite3_column_double(statement,5);
+              z = -sqlite3_column_double(statement,5);
               t = sqlite3_column_double(statement,7); //time offset, includes propagation time from top of atmosphere
 
-              double x0[3];
-              x0[0]=0;
-              x0[1]=y;
-              x0[2]=z;
-              TLorentzVector pos(x0[0],x0[1],x0[2],t);// time needs to be in ns to match GENIE, etc
+              TLorentzVector pos(fShowerBounds[1], y, z,t);// time needs to be in ns to match GENIE, etc
               TLorentzVector mom(px,py,pz,etot);
 
               simb::MCParticle p(ntotalCtr,pdg,"primary",-200,m,1);
@@ -625,6 +622,7 @@ namespace evgendp{
 
               //if it is muon, fill up the list of possible triggers
               if( p.PdgCode() == abs(13) ){ trg.AddMuon( p ); }
+
               ParticleMap[ shower ].push_back(p);
               ShowerTrkIDMap[ ntotalCtr ] = shower; //<< use the unique trackID to trace the source shower back
 
@@ -651,28 +649,27 @@ namespace evgendp{
 
       if( ParticleMapIt.first == ShowerTrkIDMap[ trg.GetTriggerId() ] ){
 
-        showerTime=1e9*trg.GetTriggerOffsetT(); //converting from s to ns
+        showerTime =1e9*trg.GetTriggerOffsetT(); //converting from s to ns
         showerTimey=1e9*trg.GetTriggerOffsetT();
         showerTimez=1e9*trg.GetTriggerOffsetT();
+
         //and a random offset in both z and x controlled by the fRandomYZShift parameter
         showerYOffset=1e9*trg.GetTriggerOffsetY();
         showerZOffset=1e9*trg.GetTriggerOffsetZ();
 
       }else{
 
-        showerTime=1e9*(flat()*fSampleTime); //converting from s to ns
+        showerTime =1e9*(flat()*fSampleTime); //converting from s to ns
         showerTimey=1e9*(flat()*fSampleTime); //converting from s to ns
         showerTimez=1e9*(flat()*fSampleTime); //converting from s to ns
         //and a random offset in both z and x controlled by the fRandomYZShift parameter
         showerYOffset=flat()*fRandomYZShift - (fRandomYZShift/2);
         showerZOffset=flat()*fRandomYZShift - (fRandomYZShift/2);
-
       }
 
       for( auto particleIt : ParticleMapIt.second ){
 
         simb::MCParticle particle(particleIt.TrackId(),particleIt.PdgCode(),"primary",-200,particleIt.Mass(),1);
-
 
         double x0[3];
         double xyzo[3];
@@ -680,24 +677,26 @@ namespace evgendp{
 
         if( particleIt.TrackId() == trg.GetTriggerId() ){
 
-          x0[0]=trg.GetTriggerPos().X();
-          x0[1]=trg.GetTriggerPos().Y();
-          x0[2]=trg.GetTriggerPos().Z();
-          dx[0]= trg.GetTriggerMom().X();
-          dx[1]= trg.GetTriggerMom().Y();
-          dx[2]= trg.GetTriggerMom().Z();
+          x0[0] = trg.GetTriggerPos().X();
+          x0[1] = trg.GetTriggerPos().Y();
+          x0[2] = trg.GetTriggerPos().Z();
+          dx[0] = trg.GetTriggerMom().X();
+          dx[1] = trg.GetTriggerMom().Y();
+          dx[2] = trg.GetTriggerMom().Z();
+
+          t = trg.GetTriggerPos().T();
 
           trg.ProjectToBoxEdge(x0, dx, x1, x2, y1, y2, z1, z2, xyzo);
 
         }else{
 
-          y = wrapvarBoxNo(particleIt.Position().Y()+showerYOffset,fShowerBounds[0],fShowerBounds[1],boxnoY);
-          z =wrapvarBoxNo(particleIt.Position().Z()+showerZOffset,fShowerBounds[4],fShowerBounds[5],boxnoZ);
+          y = wrapvarBoxNo(particleIt.Position().Y()+showerYOffset,fShowerBounds[2],fShowerBounds[3],boxnoY);
+          z = wrapvarBoxNo(particleIt.Position().Z()+showerZOffset,fShowerBounds[4],fShowerBounds[5],boxnoZ);
 
           t=particleIt.Position().T()+showerTime+(1e9*fToffset)-fToffset_corsika + showerTimey*boxnoY + showerTimez*boxnoZ;
           t=wrapvar(t,(1e9*fToffset),1e9*(fToffset+fSampleTime));
 
-          x0[0]= fShowerBounds[3];
+          x0[0]= fShowerBounds[1];
           x0[1]= y;
           x0[2]= z;
           dx[0]= particleIt.Momentum().X();
@@ -706,16 +705,15 @@ namespace evgendp{
 
           trg.ProjectToBoxEdge(x0, dx, x1, x2, y1, y2, z1, z2, xyzo);
 
-          TLorentzVector pos(xyzo[0],xyzo[1],xyzo[2],t);
-          particle.AddTrajectoryPoint( pos, particleIt.Momentum() );
         }
 
-        TLorentzVector pos(xyzo[0],xyzo[1],xyzo[2],trg.GetTriggerPos().T());
-        particle.AddTrajectoryPoint( pos, particleIt.Momentum() );
+        TLorentzVector pos(xyzo[0],xyzo[1],xyzo[2], t);
+        TLorentzVector mom(dx[0],dx[1],dx[2], particleIt.Momentum().T() );
+        particle.AddTrajectoryPoint( pos, mom );
 
         mctruth.Add( particle );
       } //end loop over particles
-    }
+    }//loop over showers
   } //end GetSample
 
 
@@ -726,6 +724,27 @@ evgendp::Trigger::Trigger(){
 }
 
 evgendp::Trigger::~Trigger(){}
+
+double evgendp::Trigger::GetPhi( const double py, const double pz ){
+
+    if( pz !=0 ){
+      if( pz > 0 ){
+        return atan( py/pz );
+      }
+      else if( atan( py/pz ) < 0 ){
+        return atan( py/pz )+3.1415926;
+      }
+      else{
+        return atan( py/pz )-3.1415926;
+      }
+    }
+    else if( py > 0 ){
+      return 3.1415926/2.;
+    }
+    else{
+      return -3.1415926/2.;
+    }
+}
 
 void evgendp::Trigger::GetMatrix( double theta, double phi, double (*p_R)[3][3] ){
 
@@ -890,9 +909,6 @@ void evgendp::Trigger::MakeTrigger(){
     CLHEP::HepRandomEngine &engine = rng->getEngine("gen");
     CLHEP::RandFlat flat(engine);
 
-    double px=0,py=0,pz=0;
-    double p=0, theta=0, phi=0;
-
     //choose a random muon
     if( fMuonList.size() == 0){
       mf::LogInfo("Gen311") << "Trigger muon not found! Only Background";
@@ -901,6 +917,9 @@ void evgendp::Trigger::MakeTrigger(){
 
     fTriggerMu = fMuonList.at( (int)flat()*fMuonList.size() );
 
+    
+    double px=0,py=0,pz=0;
+    double p=0, theta=0, phi=0;
 
     px = fTriggerMu.Momentum().X();
     py = fTriggerMu.Momentum().Y();
@@ -908,7 +927,7 @@ void evgendp::Trigger::MakeTrigger(){
 
     p = sqrt(px*px+py*py+pz*pz);
     theta = acos(px/p);
-    phi = acos( pz/(p*sin(theta)) );
+    phi = this->GetPhi( py, pz );
 
     double xyz[3] ={0.};
     xyz[0]=(tpc[5]-tpc[4])/2-tpc[5];
@@ -998,6 +1017,14 @@ void evgendp::Trigger::MakeTrigger(){
     if(iteration==0){
       mf::LogInfo("Gen311") << "Trigger muon not found in 20 iterations. Only Background";
     }
+
+
+    /*
+    double rdm_start[3] ={0.};
+    rdm_start[0] = 0;
+    rdm_start[1] = flat()*(tpc[3]-tpc[2])-(tpc[3]-tpc[2])/2;
+    rdm_start[2] = flat()*(tpc[5]-tpc[4])-(tpc[5]-tpc[4])/2;
+    */
 
     fTriggerID = fTriggerMu.TrackId();
     fTriggerPosX = rdm_start[0];

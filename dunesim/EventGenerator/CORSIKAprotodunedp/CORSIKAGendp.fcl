@@ -52,7 +52,7 @@ standard_311_trigger:
   ShowerFluxConstants:  [ 1.72e4, 9.2e3, 6.2e3, 9.2e3, 6.2e3] #list of flux constants per shower file
   BufferBox:            [ -300.0, 300.0, -300.0, 300.0, -300.0, 300.0 ] #list of buffer box extensions to cryo volume in each dimension/dir (-x,+x,-y,+y,-z,+z)
   ShowerAreaExtension:  2000                 #amount to extend the shower area beyond the cryo dimensions
-  RandomXZShift:        1000                 #amount to randomly shift shower start point in x & z [cm]
+  RandomYZShift:        600                 #amount to randomly shift shower start point in y & z [cm]
   ActiveVolumeCut:      [10, -10, 10, -10, 10, -10 ]        #Active volume cut around the TPC
 }
 
