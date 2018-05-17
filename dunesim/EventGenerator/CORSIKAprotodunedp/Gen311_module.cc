@@ -4,7 +4,6 @@
 // muon trigger
 //
 // TODO: what if no muons are in the list ?
-// TODO: how use a different particle as trigger  ?
 //
 ////////////////////////////////////////////////////////////////////////
 //#ifndef EVGEN_311Gen_H
@@ -606,12 +605,18 @@ namespace evgendp{
               if (pdgp) m = pdgp->Mass();
 
               //get momentum components
-              py = sqlite3_column_double(statement,4);
+              //NR rotation from CORSIKA ref system to LArSoft ref system:
+              //LArsoft: px, py, pz;
+              //uBoone px', py', pz'; << from the sqlite database instances
+              // px = py'
+              // py = pz'
+              // pz = px'
               px = sqlite3_column_double(statement,3);
-              pz = -sqlite3_column_double(statement,2);//uboone z=-Particlex
+              py = sqlite3_column_double(statement,4);
+              pz = sqlite3_column_double(statement,2);
               etot=sqlite3_column_double(statement,8);
               y = sqlite3_column_double(statement,6);
-              z = -sqlite3_column_double(statement,5);
+              z = sqlite3_column_double(statement,5);
               t = sqlite3_column_double(statement,7); //time offset, includes propagation time from top of atmosphere
 
               TLorentzVector pos(fShowerBounds[1], y, z,t);// time needs to be in ns to match GENIE, etc
@@ -671,9 +676,9 @@ namespace evgendp{
 
         simb::MCParticle particle(particleIt.TrackId(),particleIt.PdgCode(),"primary",-200,particleIt.Mass(),1);
 
-        double x0[3];
-        double xyzo[3];
-        double dx[3];
+        double x0[3]={0.};
+        double xyzo[3]={0.};
+        double dx[3]={0.};
 
         if( particleIt.TrackId() == trg.GetTriggerId() ){
 
@@ -685,8 +690,6 @@ namespace evgendp{
           dx[2] = trg.GetTriggerMom().Z();
 
           t = trg.GetTriggerPos().T();
-
-          trg.ProjectToBoxEdge(x0, dx, x1, x2, y1, y2, z1, z2, xyzo);
 
         }else{
 
@@ -701,12 +704,11 @@ namespace evgendp{
           x0[2]= z;
           dx[0]= particleIt.Momentum().X();
           dx[1]= particleIt.Momentum().Y();
-          dx[0]= particleIt.Momentum().Z();
-
-          trg.ProjectToBoxEdge(x0, dx, x1, x2, y1, y2, z1, z2, xyzo);
+          dx[2]= particleIt.Momentum().Z();
 
         }
 
+        trg.ProjectToBoxEdge(x0, dx, x1, x2, y1, y2, z1, z2, xyzo);
         TLorentzVector pos(xyzo[0],xyzo[1],xyzo[2], t);
         TLorentzVector mom(dx[0],dx[1],dx[2], particleIt.Momentum().T() );
         particle.AddTrajectoryPoint( pos, mom );
@@ -917,13 +919,13 @@ void evgendp::Trigger::MakeTrigger(){
 
     fTriggerMu = fMuonList.at( (int)flat()*fMuonList.size() );
 
-    
     double px=0,py=0,pz=0;
     double p=0, theta=0, phi=0;
 
     px = fTriggerMu.Momentum().X();
     py = fTriggerMu.Momentum().Y();
     pz = fTriggerMu.Momentum().Z();
+
 
     p = sqrt(px*px+py*py+pz*pz);
     theta = acos(px/p);
@@ -1014,16 +1016,18 @@ void evgendp::Trigger::MakeTrigger(){
         }
     }//end while
 
+
     if(iteration==0){
       mf::LogInfo("Gen311") << "Trigger muon not found in 20 iterations. Only Background";
     }
 
-
     /*
+
     double rdm_start[3] ={0.};
     rdm_start[0] = 0;
     rdm_start[1] = flat()*(tpc[3]-tpc[2])-(tpc[3]-tpc[2])/2;
     rdm_start[2] = flat()*(tpc[5]-tpc[4])-(tpc[5]-tpc[4])/2;
+
     */
 
     fTriggerID = fTriggerMu.TrackId();
