@@ -52,6 +52,7 @@
 #include <sqlite3.h>
 #include <memory>
 #include <stdio.h>
+#include <dirent.h>
 
 namespace evgendp{
 
@@ -327,18 +328,6 @@ namespace evgendp{
     CLHEP::HepRandomEngine &engine = rng->getEngine("gen");
     CLHEP::RandFlat flat(engine);
 
-    //setup ifdh object
-    if ( ! fIFDH ) fIFDH = new ifdh_ns::ifdh;
-    const char* ifdh_debug_env = std::getenv("IFDH_DEBUG_LEVEL");
-    if ( ifdh_debug_env ) {
-      mf::LogInfo("Gen311") << "IFDH_DEBUG_LEVEL: " << ifdh_debug_env<<"\n";
-      fIFDH->set_debug(ifdh_debug_env);
-    }
-
-    //get ifdh path for each file in fShowerInputFiles, put into selectedflist
-    //if 1 file returned, use that file
-    //if >1 file returned, randomly select one file
-    //if 0 returned, make exeption for missing files
     std::vector<std::pair<std::string,long>> selectedflist;
     for(int i=0; i<fShowerInputs; i++){
       if(fShowerInputFiles[i].find("*")==std::string::npos){
@@ -346,16 +335,38 @@ namespace evgendp{
         selectedflist.push_back(std::make_pair(fShowerInputFiles[i],0));
         mf::LogInfo("Gen311") << "Selected"<<selectedflist.back().first<<"\n";
       }else{
-        //use findMatchingFiles
+
+        //read all the file mathching the pattern
+
         std::vector<std::pair<std::string,long>> flist;
         std::string path(gSystem->DirName(fShowerInputFiles[i].c_str()));
         std::string pattern(gSystem->BaseName(fShowerInputFiles[i].c_str()));
         //pattern="/"+pattern;
 
+        auto wildcardPosition = pattern.find("*");
+        pattern = pattern.substr( 0, wildcardPosition );
+        //std::cout << path << " " << pattern << std::endl;
+	       DIR *dir;
+ 	       struct dirent *ent;
+         int index=0;
+  	     if ((dir = opendir( path.c_str() )) != NULL) {
+    		     while ((ent = readdir (dir)) != NULL) {
+               index++;
+               std::pair<std::string,long> name;
+               std::string parsename(ent->d_name);
+               //std::cout << pattern << " " << parsename.substr(0, wildcardPosition) << std::endl;
+               if( parsename.substr(0, wildcardPosition) == pattern ){
+                 name.first= parsename;
+                 name.second = index;
+                 flist.push_back( name );
+              }
+    		    }
+    		    closedir (dir);
+  	     }else {
+    		     /* could not open directory */
+    		     perror ("");
+  	    }
 
-        std::cout << path << " " << pattern << std::endl;
-
-        flist = fIFDH->findMatchingFiles(path,pattern);
         unsigned int selIndex=-1;
         if(flist.size()==1){ //0th element is the search path:pattern
           selIndex=0;
@@ -372,17 +383,16 @@ namespace evgendp{
      }
     }
 
-    //do the fetching, store local filepaths in locallist
+    //open the files in fShowerInputFilesLocalPaths with sqlite3
     std::vector<std::string> locallist;
     for(unsigned int i=0; i<selectedflist.size(); i++){
-      mf::LogInfo("Gen311")
+      mf::LogInfo("CorsikaGendp")
         << "Fetching: "<<selectedflist[i].first<<" "<<selectedflist[i].second<<"\n";
-      std::string fetchedfile(fIFDH->fetchInput(selectedflist[i].first));
-      LOG_DEBUG("Gen311") << "Fetched; local path: "<<fetchedfile;
+      std::string fetchedfile(selectedflist[i].first);
+      LOG_DEBUG("CorsikaGendp") << "Fetched; local path: "<<fetchedfile;
       locallist.push_back(fetchedfile);
     }
 
-    //open the files in fShowerInputFilesLocalPaths with sqlite3
     for(unsigned int i=0; i<locallist.size(); i++){
       //prepare and execute statement to attach db file
       int res=sqlite3_open(locallist[i].c_str(),&fdb[i]);
