@@ -91,13 +91,13 @@ private:
   AdcSignalVectorVector fNoiseY;  ///< noise on each channel for each time for Y plane
 
   // Histograms.
-  TH1* fNoiseHist;      ///< distribution of noise counts
+  //TH1* fNoiseHist;      ///< distribution of noise counts // unused
   TH1* fNoiseHistX;     ///< distribution of noise counts for X
   TH1* fNoiseHistY;     ///< distribution of noise counts for Y
   TH1* fNoiseChanHist;  ///< distribution of accessed noise samples
 
   //more
-  double fPhase;
+  //double fPhase; // unused
   unsigned int fModelsize;
 
   CLHEP::HepRandomEngine* m_pran;
