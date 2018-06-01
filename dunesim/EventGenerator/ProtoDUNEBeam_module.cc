@@ -96,16 +96,6 @@ namespace evgen{
         
         std::vector<ProtoFullSpill> fAllSpills;
 
-        // We need to make a map of good particle event numbers and all
-        // matching entries in the overlay events in the main particle list.
-        std::map<int,std::vector<std::pair<int,std::vector<int> > > > fEventParticleMap;
-        
-        // A second map storing the trigger time of the good particle.
-        std::map<int,float> fGoodParticleTriggerTime;
-        
-        // Track ID of the good particle.
-        std::map<int,int> fGoodParticleTrackID;
-        
         // A list of good events and an index for it.
         unsigned int fCurrentGoodEvent;
         std::vector<int> fGoodEventList;
@@ -467,26 +457,16 @@ void evgen::ProtoDUNEBeam::FillParticleMaps(){
         }
         
         fGoodParticleTree->GetEntry(i);
-        int event = (int)fBeamEvent;
+
+        // Make sure we didn't have two good particles in one event
+        if(std::find(fGoodEventList.begin(),fGoodEventList.end(),(int)fBeamEvent)!=fGoodEventList.end()) continue;
  
         // NEW APPROACH - construct a ProtoFullSpill object
-        ProtoFullSpill newSpill(event,fTrackID,fTriggerT);
+        ProtoFullSpill newSpill(fBeamEvent,fTrackID,fTriggerT);
         fAllSpills.push_back(newSpill); 
 
-        // Initialise the event - particle map. This will be filled
-        // in the next loop.
-        if(fEventParticleMap.find(event) == fEventParticleMap.end()){
-            std::vector<int> tempVec; // This will be the vector of track ids for each event near to the good event.
-            std::pair<int,std::vector<int> > tempPair = std::make_pair(event,tempVec);
-            std::vector<std::pair<int,std::vector<int> > > tempMainVec;
-            tempMainVec.push_back(tempPair);
-            fEventParticleMap.insert(std::make_pair(event,tempMainVec));
-            fGoodEventList.push_back(event);
-        }        
-        
-        fGoodParticleTriggerTime.insert(std::make_pair(event,fTriggerT));
-        
-        fGoodParticleTrackID.insert(std::make_pair(event,fTrackID));
+        fGoodEventList.push_back(fBeamEvent);
+
     }
     
     // Print a message in case a user starts thinking something has broken.
@@ -504,32 +484,7 @@ void evgen::ProtoDUNEBeam::FillParticleMaps(){
         std::vector<int> goodEventList = GetAllOverlays(event,fOverlays);
 
         for(auto const goodEvent : goodEventList){
-            // Ignore this good event if for some reason it avoided the map
-            if(fEventParticleMap.find(goodEvent) == fEventParticleMap.end()) continue;
 
-            // Store the index of this event so that we can quickly access
-            // it later when building events
-            std::vector<std::pair<int, std::vector<int> > > tracksForEvents = fEventParticleMap[goodEvent];
-            bool foundEvent = false;
-            unsigned int element = 0;
-            for(unsigned int v = 0; v < tracksForEvents.size(); ++v){
-                if(tracksForEvents[v].first == event){
-                    foundEvent = true;
-                    element = v;
-                    break;
-                }
-            }
-            if(foundEvent){
-                fEventParticleMap[goodEvent][element].second.push_back(i);
-            }
-            else{
-                std::vector<int> newVec;
-                newVec.push_back(i);
-                std::pair<int,std::vector<int> > newEvent = std::make_pair(event,newVec);
-                fEventParticleMap[goodEvent].push_back(newEvent);
-            }
-
-            // NEW APPROACH
             for(auto &spill : fAllSpills){
               // Does this track belong with this spill?
               if(spill.fGoodEvent != goodEvent) continue;
