@@ -335,17 +335,14 @@ namespace evgendp{
         selectedflist.push_back(std::make_pair(fShowerInputFiles[i],0));
         mf::LogInfo("Gen311") << "Selected"<<selectedflist.back().first<<"\n";
       }else{
-
         //read all the file mathching the pattern
-
         std::vector<std::pair<std::string,long>> flist;
         std::string path(gSystem->DirName(fShowerInputFiles[i].c_str()));
         std::string pattern(gSystem->BaseName(fShowerInputFiles[i].c_str()));
         //pattern="/"+pattern;
-
         auto wildcardPosition = pattern.find("*");
         pattern = pattern.substr( 0, wildcardPosition );
-        //std::cout << path << " " << pattern << std::endl;
+
 	       DIR *dir;
  	       struct dirent *ent;
          int index=0;
@@ -354,9 +351,9 @@ namespace evgendp{
                index++;
                std::pair<std::string,long> name;
                std::string parsename(ent->d_name);
-               //std::cout << pattern << " " << parsename.substr(0, wildcardPosition) << std::endl;
+
                if( parsename.substr(0, wildcardPosition) == pattern ){
-                 name.first= parsename;
+                 name.first= path+"/"+parsename;
                  name.second = index;
                  flist.push_back( name );
               }
@@ -364,9 +361,8 @@ namespace evgendp{
     		    closedir (dir);
   	     }else {
     		     /* could not open directory */
-    		     perror ("");
+    		     throw cet::exception("Gen311") << "Can't open directory with pattern: "<<path<<":"<<pattern<<std::endl;
   	    }
-
         unsigned int selIndex=-1;
         if(flist.size()==1){ //0th element is the search path:pattern
           selIndex=0;
@@ -386,10 +382,10 @@ namespace evgendp{
     //open the files in fShowerInputFilesLocalPaths with sqlite3
     std::vector<std::string> locallist;
     for(unsigned int i=0; i<selectedflist.size(); i++){
-      mf::LogInfo("CorsikaGendp")
+      mf::LogInfo("Gen311")
         << "Fetching: "<<selectedflist[i].first<<" "<<selectedflist[i].second<<"\n";
       std::string fetchedfile(selectedflist[i].first);
-      LOG_DEBUG("CorsikaGendp") << "Fetched; local path: "<<fetchedfile;
+      LOG_DEBUG("Gen311") << "Fetched; local path: "<<fetchedfile;
       locallist.push_back(fetchedfile);
     }
 
