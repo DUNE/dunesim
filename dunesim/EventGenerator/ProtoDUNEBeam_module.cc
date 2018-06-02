@@ -50,8 +50,9 @@
 #include <sys/stat.h>
 
 namespace evgen{
+
     class ProtoDUNEBeam;
-    
+ 
     class ProtoDUNEBeam : public art::EDProducer {
     public:
         explicit ProtoDUNEBeam(fhicl::ParameterSet const & p);
@@ -70,19 +71,31 @@ namespace evgen{
         void beginJob() override;
         void beginRun(art::Run& run) override;
         void endJob() override;
+
+
+        // Convenience struct to encapsulate each spill
+        // Contains the good particle and all backgrounds
+        struct ProtoFullSpill {
+
+          ProtoFullSpill(int event, int track, float time){
+            fGoodEvent = event;
+            fGoodTrack = track;
+            fGoodTime = time;
+          };
+
+          // Good particle information
+          int fGoodEvent; // Beam simulation event number
+          int fGoodTrack; // Beam simulation track number
+          float fGoodTime;  // Time of beam event
+
+          // All of the beam events and tracks
+          std::map<int,std::vector<int> > fAllSpillTracks; 
+        };
         
     private:
         
-        // We need to make a map of good particle event numbers and all
-        // matching entries in the overlay events in the main particle list.
-        std::map<int,std::vector<std::pair<int,std::vector<int> > > > fEventParticleMap;
-        
-        // A second map storing the trigger time of the good particle.
-        std::map<int,float> fGoodParticleTriggerTime;
-        
-        // Track ID of the good particle.
-        std::map<int,int> fGoodParticleTrackID;
-        
+        std::vector<ProtoFullSpill> fAllSpills;
+
         // A list of good events and an index for it.
         unsigned int fCurrentGoodEvent;
         std::vector<int> fGoodEventList;
@@ -444,91 +457,42 @@ void evgen::ProtoDUNEBeam::FillParticleMaps(){
         }
         
         fGoodParticleTree->GetEntry(i);
-        int event = (int)fBeamEvent;
-        
-        // Initialise the event - particle map. This will be filled
-        // in the next loop.
-        if(fEventParticleMap.find(event) == fEventParticleMap.end()){
-            std::vector<int> tempVec; // This will be the vector of track ids for each event near to the good event.
-            std::pair<int,std::vector<int> > tempPair = std::make_pair(event,tempVec);
-            std::vector<std::pair<int,std::vector<int> > > tempMainVec;
-            tempMainVec.push_back(tempPair);
-            fEventParticleMap.insert(std::make_pair(event,tempMainVec));
-            fGoodEventList.push_back(event);
-        }
-        
-        // Trigger times map
-        /*    if(fGoodParticleTriggerTime.find(event) == fGoodParticleTriggerTime.end()){
-         std::vector<float> trigTimes;
-         trigTimes.push_back(fTriggerT);
-         fGoodParticleTriggerTime.insert(std::make_pair(event,trigTimes));
-         }
-         else{
-         fGoodParticleTriggerTime[event].push_back(fTriggerT);
-         }
-         */
-        
-        fGoodParticleTriggerTime.insert(std::make_pair(event,fTriggerT));
-        
-        // Track ID map
-        int trackID = (int)fTrackID;
-        //    std::cout << "GoodParticle: " << event << ", " << trackID << std::endl;
-        /*    if(fGoodParticleTrackID.find(event) == fGoodParticleTrackID.end()){
-         std::vector<int> tracks;
-         tracks.push_back(trackID);
-         fGoodParticleTrackID.insert(std::make_pair(event,tracks));
-         }
-         else{
-         fGoodParticleTrackID[event].push_back(trackID);
-         }
-         */
-        
-        fGoodParticleTrackID.insert(std::make_pair(event,trackID));
+
+        // Make sure we didn't have two good particles in one event
+        if(std::find(fGoodEventList.begin(),fGoodEventList.end(),(int)fBeamEvent)!=fGoodEventList.end()) continue;
+ 
+        // NEW APPROACH - construct a ProtoFullSpill object
+        ProtoFullSpill newSpill(fBeamEvent,fTrackID,fTriggerT);
+        fAllSpills.push_back(newSpill); 
+
+        fGoodEventList.push_back(fBeamEvent);
+
     }
     
     // Print a message in case a user starts thinking something has broken.
     mf::LogInfo("ProtoDUNEBeam") << "About to loop over the beam simulation tree, this could take some time.";
     
     // Now we need to loop over the main particle tree
-    //for(int i = 0; i < fAllParticlesTree->GetEntries(); ++i){
-        for (int i =0; i<20000;i++){
+    for(int i = 0; i < fAllParticlesTree->GetEntries(); ++i){
         fAllParticlesTree->GetEntry(i);
         
-        if (i%1000==0) std::cout << "Looking at entry " << i << std::endl;
+        if (i%100000==0) std::cout << "Looking at entry " << i << std::endl;
         
-        // Is this an event we care about?
         int event = int(fBeamEvent);
-        
-        // We need to calculate if this is an interesting event, ie is it within +/- fOverlays/2 of a good particle event?
-        //		int goodEvent = IsOverlayEvent(event,fOverlays);
-        //		if(goodEvent == -1){
-        //			continue;
-        //		}
+       
+        // Look at which good events this should be overlaid with
         std::vector<int> goodEventList = GetAllOverlays(event,fOverlays);
+
         for(auto const goodEvent : goodEventList){
-            if(fEventParticleMap.find(goodEvent) != fEventParticleMap.end()){
-                // Store the index of this event so that we can quickly access
-                // it later when building events
-                std::vector<std::pair<int, std::vector<int> > > tracksForEvents = fEventParticleMap[goodEvent];
-                bool foundEvent = false;
-                unsigned int element = 0;
-                for(unsigned int v = 0; v < tracksForEvents.size(); ++v){
-                    if(tracksForEvents[v].first == event){
-                        foundEvent = true;
-                        element = v;
-                        break;
-                    }
-                }
-                if(foundEvent){
-                    fEventParticleMap[goodEvent][element].second.push_back(i);
-                }
-                else{
-                    std::vector<int> newVec;
-                    newVec.push_back(i);
-                    std::pair<int,std::vector<int> > newEvent = std::make_pair(event,newVec);
-                    fEventParticleMap[goodEvent].push_back(newEvent);
-                }
+
+            for(auto &spill : fAllSpills){
+              // Does this track belong with this spill?
+              if(spill.fGoodEvent != goodEvent) continue;
+              
+              spill.fAllSpillTracks[event].push_back(i);
+              
             }
+
         } // End loop over matching events to overlay (this re-uses beam interactions...)
     } // End loop over the main tree.
     
@@ -551,46 +515,37 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
     } //end of if statement
     
     // Get the list of entries for the current event
-    int beamEvent = fGoodEventList[fCurrentGoodEvent];
-    
-    /*
-     // Get the trigger time for this event so that
-     // we can correct all other times
-     float earliestTime = 1e6;
-     for(auto const &t : fGoodParticleTriggerTime[beamEvent]){
-     if(t < earliestTime){
-     earliestTime = t;
-     }
-     }
-     */
+//    int beamEvent = fGoodEventList[fCurrentGoodEvent];
     
     // Get the random number generator service and make some CLHEP generators
     art::ServiceHandle<art::RandomNumberGenerator> rng;
     CLHEP::HepRandomEngine &engine = rng->getEngine("protoDUNEBeam");
     CLHEP::RandFlat flatRnd(engine);
     
-    // The trigger time comes from the good particle to correct the good particle time to roughly 0.
-    //	float triggerTime = fGoodParticleTriggerTime[beamEvent];
-    
     // A single particle seems the most accurate description.
     mcTruth.SetOrigin(simb::kSingleParticle);
-    
+   
+    // NEW APPROACH
+    ProtoFullSpill spill = fAllSpills[fCurrentGoodEvent];
+ 
     // Find the entries that we are interested in.
     //	std::cout << "Finding all particles associated with good particle event " << beamEvent << std::endl;
-    for(auto const e : fEventParticleMap[beamEvent]){
+//    for(auto const e : fEventParticleMap[beamEvent]){
+    for(auto const & event : spill.fAllSpillTracks){
         // Is this the event we would have triggered on?
-        bool trigEvent = (e.first == beamEvent);
+//        bool trigEvent = (e.first == beamEvent);
+        bool trigEvent = (event.first == spill.fGoodEvent);
         float baseTime;
         if(trigEvent){
             // Set the base time for the triggered event equal to the negative of the good particle time.
             // This will be corrected later on to set the time to zero, but keep time offsets within the event.
-            baseTime = -1.0 * fGoodParticleTriggerTime[beamEvent];
+            baseTime = -1.0 * spill.fGoodTime;
         }
         else{
             // Get a random time from -fReadoutWindow to +fReadoutWindow in ns (fReadoutWindow value is in ms).
             baseTime = (flatRnd.fire() - 0.5)*2.0*(fReadoutWindow*1000.*1000.);
         }
-        for(auto const t : e.second){
+        for(auto const t : event.second){
             // Get the entry from the tree for this event and track.
             fAllParticlesTree->GetEntry(t);
             
@@ -602,7 +557,7 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
             // Check to see if this should be a primary beam particle (good particle) or beam background
             std::string process="primaryBackground";
             // If this track is a "good particle", use the usual "primary" tag
-            if(trigEvent && (fGoodParticleTrackID[beamEvent] == (int)fTrackID)){
+            if(trigEvent && (spill.fGoodTrack == (int)fTrackID)){
                 process="primary";
             }
             
@@ -618,7 +573,7 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
                 continue;
             }
             
-            //if(process=="primary") std::cout << " - Got the good particle (" << intPDG << ", " << e.first << ", " << (int)fTrackID << ") with momentum = " << mom.Vect().Mag() << std::endl;
+//            if(process=="primary") std::cout << " - Got the good particle (" << intPDG << ", " << event.first << ", " << (int)fTrackID << ") with momentum = " << mom.Vect().Mag() << std::endl;
             
             // Track ID needs to be negative for primaries
             int trackID = -1*(mcTruth.NParticles() + 1); //g4trkid in larsoft
@@ -633,7 +588,7 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
             //////------caroline's new code-------
 	    //Make the assn 
 	    //util::CreateAssn(*this, e, *beamsimcol, newParticle, *beamsimassn);
-            if(trigEvent && (fGoodParticleTrackID[beamEvent] == (int)fTrackID)){
+            if(trigEvent && (spill.fGoodTrack == (int)fTrackID)){
                 // process="primary";
                 
                 int EarlierTrackID = fTrackID;
@@ -671,54 +626,6 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
     
     mf::LogInfo("ProtoDUNEBeam") << "Created event with " << mcTruth.NParticles() << " particles.";
     
-    /*
-     // Get the required particles
-     for(auto const &v : fEventParticleMap[beamEvent]){
-     
-     fAllParticlesTree->GetEntry(v);
-     
-     // Get the time of the entry into the detector relative to the trigger.
-     // This might change in future, but will serve as T0 for now.
-     float correctedTime = fEntryT - earliestTime;
-     
-     // Since the tree is actually an ntuple, everything is stored as a float.
-     // Most things want the PDG code as an int, so make one.
-     int intPDG = (int)fPDG;
-     
-     // We need to ignore nuclei for now...
-     if(intPDG > 100000) continue;
-     
-     // Check to see if this should be a primary beam particle (good particle) or beam background
-     std::string process="primary";
-     // If this track is a "beam background", use a different tag, but still containing "primary"
-     if(std::find(fGoodParticleTrackID[beamEvent].begin(),fGoodParticleTrackID[beamEvent].end(),int(fTrackID)) == fGoodParticleTrackID[beamEvent].end()){
-     process="primaryBackground";
-     }
-     // Sometimes it seems that there is a second match for the event and track ID pair. For now, just check any particle that claims to be good
-     // is actually good.
-     if(process == "primary"){
-     if(fabs(fX) > 250 || fabs(fY) > 250){
-     continue;
-     }
-     }
-     
-     // Get the position four vector, converting mm to cm
-     TLorentzVector pos = ConvertCoordinates(fX/10.,fY/10.,fZ/10.,correctedTime);
-     // Get momentum four vector, remembering to convert MeV to GeV
-     TLorentzVector mom = MakeMomentumVector(fPx/1000.,fPy/1000.,fPz/1000.,intPDG);
-     
-     // Track ID needs to be negative for primaries
-     int trackID = -1*(mcTruth.NParticles() + 1);
-     
-     // Create the particle and add the starting position and momentum
-     simb::MCParticle newParticle(trackID,intPDG,process);
-     newParticle.AddTrajectoryPoint(pos,mom);
-     
-     // Add the MCParticle to the MCTruth for the event.
-     mcTruth.Add(newParticle);
-     
-     }
-     */
     // Move on the good event iterator
     ++fCurrentGoodEvent;
 }
