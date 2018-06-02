@@ -4,7 +4,7 @@ art_make( NO_PLUGINS
                         lardata_Utilities
 			larcorealg_Geometry
                         ${MF_MESSAGELOGGER}
-                        ${MF_UTILITIES}
+                        
                         cetlib cetlib_except
 			${FHICLCPP}
                         ${ROOT_BASIC_LIB_LIST}

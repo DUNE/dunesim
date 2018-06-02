@@ -19,7 +19,7 @@
 #include "dune/SpaceCharge/SpaceChargeProtoDUNE.h"
 
 // Framework includes
-#include "cetlib/exception.h"
+#include "cetlib_except/exception.h"
 
 //-----------------------------------------------
 spacecharge::SpaceChargeProtoDUNE::SpaceChargeProtoDUNE(
