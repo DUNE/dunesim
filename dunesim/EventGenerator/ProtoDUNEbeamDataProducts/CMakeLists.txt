@@ -6,7 +6,7 @@ art_make(
           art_Persistency_Common canvas
           art_Persistency_Provenance canvas
           ${MF_MESSAGELOGGER}
-          ${MF_UTILITIES}
+          
           cetlib cetlib_except
           ${ROOT_BASIC_LIB_LIST}
         )
@@ -20,7 +20,7 @@ install_fhicl()
 #	  LIBRARIES nusimdata_SimulationBase
 #                    canvas
 #                    MF_MessageLogger
-#                    MF_Utilities
+#                    
 #                    cetlib cetlib_except
 #                    ${ROOT_BASIC_LIB_LIST}
 #          NO_DICTIONARY )
