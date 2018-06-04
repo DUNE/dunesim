@@ -32,6 +32,15 @@ namespace sim {
   private:
 
     //values I need to contain
+    Float_t         BPROFEXT_x;
+    Float_t         BPROFEXT_y;
+    Float_t         BPROFEXT_z;
+    Float_t         BPROFEXT_Px;
+    Float_t         BPROFEXT_Py;
+    Float_t         BPROFEXT_Pz;
+    Float_t         BPROFEXT_PDGid;
+    Float_t         BPROFEXT_EventID;
+    Float_t         BPROFEXT_TrackID;
     Float_t         BPROF4_x;
     Float_t         BPROF4_y;
     Float_t         BPROF4_z;
@@ -41,6 +50,14 @@ namespace sim {
     Float_t         BPROF4_PDGid;
     Float_t         BPROF4_EventID;
     Float_t         BPROF4_TrackID;
+    Float_t         TOF1_t;
+    Float_t         TOF1_x;
+    Float_t         TOF1_y;
+    Float_t         TOF1_z;
+    Float_t         TOF1_Px;
+    Float_t         TOF1_Py;
+    Float_t         TOF1_Pz;
+    Float_t         TOF1_PDGid;
     Float_t         TRIG2_x;
     Float_t         TRIG2_y;
     Float_t         TRIG2_z;
@@ -50,20 +67,28 @@ namespace sim {
     Float_t         TRIG2_PDGid;
     Float_t         TRIG2_EventID;
     Float_t         TRIG2_TrackID;
-    Float_t         Lag_ENTRY_x;
-    Float_t         Lag_ENTRY_y;
-    Float_t         Lag_ENTRY_z;
-    Float_t         Lag_ENTRY_Px;
-    Float_t         Lag_ENTRY_Py;
-    Float_t         Lag_ENTRY_Pz;
-    Float_t         Lag_ENTRY_PDGid;
-    Float_t         Lag_ENTRY_EventID;
-    Float_t         Lag_ENTRY_TrackID;
-    
+    Float_t         NP04FieldCage_x;
+    Float_t         NP04FieldCage_y;
+    Float_t         NP04FieldCage_z;
+    Float_t         NP04FieldCage_Px;
+    Float_t         NP04FieldCage_Py;
+    Float_t         NP04FieldCage_Pz;
+    Float_t         NP04FieldCage_PDGid;
+    Float_t         NP04FieldCage_EventID;
+    Float_t         NP04FieldCage_TrackID; 
     
   public:
 
-    ProtoDUNEbeamsim(    Float_t         BPROF4_x,
+    ProtoDUNEbeamsim(    Float_t         BPROFEXT_x,
+                         Float_t         BPROFEXT_y,
+                         Float_t         BPROFEXT_z,
+                         Float_t         BPROFEXT_Px,
+                         Float_t         BPROFEXT_Py,
+                         Float_t         BPROFEXT_Pz,
+                         Float_t         BPROFEXT_PDGid,
+                         Float_t         BPROFEXT_EventID,
+                         Float_t         BPROFEXT_TrackID,
+			 Float_t         BPROF4_x,
 			 Float_t         BPROF4_y,
 			 Float_t         BPROF4_z,
 			 Float_t         BPROF4_Px,
@@ -72,6 +97,14 @@ namespace sim {
 			 Float_t         BPROF4_PDGid,
 			 Float_t         BPROF4_EventID,
 			 Float_t         BPROF4_TrackID,
+			 Float_t         TOF1_t,
+			 Float_t         TOF1_x,
+                         Float_t         TOF1_y,
+                         Float_t         TOF1_z,
+                         Float_t         TOF1_Px,
+                         Float_t         TOF1_Py,
+                         Float_t         TOF1_Pz,
+                         Float_t         TOF1_PDGid,
 			 Float_t         TRIG2_x,
 			 Float_t         TRIG2_y,
 			 Float_t         TRIG2_z,
@@ -80,16 +113,25 @@ namespace sim {
 			 Float_t         TRIG2_Pz,
 			 Float_t         TRIG2_EventID,
 			 Float_t         TRIG2_TrackID,
-			 Float_t         Lag_ENTRY_x,
-			 Float_t         Lag_ENTRY_y,
-			 Float_t         Lag_ENTRY_z,
-			 Float_t         Lag_ENTRY_Px,
-			 Float_t         Lag_ENTRY_Py,
-			 Float_t         Lag_ENTRY_Pz,
-			 Float_t         Lag_ENTRY_EventID,
-		         Float_t         Lag_ENTRY_TrackID);
+			 Float_t         NP04FieldCage_x,
+                         Float_t         NP04FieldCage_y,
+                         Float_t         NP04FieldCage_z,
+                         Float_t         NP04FieldCage_Px,
+                         Float_t         NP04FieldCage_Py,
+                         Float_t         NP04FieldCage_Pz,
+                         Float_t         NP04FieldCage_EventID,
+                         Float_t         NP04FieldCage_TrackID);
 
 //inspectors 
+		Float_t         get_BPROFEXT_x() const;
+                Float_t         get_BPROFEXT_y() const;
+                Float_t         get_BPROFEXT_z() const;
+                Float_t         get_BPROFEXT_Px() const;
+                Float_t         get_BPROFEXT_Py() const;
+                Float_t         get_BPROFEXT_Pz() const;
+                Float_t         get_BPROFEXT_PDGid() const;
+                Float_t         get_BPROFEXT_EventID() const;
+                Float_t         get_BPROFEXT_TrackID() const;
 		Float_t         get_BPROF4_x() const;
 	    	Float_t         get_BPROF4_y() const;
 	    	Float_t         get_BPROF4_z() const;
@@ -99,6 +141,14 @@ namespace sim {
 	   	Float_t         get_BPROF4_PDGid() const;
 	    	Float_t         get_BPROF4_EventID() const;
 	    	Float_t         get_BPROF4_TrackID() const;
+                Float_t         get_TOF1_t() const;
+                Float_t         get_TOF1_x() const;
+                Float_t         get_TOF1_y() const;
+                Float_t         get_TOF1_z() const;
+                Float_t         get_TOF1_Px() const;
+                Float_t         get_TOF1_Py() const;
+                Float_t         get_TOF1_Pz() const;
+                Float_t         get_TOF1_PDGid() const;
 	    	Float_t         get_TRIG2_x() const;
 	    	Float_t         get_TRIG2_y() const;
 	    	Float_t         get_TRIG2_z() const;
@@ -107,17 +157,26 @@ namespace sim {
 	    	Float_t         get_TRIG2_Pz() const;
 	    	Float_t         get_TRIG2_EventID() const;
 	    	Float_t         get_TRIG2_TrackID() const;
-	    	Float_t         get_Lag_ENTRY_x() const;
-	    	Float_t         get_Lag_ENTRY_y() const;
-	    	Float_t         get_Lag_ENTRY_z() const;
-	    	Float_t         get_Lag_ENTRY_Px() const;
-	    	Float_t         get_Lag_ENTRY_Py() const;
-	    	Float_t         get_Lag_ENTRY_Pz() const;
-	    	Float_t         get_Lag_ENTRY_EventID() const;
-	    	Float_t         get_Lag_ENTRY_TrackID() const;
-    
+                Float_t         get_NP04FieldCage_x() const;
+                Float_t         get_NP04FieldCage_y() const;
+                Float_t         get_NP04FieldCage_z() const;
+                Float_t         get_NP04FieldCage_Px() const;
+                Float_t         get_NP04FieldCage_Py() const;
+                Float_t         get_NP04FieldCage_Pz() const;
+                Float_t         get_NP04FieldCage_EventID() const;
+                Float_t         get_NP04FieldCage_TrackID() const;
+ 
   //mutators 
 
+		 void SetBPROFEXT_x(Float_t val);
+                void SetBPROFEXT_y(Float_t val);
+                void SetBPROFEXT_z(Float_t val);
+                void SetBPROFEXT_Px(Float_t val);
+                void SetBPROFEXT_Py(Float_t val);
+                void SetBPROFEXT_Pz(Float_t val);
+                void SetBPROFEXT_PDGid(Float_t val);
+                void SetBPROFEXT_EventID(Float_t val);
+                void SetBPROFEXT_TrackID(Float_t val);
 		void SetBPROF4_x(Float_t val);
 	    	void SetBPROF4_y(Float_t val);
 	    	void SetBPROF4_z(Float_t val);
@@ -127,6 +186,14 @@ namespace sim {
 	   	void SetBPROF4_PDGid(Float_t val);
 	    	void SetBPROF4_EventID(Float_t val);
 	    	void SetBPROF4_TrackID(Float_t val);
+                void SetTOF1_t(Float_t val);
+                void SetTOF1_x(Float_t val);
+                void SetTOF1_y(Float_t val);
+                void SetTOF1_z(Float_t val);
+                void SetTOF1_Px(Float_t val);
+                void SetTOF1_Py(Float_t val);
+                void SetTOF1_Pz(Float_t val);
+                void SetTOF1_PDGid(Float_t val);
 	    	void SetTRIG2_x(Float_t val);
 	    	void SetTRIG2_y(Float_t val);
 	    	void SetTRIG2_z(Float_t val);
@@ -136,15 +203,15 @@ namespace sim {
 	    	void SetTRIG2_PDGid(Float_t val);
 	    	void SetTRIG2_EventID(Float_t val);
 	    	void SetTRIG2_TrackID(Float_t val);
-	    	void SetLag_ENTRY_x(Float_t val);
-	    	void SetLag_ENTRY_y(Float_t val);
-	    	void SetLag_ENTRY_z(Float_t val);
-	    	void SetLag_ENTRY_Px(Float_t val);
-	    	void SetLag_ENTRY_Py(Float_t val);
-	    	void SetLag_ENTRY_Pz(Float_t val);
-	    	void SetLag_ENTRY_PDGid(Float_t val);
-	    	void SetLag_ENTRY_EventID(Float_t val);
-	    	void SetLag_ENTRY_TrackID(Float_t val);
+                void SetNP04FieldCage_x(Float_t val);
+                void SetNP04FieldCage_y(Float_t val);
+                void SetNP04FieldCage_z(Float_t val);
+                void SetNP04FieldCage_Px(Float_t val);
+                void SetNP04FieldCage_Py(Float_t val);
+                void SetNP04FieldCage_Pz(Float_t val);
+                void SetNP04FieldCage_PDGid(Float_t val);
+                void SetNP04FieldCage_EventID(Float_t val);
+                void SetNP04FieldCage_TrackID(Float_t val);
   
     
   };

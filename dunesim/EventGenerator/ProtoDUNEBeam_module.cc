@@ -143,16 +143,23 @@ namespace evgen{
         //////////////////// Good Particle Tree Variables added by Caroline for beam simulation storage
         ////////////////////////////////////////////////////////////////////////////////////////////////
         //For the LAG_ENTRY part
-        Float_t fGoodLag_ENTRY_x;
-        Float_t fGoodLag_ENTRY_y;
-        Float_t fGoodLag_ENTRY_z;
-        Float_t fGoodLagPDGID;
-        Float_t fGoodLagPx;
-        Float_t fGoodLagPy;
-        Float_t fGoodLagPz;
-        
+        Float_t fGoodNP04FieldCage_x;
+        Float_t fGoodNP04FieldCage_y;
+        Float_t fGoodNP04FieldCage_z;
+        Float_t fGoodNP04FieldCage_PDGID;
+        Float_t fGoodNP04FieldCage_Px;
+        Float_t fGoodNP04FieldCage_Py;
+        Float_t fGoodNP04FieldCage_Pz;
         // add more lines for the trig 2 part
-        Float_t fGoodTRIG2_x;
+        Float_t fGoodTOF1_x;
+        Float_t fGoodTOF1_y;
+        Float_t fGoodTOF1_z;
+        Float_t fGoodTOF1_t;
+        Float_t fGoodTOF1_Px;
+        Float_t fGoodTOF1_Py;
+        Float_t fGoodTOF1_Pz;
+        Float_t fGoodTOF1_PDGid;
+	Float_t fGoodTRIG2_x;
         Float_t fGoodTRIG2_y;
         Float_t fGoodTRIG2_z;
         Float_t fGoodTRIG2_PDGid;
@@ -173,7 +180,15 @@ namespace evgen{
         Float_t fGoodBPROF4_EventID;
         Float_t fGoodBPROF4_TrackID;
         //////////////////////////////////
-        
+        Float_t fGoodBPROFEXT_x;
+        Float_t fGoodBPROFEXT_y;
+        Float_t fGoodBPROFEXT_z;
+        Float_t fGoodBPROFEXT_PDGid;
+        Float_t fGoodBPROFEXT_Px;
+        Float_t fGoodBPROFEXT_Py;
+        Float_t fGoodBPROFEXT_Pz;
+        Float_t fGoodBPROFEXT_EventID;
+        Float_t fGoodBPROFEXT_TrackID;
         
         // Members we need to extract from the tree
         float fX, fY, fZ;
@@ -349,15 +364,24 @@ void evgen::ProtoDUNEBeam::beginJob(){
  
     ////////************added by Caroline for beam simulation storage for good particles ***************//////////////
     // add lines for the LAG_ENTRY part
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_x").c_str(),&fGoodLag_ENTRY_x);
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_y").c_str(),&fGoodLag_ENTRY_y);
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_z").c_str(),&fGoodLag_ENTRY_z);
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_PDGid").c_str(),&fGoodLagPDGID);
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_Px").c_str(),&fGoodLagPx);
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_Py").c_str(),&fGoodLagPy);
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_Pz").c_str(),&fGoodLagPz);
+    fGoodParticleTree->SetBranchAddress((namePrefix+"_x").c_str(),&fGoodNP04FieldCage_x);
+    fGoodParticleTree->SetBranchAddress((namePrefix+"_y").c_str(),&fGoodNP04FieldCage_y);
+    fGoodParticleTree->SetBranchAddress((namePrefix+"_z").c_str(),&fGoodNP04FieldCage_z);
+    fGoodParticleTree->SetBranchAddress((namePrefix+"_PDGid").c_str(),&fGoodNP04FieldCage_PDGID);
+    fGoodParticleTree->SetBranchAddress((namePrefix+"_Px").c_str(),&fGoodNP04FieldCage_Px);
+    fGoodParticleTree->SetBranchAddress((namePrefix+"_Py").c_str(),&fGoodNP04FieldCage_Py);
+    fGoodParticleTree->SetBranchAddress((namePrefix+"_Pz").c_str(),&fGoodNP04FieldCage_Pz);
     
     // add more lines for the trig 2 part
+    fGoodParticleTree->SetBranchAddress("TOF1_t",&fGoodTOF1_t);
+    fGoodParticleTree->SetBranchAddress("TOF1_x",&fGoodTOF1_x);
+    fGoodParticleTree->SetBranchAddress("TOF1_y",&fGoodTOF1_y);
+    fGoodParticleTree->SetBranchAddress("TOF1_z",&fGoodTOF1_z);
+    fGoodParticleTree->SetBranchAddress("TOF1_PDGid",&fGoodTOF1_PDGid);
+    fGoodParticleTree->SetBranchAddress("TOF1_Px",&fGoodTOF1_Px);
+    fGoodParticleTree->SetBranchAddress("TOF1_Py",&fGoodTOF1_Py);
+    fGoodParticleTree->SetBranchAddress("TOF1_Pz",&fGoodTOF1_Pz);
+
     fGoodParticleTree->SetBranchAddress("TRIG2_t",&fTriggerT);
     fGoodParticleTree->SetBranchAddress("TRIG2_x",&fGoodTRIG2_x);
     fGoodParticleTree->SetBranchAddress("TRIG2_y",&fGoodTRIG2_y);
@@ -379,6 +403,15 @@ void evgen::ProtoDUNEBeam::beginJob(){
     fGoodParticleTree->SetBranchAddress("BPROF4_Pz",&fGoodBPROF4_Pz);
     fGoodParticleTree->SetBranchAddress("BPROF4_EventID",&fGoodBPROF4_EventID);
     fGoodParticleTree->SetBranchAddress("BPROF4_TrackID",&fGoodBPROF4_TrackID);
+    fGoodParticleTree->SetBranchAddress("BPROFEXT_x",&fGoodBPROFEXT_x);
+    fGoodParticleTree->SetBranchAddress("BPROFEXT_y",&fGoodBPROFEXT_y);
+    fGoodParticleTree->SetBranchAddress("BPROFEXT_z",&fGoodBPROFEXT_z);
+    fGoodParticleTree->SetBranchAddress("BPROFEXT_PDGid",&fGoodBPROFEXT_PDGid);
+    fGoodParticleTree->SetBranchAddress("BPROFEXT_Px",&fGoodBPROFEXT_Px);
+    fGoodParticleTree->SetBranchAddress("BPROFEXT_Py",&fGoodBPROFEXT_Py);
+    fGoodParticleTree->SetBranchAddress("BPROFEXT_Pz",&fGoodBPROFEXT_Pz);
+    fGoodParticleTree->SetBranchAddress("BPROFEXT_EventID",&fGoodBPROFEXT_EventID);
+    fGoodParticleTree->SetBranchAddress("BPROFEXT_TrackID",&fGoodBPROFEXT_TrackID);
     
     //************************************end of caroline's beam particle tree******************************/////////////
         
@@ -597,7 +630,7 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
                     if ((int)fTrackID == EarlierTrackID){
                         
                         
-                        sim::ProtoDUNEbeamsim temp (fGoodBPROF4_x,fGoodBPROF4_y,fGoodBPROF4_z,fGoodBPROF4_Px,fGoodBPROF4_Py,fGoodBPROF4_Pz,fGoodBPROF4_PDGid,fGoodBPROF4_EventID,fGoodBPROF4_TrackID,fGoodTRIG2_x,fGoodTRIG2_y,fGoodTRIG2_z,fGoodTRIG2_Px,fGoodTRIG2_Py,fGoodTRIG2_Pz,fGoodTRIG2_EventID,fGoodTRIG2_TrackID,fGoodLag_ENTRY_x,fGoodLag_ENTRY_y,fGoodLag_ENTRY_z,fGoodLagPx,fGoodLagPy,fGoodLagPz,fBeamEvent,fTrackID);
+                        sim::ProtoDUNEbeamsim temp (fGoodBPROFEXT_x,fGoodBPROFEXT_y,fGoodBPROFEXT_z,fGoodBPROFEXT_Px,fGoodBPROFEXT_Py,fGoodBPROFEXT_Pz,fGoodBPROFEXT_PDGid,fGoodBPROFEXT_EventID,fGoodBPROFEXT_TrackID,fGoodBPROF4_x,fGoodBPROF4_y,fGoodBPROF4_z,fGoodBPROF4_Px,fGoodBPROF4_Py,fGoodBPROF4_Pz,fGoodBPROF4_PDGid,fGoodBPROF4_EventID,fGoodBPROF4_TrackID,fGoodTOF1_t,fGoodTOF1_x,fGoodTOF1_y,fGoodTOF1_z,fGoodTOF1_Px,fGoodTOF1_Py,fGoodTOF1_Pz,fGoodTOF1_PDGid,fGoodTRIG2_x,fGoodTRIG2_y,fGoodTRIG2_z,fGoodTRIG2_Px,fGoodTRIG2_Py,fGoodTRIG2_Pz,fGoodTRIG2_EventID,fGoodTRIG2_TrackID,fGoodNP04FildCage_x,fGoodNP04FildCage_y,fGoodNP04FildCage_z,fGoodNP04FildCage_Px,fGoodNP04FildCage_Py,fGoodNP04FildCage_Pz,fBeamEvent,fTrackID);
                         beamsimcol.push_back(temp);
                         // std::cout<<" test value beam profile monitor: TTREE   "<<fGoodBPROF4_x<<std::endl;
                         std::cout<<"From TTree TRIG2_TRACKID: "<<fGoodTRIG2_TrackID<<std::endl;
