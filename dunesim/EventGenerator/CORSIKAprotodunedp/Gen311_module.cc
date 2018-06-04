@@ -95,6 +95,8 @@ namespace evgendp{
       sqlite3* fdb[5]; ///< Pointers to sqlite3 database object, max of 5
       double fRandomYZShift=0.; ///< Each shower will be shifted by a random amount in xz so that showers won't repeatedly sample the same space [cm]
       std::vector<double> fActiveVolumeCut; ///< Active volume cut
+      std::vector< double > fLeadingParticlesList; /// < List of pdg codes for particles that can be potentially used as triggers
+      bool fUseIFDH; ///<< use ifdh protocol
 
       int fRun;
       int fEvent;
@@ -253,7 +255,9 @@ namespace evgendp{
       fBuffBox(p.get< std::vector< double > >("BufferBox",{0.0, 0.0, 0.0, 0.0, 0.0, 0.0})),
       fShowerAreaExtension(p.get< double >("ShowerAreaExtension",0.)),
       fRandomYZShift(p.get< double >("RandomYZShift",0.)),
-      fActiveVolumeCut(p.get< std::vector< double > >("ActiveVolumeCut"))
+      fActiveVolumeCut(p.get< std::vector< double > >("ActiveVolumeCut")),
+      fLeadingParticlesList(p.get< std::vector< double > >("LeadingParticlesList")),
+      fUseIFDH(p.get< bool >("UseIFDH"))
    {
 
     if(fShowerInputFiles.size() != fShowerFluxConstants.size() || fShowerInputFiles.size()==0 || fShowerFluxConstants.size()==0)
@@ -328,6 +332,24 @@ namespace evgendp{
     CLHEP::HepRandomEngine &engine = rng->getEngine("gen");
     CLHEP::RandFlat flat(engine);
 
+    if(fUseIFDH){
+      //setup ifdh object
+      if ( ! fIFDH ) fIFDH = new ifdh_ns::ifdh;
+      const char* ifdh_debug_env = std::getenv("IFDH_DEBUG_LEVEL");
+      if ( ifdh_debug_env ) {
+        mf::LogInfo("CORSIKAGendp") << "IFDH_DEBUG_LEVEL: " << ifdh_debug_env<<"\n";
+        fIFDH->set_debug(ifdh_debug_env);
+      }
+    }
+
+    //setup ifdh object
+    if ( ! fIFDH ) fIFDH = new ifdh_ns::ifdh;
+    const char* ifdh_debug_env = std::getenv("IFDH_DEBUG_LEVEL");
+    if ( ifdh_debug_env ) {
+      mf::LogInfo("CORSIKAGendp") << "IFDH_DEBUG_LEVEL: " << ifdh_debug_env<<"\n";
+      fIFDH->set_debug(ifdh_debug_env);
+    }
+
     std::vector<std::pair<std::string,long>> selectedflist;
     for(int i=0; i<fShowerInputs; i++){
       if(fShowerInputFiles[i].find("*")==std::string::npos){
@@ -339,30 +361,36 @@ namespace evgendp{
         std::vector<std::pair<std::string,long>> flist;
         std::string path(gSystem->DirName(fShowerInputFiles[i].c_str()));
         std::string pattern(gSystem->BaseName(fShowerInputFiles[i].c_str()));
-        //pattern="/"+pattern;
-        auto wildcardPosition = pattern.find("*");
-        pattern = pattern.substr( 0, wildcardPosition );
 
-	       DIR *dir;
- 	       struct dirent *ent;
-         int index=0;
-  	     if ((dir = opendir( path.c_str() )) != NULL) {
-    		     while ((ent = readdir (dir)) != NULL) {
-               index++;
-               std::pair<std::string,long> name;
-               std::string parsename(ent->d_name);
+        if(fUseIFDH){
+          //acess the files using ifdh
+          flist = fIFDH->findMatchingFiles(path,pattern);
+        }else{
+          //access the files using drent
+          auto wildcardPosition = pattern.find("*");
+          pattern = pattern.substr( 0, wildcardPosition );
 
-               if( parsename.substr(0, wildcardPosition) == pattern ){
-                 name.first= path+"/"+parsename;
-                 name.second = index;
-                 flist.push_back( name );
+           DIR *dir;
+           struct dirent *ent;
+           int index=0;
+           if ((dir = opendir( path.c_str() )) != NULL) {
+               while ((ent = readdir (dir)) != NULL) {
+                 index++;
+                 std::pair<std::string,long> name;
+                 std::string parsename(ent->d_name);
+
+                 if( parsename.substr(0, wildcardPosition) == pattern ){
+                   name.first= path+"/"+parsename;
+                   name.second = index;
+                   flist.push_back( name );
+                }
               }
-    		    }
-    		    closedir (dir);
-  	     }else {
-    		     /* could not open directory */
-    		     throw cet::exception("Gen311") << "Can't open directory with pattern: "<<path<<":"<<pattern<<std::endl;
-  	    }
+              closedir (dir);
+           }else {
+               throw cet::exception("Gen311") << "Can't open directory with pattern: "<<path<<":"<<pattern<<std::endl;
+           }
+        }
+
         unsigned int selIndex=-1;
         if(flist.size()==1){ //0th element is the search path:pattern
           selIndex=0;
@@ -470,13 +498,6 @@ namespace evgendp{
     sqlite3_stmt *statement;
     const std::string kStatement("select erange_high,erange_low,eslope,nshow from input");
     double upperLimitOfEnergyRange=0.,lowerLimitOfEnergyRange=0.,energySlope=0.,oneMinusGamma=0.,EiToOneMinusGamma=0.,EfToOneMinusGamma=0.;
-
-    /*
-    // get random number generator engine... currently unused here
-    art::ServiceHandle<art::RandomNumberGenerator> rng;
-    CLHEP::HepRandomEngine &engine = rng->getEngine("gen");
-    CLHEP::RandFlat flat(engine);
-    */
 
     for(int i=0; i<fShowerInputs; i++){
         //build and do query to get run info from databases
@@ -632,7 +653,9 @@ namespace evgendp{
               p.AddTrajectoryPoint(pos,mom);
 
               //if it is muon, fill up the list of possible triggers
-              if( p.PdgCode() == abs(13) ){ trg.AddMuon( p ); }
+              std::vector<double>::iterator pdgIt;
+              pdgIt = find( fLeadingParticlesList.begin(), fLeadingParticlesList.end(), p.PdgCode() );
+              if( pdgIt != fLeadingParticlesList.end() ){ trg.AddMuon( p ); }
 
               ParticleMap[ shower ].push_back(p);
               ShowerTrkIDMap[ ntotalCtr ] = shower; //<< use the unique trackID to trace the source shower back

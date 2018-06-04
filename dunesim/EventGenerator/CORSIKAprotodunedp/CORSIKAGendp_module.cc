@@ -240,6 +240,7 @@ namespace evgendp{
 		}else{
 			throw cet::exception("CORSIKAGendp") << "No files returned for path:pattern: "<<path<<":"<<pattern<<std::endl;
 		}
+
 		selectedflist.push_back(flist[selIndex]);
 		mf::LogInfo("CorsikaGendp") << "For "<<fShowerInputFiles[i]<<":"<<pattern
         <<"\nFound "<< flist.size() << " candidate files"
