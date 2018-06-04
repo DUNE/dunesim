@@ -9,7 +9,8 @@
 
 
 <lcgdict>
- <class name="sim::ProtoDUNEbeamsim" ClassVersion="10">
+ <class name="sim::ProtoDUNEbeamsim" ClassVersion="11">
+  <version ClassVersion="11" checksum="4210955202"/>
 <version ClassVersion="10" checksum="4021958745"/>
 
 </class>
