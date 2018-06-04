@@ -18,7 +18,7 @@ namespace sim{
   }
 
   //-------------------------------default destructor------------------------------------------
-  ProtoDUNEBeamInstrument::~ProtoDUNEbeamsim(){
+  ProtoDUNEBeamInstrument::~ProtoDUNEBeamInstrument(){
 
   }
 
@@ -36,7 +36,7 @@ namespace sim{
     fInstrumentName = name;
     fX = x; fY = y; fZ = z;
     fPx = Px; fPy = Py; fPz = Pz;
-    fPDGid = PDGig;
+    fPDGid = PDGid;
     fEventID = EventID;
     fTrackID = TrackID;
   }
@@ -52,7 +52,7 @@ namespace sim{
     fInstrumentName = name;
     fX = position[0]; fY = position[1]; fZ = position[2];
     fPx = momentum[0]; fPy = momentum[1]; fPz = momentum[2];
-    fPDGid = PDGig;
+    fPDGid = PDGid;
     fEventID = EventID;
     fTrackID = TrackID;
   }
@@ -68,7 +68,7 @@ namespace sim{
     fInstrumentName = name;
     fX = position.X(); fY = position.Y(); fZ = position.Z();
     fPx = momentum.X(); fPy = momentum.Y(); fPz = momentum.Z();
-    fPDGid = PDGig;
+    fPDGid = PDGid;
     fEventID = EventID;
     fTrackID = TrackID;
 

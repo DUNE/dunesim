@@ -70,7 +70,7 @@ namespace sim {
       std::string GetInstrumentName() const {return fInstrumentName;};
       Float_t GetX() const {return fX;};
       Float_t GetY() const {return fY;};
-      Float_t GetY() const {return fZ;};
+      Float_t GetZ() const {return fZ;};
       Float_t GetPx() const {return fPx;};
       Float_t GetPy() const {return fPy;};
       Float_t GetPz() const {return fPz;};
