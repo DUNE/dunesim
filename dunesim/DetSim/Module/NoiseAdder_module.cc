@@ -23,6 +23,8 @@
 #include "lardataobj/Simulation/SimChannel.h"
 #include "lardataobj/RawData/RawDigit.h"
 
+#include "dune/DuneInterface/ChannelNoiseService.h"
+
 #include "cetlib/search_path.h"
 
 #include <memory>
@@ -61,12 +63,13 @@ public:
 private:
 
     // Declare member data here.
+    art::ServiceHandle<ChannelNoiseService> m_noiseService;
     std::map<int, ElectronicsAddress> m_channelMap;
 };
 
 
 NoiseAdder::NoiseAdder(fhicl::ParameterSet const & p)
-// :
+
 // Initialize member data here.
 {
     produces< std::vector<raw::RawDigit> >();
@@ -98,8 +101,6 @@ NoiseAdder::NoiseAdder(fhicl::ParameterSet const & p)
 
 void NoiseAdder::produce(art::Event & e)
 {
-    CLHEP::HepJamesRandom rand;
-    CLHEP::RandGauss gaus(rand, 5, 0);
     // Implementation of required member function here.
     auto& digits_in =
         *e.getValidHandle<std::vector<raw::RawDigit>>("daq");
@@ -111,8 +112,9 @@ void NoiseAdder::produce(art::Event & e)
             std::cout << "Compression type " << digit.Compression() << std::endl;
         }
         std::vector<short> samples_out(digit.NADC(), 0);
+        std::vector<float> samples_work(digit.NADC(), 0);
         for(size_t i=0; i<digit.NADC(); ++i){
-            samples_out[i]=digit.ADC(i)+gaus.fire();
+            samples_out[i]=m_noiseService->addNoise(digit.Channel(), samples_work);
         }
         digits_out->push_back(raw::RawDigit(digit.Channel(),
                                            digit.Samples(),
