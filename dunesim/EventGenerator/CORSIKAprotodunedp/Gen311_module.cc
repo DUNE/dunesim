@@ -70,11 +70,8 @@ namespace evgendp{
       void produce(art::Event & e) override;
 
       void reconfigure(fhicl::ParameterSet const& p);
-      void openDBs();
-      void populateNShowers();
-      void populateTOffset();
-      void beginJob();
-      void beginRun(art::Run& run);
+      void beginJob() override;
+      void beginRun(art::Run& run) override;
 
 
       int fShowerInputs=0; ///< Number of shower inputs to process from
@@ -116,6 +113,9 @@ namespace evgendp{
 
     private:
 
+      void openDBs();
+      void populateNShowers();
+      void populateTOffset();
       bool InTPC(const simb::MCParticle particle);
       double wrapvar( const double var, const double low, const double high);
       double wrapvarBoxNo( const double var, const double low, const double high, int& boxno);
