@@ -23,6 +23,8 @@
 #include "lardataobj/Simulation/SimChannel.h"
 #include "lardataobj/RawData/RawDigit.h"
 
+#include "cetlib/search_path.h"
+
 #include <memory>
 
 class NoiseAdder;
@@ -30,6 +32,18 @@ class NoiseAdder;
 
 class NoiseAdder : public art::EDProducer {
 public:
+    struct ElectronicsAddress
+    {
+        ElectronicsAddress(int _crate, int _slot, int _fiber, int _asic, int _asicChannel)
+            : crate(_crate), slot(_slot), fiber(_fiber), asic(_asic), asicChannel(_asicChannel)
+            {}
+        int crate;
+        int slot;
+        int fiber;
+        int asic;
+        int asicChannel;
+    };
+
     explicit NoiseAdder(fhicl::ParameterSet const & p);
     // The compiler-generated destructor is fine for non-base
     // classes without bare pointers or other resource use.
@@ -43,10 +57,11 @@ public:
     // Required functions.
     void produce(art::Event & e) override;
 
+
 private:
 
     // Declare member data here.
-
+    std::map<int, ElectronicsAddress> m_channelMap;
 };
 
 
@@ -55,6 +70,30 @@ NoiseAdder::NoiseAdder(fhicl::ParameterSet const & p)
 // Initialize member data here.
 {
     produces< std::vector<raw::RawDigit> >();
+
+    // The ProtoDUNE channel map lives in dune_raw_data:
+    //
+    // https://cdcvs.fnal.gov/redmine/projects/dune-raw-data/repository/revisions/develop/entry/dune-raw-data/Services/ChannelMap/protoDUNETPCChannelMap_v3.txt
+    //
+    // It's created by:
+    //
+    // https://cdcvs.fnal.gov/redmine/projects/dune-raw-data/repository/revisions/develop/entry/dune-raw-data/Services/ChannelMap/mapmakers/MakePdspChannelMap_v3.C
+    cet::search_path sp("FW_SEARCH_PATH");
+    std::string channelMapFile=sp.find_file("protoDUNETPCChannelMap_v3.txt");
+    std::ifstream fin(channelMapFile.c_str());
+
+    int crateNo, slotNo, fiberNo, FEMBChannel,
+        StreamChannel, slotID, fiberID,
+        chipNo, chipChannel, asicNo,
+        asicChannel, planeType, offlineChannel;
+    
+    while(fin >> crateNo >> slotNo >> fiberNo >> FEMBChannel
+          >> StreamChannel >> slotID >> fiberID
+          >> chipNo >> chipChannel >> asicNo
+          >> asicChannel >> planeType >> offlineChannel){
+        m_channelMap.emplace(std::make_pair(offlineChannel,
+                                            ElectronicsAddress(crateNo, slotNo, fiberNo, asicNo, asicChannel)));
+    }
 }
 
 void NoiseAdder::produce(art::Event & e)
@@ -68,6 +107,7 @@ void NoiseAdder::produce(art::Event & e)
 
     for(auto&& digit: digits_in){
         if(digit.Compression()!=0){
+            // TODO: throw or just uncompress the stream and carry on
             std::cout << "Compression type " << digit.Compression() << std::endl;
         }
         std::vector<short> samples_out(digit.NADC(), 0);
