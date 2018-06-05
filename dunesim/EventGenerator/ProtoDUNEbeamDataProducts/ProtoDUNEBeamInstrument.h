@@ -21,22 +21,6 @@ namespace sim {
       ProtoDUNEBeamInstrument(); //constructor
       ~ProtoDUNEBeamInstrument(); //destructor
 
-    private:
-
-      std::string fInstrumentName;
-
-      Float_t fX;
-      Float_t fY;
-      Float_t fZ;
-      Float_t fPx;
-      Float_t fPy;
-      Float_t fPz;
-      Int_t fPDGid;
-      Int_t fEventID;
-      Int_t fTrackID;
-
-    public:
-
       ProtoDUNEBeamInstrument(std::string name,
         Float_t x,
         Float_t y,
@@ -67,6 +51,9 @@ namespace sim {
         Int_t TrackID
       );      
 
+      // Copy constructor
+      ProtoDUNEBeamInstrument(const ProtoDUNEBeamInstrument& rhs);
+
       std::string GetInstrumentName() const {return fInstrumentName;};
       Float_t GetX() const {return fX;};
       Float_t GetY() const {return fY;};
@@ -88,6 +75,20 @@ namespace sim {
       void SetPDGid(Int_t val) {fPDGid = val;};
       void SetEventID(Int_t val) {fEventID = val;};
       void SetTrackID(Int_t val) {fTrackID = val;};
+
+    private:
+
+      std::string fInstrumentName;
+
+      Float_t fX;
+      Float_t fY;
+      Float_t fZ;
+      Float_t fPx;
+      Float_t fPy;
+      Float_t fPz;
+      Int_t fPDGid;
+      Int_t fEventID;
+      Int_t fTrackID;
 
   };
 }

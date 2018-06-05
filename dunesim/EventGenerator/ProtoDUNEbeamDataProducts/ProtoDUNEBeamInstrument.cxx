@@ -74,5 +74,14 @@ namespace sim{
 
   }
 
+  ProtoDUNEBeamInstrument::ProtoDUNEBeamInstrument(const ProtoDUNEBeamInstrument& rhs){
+    fX = rhs.fX; fY = rhs.fY; fZ = rhs.fZ;
+    fPx = rhs.fPx; fPy = rhs.fPy; fPz = rhs.fPz;
+    fPDGid = rhs.fPDGid;
+    fEventID = rhs.fEventID;
+    fTrackID = rhs.fTrackID;
+    fInstrumentName = rhs.fInstrumentName;
+  }
+
 }
 

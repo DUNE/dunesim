@@ -20,6 +20,8 @@
 #include "TStyle.h"
 #include "TMath.h"
 
+#include "dune/EventGenerator/ProtoDUNEbeamDataProducts/ProtoDUNEBeamInstrument.h"
+
 namespace sim {
   class ProtoDUNEbeamsim  {
     
@@ -76,7 +78,11 @@ namespace sim {
     Float_t         NP04FieldCage_PDGid;
     Float_t         NP04FieldCage_EventID;
     Float_t         NP04FieldCage_TrackID; 
-    
+   
+    // Leigh: I thibk it would make much more sense to store a ProtoDUNEBeamInstrument object
+    // for each of the instruments
+    std::vector<ProtoDUNEBeamInstrument> fAllInstruments;
+
   public:
 
     ProtoDUNEbeamsim(    Float_t         BPROFEXT_x,
@@ -213,6 +219,9 @@ namespace sim {
                 void SetNP04FieldCage_EventID(Float_t val);
                 void SetNP04FieldCage_TrackID(Float_t val);
   
+
+    void AddInstrument(ProtoDUNEBeamInstrument newInst);
+    ProtoDUNEBeamInstrument GetInstrument(std::string name) const;
     
   };
   
