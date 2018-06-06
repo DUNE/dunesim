@@ -73,7 +73,6 @@ namespace evgendp{
       void beginJob() override;
       void beginRun(art::Run& run) override;
 
-
       int fShowerInputs=0; ///< Number of shower inputs to process from
       std::vector<double> fNShowersPerEvent; ///< Number of showers to put in each event of duration fSampleTime; one per showerinput
       std::vector<int> fMaxShowers; //< Max number of showers to query, one per showerinput
@@ -113,14 +112,14 @@ namespace evgendp{
 
     private:
 
-      void openDBs();
-      void populateNShowers();
-      void populateTOffset();
       bool InTPC(const simb::MCParticle particle);
       double wrapvar( const double var, const double low, const double high);
       double wrapvarBoxNo( const double var, const double low, const double high, int& boxno);
       void GetSample(simb::MCTruth&);
 
+      void openDBs();
+      void populateNShowers();
+      void populateTOffset();
     };
 
     class Trigger{
