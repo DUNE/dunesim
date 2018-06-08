@@ -25,6 +25,7 @@ namespace sim {
         Float_t x,
         Float_t y,
         Float_t z,
+        Float_t t,
         Float_t Px,
         Float_t Py,
         Float_t Pz,
@@ -36,6 +37,7 @@ namespace sim {
       /// Vector-based constructor
       ProtoDUNEBeamInstrument(std::string name, 
         std::vector<Float_t> position,
+        Float_t t,
         std::vector<Float_t> momentum,
         Int_t PDGid,
         Int_t EventID,
@@ -45,6 +47,7 @@ namespace sim {
       // TVector3-based constructor
       ProtoDUNEBeamInstrument(std::string name, 
         TVector3 position,
+        Float_t t,
         TVector3 momentum,
         Int_t PDGid,
         Int_t EventID,
@@ -55,6 +58,7 @@ namespace sim {
       ProtoDUNEBeamInstrument(const ProtoDUNEBeamInstrument& rhs);
 
       std::string GetInstrumentName() const {return fInstrumentName;};
+      Float_t GetT() const {return fT;};
       Float_t GetX() const {return fX;};
       Float_t GetY() const {return fY;};
       Float_t GetZ() const {return fZ;};
@@ -66,6 +70,7 @@ namespace sim {
       Int_t GetTrackID() const {return fTrackID;};
 
       void SetInstrumentName(std::string name) {fInstrumentName = name;};
+      void SetT(Float_t val) {fT = val;};
       void SetX(Float_t val) {fX = val;};
       void SetY(Float_t val) {fY = val;};
       void SetZ(Float_t val) {fZ = val;};
@@ -80,6 +85,7 @@ namespace sim {
 
       std::string fInstrumentName;
 
+      Float_t fT;
       Float_t fX;
       Float_t fY;
       Float_t fZ;
