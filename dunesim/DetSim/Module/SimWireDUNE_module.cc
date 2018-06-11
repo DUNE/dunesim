@@ -128,7 +128,7 @@ void SimWireDUNE::reconfigure(fhicl::ParameterSet const& p) {
   fSuppressOn        = p.get<bool>("SuppressOn");
   fKeepEmptyChannels = p.get<bool>("KeepEmptyChannels");
   fUseRawDigitInput  = p.get<bool>("UseRawDigitInput", false);
-  fRawDigitInputLabel= p.get<string>("RawDigitInputLabel");
+  fRawDigitInputLabel= p.get<string>("RawDigitInputLabel", "");
   fAdcSimulatorName = p.get<string>("AdcSimulator");
 
   DuneToolManager* pdtm = DuneToolManager::instance();
