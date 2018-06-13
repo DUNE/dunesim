@@ -94,3 +94,12 @@ outputs:
 }
 
 
+
+##########Sync times. We start from 0 to make sure none of the calibration source comes in outside of our readout time. This allows us to do accurate wall time measurements.
+physics.producers.arGen.T0: [ 0.0 ]
+physics.producers.rnGen.T0: [ 0.0 ]
+physics.producers.apaGen.T0: [ 0.0 ]
+physics.producers.cpaGen.T0: [ 0.0 ]
+physics.producers.poGen.T0: [ 0.0 ]
+physics.producers.krGen.T0: [ 0.0 ]
+physics.producers.fcGen.T0: [ 0.0, 0.0, 0.0, 0.0 ]
