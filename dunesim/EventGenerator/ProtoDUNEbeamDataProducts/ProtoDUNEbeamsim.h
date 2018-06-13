@@ -222,6 +222,7 @@ namespace sim {
 
     void AddInstrument(ProtoDUNEBeamInstrument newInst);
     ProtoDUNEBeamInstrument GetInstrument(std::string name) const;
+    unsigned short NInstruments() {return fAllInstruments.size();};
     
   };
   

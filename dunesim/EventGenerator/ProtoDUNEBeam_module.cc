@@ -35,6 +35,7 @@
 // Added for ProtoDUNE beam simulation storage
 //#include "lardataobj/Simulation/ProtoDUNEbeamsim.h"
 #include "dune/EventGenerator/ProtoDUNEbeamDataProducts/ProtoDUNEbeamsim.h"
+#include "dune/EventGenerator/ProtoDUNEbeamDataProducts/ProtoDUNEBeamInstrument.h"
 #include "lardata/Utilities/AssociationUtil.h"
 // art extensions
 #include "nutools/RandomUtils/NuRandomService.h"
@@ -159,9 +160,12 @@ namespace evgen{
         Float_t fGoodTOF1_Py;
         Float_t fGoodTOF1_Pz;
         Float_t fGoodTOF1_PDGid;
-	Float_t fGoodTRIG2_x;
+        Float_t fGoodTOF1_EventID;
+        Float_t fGoodTOF1_TrackID;
+	      Float_t fGoodTRIG2_x;
         Float_t fGoodTRIG2_y;
         Float_t fGoodTRIG2_z;
+        Float_t fGoodTRIG2_t;
         Float_t fGoodTRIG2_PDGid;
         Float_t fGoodTRIG2_Px;
         Float_t fGoodTRIG2_Py;
@@ -381,8 +385,10 @@ void evgen::ProtoDUNEBeam::beginJob(){
     fGoodParticleTree->SetBranchAddress("TOF1_Px",&fGoodTOF1_Px);
     fGoodParticleTree->SetBranchAddress("TOF1_Py",&fGoodTOF1_Py);
     fGoodParticleTree->SetBranchAddress("TOF1_Pz",&fGoodTOF1_Pz);
+    fGoodParticleTree->SetBranchAddress("TOF1_EventID",&fGoodTOF1_EventID);
+    fGoodParticleTree->SetBranchAddress("TOF1_TrackID",&fGoodTOF1_TrackID);
 
-    fGoodParticleTree->SetBranchAddress("TRIG2_t",&fTriggerT);
+    fGoodParticleTree->SetBranchAddress("TRIG2_t",&fGoodTRIG2_t);
     fGoodParticleTree->SetBranchAddress("TRIG2_x",&fGoodTRIG2_x);
     fGoodParticleTree->SetBranchAddress("TRIG2_y",&fGoodTRIG2_y);
     fGoodParticleTree->SetBranchAddress("TRIG2_z",&fGoodTRIG2_z);
@@ -629,8 +635,19 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
                     fGoodParticleTree->GetEntry(i);
                     if ((int)fTrackID == EarlierTrackID){
                         
-                        
+                        sim::ProtoDUNEBeamInstrument tof1("TOF1",fGoodTOF1_x,fGoodTOF1_y,fGoodTOF1_z,fGoodTOF1_t,fGoodTOF1_Px,fGoodTOF1_Py,fGoodTOF1_Pz,
+                                                     fGoodTOF1_PDGid,fGoodTOF1_EventID,fGoodTOF1_TrackID);  
+                        sim::ProtoDUNEBeamInstrument trig2("TRIG2",fGoodTRIG2_x,fGoodTRIG2_y,fGoodTRIG2_z,fGoodTRIG2_t,fGoodTRIG2_Px,fGoodTRIG2_Py,fGoodTRIG2_Pz,
+                                                      fGoodTRIG2_PDGid,fGoodTRIG2_EventID,fGoodTRIG2_TrackID);  
+ 
                         sim::ProtoDUNEbeamsim temp (fGoodBPROFEXT_x,fGoodBPROFEXT_y,fGoodBPROFEXT_z,fGoodBPROFEXT_Px,fGoodBPROFEXT_Py,fGoodBPROFEXT_Pz,fGoodBPROFEXT_PDGid,fGoodBPROFEXT_EventID,fGoodBPROFEXT_TrackID,fGoodBPROF4_x,fGoodBPROF4_y,fGoodBPROF4_z,fGoodBPROF4_Px,fGoodBPROF4_Py,fGoodBPROF4_Pz,fGoodBPROF4_PDGid,fGoodBPROF4_EventID,fGoodBPROF4_TrackID,fGoodTOF1_t,fGoodTOF1_x,fGoodTOF1_y,fGoodTOF1_z,fGoodTOF1_Px,fGoodTOF1_Py,fGoodTOF1_Pz,fGoodTOF1_PDGid,fGoodTRIG2_x,fGoodTRIG2_y,fGoodTRIG2_z,fGoodTRIG2_Px,fGoodTRIG2_Py,fGoodTRIG2_Pz,fGoodTRIG2_EventID,fGoodTRIG2_TrackID,fGoodNP04FieldCage_x,fGoodNP04FieldCage_y,fGoodNP04FieldCage_z,fGoodNP04FieldCage_Px,fGoodNP04FieldCage_Py,fGoodNP04FieldCage_Pz,fBeamEvent,fTrackID);
+
+                        // Add the beam instruments (we will eventually just do sim::ProtoDUNEbeamsim temp; above)
+                        temp.AddInstrument(tof1);
+                        temp.AddInstrument(trig2);
+
+                        std::cout << "ProtoDUNEbeamsim object has " << temp.NInstruments() << " beam instruments" << std::endl;
+
                         beamsimcol.push_back(temp);
                         // std::cout<<" test value beam profile monitor: TTREE   "<<fGoodBPROF4_x<<std::endl;
                         std::cout<<"From TTree TRIG2_TRACKID: "<<fGoodTRIG2_TrackID<<std::endl;
