@@ -143,15 +143,30 @@ namespace evgen{
         ////////////////////////////////////////////////////////////////////////////////////////////////
         //////////////////// Good Particle Tree Variables added by Caroline for beam simulation storage
         ////////////////////////////////////////////////////////////////////////////////////////////////
-        //For the LAG_ENTRY part
+        //For the NP04 Cage part
         Float_t fGoodNP04FieldCage_x;
         Float_t fGoodNP04FieldCage_y;
         Float_t fGoodNP04FieldCage_z;
-        Float_t fGoodNP04FieldCage_PDGID;
+        Float_t fGoodNP04FieldCage_t;
         Float_t fGoodNP04FieldCage_Px;
         Float_t fGoodNP04FieldCage_Py;
         Float_t fGoodNP04FieldCage_Pz;
-        // add more lines for the trig 2 part
+        Float_t fGoodNP04FieldCage_PDGid;
+        Float_t fGoodNP04FieldCage_EventID;
+        Float_t fGoodNP04FieldCage_TrackID;
+       
+        Float_t fGoodNP04front_x;
+        Float_t fGoodNP04front_y;
+        Float_t fGoodNP04front_z;
+        Float_t fGoodNP04front_t;
+        Float_t fGoodNP04front_Px;
+        Float_t fGoodNP04front_Py;
+        Float_t fGoodNP04front_Pz;
+        Float_t fGoodNP04front_PDGid;
+        Float_t fGoodNP04front_EventID;
+        Float_t fGoodNP04front_TrackID;
+
+	// For the TOF part
         Float_t fGoodTOF1_x;
         Float_t fGoodTOF1_y;
         Float_t fGoodTOF1_z;
@@ -162,38 +177,94 @@ namespace evgen{
         Float_t fGoodTOF1_PDGid;
         Float_t fGoodTOF1_EventID;
         Float_t fGoodTOF1_TrackID;
-	      Float_t fGoodTRIG2_x;
+
+        //For the TRIG part
+        Float_t fGoodTRIG1_x;
+        Float_t fGoodTRIG1_y;
+        Float_t fGoodTRIG1_z;
+        Float_t fGoodTRIG1_t;
+        Float_t fGoodTRIG1_Px;
+        Float_t fGoodTRIG1_Py;
+        Float_t fGoodTRIG1_Pz;
+        Float_t fGoodTRIG1_PDGid;
+        Float_t fGoodTRIG1_EventID;
+        Float_t fGoodTRIG1_TrackID;
+
+        Float_t fGoodTRIG2_x;
         Float_t fGoodTRIG2_y;
         Float_t fGoodTRIG2_z;
         Float_t fGoodTRIG2_t;
-        Float_t fGoodTRIG2_PDGid;
         Float_t fGoodTRIG2_Px;
         Float_t fGoodTRIG2_Py;
         Float_t fGoodTRIG2_Pz;
+        Float_t fGoodTRIG2_PDGid;
         Float_t fGoodTRIG2_EventID;
         Float_t fGoodTRIG2_TrackID;
-        
-        //add more lines for the BPROF4 part
+
+        //For the BPROF part
+        Float_t fGoodBPROF1_x;
+        Float_t fGoodBPROF1_y;
+        Float_t fGoodBPROF1_z;
+        Float_t fGoodBPROF1_t;
+        Float_t fGoodBPROF1_Px;
+        Float_t fGoodBPROF1_Py;
+        Float_t fGoodBPROF1_Pz;
+        Float_t fGoodBPROF1_PDGid;
+        Float_t fGoodBPROF1_EventID;
+        Float_t fGoodBPROF1_TrackID;
+
+        Float_t fGoodBPROF2_x;
+        Float_t fGoodBPROF2_y;
+        Float_t fGoodBPROF2_z;
+        Float_t fGoodBPROF2_t;
+        Float_t fGoodBPROF2_Px;
+        Float_t fGoodBPROF2_Py;
+        Float_t fGoodBPROF2_Pz;
+        Float_t fGoodBPROF2_PDGid;
+        Float_t fGoodBPROF2_EventID;
+        Float_t fGoodBPROF2_TrackID;
+
+        Float_t fGoodBPROF3_x;
+        Float_t fGoodBPROF3_y;
+        Float_t fGoodBPROF3_z;
+        Float_t fGoodBPROF3_t;
+        Float_t fGoodBPROF3_Px;
+        Float_t fGoodBPROF3_Py;
+        Float_t fGoodBPROF3_Pz;
+        Float_t fGoodBPROF3_PDGid;
+        Float_t fGoodBPROF3_EventID;
+        Float_t fGoodBPROF3_TrackID;
+
         Float_t fGoodBPROF4_x;
         Float_t fGoodBPROF4_y;
         Float_t fGoodBPROF4_z;
-        Float_t fGoodBPROF4_PDGid;
+        Float_t fGoodBPROF4_t;
         Float_t fGoodBPROF4_Px;
         Float_t fGoodBPROF4_Py;
         Float_t fGoodBPROF4_Pz;
+        Float_t fGoodBPROF4_PDGid;
         Float_t fGoodBPROF4_EventID;
         Float_t fGoodBPROF4_TrackID;
-        //////////////////////////////////
+
         Float_t fGoodBPROFEXT_x;
         Float_t fGoodBPROFEXT_y;
         Float_t fGoodBPROFEXT_z;
-        Float_t fGoodBPROFEXT_PDGid;
+        Float_t fGoodBPROFEXT_t;
         Float_t fGoodBPROFEXT_Px;
         Float_t fGoodBPROFEXT_Py;
         Float_t fGoodBPROFEXT_Pz;
+        Float_t fGoodBPROFEXT_PDGid;
         Float_t fGoodBPROFEXT_EventID;
         Float_t fGoodBPROFEXT_TrackID;
-        
+
+
+
+
+
+
+
+
+ 
         // Members we need to extract from the tree
         float fX, fY, fZ;
         float fPx, fPy, fPz;
@@ -367,55 +438,117 @@ void evgen::ProtoDUNEBeam::beginJob(){
     fGoodParticleTree->SetBranchAddress((namePrefix+"_TrackID").c_str(),&fTrackID);
  
     ////////************added by Caroline for beam simulation storage for good particles ***************//////////////
-    // add lines for the LAG_ENTRY part
+    // add lines for the NP04 part
     fGoodParticleTree->SetBranchAddress((namePrefix+"_x").c_str(),&fGoodNP04FieldCage_x);
     fGoodParticleTree->SetBranchAddress((namePrefix+"_y").c_str(),&fGoodNP04FieldCage_y);
     fGoodParticleTree->SetBranchAddress((namePrefix+"_z").c_str(),&fGoodNP04FieldCage_z);
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_PDGid").c_str(),&fGoodNP04FieldCage_PDGID);
+    fGoodParticleTree->SetBranchAddress((namePrefix+"_t").c_str(),&fGoodNP04FieldCage_t);
     fGoodParticleTree->SetBranchAddress((namePrefix+"_Px").c_str(),&fGoodNP04FieldCage_Px);
     fGoodParticleTree->SetBranchAddress((namePrefix+"_Py").c_str(),&fGoodNP04FieldCage_Py);
     fGoodParticleTree->SetBranchAddress((namePrefix+"_Pz").c_str(),&fGoodNP04FieldCage_Pz);
+    fGoodParticleTree->SetBranchAddress((namePrefix+"_PDGid").c_str(),&fGoodNP04FieldCage_PDGid);
+    fGoodParticleTree->SetBranchAddress((namePrefix+"_EventID").c_str(),&fGoodNP04FieldCage_EventID);
+    fGoodParticleTree->SetBranchAddress((namePrefix+"_TrackID").c_str(),&fGoodNP04FieldCage_TrackID);
+
+    fGoodParticleTree->SetBranchAddress((namePrefix+"_x").c_str(),&fGoodNP04front_x);
+    fGoodParticleTree->SetBranchAddress((namePrefix+"_y").c_str(),&fGoodNP04front_y);
+    fGoodParticleTree->SetBranchAddress((namePrefix+"_z").c_str(),&fGoodNP04front_z);
+    fGoodParticleTree->SetBranchAddress((namePrefix+"_t").c_str(),&fGoodNP04front_t);
+    fGoodParticleTree->SetBranchAddress((namePrefix+"_Px").c_str(),&fGoodNP04front_Px);
+    fGoodParticleTree->SetBranchAddress((namePrefix+"_Py").c_str(),&fGoodNP04front_Py);
+    fGoodParticleTree->SetBranchAddress((namePrefix+"_Pz").c_str(),&fGoodNP04front_Pz);
+    fGoodParticleTree->SetBranchAddress((namePrefix+"_PDGid").c_str(),&fGoodNP04front_PDGid);
+    fGoodParticleTree->SetBranchAddress((namePrefix+"_EventID").c_str(),&fGoodNP04front_EventID);
+    fGoodParticleTree->SetBranchAddress((namePrefix+"_TrackID").c_str(),&fGoodNP04front_TrackID);
     
-    // add more lines for the trig 2 part
-    fGoodParticleTree->SetBranchAddress("TOF1_t",&fGoodTOF1_t);
+    // add more lines for the TOF part
     fGoodParticleTree->SetBranchAddress("TOF1_x",&fGoodTOF1_x);
     fGoodParticleTree->SetBranchAddress("TOF1_y",&fGoodTOF1_y);
     fGoodParticleTree->SetBranchAddress("TOF1_z",&fGoodTOF1_z);
-    fGoodParticleTree->SetBranchAddress("TOF1_PDGid",&fGoodTOF1_PDGid);
+    fGoodParticleTree->SetBranchAddress("TOF1_t",&fGoodTOF1_t);
     fGoodParticleTree->SetBranchAddress("TOF1_Px",&fGoodTOF1_Px);
     fGoodParticleTree->SetBranchAddress("TOF1_Py",&fGoodTOF1_Py);
     fGoodParticleTree->SetBranchAddress("TOF1_Pz",&fGoodTOF1_Pz);
+    fGoodParticleTree->SetBranchAddress("TOF1_PDGid",&fGoodTOF1_PDGid);
     fGoodParticleTree->SetBranchAddress("TOF1_EventID",&fGoodTOF1_EventID);
     fGoodParticleTree->SetBranchAddress("TOF1_TrackID",&fGoodTOF1_TrackID);
 
-    fGoodParticleTree->SetBranchAddress("TRIG2_t",&fGoodTRIG2_t);
+    // add more lines for the TRIG part
+    fGoodParticleTree->SetBranchAddress("TRIG1_x",&fGoodTRIG2_x);
+    fGoodParticleTree->SetBranchAddress("TRIG1_y",&fGoodTRIG2_y);
+    fGoodParticleTree->SetBranchAddress("TRIG1_z",&fGoodTRIG2_z);
+    fGoodParticleTree->SetBranchAddress("TRIG1_t",&fGoodTRIG2_t);
+    fGoodParticleTree->SetBranchAddress("TRIG1_Px",&fGoodTRIG2_Px);
+    fGoodParticleTree->SetBranchAddress("TRIG1_Py",&fGoodTRIG2_Py);
+    fGoodParticleTree->SetBranchAddress("TRIG1_Pz",&fGoodTRIG2_Pz);
+    fGoodParticleTree->SetBranchAddress("TRIG1_PDGid",&fGoodTRIG2_PDGid);
+    fGoodParticleTree->SetBranchAddress("TRIG1_EventID",&fGoodTRIG2_EventID);
+    fGoodParticleTree->SetBranchAddress("TRIG1_TrackID",&fGoodTRIG2_TrackID);
+    
     fGoodParticleTree->SetBranchAddress("TRIG2_x",&fGoodTRIG2_x);
     fGoodParticleTree->SetBranchAddress("TRIG2_y",&fGoodTRIG2_y);
     fGoodParticleTree->SetBranchAddress("TRIG2_z",&fGoodTRIG2_z);
-    fGoodParticleTree->SetBranchAddress("TRIG2_PDGid",&fGoodTRIG2_PDGid);
+    fGoodParticleTree->SetBranchAddress("TRIG2_t",&fGoodTRIG2_t);
     fGoodParticleTree->SetBranchAddress("TRIG2_Px",&fGoodTRIG2_Px);
     fGoodParticleTree->SetBranchAddress("TRIG2_Py",&fGoodTRIG2_Py);
     fGoodParticleTree->SetBranchAddress("TRIG2_Pz",&fGoodTRIG2_Pz);
+    fGoodParticleTree->SetBranchAddress("TRIG2_PDGid",&fGoodTRIG2_PDGid);
     fGoodParticleTree->SetBranchAddress("TRIG2_EventID",&fGoodTRIG2_EventID);
     fGoodParticleTree->SetBranchAddress("TRIG2_TrackID",&fGoodTRIG2_TrackID);
-    
-    //add more lines for the BPROF4 part
+
+    //add more lines for the BPROF part
+    fGoodParticleTree->SetBranchAddress("BPROF1_x",&fGoodBPROF4_x);
+    fGoodParticleTree->SetBranchAddress("BPROF1_y",&fGoodBPROF4_y);
+    fGoodParticleTree->SetBranchAddress("BPROF1_z",&fGoodBPROF4_z);
+    fGoodParticleTree->SetBranchAddress("BPROF1_t",&fGoodBPROF4_t);
+    fGoodParticleTree->SetBranchAddress("BPROF1_Px",&fGoodBPROF4_Px);
+    fGoodParticleTree->SetBranchAddress("BPROF1_Py",&fGoodBPROF4_Py);
+    fGoodParticleTree->SetBranchAddress("BPROF1_Pz",&fGoodBPROF4_Pz);
+    fGoodParticleTree->SetBranchAddress("BPROF1_PDGid",&fGoodBPROF4_PDGid);
+    fGoodParticleTree->SetBranchAddress("BPROF1_EventID",&fGoodBPROF4_EventID);
+    fGoodParticleTree->SetBranchAddress("BPROF1_TrackID",&fGoodBPROF4_TrackID);
+
+    fGoodParticleTree->SetBranchAddress("BPROF2_x",&fGoodBPROF4_x);
+    fGoodParticleTree->SetBranchAddress("BPROF2_y",&fGoodBPROF4_y);
+    fGoodParticleTree->SetBranchAddress("BPROF2_z",&fGoodBPROF4_z);
+    fGoodParticleTree->SetBranchAddress("BPROF2_t",&fGoodBPROF4_t);
+    fGoodParticleTree->SetBranchAddress("BPROF2_Px",&fGoodBPROF4_Px);
+    fGoodParticleTree->SetBranchAddress("BPROF2_Py",&fGoodBPROF4_Py);
+    fGoodParticleTree->SetBranchAddress("BPROF2_Pz",&fGoodBPROF4_Pz);
+    fGoodParticleTree->SetBranchAddress("BPROF2_PDGid",&fGoodBPROF4_PDGid);
+    fGoodParticleTree->SetBranchAddress("BPROF2_EventID",&fGoodBPROF4_EventID);
+    fGoodParticleTree->SetBranchAddress("BPROF2_TrackID",&fGoodBPROF4_TrackID);
+
+    fGoodParticleTree->SetBranchAddress("BPROF3_x",&fGoodBPROF4_x);
+    fGoodParticleTree->SetBranchAddress("BPROF3_y",&fGoodBPROF4_y);
+    fGoodParticleTree->SetBranchAddress("BPROF3_z",&fGoodBPROF4_z);
+    fGoodParticleTree->SetBranchAddress("BPROF3_t",&fGoodBPROF4_t);
+    fGoodParticleTree->SetBranchAddress("BPROF3_Px",&fGoodBPROF4_Px);
+    fGoodParticleTree->SetBranchAddress("BPROF3_Py",&fGoodBPROF4_Py);
+    fGoodParticleTree->SetBranchAddress("BPROF3_Pz",&fGoodBPROF4_Pz);
+    fGoodParticleTree->SetBranchAddress("BPROF3_PDGid",&fGoodBPROF4_PDGid);
+    fGoodParticleTree->SetBranchAddress("BPROF3_EventID",&fGoodBPROF4_EventID);
+    fGoodParticleTree->SetBranchAddress("BPROF3_TrackID",&fGoodBPROF4_TrackID);
+
     fGoodParticleTree->SetBranchAddress("BPROF4_x",&fGoodBPROF4_x);
     fGoodParticleTree->SetBranchAddress("BPROF4_y",&fGoodBPROF4_y);
     fGoodParticleTree->SetBranchAddress("BPROF4_z",&fGoodBPROF4_z);
-    fGoodParticleTree->SetBranchAddress("BPROF4_PDGid",&fGoodBPROF4_PDGid);
+    fGoodParticleTree->SetBranchAddress("BPROF4_t",&fGoodBPROF4_t);
     fGoodParticleTree->SetBranchAddress("BPROF4_Px",&fGoodBPROF4_Px);
     fGoodParticleTree->SetBranchAddress("BPROF4_Py",&fGoodBPROF4_Py);
     fGoodParticleTree->SetBranchAddress("BPROF4_Pz",&fGoodBPROF4_Pz);
+    fGoodParticleTree->SetBranchAddress("BPROF4_PDGid",&fGoodBPROF4_PDGid);
     fGoodParticleTree->SetBranchAddress("BPROF4_EventID",&fGoodBPROF4_EventID);
     fGoodParticleTree->SetBranchAddress("BPROF4_TrackID",&fGoodBPROF4_TrackID);
+
     fGoodParticleTree->SetBranchAddress("BPROFEXT_x",&fGoodBPROFEXT_x);
     fGoodParticleTree->SetBranchAddress("BPROFEXT_y",&fGoodBPROFEXT_y);
     fGoodParticleTree->SetBranchAddress("BPROFEXT_z",&fGoodBPROFEXT_z);
-    fGoodParticleTree->SetBranchAddress("BPROFEXT_PDGid",&fGoodBPROFEXT_PDGid);
+    fGoodParticleTree->SetBranchAddress("BPROFEXT_t",&fGoodBPROFEXT_t);
     fGoodParticleTree->SetBranchAddress("BPROFEXT_Px",&fGoodBPROFEXT_Px);
     fGoodParticleTree->SetBranchAddress("BPROFEXT_Py",&fGoodBPROFEXT_Py);
     fGoodParticleTree->SetBranchAddress("BPROFEXT_Pz",&fGoodBPROFEXT_Pz);
+    fGoodParticleTree->SetBranchAddress("BPROFEXT_PDGid",&fGoodBPROFEXT_PDGid);
     fGoodParticleTree->SetBranchAddress("BPROFEXT_EventID",&fGoodBPROFEXT_EventID);
     fGoodParticleTree->SetBranchAddress("BPROFEXT_TrackID",&fGoodBPROFEXT_TrackID);
     
@@ -639,12 +772,30 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
                                                      fGoodTOF1_PDGid,fGoodTOF1_EventID,fGoodTOF1_TrackID);  
                         sim::ProtoDUNEBeamInstrument trig2("TRIG2",fGoodTRIG2_x,fGoodTRIG2_y,fGoodTRIG2_z,fGoodTRIG2_t,fGoodTRIG2_Px,fGoodTRIG2_Py,fGoodTRIG2_Pz,
                                                       fGoodTRIG2_PDGid,fGoodTRIG2_EventID,fGoodTRIG2_TrackID);  
- 
-                        sim::ProtoDUNEbeamsim temp (fGoodBPROFEXT_x,fGoodBPROFEXT_y,fGoodBPROFEXT_z,fGoodBPROFEXT_Px,fGoodBPROFEXT_Py,fGoodBPROFEXT_Pz,fGoodBPROFEXT_PDGid,fGoodBPROFEXT_EventID,fGoodBPROFEXT_TrackID,fGoodBPROF4_x,fGoodBPROF4_y,fGoodBPROF4_z,fGoodBPROF4_Px,fGoodBPROF4_Py,fGoodBPROF4_Pz,fGoodBPROF4_PDGid,fGoodBPROF4_EventID,fGoodBPROF4_TrackID,fGoodTOF1_t,fGoodTOF1_x,fGoodTOF1_y,fGoodTOF1_z,fGoodTOF1_Px,fGoodTOF1_Py,fGoodTOF1_Pz,fGoodTOF1_PDGid,fGoodTRIG2_x,fGoodTRIG2_y,fGoodTRIG2_z,fGoodTRIG2_Px,fGoodTRIG2_Py,fGoodTRIG2_Pz,fGoodTRIG2_EventID,fGoodTRIG2_TrackID,fGoodNP04FieldCage_x,fGoodNP04FieldCage_y,fGoodNP04FieldCage_z,fGoodNP04FieldCage_Px,fGoodNP04FieldCage_Py,fGoodNP04FieldCage_Pz,fBeamEvent,fTrackID);
+			sim::ProtoDUNEBeamInstrument fieldcage("NP04FieldCage",fGoodNP04FieldCage_x,fGoodNP04FieldCage_y,fGoodNP04FieldCage_z,fGoodNP04FieldCage_t,
+						      fGoodNP04FieldCage_Px,fGoodNP04FieldCage_Py,fGoodNP04FieldCage_Pz,fGoodNP04FieldCage_PDGid,fGoodNP04FieldCage_EventID,fGoodNP04FieldCage_TrackID);
+			sim::ProtoDUNEBeamInstrument front("NP04front",fGoodNP04front_x,fGoodNP04front_y,fGoodNP04front_z,fGoodNP04front_t,fGoodNP04front_Px,fGoodNP04front_Py,fGoodNP04front_Pz,
+						      fGoodNP04front_PDGid,fGoodNP04front_EventID,fGoodNP04front_TrackID);
+			sim::ProtoDUNEBeamInstrument bprof4("BPROF4",fGoodBPROF4_x,fGoodBPROF4_y,fGoodBPROF4_z,fGoodBPROF4_t,fGoodBPROF4_Px,fGoodBPROF4_Py,fGoodBPROF4_Pz,
+						      fGoodBPROF4_PDGid,fGoodBPROF4_EventID,fGoodBPROF4_TrackID);
+			sim::ProtoDUNEBeamInstrument bprofext("BPROFEXT",fGoodBPROFEXT_x,fGoodBPROFEXT_y,fGoodBPROFEXT_z,fGoodBPROFEXT_t,fGoodBPROFEXT_Px,fGoodBPROFEXT_Py,fGoodBPROFEXT_Pz,
+						      fGoodBPROFEXT_PDGid,fGoodBPROFEXT_EventID,fGoodBPROFEXT_TrackID);
+			sim::ProtoDUNEBeamInstrument trig1("TRIG1",fGoodTRIG1_x,fGoodTRIG1_y,fGoodTRIG1_z,fGoodTRIG1_t,fGoodTRIG1_Px,fGoodTRIG1_Py,fGoodTRIG1_Pz,
+	 					      fGoodTRIG1_PDGid,fGoodTRIG1_EventID,fGoodTRIG1_TrackID);
+			sim::ProtoDUNEBeamInstrument bprof3("BPROF3",fGoodBPROF3_x,fGoodBPROF3_y,fGoodBPROF3_z,fGoodBPROF3_t,fGoodBPROF3_Px,fGoodBPROF3_Py,fGoodBPROF3_Pz,
+	 					      fGoodBPROF3_PDGid,fGoodBPROF3_EventID,fGoodBPROF3_TrackID);
+			sim::ProtoDUNEBeamInstrument bprof2("BPROF2",fGoodBPROF2_x,fGoodBPROF2_y,fGoodBPROF2_z,fGoodBPROF2_t,fGoodBPROF2_Px,fGoodBPROF2_Py,fGoodBPROF2_Pz,
+						      fGoodBPROF2_PDGid,fGoodBPROF2_EventID,fGoodBPROF2_TrackID);
+			sim::ProtoDUNEBeamInstrument bprof1("BPROF1",fGoodBPROF1_x,fGoodBPROF1_y,fGoodBPROF1_z,fGoodBPROF1_t,fGoodBPROF1_Px,fGoodBPROF1_Py,fGoodBPROF1_Pz,
+						      fGoodBPROF1_PDGid,fGoodBPROF1_EventID,fGoodBPROF1_TrackID);
+
+			sim::ProtoDUNEbeamsim temp; 
+
+//                        sim::ProtoDUNEbeamsim temp (fGoodBPROFEXT_x,fGoodBPROFEXT_y,fGoodBPROFEXT_z,fGoodBPROFEXT_Px,fGoodBPROFEXT_Py,fGoodBPROFEXT_Pz,fGoodBPROFEXT_PDGid,fGoodBPROFEXT_EventID,fGoodBPROFEXT_TrackID,fGoodBPROF4_x,fGoodBPROF4_y,fGoodBPROF4_z,fGoodBPROF4_Px,fGoodBPROF4_Py,fGoodBPROF4_Pz,fGoodBPROF4_PDGid,fGoodBPROF4_EventID,fGoodBPROF4_TrackID,fGoodTOF1_t,fGoodTOF1_x,fGoodTOF1_y,fGoodTOF1_z,fGoodTOF1_Px,fGoodTOF1_Py,fGoodTOF1_Pz,fGoodTOF1_PDGid,fGoodTRIG2_x,fGoodTRIG2_y,fGoodTRIG2_z,fGoodTRIG2_Px,fGoodTRIG2_Py,fGoodTRIG2_Pz,fGoodTRIG2_EventID,fGoodTRIG2_TrackID,fGoodNP04FieldCage_x,fGoodNP04FieldCage_y,fGoodNP04FieldCage_z,fGoodNP04FieldCage_Px,fGoodNP04FieldCage_Py,fGoodNP04FieldCage_Pz,fBeamEvent,fTrackID);
 
                         // Add the beam instruments (we will eventually just do sim::ProtoDUNEbeamsim temp; above)
-                        temp.AddInstrument(tof1);
-                        temp.AddInstrument(trig2);
+//                        temp.AddInstrument(tof1);
+//                        temp.AddInstrument(trig2);
 
                         std::cout << "ProtoDUNEbeamsim object has " << temp.NInstruments() << " beam instruments" << std::endl;
 
