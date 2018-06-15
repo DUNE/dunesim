@@ -3,7 +3,6 @@
 // Event generator for the 311 (Can be also used for ProtoDUNE) with realistic
 // muon trigger
 //
-// TODO: what if no muons are in the list ?
 //
 ////////////////////////////////////////////////////////////////////////
 //#ifndef EVGEN_311Gen_H
@@ -73,7 +72,6 @@ namespace evgendp{
       void beginJob() override;
       void beginRun(art::Run& run) override;
 
-
       int fShowerInputs=0; ///< Number of shower inputs to process from
       std::vector<double> fNShowersPerEvent; ///< Number of showers to put in each event of duration fSampleTime; one per showerinput
       std::vector<int> fMaxShowers; //< Max number of showers to query, one per showerinput
@@ -116,6 +114,7 @@ namespace evgendp{
       void openDBs();
       void populateNShowers();
       void populateTOffset();
+
       bool InTPC(const simb::MCParticle particle);
       double wrapvar( const double var, const double low, const double high);
       double wrapvarBoxNo( const double var, const double low, const double high, int& boxno);
@@ -324,6 +323,7 @@ namespace evgendp{
    return;
   }
 
+
   void evgendp::Gen311::openDBs(){
     //choose files based on fShowerInputFiles, copy them with ifdh, open them
     //sqlite3_stmt *statement;
@@ -426,6 +426,84 @@ namespace evgendp{
         mf::LogInfo("Gen311")<<"Attached db "<< locallist[i]<<"\n";
     }
   }//end openDBs
+
+/*
+void evgendp::Gen311::openDBs(){
+  //choose files based on fShowerInputFiles, copy them with ifdh, open them
+  //sqlite3_stmt *statement;
+  //get rng engine
+  art::ServiceHandle<art::RandomNumberGenerator> rng;
+  CLHEP::HepRandomEngine &engine = rng->getEngine("gen");
+  CLHEP::RandFlat flat(engine);
+
+  //setup ifdh object
+  if ( ! fIFDH ) fIFDH = new ifdh_ns::ifdh;
+  const char* ifdh_debug_env = std::getenv("IFDH_DEBUG_LEVEL");
+  if ( ifdh_debug_env ) {
+    mf::LogInfo("CORSIKAGendp") << "IFDH_DEBUG_LEVEL: " << ifdh_debug_env<<"\n";
+    fIFDH->set_debug(ifdh_debug_env);
+  }
+
+  //get ifdh path for each file in fShowerInputFiles, put into selectedflist
+  //if 1 file returned, use that file
+  //if >1 file returned, randomly select one file
+  //if 0 returned, make exeption for missing files
+  std::vector<std::pair<std::string,long>> selectedflist;
+  for(int i=0; i<fShowerInputs; i++){
+    if(fShowerInputFiles[i].find("*")==std::string::npos){
+      //if there are no wildcards, don't call findMatchingFiles
+      selectedflist.push_back(std::make_pair(fShowerInputFiles[i],0));
+      mf::LogInfo("CorsikaGendp") << "Selected"<<selectedflist.back().first<<"\n";
+  }else{
+      //use findMatchingFiles
+      std::vector<std::pair<std::string,long>> flist;
+  std::string path(gSystem->DirName(fShowerInputFiles[i].c_str()));
+  std::string pattern(gSystem->BaseName(fShowerInputFiles[i].c_str()));
+  //pattern="/"+pattern;
+
+
+  std::cout << path << " " << pattern << std::endl;
+
+  flist = fIFDH->findMatchingFiles(path,pattern);
+  unsigned int selIndex=-1;
+  if(flist.size()==1){ //0th element is the search path:pattern
+    selIndex=0;
+  }else if(flist.size()>1){
+    selIndex= (unsigned int) (flat()*(flist.size()-1)+0.5); //rnd with rounding, dont allow picking the 0th element
+  }else{
+    throw cet::exception("CORSIKAGendp") << "No files returned for path:pattern: "<<path<<":"<<pattern<<std::endl;
+  }
+
+  selectedflist.push_back(flist[selIndex]);
+  mf::LogInfo("CorsikaGendp") << "For "<<fShowerInputFiles[i]<<":"<<pattern
+      <<"\nFound "<< flist.size() << " candidate files"
+<<"\nChoosing file number "<< selIndex << "\n"
+      <<"\nSelected "<<selectedflist.back().first<<"\n";
+   }
+
+  }
+
+  //do the fetching, store local filepaths in locallist
+  std::vector<std::string> locallist;
+  for(unsigned int i=0; i<selectedflist.size(); i++){
+    mf::LogInfo("CorsikaGendp")
+      << "Fetching: "<<selectedflist[i].first<<" "<<selectedflist[i].second<<"\n";
+    std::string fetchedfile(fIFDH->fetchInput(selectedflist[i].first));
+    LOG_DEBUG("CorsikaGendp") << "Fetched; local path: "<<fetchedfile;
+    locallist.push_back(fetchedfile);
+  }
+
+  //open the files in fShowerInputFilesLocalPaths with sqlite3
+  for(unsigned int i=0; i<locallist.size(); i++){
+    //prepare and execute statement to attach db file
+    int res=sqlite3_open(locallist[i].c_str(),&fdb[i]);
+    if (res!= SQLITE_OK)
+      throw cet::exception("CORSIKAGendp") << "Error opening db: (" <<locallist[i].c_str()<<") ("<<res<<"): " << sqlite3_errmsg(fdb[i]) << "; memory used:<<"<<sqlite3_memory_used()<<"/"<<sqlite3_memory_highwater(0)<<"\n";
+    else
+      mf::LogInfo("CORSIKAGendp")<<"Attached db "<< locallist[i]<<"\n";
+  }
+}
+*/
 
   void evgendp::Gen311::populateTOffset(){
     //populate TOffset_corsika by finding minimum ParticleTime from db file
