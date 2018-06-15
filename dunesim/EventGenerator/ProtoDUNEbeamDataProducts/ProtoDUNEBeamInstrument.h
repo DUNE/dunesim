@@ -58,10 +58,10 @@ namespace sim {
       ProtoDUNEBeamInstrument(const ProtoDUNEBeamInstrument& rhs);
 
       std::string GetInstrumentName() const {return fInstrumentName;};
-      Float_t GetT() const {return fT;};
       Float_t GetX() const {return fX;};
       Float_t GetY() const {return fY;};
       Float_t GetZ() const {return fZ;};
+      Float_t GetT() const {return fT;};
       Float_t GetPx() const {return fPx;};
       Float_t GetPy() const {return fPy;};
       Float_t GetPz() const {return fPz;};
@@ -70,10 +70,10 @@ namespace sim {
       Int_t GetTrackID() const {return fTrackID;};
 
       void SetInstrumentName(std::string name) {fInstrumentName = name;};
-      void SetT(Float_t val) {fT = val;};
       void SetX(Float_t val) {fX = val;};
       void SetY(Float_t val) {fY = val;};
       void SetZ(Float_t val) {fZ = val;};
+      void SetT(Float_t val) {fT = val;};
       void SetPx(Float_t val) {fPx = val;};
       void SetPy(Float_t val) {fPy = val;};
       void SetPz(Float_t val) {fPz = val;};
@@ -85,10 +85,10 @@ namespace sim {
 
       std::string fInstrumentName;
 
-      Float_t fT;
       Float_t fX;
       Float_t fY;
       Float_t fZ;
+      Float_t fT;
       Float_t fPx;
       Float_t fPy;
       Float_t fPz;

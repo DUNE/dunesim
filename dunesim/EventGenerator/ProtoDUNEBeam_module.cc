@@ -800,11 +800,11 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
                         // std::cout<<"the testing for beam profile monitor information:  "<<fGoodBPROF4_z<<std::endl;
                         
                         
-                        std::cout<< "From the data product:  TRIG2TRACKID:   "<<temp.get_TRIG2_TrackID()<<std::endl;
+//                        std::cout<< "From the data product:  TRIG2TRACKID:   "<<temp.get_TRIG2_TrackID()<<std::endl;
                         //check the last index of the vector
                         sim::ProtoDUNEbeamsim lastelement = beamsimcol.back();
                         
-                        std::cout<<"From the vector TRIG2_TRACKID: "<<lastelement.get_TRIG2_TrackID()<<std::endl;
+//                        std::cout<<"From the vector TRIG2_TRACKID: "<<lastelement.get_TRIG2_TrackID()<<std::endl;
                         
                         
                         //Make the assn                                                                                                                                  
