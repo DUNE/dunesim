@@ -791,12 +791,6 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
 
 			sim::ProtoDUNEbeamsim temp; 
 
-//                        sim::ProtoDUNEbeamsim temp (fGoodBPROFEXT_x,fGoodBPROFEXT_y,fGoodBPROFEXT_z,fGoodBPROFEXT_Px,fGoodBPROFEXT_Py,fGoodBPROFEXT_Pz,fGoodBPROFEXT_PDGid,fGoodBPROFEXT_EventID,fGoodBPROFEXT_TrackID,fGoodBPROF4_x,fGoodBPROF4_y,fGoodBPROF4_z,fGoodBPROF4_Px,fGoodBPROF4_Py,fGoodBPROF4_Pz,fGoodBPROF4_PDGid,fGoodBPROF4_EventID,fGoodBPROF4_TrackID,fGoodTOF1_t,fGoodTOF1_x,fGoodTOF1_y,fGoodTOF1_z,fGoodTOF1_Px,fGoodTOF1_Py,fGoodTOF1_Pz,fGoodTOF1_PDGid,fGoodTRIG2_x,fGoodTRIG2_y,fGoodTRIG2_z,fGoodTRIG2_Px,fGoodTRIG2_Py,fGoodTRIG2_Pz,fGoodTRIG2_EventID,fGoodTRIG2_TrackID,fGoodNP04FieldCage_x,fGoodNP04FieldCage_y,fGoodNP04FieldCage_z,fGoodNP04FieldCage_Px,fGoodNP04FieldCage_Py,fGoodNP04FieldCage_Pz,fBeamEvent,fTrackID);
-
-                        // Add the beam instruments (we will eventually just do sim::ProtoDUNEbeamsim temp; above)
-//                        temp.AddInstrument(tof1);
-//                        temp.AddInstrument(trig2);
-
                         std::cout << "ProtoDUNEbeamsim object has " << temp.NInstruments() << " beam instruments" << std::endl;
 
                         beamsimcol.push_back(temp);
