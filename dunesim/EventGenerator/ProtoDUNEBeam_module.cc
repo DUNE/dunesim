@@ -36,6 +36,8 @@
 //#include "lardataobj/Simulation/ProtoDUNEbeamsim.h"
 #include "dune/EventGenerator/ProtoDUNEbeamDataProducts/ProtoDUNEbeamsim.h"
 #include "dune/EventGenerator/ProtoDUNEbeamDataProducts/ProtoDUNEBeamInstrument.h"
+#include "dune/EventGenerator/ProtoDUNEbeamTPCmatching/ProtoDUNEbeammatch.h"
+#include "dune/EventGenerator/ProtoDUNEbeamTPCmatching/ProtoDUNEBeamToF.h"
 #include "lardata/Utilities/AssociationUtil.h"
 // art extensions
 #include "nutools/RandomUtils/NuRandomService.h"
@@ -258,13 +260,6 @@ namespace evgen{
         Float_t fGoodBPROFEXT_TrackID;
 
 
-
-
-
-
-
-
- 
         // Members we need to extract from the tree
         float fX, fY, fZ;
         float fPx, fPy, fPz;
@@ -767,6 +762,10 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
                 for (int i =0; i<fGoodParticleTree->GetEntries();++i){
                     fGoodParticleTree->GetEntry(i);
                     if ((int)fTrackID == EarlierTrackID){
+
+                        match::ProtoDUNEBeamToF tof(fGoodTOF1_t,fGoodTRIG2_t);
+//                        match::ProtoDUNEbeamMatch ;
+
                         
                         sim::ProtoDUNEBeamInstrument tof1("TOF1",fGoodTOF1_x,fGoodTOF1_y,fGoodTOF1_z,fGoodTOF1_t,fGoodTOF1_Px,fGoodTOF1_Py,fGoodTOF1_Pz,
                                                      fGoodTOF1_PDGid,fGoodTOF1_EventID,fGoodTOF1_TrackID);  

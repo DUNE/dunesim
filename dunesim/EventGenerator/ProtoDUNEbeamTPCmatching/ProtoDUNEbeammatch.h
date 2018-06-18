@@ -20,19 +20,23 @@
 #include "TMath.h"
 
 //#include "dune/EventGenerator/ProtoDUNEbeamTPCmatching/ProtoDUNEBeamDirection.h"
-//#include "dune/EventGenerator/ProtoDUNEbeamTPCmatching/ProtoDUNEBeamTof.h"
+#include "dune/EventGenerator/ProtoDUNEbeamTPCmatching/ProtoDUNEBeamToF.h"
 
 namespace match {
  class ProtoDUNEbeamMatch  {
 
   public:
+
     ProtoDUNEbeammatch(); //constructor
 
     ~ProtoDUNEbeammatch(); //destructor
 
-    private:
+  private:
 
+  public:
 
+//    ProtoDUNEBeamDirection GetDir() const;  
+    ProtoDUNEBeamToF GetToF() const;
 
 
 
