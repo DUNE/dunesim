@@ -23,7 +23,7 @@
 #include "dune/EventGenerator/ProtoDUNEbeamTPCmatching/ProtoDUNEBeamToF.h"
 
 namespace match {
- class ProtoDUNEbeamMatch  {
+ class ProtoDUNEbeammatch  {
 
   public:
 
@@ -40,7 +40,7 @@ namespace match {
 
 
 
-
+};
 }//namespace
 #endif // PROTODUNEMATCH_H
 
