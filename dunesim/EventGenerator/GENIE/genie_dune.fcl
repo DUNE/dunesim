@@ -110,7 +110,7 @@ dune_fd_genie_atmo_max_hondaflux.FluxSearchPaths: "/pnfs/dune/persistent/TaskFor
 dune_fd_genie_atmo_max_hondaflux.FluxFiles: ["hms-ally-20-12-solmax.d","hms-ally-20-12-solmax.d","hms-ally-20-12-solmax.d","hms-ally-20-12-solmax.d"]
 dune_fd_genie_atmo_max_hondaflux.FluxCopyMethod: "IFDH"
 
-dune_fd_genie_atmo_min_hondaflux: @local::dune_fd_genie_atmo_min_hondaflux
+dune_fd_genie_atmo_min_hondaflux: @local::dune_fd_genie_atmo_max_hondaflux
 dune_fd_genie_atmo_min_hondaflux.FluxFiles: ["hms-ally-20-12-solmin.d","hms-ally-20-12-solmin.d","hms-ally-20-12-solmin.d","hms-ally-20-12-solmin.d"]
 
 END_PROLOG
