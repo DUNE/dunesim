@@ -59,7 +59,7 @@ dune10kt_1x2x6_APA:{
  T1:                    [  2246000. ] # ending time in ns
 }
 
-dune10kt_1x2x6_neutron:
+dune10kt_1x2x6_neutron: #Center region is added to simulate neutrons comming in from the rock at the outermost APAs (on the edge of the cryostat).
 {
  module_type:           "RadioGen"
  Nuclide:               ["Concrete_DUNE1", "Concrete_DUNE1", "Concrete_DUNE1", "Concrete_DUNE1", "Concrete_DUNE1" ]
