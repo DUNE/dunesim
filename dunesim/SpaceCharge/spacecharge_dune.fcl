@@ -14,4 +14,8 @@ dune35t_spacecharge:   @local::standard_spacecharge
 dune35t_spacecharge.InputFilename:  "SCEoffsets_DUNE35t_E500.root"
 dune35t_spacecharge.service_provider:  SpaceChargeServiceDUNE35t
 
+dphase3x1x1_spacecharge:   @local::standard_spacecharge
+dphase3x1x1_spacecharge.InputFilename:  "SCEOffsets_311_Fieldcage_E500.root"
+dphase3x1x1_spacecharge.service_provider:  SpaceChargeService3x1x1dphase
+
 END_PROLOG

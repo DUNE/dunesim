@@ -62,9 +62,11 @@ standard_311_fake_data:
 {
   module_type: "DataGen311"
 
-  P0:             10.
-  SigmaP:         5.
-  FileName:       "/eos/user/a/ascarpel/selectedTrack/run840to842_subrun0to117_50cm_selected_tracks.txt"
+  EventsToProcess:100
+  StartEvent:     3000
+  PDG:            13
+  TrackFile:      "/eos/user/a/ascarpel/selectedTrack/run840to842_subrun0to117_50cm_selected_tracks.txt"
+  HistFile:       "/eos/user/a/amedcalf/corsika_hist/corsika_hist.root"
 }
 
 END_PROLOG
