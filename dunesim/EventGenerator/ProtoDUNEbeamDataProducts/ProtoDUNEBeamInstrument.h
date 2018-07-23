@@ -81,6 +81,23 @@ namespace sim {
       void SetEventID(Int_t val) {fEventID = val;};
       void SetTrackID(Int_t val) {fTrackID = val;};
 
+      void GetSmear(std::string name){
+	if (name == "TOF1"){
+//        Float_t GetSmearT() const {return fsmearedmonitor;};
+	}
+	};
+
+      void SetSmear(std::string name){
+//        void SetSmearT(Float_t fsmearedmonitor) {fsmearedmonitor = value;};
+}
+
+
+      Float_t Smearing(Float_t value){return value;};
+
+      Float_t UnitGauss(Float_t mean, Float_t value, Float_t sigma){
+        Float_t p = exp(0.5*pow((mean-value),2)/(pow(sigma,2)));
+        return p;}
+
     private:
 
       std::string fInstrumentName;
@@ -95,7 +112,7 @@ namespace sim {
       Int_t fPDGid;
       Int_t fEventID;
       Int_t fTrackID;
-
+      Float_t fsmearedmonitor;
   };
 }
 

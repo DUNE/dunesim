@@ -16,6 +16,8 @@ namespace sim{
     fPDGid = 0;
     fEventID = 0;
     fTrackID = 0;
+    fsmearedmonitor = 0;
+
   }
 
   //-------------------------------default destructor------------------------------------------
@@ -40,7 +42,23 @@ namespace sim{
     fPx = Px; fPy = Py; fPz = Pz;
     fPDGid = PDGid;
     fEventID = EventID;
-    fTrackID = TrackID;
+    fTrackID = TrackID;	
+    if (name == "TOF1"){
+      fsmearedmonitor = t;
+      Float_t to = 2295;
+      Float_t tf = 2293;
+      Float_t resol = 1;
+      srand (static_cast <unsigned> (time(0)));
+      Float_t t_test = to + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(tf-to)));
+      Float_t p_test = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX));
+      Float_t p_gauss = ProtoDUNEBeamInstrument::UnitGauss(t,t_test,resol);
+      while (p_test > p_gauss){
+        p_test = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX));
+        t_test = to + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(tf-to)));
+        p_gauss = UnitGauss(t,t_test,resol);
+      }
+      fsmearedmonitor = t_test;
+  }
   }
 
   /// Vector-based constructor
