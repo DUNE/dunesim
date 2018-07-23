@@ -1,5 +1,5 @@
 #include "services_dune.fcl"
-#include "radiological_gen_dune_full.fcl"
+#include "dune_radiological_model.fcl"
 
 process_name: BackgroundGen
 
@@ -59,7 +59,7 @@ physics:
     cpaGen:    @local::dune10kt_1x2x6_CPA
     poGen:     @local::dune10kt_1x2x6_210po
     krGen:     @local::dune10kt_1x2x6_85kr
-    fcGen:     @local::dune10kt_1x2x6_fc
+    neutronGen:     @local::dune10kt_1x2x6_neutron
     rns:       { module_type: "RandomNumberSaver" }
   }
  

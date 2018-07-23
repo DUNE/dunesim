@@ -1,9 +1,9 @@
 
-art_make( 
-          MODULE_LIBRARIES 
+art_make(
+          MODULE_LIBRARIES
                         larcoreobj_SummaryData
                         larcore_Geometry_Geometry_service
-			larcorealg_Geometry
+			                  larcorealg_Geometry
                         nutools_RandomUtils_NuRandomService_service
                         larsim_Simulation lardataobj_Simulation
                         nusimdata_SimulationBase
@@ -18,7 +18,7 @@ art_make(
                         art_Utilities
                         canvas
                         ${MF_MESSAGELOGGER}
-                        
+
                         ${FHICLCPP}
                         cetlib cetlib_except
                         ${CLHEP}
@@ -31,4 +31,3 @@ art_make(
 install_headers()
 install_fhicl()
 install_source()
-
