@@ -37,7 +37,7 @@ physics:
  
   producers:
   {
-    generator: @local::dune10kt_1x2x6_39ar
+    ar39Gen: @local::dune10kt_1x2x6_39ar
     ar42Gen:   @local::dune10kt_1x2x6_42ar
     rnGen:     @local::dune10kt_1x2x6_222rn
     apaGen:    @local::dune10kt_1x2x6_APA
@@ -50,7 +50,7 @@ physics:
   }
  
   # Define the producer and filter modules for this path, order matters, 
-  simulate:      [ rns, generator, fcGen, rnGen, krGen, poGen, cpaGen, apaGen ]
+  simulate:      [ rns, ar39Gen, fcGen, rnGen, krGen, poGen, cpaGen, apaGen ]
   
   # Define the output stream, there could be more than one if using filters 
   stream1:       [ out1 ]
