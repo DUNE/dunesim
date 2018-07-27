@@ -789,6 +789,16 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
 						      fGoodBPROF1_PDGid,fGoodBPROF1_EventID,fGoodBPROF1_TrackID);
 
 			sim::ProtoDUNEbeamsim temp; 
+                        temp.AddInstrument(tof1);
+                        temp.AddInstrument(trig2);
+                        temp.AddInstrument(fieldcage);
+                        temp.AddInstrument(front);
+                        temp.AddInstrument(bprof4);
+                        temp.AddInstrument(bprofext);
+                        temp.AddInstrument(trig1);
+                        temp.AddInstrument(bprof3);
+                        temp.AddInstrument(bprof2);
+                        temp.AddInstrument(bprof1);
 
                         std::cout << "ProtoDUNEbeamsim object has " << temp.NInstruments() << " beam instruments" << std::endl;
 
