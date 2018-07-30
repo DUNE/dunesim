@@ -146,27 +146,27 @@ namespace evgen{
         //////////////////// Good Particle Tree Variables added by Caroline for beam simulation storage
         ////////////////////////////////////////////////////////////////////////////////////////////////
         //For the NP04 Cage part
-        Float_t fGoodNP04FieldCage_x;
-        Float_t fGoodNP04FieldCage_y;
-        Float_t fGoodNP04FieldCage_z;
-        Float_t fGoodNP04FieldCage_t;
-        Float_t fGoodNP04FieldCage_Px;
-        Float_t fGoodNP04FieldCage_Py;
-        Float_t fGoodNP04FieldCage_Pz;
-        Float_t fGoodNP04FieldCage_PDGid;
-        Float_t fGoodNP04FieldCage_EventID;
-        Float_t fGoodNP04FieldCage_TrackID;
-       
-        Float_t fGoodNP04front_x;
-        Float_t fGoodNP04front_y;
-        Float_t fGoodNP04front_z;
-        Float_t fGoodNP04front_t;
-        Float_t fGoodNP04front_Px;
-        Float_t fGoodNP04front_Py;
-        Float_t fGoodNP04front_Pz;
-        Float_t fGoodNP04front_PDGid;
-        Float_t fGoodNP04front_EventID;
-        Float_t fGoodNP04front_TrackID;
+//        Float_t fGoodNP04FieldCage_x;
+//        Float_t fGoodNP04FieldCage_y;
+//        Float_t fGoodNP04FieldCage_z;
+//        Float_t fGoodNP04FieldCage_t;
+//        Float_t fGoodNP04FieldCage_Px;
+//        Float_t fGoodNP04FieldCage_Py;
+//        Float_t fGoodNP04FieldCage_Pz;
+//        Float_t fGoodNP04FieldCage_PDGid;
+//        Float_t fGoodNP04FieldCage_EventID;
+//        Float_t fGoodNP04FieldCage_TrackID;
+//       
+//        Float_t fGoodNP04front_x;
+//        Float_t fGoodNP04front_y;
+//        Float_t fGoodNP04front_z;
+//        Float_t fGoodNP04front_t;
+//        Float_t fGoodNP04front_Px;
+//        Float_t fGoodNP04front_Py;
+//        Float_t fGoodNP04front_Pz;
+//        Float_t fGoodNP04front_PDGid;
+//        Float_t fGoodNP04front_EventID;
+//        Float_t fGoodNP04front_TrackID;
 
 	// For the TOF part
         Float_t fGoodTOF1_x;
@@ -264,8 +264,15 @@ namespace evgen{
         float fX, fY, fZ;
         float fPx, fPy, fPz;
         float fPDG; // Input tree has all floats
+
+        // Event and TrackID for good particle tree
         float fBeamEvent;
         float fTrackID;
+
+        // Same for all particles
+        float fAllEventID;
+        float fAllTrackID;
+
         // We need two times: the trigger time, and the time at the entry point
         // to the TPC where we generate the event.
         float fEntryT, fTriggerT;
@@ -422,39 +429,41 @@ void evgen::ProtoDUNEBeam::beginJob(){
     // PDG code
     fAllParticlesTree->SetBranchAddress("PDGid",&fPDG);
     // Event and track number
-    fAllParticlesTree->SetBranchAddress("EventID",&fBeamEvent);
-    fAllParticlesTree->SetBranchAddress("TrackID",&fTrackID);
+    fAllParticlesTree->SetBranchAddress("EventID",&fAllEventID);
+    fAllParticlesTree->SetBranchAddress("TrackID",&fAllTrackID);
     
     // We only need the trigger time and event number from the good particle tree.
     // The good particle tree variable should match the names of the other trees
     std::string namePrefix = fAllParticlesTreeName.substr(fAllParticlesTreeName.find_last_of("\\/")+1,std::string::npos);
+
+    std::cout << "Name prefix for good particle tree = " << namePrefix << std::endl;
 
     fGoodParticleTree->SetBranchAddress((namePrefix+"_EventID").c_str(),&fBeamEvent);
     fGoodParticleTree->SetBranchAddress((namePrefix+"_TrackID").c_str(),&fTrackID);
  
     ////////************added by Caroline for beam simulation storage for good particles ***************//////////////
     // add lines for the NP04 part
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_x").c_str(),&fGoodNP04FieldCage_x);
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_y").c_str(),&fGoodNP04FieldCage_y);
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_z").c_str(),&fGoodNP04FieldCage_z);
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_t").c_str(),&fGoodNP04FieldCage_t);
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_Px").c_str(),&fGoodNP04FieldCage_Px);
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_Py").c_str(),&fGoodNP04FieldCage_Py);
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_Pz").c_str(),&fGoodNP04FieldCage_Pz);
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_PDGid").c_str(),&fGoodNP04FieldCage_PDGid);
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_EventID").c_str(),&fGoodNP04FieldCage_EventID);
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_TrackID").c_str(),&fGoodNP04FieldCage_TrackID);
-
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_x").c_str(),&fGoodNP04front_x);
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_y").c_str(),&fGoodNP04front_y);
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_z").c_str(),&fGoodNP04front_z);
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_t").c_str(),&fGoodNP04front_t);
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_Px").c_str(),&fGoodNP04front_Px);
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_Py").c_str(),&fGoodNP04front_Py);
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_Pz").c_str(),&fGoodNP04front_Pz);
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_PDGid").c_str(),&fGoodNP04front_PDGid);
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_EventID").c_str(),&fGoodNP04front_EventID);
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_TrackID").c_str(),&fGoodNP04front_TrackID);
+//    fGoodParticleTree->SetBranchAddress((namePrefix+"_x").c_str(),&fGoodNP04FieldCage_x);
+//    fGoodParticleTree->SetBranchAddress((namePrefix+"_y").c_str(),&fGoodNP04FieldCage_y);
+//    fGoodParticleTree->SetBranchAddress((namePrefix+"_z").c_str(),&fGoodNP04FieldCage_z);
+//    fGoodParticleTree->SetBranchAddress((namePrefix+"_t").c_str(),&fGoodNP04FieldCage_t);
+//    fGoodParticleTree->SetBranchAddress((namePrefix+"_Px").c_str(),&fGoodNP04FieldCage_Px);
+//    fGoodParticleTree->SetBranchAddress((namePrefix+"_Py").c_str(),&fGoodNP04FieldCage_Py);
+//    fGoodParticleTree->SetBranchAddress((namePrefix+"_Pz").c_str(),&fGoodNP04FieldCage_Pz);
+//    fGoodParticleTree->SetBranchAddress((namePrefix+"_PDGid").c_str(),&fGoodNP04FieldCage_PDGid);
+//    fGoodParticleTree->SetBranchAddress((namePrefix+"_EventID").c_str(),&fGoodNP04FieldCage_EventID);
+//    fGoodParticleTree->SetBranchAddress((namePrefix+"_TrackID").c_str(),&fGoodNP04FieldCage_TrackID);
+//
+//    fGoodParticleTree->SetBranchAddress((namePrefix+"_x").c_str(),&fGoodNP04front_x);
+//    fGoodParticleTree->SetBranchAddress((namePrefix+"_y").c_str(),&fGoodNP04front_y);
+//    fGoodParticleTree->SetBranchAddress((namePrefix+"_z").c_str(),&fGoodNP04front_z);
+//    fGoodParticleTree->SetBranchAddress((namePrefix+"_t").c_str(),&fGoodNP04front_t);
+//    fGoodParticleTree->SetBranchAddress((namePrefix+"_Px").c_str(),&fGoodNP04front_Px);
+//    fGoodParticleTree->SetBranchAddress((namePrefix+"_Py").c_str(),&fGoodNP04front_Py);
+//    fGoodParticleTree->SetBranchAddress((namePrefix+"_Pz").c_str(),&fGoodNP04front_Pz);
+//    fGoodParticleTree->SetBranchAddress((namePrefix+"_PDGid").c_str(),&fGoodNP04front_PDGid);
+//    fGoodParticleTree->SetBranchAddress((namePrefix+"_EventID").c_str(),&fGoodNP04front_EventID);
+//    fGoodParticleTree->SetBranchAddress((namePrefix+"_TrackID").c_str(),&fGoodNP04front_TrackID);
     
     // add more lines for the TOF part
     fGoodParticleTree->SetBranchAddress("TOF1_x",&fGoodTOF1_x);
@@ -588,11 +597,6 @@ void evgen::ProtoDUNEBeam::produce(art::Event & e)
     // Fill the MCTruth object
     GenerateTrueEvent(truth, (*beamsimcol) );
     
-    //call the event generation fuction to obtain the values
-    std::cout<<"the size of *beamsimcol: "<<(*beamsimcol).size()<<std::endl;
-    
-    ///get your vector of mc particles ...loop over  get the track id inside the loop, loop through data product...track ID -ASSOSCIATED
-    
     // Add the MCTruth to the vector
     truthcol->push_back(truth);
     
@@ -625,6 +629,8 @@ void evgen::ProtoDUNEBeam::FillParticleMaps(){
         
         fGoodParticleTree->GetEntry(i);
 
+        std::cout << "Tree entry " << i << " corresponds to event " << fBeamEvent << std::endl;
+
         // Make sure we didn't have two good particles in one event
         if(std::find(fGoodEventList.begin(),fGoodEventList.end(),(int)fBeamEvent)!=fGoodEventList.end()) continue;
  
@@ -645,7 +651,7 @@ void evgen::ProtoDUNEBeam::FillParticleMaps(){
         
         if (i%100000==0) std::cout << "Looking at entry " << i << std::endl;
         
-        int event = int(fBeamEvent);
+        int event = int(fAllEventID);
        
         // Look at which good events this should be overlaid with
         std::vector<int> goodEventList = GetAllOverlays(event,fOverlays);
@@ -716,6 +722,8 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
             // Get the entry from the tree for this event and track.
             fAllParticlesTree->GetEntry(t);
             
+            std::cout << fAllEventID << ", " << fAllTrackID << ", " << spill.fGoodEvent << ", " << spill.fGoodTrack << std::endl;
+
             // Convert the pdgCode to an int
             int intPDG = (int)fPDG;
             // We need to ignore nuclei for now...
@@ -724,7 +732,7 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
             // Check to see if this should be a primary beam particle (good particle) or beam background
             std::string process="primaryBackground";
             // If this track is a "good particle", use the usual "primary" tag
-            if(trigEvent && (spill.fGoodTrack == (int)fTrackID)){
+            if(trigEvent && (spill.fGoodTrack == (int)fAllTrackID)){
                 process="primary";
             }
             
@@ -755,13 +763,15 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
             //////------caroline's new code-------
 	    //Make the assn 
 	    //util::CreateAssn(*this, e, *beamsimcol, newParticle, *beamsimassn);
-            if(trigEvent && (spill.fGoodTrack == (int)fTrackID)){
+            if(trigEvent && (spill.fGoodTrack == (int)fAllTrackID)){
                 // process="primary";
                 
-                int EarlierTrackID = fTrackID;
+//                int EarlierTrackID = fTrackID;
                 for (int i =0; i<fGoodParticleTree->GetEntries();++i){
                     fGoodParticleTree->GetEntry(i);
-                    if ((int)fTrackID == EarlierTrackID){
+                    if ((int)fTrackID == (int)fAllTrackID && (int)fBeamEvent == (int)fAllEventID){
+
+                      std::cout << "Found the good particle...? " << (int)fTrackID << ", " << fAllTrackID << std::endl;
 
 //                        match::ProtoDUNEBeamToF tof(fGoodTOF1_t,fGoodTRIG2_t);
 //                        match::ProtoDUNEbeamMatch ;
@@ -771,10 +781,10 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
                                                      fGoodTOF1_PDGid,fGoodTOF1_EventID,fGoodTOF1_TrackID);  
                         sim::ProtoDUNEBeamInstrument trig2("TRIG2",fGoodTRIG2_x,fGoodTRIG2_y,fGoodTRIG2_z,fGoodTRIG2_t,fGoodTRIG2_Px,fGoodTRIG2_Py,fGoodTRIG2_Pz,
                                                       fGoodTRIG2_PDGid,fGoodTRIG2_EventID,fGoodTRIG2_TrackID);  
-			sim::ProtoDUNEBeamInstrument fieldcage("NP04FieldCage",fGoodNP04FieldCage_x,fGoodNP04FieldCage_y,fGoodNP04FieldCage_z,fGoodNP04FieldCage_t,
-						      fGoodNP04FieldCage_Px,fGoodNP04FieldCage_Py,fGoodNP04FieldCage_Pz,fGoodNP04FieldCage_PDGid,fGoodNP04FieldCage_EventID,fGoodNP04FieldCage_TrackID);
-			sim::ProtoDUNEBeamInstrument front("NP04front",fGoodNP04front_x,fGoodNP04front_y,fGoodNP04front_z,fGoodNP04front_t,fGoodNP04front_Px,fGoodNP04front_Py,fGoodNP04front_Pz,
-						      fGoodNP04front_PDGid,fGoodNP04front_EventID,fGoodNP04front_TrackID);
+//			sim::ProtoDUNEBeamInstrument fieldcage("NP04FieldCage",fGoodNP04FieldCage_x,fGoodNP04FieldCage_y,fGoodNP04FieldCage_z,fGoodNP04FieldCage_t,
+//						      fGoodNP04FieldCage_Px,fGoodNP04FieldCage_Py,fGoodNP04FieldCage_Pz,fGoodNP04FieldCage_PDGid,fGoodNP04FieldCage_EventID,fGoodNP04FieldCage_TrackID);
+//			sim::ProtoDUNEBeamInstrument front("NP04front",fGoodNP04front_x,fGoodNP04front_y,fGoodNP04front_z,fGoodNP04front_t,fGoodNP04front_Px,fGoodNP04front_Py,fGoodNP04front_Pz,
+//						      fGoodNP04front_PDGid,fGoodNP04front_EventID,fGoodNP04front_TrackID);
 			sim::ProtoDUNEBeamInstrument bprof4("BPROF4",fGoodBPROF4_x,fGoodBPROF4_y,fGoodBPROF4_z,fGoodBPROF4_t,fGoodBPROF4_Px,fGoodBPROF4_Py,fGoodBPROF4_Pz,
 						      fGoodBPROF4_PDGid,fGoodBPROF4_EventID,fGoodBPROF4_TrackID);
 			sim::ProtoDUNEBeamInstrument bprofext("BPROFEXT",fGoodBPROFEXT_x,fGoodBPROFEXT_y,fGoodBPROFEXT_z,fGoodBPROFEXT_t,fGoodBPROFEXT_Px,fGoodBPROFEXT_Py,fGoodBPROFEXT_Pz,
@@ -791,8 +801,8 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
 			sim::ProtoDUNEbeamsim temp; 
                         temp.AddInstrument(tof1);
                         temp.AddInstrument(trig2);
-                        temp.AddInstrument(fieldcage);
-                        temp.AddInstrument(front);
+ //                       temp.AddInstrument(fieldcage);
+ //                       temp.AddInstrument(front);
                         temp.AddInstrument(bprof4);
                         temp.AddInstrument(bprofext);
                         temp.AddInstrument(trig1);

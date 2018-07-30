@@ -2,6 +2,7 @@
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
 
 art_make(
+          MODULE_LIBRARIES dune_EventGenerator_ProtoDUNEbeamDataProducts
           LIB_LIBRARIES lardataobj_Simulation
           art_Persistency_Common canvas
           art_Persistency_Provenance canvas
