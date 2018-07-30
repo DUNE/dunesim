@@ -629,7 +629,7 @@ void evgen::ProtoDUNEBeam::FillParticleMaps(){
         
         fGoodParticleTree->GetEntry(i);
 
-        std::cout << "Tree entry " << i << " corresponds to event " << fBeamEvent << std::endl;
+//        std::cout << "Tree entry " << i << " corresponds to event " << fBeamEvent << std::endl;
 
         // Make sure we didn't have two good particles in one event
         if(std::find(fGoodEventList.begin(),fGoodEventList.end(),(int)fBeamEvent)!=fGoodEventList.end()) continue;
@@ -722,7 +722,7 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
             // Get the entry from the tree for this event and track.
             fAllParticlesTree->GetEntry(t);
             
-            std::cout << fAllEventID << ", " << fAllTrackID << ", " << spill.fGoodEvent << ", " << spill.fGoodTrack << std::endl;
+//            std::cout << fAllEventID << ", " << fAllTrackID << ", " << spill.fGoodEvent << ", " << spill.fGoodTrack << std::endl;
 
             // Convert the pdgCode to an int
             int intPDG = (int)fPDG;
@@ -771,7 +771,7 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
                     fGoodParticleTree->GetEntry(i);
                     if ((int)fTrackID == (int)fAllTrackID && (int)fBeamEvent == (int)fAllEventID){
 
-                      std::cout << "Found the good particle...? " << (int)fTrackID << ", " << fAllTrackID << std::endl;
+//                      std::cout << "Found the good particle...? " << (int)fTrackID << ", " << fAllTrackID << std::endl;
 
 //                        match::ProtoDUNEBeamToF tof(fGoodTOF1_t,fGoodTRIG2_t);
 //                        match::ProtoDUNEbeamMatch ;
