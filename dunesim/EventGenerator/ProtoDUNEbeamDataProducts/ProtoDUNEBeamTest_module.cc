@@ -76,7 +76,7 @@ void sim::ProtoDUNEBeamTest::analyze(art::Event const & evt)
 
   // Get the reconstructed tracks
   auto beamsim = evt.getValidHandle<std::vector<sim::ProtoDUNEbeamsim> >("generator");
-  const sim::ProtoDUNEbeamsim temp = (*beamsim)[0];
+  const sim::ProtoDUNEbeamsim temp = (*beamsim)[1];
   unsigned short nInst = temp.NInstruments();
   std::cout << "Number of beam instruments read from the file = " << nInst << std::endl;
 

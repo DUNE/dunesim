@@ -555,8 +555,9 @@ void evgen::ProtoDUNEBeam::beginJob(){
     fGoodParticleTree->SetBranchAddress("BPROFEXT_PDGid",&fGoodBPROFEXT_PDGid);
     fGoodParticleTree->SetBranchAddress("BPROFEXT_EventID",&fGoodBPROFEXT_EventID);
     fGoodParticleTree->SetBranchAddress("BPROFEXT_TrackID",&fGoodBPROFEXT_TrackID);
-    
-    //************************************end of caroline's beam particle tree******************************/////////////
+ 
+
+   
         
     // Calculate the number of events to overlay
     CalculateNOverlays();
@@ -764,6 +765,7 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
 	    //Make the assn 
 	    //util::CreateAssn(*this, e, *beamsimcol, newParticle, *beamsimassn);
             if(trigEvent && (spill.fGoodTrack == (int)fAllTrackID)){
+
                 // process="primary";
                 
 //                int EarlierTrackID = fTrackID;
@@ -798,6 +800,13 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
 			sim::ProtoDUNEBeamInstrument bprof1("BPROF1",fGoodBPROF1_x,fGoodBPROF1_y,fGoodBPROF1_z,fGoodBPROF1_t,fGoodBPROF1_Px,fGoodBPROF1_Py,fGoodBPROF1_Pz,
 						      fGoodBPROF1_PDGid,fGoodBPROF1_EventID,fGoodBPROF1_TrackID);
 
+// Adding Cherenkovs with same variables as BPROFEXT except for their response
+sim::ProtoDUNEBeamInstrument cherenkov1("CHERENKOV1",fGoodBPROFEXT_x,fGoodBPROFEXT_y,fGoodBPROFEXT_z,fGoodBPROFEXT_t,fGoodBPROFEXT_Px,fGoodBPROFEXT_Py,fGoodBPROFEXT_Pz,
+						      fGoodBPROFEXT_PDGid,fGoodBPROFEXT_EventID,fGoodBPROFEXT_TrackID);
+sim::ProtoDUNEBeamInstrument cherenkov2("CHERENKOV2",fGoodBPROFEXT_x,fGoodBPROFEXT_y,fGoodBPROFEXT_z,fGoodBPROFEXT_t,fGoodBPROFEXT_Px,fGoodBPROFEXT_Py,fGoodBPROFEXT_Pz,
+                                                      fGoodBPROFEXT_PDGid,fGoodBPROFEXT_EventID,fGoodBPROFEXT_TrackID);
+
+
 			sim::ProtoDUNEbeamsim temp; 
                         temp.AddInstrument(tof1);
                         temp.AddInstrument(trig2);
@@ -809,13 +818,89 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
                         temp.AddInstrument(bprof3);
                         temp.AddInstrument(bprof2);
                         temp.AddInstrument(bprof1);
+                        temp.AddInstrument(cherenkov1);
+                        temp.AddInstrument(cherenkov2);
 
                         std::cout << "ProtoDUNEbeamsim object has " << temp.NInstruments() << " beam instruments" << std::endl;
 
                         beamsimcol.push_back(temp);
+                        std::cout<< beamsimcol.size() << std::endl;
                         // std::cout<<" test value beam profile monitor: TTREE   "<<fGoodBPROF4_x<<std::endl;
                         std::cout<<"From TTree TRIG2_TRACKID: "<<fGoodTRIG2_TrackID<<std::endl;
-                        
+/*                        
+// Create Virtual Cherenkovs with true (100% efficiency) response
+   fGoodBPROFEXT_Ptot = pow(pow(fGoodBPROFEXT_Px,2)+pow(fGoodBPROFEXT_Py,2)+pow(fGoodBPROFEXT_Pz,2),0.5)/1000.;
+//   std::cout << "Ptot" << fGoodBPROFEXT_Ptot << std::endl;
+//   CHERENKOV1_value = fGoodBPROFEXT_PDGid;
+   CHERENKOV2_value = fGoodBPROFEXT_PDGid;
+   CHERENKOV1_value = CHERENKOV2_value;
+   if (fGoodBPROFEXT_Ptot <= 2.0){
+	if (abs(fGoodBPROFEXT_PDGid) == 2212 || abs(fGoodBPROFEXT_PDGid) == 310){
+		CHERENKOV1_value = 0;
+		CHERENKOV2_value = 0;
+}
+        if (abs(fGoodBPROFEXT_PDGid) == 11){
+                CHERENKOV1_value = 1;
+                CHERENKOV2_value = 0;
+}
+        if (abs(fGoodBPROFEXT_PDGid) == 211){
+                CHERENKOV1_value = 1;
+                CHERENKOV2_value = 1;
+}
+}
+   if (fGoodBPROFEXT_Ptot <= 3.0 && fGoodBPROFEXT_Ptot > 2.0){
+        if (abs(fGoodBPROFEXT_PDGid) == 2212 || abs(fGoodBPROFEXT_PDGid) == 310){
+                CHERENKOV1_value = 0;
+                CHERENKOV2_value = 0;
+}
+        if (abs(fGoodBPROFEXT_PDGid) == 11){
+                CHERENKOV1_value = 1;
+                CHERENKOV2_value = 0;
+}
+        if (abs(fGoodBPROFEXT_PDGid) == 211){
+                CHERENKOV1_value = 1;
+                CHERENKOV2_value = 1;
+}
+}
+   if (fGoodBPROFEXT_Ptot <= 5.0 && fGoodBPROFEXT_Ptot >3.0){
+        if (abs(fGoodBPROFEXT_PDGid) == 2212 || abs(fGoodBPROFEXT_PDGid) == 310){
+                CHERENKOV1_value = 0;
+                CHERENKOV2_value = 0;
+}
+        if (abs(fGoodBPROFEXT_PDGid) == 11){
+                CHERENKOV1_value = 1;
+                CHERENKOV2_value = 0;
+}
+        if (abs(fGoodBPROFEXT_PDGid) == 211){
+                CHERENKOV1_value = 1;
+                CHERENKOV2_value = 1;
+}
+}
+   if (fGoodBPROFEXT_Ptot > 5.0){
+        if (abs(fGoodBPROFEXT_PDGid) == 2212 || abs(fGoodBPROFEXT_PDGid) == 310){
+                CHERENKOV1_value = 0;
+                CHERENKOV2_value = 0;
+}
+        if (abs(fGoodBPROFEXT_PDGid) == 11){
+                CHERENKOV1_value = 0;
+                CHERENKOV2_value = 0;
+}
+        if (abs(fGoodBPROFEXT_PDGid) == 211){
+                CHERENKOV1_value = 1;
+                CHERENKOV2_value = 1;
+}
+}
+        cherenkovs = "CHERENKOV1";
+//        beamsimcol.push_back(cherenkovs);
+//        beamsimcol.push_back(CHERENKOV1_value);
+//        beamsimcol.push_back(CHERENKOV2_value);
+//        std::cout << "PDGID:" << fGoodBPROFEXT_PDGid << std::endl;
+        std::cout << "Cherenkovs response: " << CHERENKOV1_value << ", " << CHERENKOV2_value << std::endl;
+        std::cout << "--------------------------" << std::endl;
+*/
+
+
+
                         // std::cout<<"the testing for beam profile monitor information:  "<<fGoodBPROF4_z<<std::endl;
                         
                         
@@ -829,6 +914,7 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
                         //Make the assn                                                                                                                                  
 			//util::CreateAssn(*this, e, *beamsimcol, newParticle, *beamsimassn)
                         
+
                     }
                 }
             }

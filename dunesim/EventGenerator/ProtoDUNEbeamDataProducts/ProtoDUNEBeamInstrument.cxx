@@ -16,8 +16,8 @@ namespace sim{
     fPDGid = 0;
     fEventID = 0;
     fTrackID = 0;
-    fsmearedmonitor = 0;
-
+    fSmearedVar[0] = 0.0;
+    fSmearedVar[1] = 0.0;
   }
 
   //-------------------------------default destructor------------------------------------------
@@ -43,22 +43,93 @@ namespace sim{
     fPDGid = PDGid;
     fEventID = EventID;
     fTrackID = TrackID;	
-    if (name == "TOF1"){
-      fsmearedmonitor = t;
-      Float_t to = 2295;
-      Float_t tf = 2293;
-      Float_t resol = 1;
+    if (name == "TOF1" || name == "TRIG2"){
+      Float_t delta_t = 10.;
+      Float_t resolt = 1.0;
       srand (static_cast <unsigned> (time(0)));
-      Float_t t_test = to + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(tf-to)));
+      Float_t t_test = t -delta_t + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(delta_t)));
       Float_t p_test = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX));
-      Float_t p_gauss = ProtoDUNEBeamInstrument::UnitGauss(t,t_test,resol);
+      Float_t p_gauss = ProtoDUNEBeamInstrument::UnitGauss(t,t_test,resolt);
       while (p_test > p_gauss){
         p_test = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX));
-        t_test = to + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(tf-to)));
-        p_gauss = UnitGauss(t,t_test,resol);
+        t_test = t -delta_t + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(delta_t)));
+        p_gauss = UnitGauss(t,t_test,resolt);
       }
-      fsmearedmonitor = t_test;
+      fSmearedVar[0] = t_test;
   }
+    if (name == "BPROFEXT" || name == "BPROF4"){
+      Float_t delta_x = 10.;
+      Float_t resolx = 2.0/pow(12,0.5);
+      srand (static_cast <unsigned> (time(0)));
+      Float_t x_test = x -delta_x + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(delta_x)));
+      Float_t p_test = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX));
+      Float_t p_gauss = ProtoDUNEBeamInstrument::UnitGauss(x,x_test,resolx);
+      while (p_test > p_gauss){
+        p_test = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX)); 
+        x_test = x -delta_x + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(delta_x)));
+        p_gauss = UnitGauss(x,x_test,resolx);
+      }
+      fSmearedVar[0] = x_test;
+
+      Float_t delta_y = 10.;
+      Float_t resoly = 2.0/pow(12,0.5);
+      srand (static_cast <unsigned> (time(0)));
+      Float_t y_test = y -delta_y + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(delta_y)));
+      p_test = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX));
+      p_gauss = ProtoDUNEBeamInstrument::UnitGauss(y,y_test,resoly);
+      while (p_test > p_gauss){
+        p_test = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX));
+        y_test = y -delta_y + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(delta_y)));
+        p_gauss = UnitGauss(y,y_test,resoly);
+      }
+      fSmearedVar[1] = y_test;
+}
+    if (name == "CHERENKOV1"){
+      Float_t Ptot = pow(pow(Px,2)+pow(Py,2)+pow(Pz,2),0.5)/1000.;
+      if (Ptot <= 2.0){
+        if (abs(PDGid) == 2212 || abs(PDGid) == 310) fSmearedVar[0] = 0;
+        if (abs(PDGid) == 11) fSmearedVar[0] = 1;
+        if (abs(PDGid) == 211) fSmearedVar[0] = 1;
+}
+      if (Ptot <= 3.0 && Ptot >2.0){
+        if (abs(PDGid) == 2212 || abs(PDGid) == 310) fSmearedVar[0] = 0;
+        if (abs(PDGid) == 11) fSmearedVar[0] = 1;
+        if (abs(PDGid) == 211) fSmearedVar[0] = 1;
+}
+      if (Ptot <= 5.0 && Ptot > 3.0){
+        if (abs(PDGid) == 2212 || abs(PDGid) == 310) fSmearedVar[0] = 0;
+        if (abs(PDGid) == 11) fSmearedVar[0] = 1;
+        if (abs(PDGid) == 211) fSmearedVar[0] = 1;
+}
+      if (Ptot > 5.0){
+        if (abs(PDGid) == 2212 || abs(PDGid) == 310) fSmearedVar[0] = 0;
+        if (abs(PDGid) == 11) fSmearedVar[0] = 0;
+        if (abs(PDGid) == 211) fSmearedVar[0] = 1;
+}
+}
+    if (name == "CHERENKOV2"){
+      Float_t Ptot = pow(pow(Px,2)+pow(Py,2)+pow(Pz,2),0.5)/1000.;
+      if (Ptot <= 2.0){
+        if (abs(PDGid) == 2212 || abs(PDGid) == 310) fSmearedVar[0] = 0;
+        if (abs(PDGid) == 11) fSmearedVar[0] = 0;
+        if (abs(PDGid) == 211) fSmearedVar[0] = 1;
+}
+      if (Ptot <= 3.0 && Ptot >2.0){
+        if (abs(PDGid) == 2212 || abs(PDGid) == 310) fSmearedVar[0] = 0;
+        if (abs(PDGid) == 11) fSmearedVar[0] = 0;
+        if (abs(PDGid) == 211) fSmearedVar[0] = 1;
+}
+      if (Ptot <= 5.0 && Ptot > 3.0){
+        if (abs(PDGid) == 2212 || abs(PDGid) == 310) fSmearedVar[0] = 0;
+        if (abs(PDGid) == 11) fSmearedVar[0] = 0;
+        if (abs(PDGid) == 211) fSmearedVar[0] = 1;
+}
+      if (Ptot > 5.0){
+        if (abs(PDGid) == 2212 || abs(PDGid) == 310) fSmearedVar[0] = 0;
+        if (abs(PDGid) == 11) fSmearedVar[0] = 0;
+        if (abs(PDGid) == 211) fSmearedVar[0] = 1;
+}
+}
   }
 
   /// Vector-based constructor
@@ -76,6 +147,7 @@ namespace sim{
     fPDGid = PDGid;
     fEventID = EventID;
     fTrackID = TrackID;
+
   }
 
   // TVector3-based constructor
