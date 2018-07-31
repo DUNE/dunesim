@@ -80,16 +80,18 @@ namespace evgen{
         // Contains the good particle and all backgrounds
         struct ProtoFullSpill {
 
-          ProtoFullSpill(int event, int track, float time){
+          ProtoFullSpill(int event, int track, float time, int id){
             fGoodEvent = event;
             fGoodTrack = track;
             fGoodTime = time;
+            fGoodIndex = id;
           };
 
           // Good particle information
           int fGoodEvent; // Beam simulation event number
           int fGoodTrack; // Beam simulation track number
           float fGoodTime;  // Time of beam event
+          int fGoodIndex; // Index of the good particle in the good particle tree
 
           // All of the beam events and tracks
           std::map<int,std::vector<int> > fAllSpillTracks; 
@@ -636,7 +638,7 @@ void evgen::ProtoDUNEBeam::FillParticleMaps(){
         if(std::find(fGoodEventList.begin(),fGoodEventList.end(),(int)fBeamEvent)!=fGoodEventList.end()) continue;
  
         // NEW APPROACH - construct a ProtoFullSpill object
-        ProtoFullSpill newSpill(fBeamEvent,fTrackID,fTriggerT);
+        ProtoFullSpill newSpill(fBeamEvent,fTrackID,fTriggerT,i);
         fAllSpills.push_back(newSpill); 
 
         fGoodEventList.push_back(fBeamEvent);
@@ -761,10 +763,8 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
             // Add the MCParticle to the MCTruth for the event.
             mcTruth.Add(newParticle);
 
-            //////------caroline's new code-------
-	    //Make the assn 
-	    //util::CreateAssn(*this, e, *beamsimcol, newParticle, *beamsimassn);
             if(trigEvent && (spill.fGoodTrack == (int)fAllTrackID)){
+<<<<<<< HEAD
 
                 // process="primary";
                 
@@ -772,6 +772,9 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
                 for (int i =0; i<fGoodParticleTree->GetEntries();++i){
                     fGoodParticleTree->GetEntry(i);
                     if ((int)fTrackID == (int)fAllTrackID && (int)fBeamEvent == (int)fAllEventID){
+=======
+              fGoodParticleTree->GetEntry(spill.fGoodIndex);
+>>>>>>> 113e6ee5c2f2b3a097d2f9bc44fb248cb7cacfec
 
 //                      std::cout << "Found the good particle...? " << (int)fTrackID << ", " << fAllTrackID << std::endl;
 
@@ -779,14 +782,15 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
 //                        match::ProtoDUNEbeamMatch ;
 
                         
-                        sim::ProtoDUNEBeamInstrument tof1("TOF1",fGoodTOF1_x,fGoodTOF1_y,fGoodTOF1_z,fGoodTOF1_t,fGoodTOF1_Px,fGoodTOF1_Py,fGoodTOF1_Pz,
-                                                     fGoodTOF1_PDGid,fGoodTOF1_EventID,fGoodTOF1_TrackID);  
-                        sim::ProtoDUNEBeamInstrument trig2("TRIG2",fGoodTRIG2_x,fGoodTRIG2_y,fGoodTRIG2_z,fGoodTRIG2_t,fGoodTRIG2_Px,fGoodTRIG2_Py,fGoodTRIG2_Pz,
-                                                      fGoodTRIG2_PDGid,fGoodTRIG2_EventID,fGoodTRIG2_TrackID);  
+              sim::ProtoDUNEBeamInstrument tof1("TOF1",fGoodTOF1_x,fGoodTOF1_y,fGoodTOF1_z,fGoodTOF1_t,fGoodTOF1_Px,fGoodTOF1_Py,fGoodTOF1_Pz,
+                                                fGoodTOF1_PDGid,fGoodTOF1_EventID,fGoodTOF1_TrackID);  
+              sim::ProtoDUNEBeamInstrument trig2("TRIG2",fGoodTRIG2_x,fGoodTRIG2_y,fGoodTRIG2_z,fGoodTRIG2_t,fGoodTRIG2_Px,fGoodTRIG2_Py,fGoodTRIG2_Pz,
+                                                 fGoodTRIG2_PDGid,fGoodTRIG2_EventID,fGoodTRIG2_TrackID);  
 //			sim::ProtoDUNEBeamInstrument fieldcage("NP04FieldCage",fGoodNP04FieldCage_x,fGoodNP04FieldCage_y,fGoodNP04FieldCage_z,fGoodNP04FieldCage_t,
 //						      fGoodNP04FieldCage_Px,fGoodNP04FieldCage_Py,fGoodNP04FieldCage_Pz,fGoodNP04FieldCage_PDGid,fGoodNP04FieldCage_EventID,fGoodNP04FieldCage_TrackID);
 //			sim::ProtoDUNEBeamInstrument front("NP04front",fGoodNP04front_x,fGoodNP04front_y,fGoodNP04front_z,fGoodNP04front_t,fGoodNP04front_Px,fGoodNP04front_Py,fGoodNP04front_Pz,
 //						      fGoodNP04front_PDGid,fGoodNP04front_EventID,fGoodNP04front_TrackID);
+<<<<<<< HEAD
 			sim::ProtoDUNEBeamInstrument bprof4("BPROF4",fGoodBPROF4_x,fGoodBPROF4_y,fGoodBPROF4_z,fGoodBPROF4_t,fGoodBPROF4_Px,fGoodBPROF4_Py,fGoodBPROF4_Pz,
 						      fGoodBPROF4_PDGid,fGoodBPROF4_EventID,fGoodBPROF4_TrackID);
 			sim::ProtoDUNEBeamInstrument bprofext("BPROFEXT",fGoodBPROFEXT_x,fGoodBPROFEXT_y,fGoodBPROFEXT_z,fGoodBPROFEXT_t,fGoodBPROFEXT_Px,fGoodBPROFEXT_Py,fGoodBPROFEXT_Pz,
@@ -917,9 +921,45 @@ sim::ProtoDUNEBeamInstrument cherenkov2("CHERENKOV2",fGoodBPROFEXT_x,fGoodBPROFE
 
                     }
                 }
+=======
+			        sim::ProtoDUNEBeamInstrument bprof4("BPROF4",fGoodBPROF4_x,fGoodBPROF4_y,fGoodBPROF4_z,fGoodBPROF4_t,fGoodBPROF4_Px,fGoodBPROF4_Py,fGoodBPROF4_Pz,
+						                                      fGoodBPROF4_PDGid,fGoodBPROF4_EventID,fGoodBPROF4_TrackID);
+        			sim::ProtoDUNEBeamInstrument bprofext("BPROFEXT",fGoodBPROFEXT_x,fGoodBPROFEXT_y,fGoodBPROFEXT_z,fGoodBPROFEXT_t,fGoodBPROFEXT_Px,fGoodBPROFEXT_Py,fGoodBPROFEXT_Pz,
+						                                        fGoodBPROFEXT_PDGid,fGoodBPROFEXT_EventID,fGoodBPROFEXT_TrackID);
+        			sim::ProtoDUNEBeamInstrument trig1("TRIG1",fGoodTRIG1_x,fGoodTRIG1_y,fGoodTRIG1_z,fGoodTRIG1_t,fGoodTRIG1_Px,fGoodTRIG1_Py,fGoodTRIG1_Pz,
+	 					                                     fGoodTRIG1_PDGid,fGoodTRIG1_EventID,fGoodTRIG1_TrackID);
+        			sim::ProtoDUNEBeamInstrument bprof3("BPROF3",fGoodBPROF3_x,fGoodBPROF3_y,fGoodBPROF3_z,fGoodBPROF3_t,fGoodBPROF3_Px,fGoodBPROF3_Py,fGoodBPROF3_Pz,
+	 					                                      fGoodBPROF3_PDGid,fGoodBPROF3_EventID,fGoodBPROF3_TrackID);
+        			sim::ProtoDUNEBeamInstrument bprof2("BPROF2",fGoodBPROF2_x,fGoodBPROF2_y,fGoodBPROF2_z,fGoodBPROF2_t,fGoodBPROF2_Px,fGoodBPROF2_Py,fGoodBPROF2_Pz,
+						                                      fGoodBPROF2_PDGid,fGoodBPROF2_EventID,fGoodBPROF2_TrackID);
+        			sim::ProtoDUNEBeamInstrument bprof1("BPROF1",fGoodBPROF1_x,fGoodBPROF1_y,fGoodBPROF1_z,fGoodBPROF1_t,fGoodBPROF1_Px,fGoodBPROF1_Py,fGoodBPROF1_Pz,
+						                                      fGoodBPROF1_PDGid,fGoodBPROF1_EventID,fGoodBPROF1_TrackID);
+
+              sim::ProtoDUNEbeamsim temp; 
+              temp.AddInstrument(tof1);
+              temp.AddInstrument(trig2);
+ //             temp.AddInstrument(fieldcage);
+ //             temp.AddInstrument(front);
+              temp.AddInstrument(bprof4);
+              temp.AddInstrument(bprofext);
+              temp.AddInstrument(trig1);
+              temp.AddInstrument(bprof3);
+              temp.AddInstrument(bprof2);
+              temp.AddInstrument(bprof1);
+
+              std::cout << "ProtoDUNEbeamsim object has " << temp.NInstruments() << " beam instruments" << std::endl;
+
+              beamsimcol.push_back(temp);
+              // std::cout<<" test value beam profile monitor: TTREE   "<<fGoodBPROF4_x<<std::endl;
+              std::cout<<"From TTree TRIG2_TRACKID: "<<fGoodTRIG2_TrackID<<std::endl;
+              
+              // std::cout<<"the testing for beam profile monitor information:  "<<fGoodBPROF4_z<<std::endl;
+              
+              
+//              std::cout<< "From the data product:  TRIG2TRACKID:   "<<temp.get_TRIG2_TrackID()<<std::endl;
+                        
+>>>>>>> 113e6ee5c2f2b3a097d2f9bc44fb248cb7cacfec
             }
-            
-            //------------caroline added finish---
             
         } // End loop over interesting tracks for each event
     } // End loop over the vector of interesting events
