@@ -102,7 +102,7 @@ void sim::ProtoDUNEBeamTest::beginJob()
   fUzHist_zoom = tfs->make<TH1F>("Z_DIRECTION_TRUE_zoom","Uz",100,-1,-0.95);
   fUxsHist_zoom = tfs->make<TH1F>("X_DIRECTION_SMEARED_zoom","Ux",100,-0.05,0.05);
   fUysHist_zoom = tfs->make<TH1F>("Y_DIRECTION_SMEARED_zoom","Uy",100,-0.05,0.05);
-  fUzsHist_zoom = tfs->make<TH1F>("Z_DIRECTION_SMEARED_zoom","Uz",100,-1,0.95);
+  fUzsHist_zoom = tfs->make<TH1F>("Z_DIRECTION_SMEARED_zoom","Uz",100,-1,-0.95);
   fT0FHist = tfs->make<TH1F>("TOF_TRUE","T0F (ns)",100,93,97);
   fT0FsHist = tfs->make<TH1F>("TOF_SMEARED","T0F (ns)",100,93,97);
   fUxHist = tfs->make<TH1F>("X_DIRECTION_TRUE","Ux",100,-1,1);
@@ -130,7 +130,7 @@ void sim::ProtoDUNEBeamTest::analyze(art::Event const & evt)
 
   sim::ProtoDUNEBeamInstrument bprofext = temp.GetInstrument("BPROFEXT");
   sim::ProtoDUNEBeamInstrument bprof4 = temp.GetInstrument("BPROF4");
-  float dir[3],dir_smeared[3],dummy;
+  double dir[3],dir_smeared[3],dummy;
   dummy = pow(pow(bprofext.GetX() -bprof4.GetX(),2)+pow(bprofext.GetY() -bprof4.GetY(),2)+pow(bprofext.GetZ() -bprof4.GetZ(),2),0.5);
   dir[0] = (bprofext.GetX() -bprof4.GetX())/dummy;
   dir[1] = (bprofext.GetY() -bprof4.GetY())/dummy;
@@ -140,7 +140,8 @@ void sim::ProtoDUNEBeamTest::analyze(art::Event const & evt)
   dir_smeared[1] = (bprofext.GetSmearedVar2() -bprof4.GetSmearedVar2())/dummy;
   dir_smeared[2] = (bprofext.GetZ() -bprof4.GetZ())/dummy;
   std::cout << "cos" << dir[0]*dir_smeared[0]+dir[1]*dir_smeared[1]+dir[2]*dir_smeared[2] << std::endl;
-  std::cout << bprofext.GetZ() << "," << bprofext.GetSmearedVar1() << std::endl;
+  std::cout << bprofext.GetX() << "," << bprofext.GetSmearedVar1() << std::endl;
+  std::cout << dir[0] << "," << dir_smeared[0] << std::endl;
 
 //Filling hisotgrams
   fT0FHist_zoom->Fill(tof);
