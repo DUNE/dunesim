@@ -68,6 +68,8 @@ namespace sim {
       Int_t GetPDGid() const {return fPDGid;};
       Int_t GetEventID() const {return fEventID;}; 
       Int_t GetTrackID() const {return fTrackID;};
+      Float_t GetSmearedVar1() const {return fSmearedVar1;};
+      Float_t GetSmearedVar2() const {return fSmearedVar2;};
 
       void SetInstrumentName(std::string name) {fInstrumentName = name;};
       void SetX(Float_t val) {fX = val;};
@@ -80,12 +82,12 @@ namespace sim {
       void SetPDGid(Int_t val) {fPDGid = val;};
       void SetEventID(Int_t val) {fEventID = val;};
       void SetTrackID(Int_t val) {fTrackID = val;};
+      void SetSmearedVar1(Float_t val) {fSmearedVar1 = val;};
+      void SetSmearedVar2(Float_t val) {fSmearedVar2 = val;};
 
-
-      //Float_t Smearing(Float_t value){return value;};
 
       Float_t UnitGauss(Float_t mean, Float_t value, Float_t sigma){
-      Float_t p = exp(0.5*pow((mean-value),2)/(pow(sigma,2)));
+      Float_t p = exp(-0.5*pow((mean-value),2)/(pow(sigma,2)));
       return p;}
 
 
@@ -103,7 +105,8 @@ namespace sim {
       Int_t fPDGid;
       Int_t fEventID;
       Int_t fTrackID;
-      Float_t fSmearedVar[2];
+      Float_t fSmearedVar1;
+      Float_t fSmearedVar2;
   };
 }
 

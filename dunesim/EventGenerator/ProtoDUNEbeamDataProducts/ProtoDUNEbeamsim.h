@@ -4,6 +4,10 @@
 // carolineligezhang@gmail.com
 // August 2017
 //
+// Modified by Pablo and Leigh H. Howard, 
+// // pablo.fer@cern.ch
+// // July 2018
+// /////////////////////////////////////////////////////////
 
 #ifndef PROTODUNEBEAMSIM_H
 #define PROTODUNEBEAMSIM_H

@@ -4,9 +4,18 @@ include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
 art_make(
           MODULE_LIBRARIES dune_EventGenerator_ProtoDUNEbeamDataProducts
           LIB_LIBRARIES lardataobj_Simulation
-          art_Persistency_Common canvas
-          art_Persistency_Provenance canvas
+          ${ART_FRAMEWORK_CORE}
+          ${ART_FRAMEWORK_PRINCIPAL}
+          ${ART_FRAMEWORK_SERVICES_REGISTRY}
+          ${ART_FRAMEWORK_SERVICES_OPTIONAL}
+          ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
+          art_Persistency_Common
+          art_Utilities 
+          art_Persistency_Common
+          art_Persistency_Provenance 
+	  canvas
           ${MF_MESSAGELOGGER}
+
           
           cetlib cetlib_except
           ${ROOT_BASIC_LIB_LIST}
@@ -15,6 +24,8 @@ art_make(
 install_headers()
 install_source()
 install_fhicl()   
+install_scripts()
+
 
 #cet_make( LIBRARY_NAME     
 #	  LIBRARIES lardataobj_Simulation
