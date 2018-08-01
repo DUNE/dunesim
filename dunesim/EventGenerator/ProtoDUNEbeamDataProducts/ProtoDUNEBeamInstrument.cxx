@@ -114,6 +114,8 @@ namespace sim{
         if (abs(PDGid) == 11) fSmearedVar1 = 0;
         if (abs(PDGid) == 211) fSmearedVar1 = 1;
 }
+std::cout << "Particle ID: " << fPDGid << std::endl;
+std::cout << "Cherenkov 1: " << fSmearedVar1 << std::endl;
 }
     if (name == "CHERENKOV2"){
       Float_t Ptot = pow(pow(Px,2)+pow(Py,2)+pow(Pz,2),0.5)/1000.;
@@ -137,6 +139,7 @@ namespace sim{
         if (abs(PDGid) == 11) fSmearedVar1 = 0;
         if (abs(PDGid) == 211) fSmearedVar1 = 1;
 }
+std::cout << "Cherenkov 2: " << fSmearedVar1 << std::endl;
 }
   }
 
