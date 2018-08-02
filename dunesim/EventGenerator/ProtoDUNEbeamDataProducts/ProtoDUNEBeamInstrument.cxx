@@ -53,10 +53,10 @@ namespace sim{
     fEventID = EventID;
     fTrackID = TrackID;	
     fResolution = Resolution;
+    srand (static_cast <unsigned> (time(NULL)));
     if (name == "TOF1" || name == "TRIG2"){
       Float_t delta_t = 20.;
-      srand (static_cast <unsigned> (time(0)));
-      if (name == "TOF1") srand (static_cast <unsigned> (time(0)*9));
+//      if (name == "TOF1") srand (static_cast <unsigned> (time(0)*9));
       Float_t t_test = t - delta_t/2. + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(delta_t)));
       Float_t p_test = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX));
       Float_t p_gauss = ProtoDUNEBeamInstrument::UnitGauss(t,t_test,fResolution);
@@ -69,7 +69,7 @@ namespace sim{
   }
     if (name == "BPROFEXT" || name == "BPROF4"){
       Float_t delta_x = 40.;
-      srand (static_cast <unsigned> (time(0)*99));
+//      srand (static_cast <unsigned> (time(0)*99));
       Float_t x_test = x -delta_x/2. + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(delta_x)));
       Float_t p_test = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX));
       Float_t p_gauss = ProtoDUNEBeamInstrument::UnitGauss(x,x_test,fResolution);
@@ -81,7 +81,7 @@ namespace sim{
       fSmearedVar1 = x_test;
 
       Float_t delta_y = 40.;
-      srand (static_cast <unsigned> (time(0)*7));
+//      srand (static_cast <unsigned> (time(0)*7));
       Float_t y_test = y -delta_y/2. + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(delta_y)));
       p_test = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX));
       p_gauss = ProtoDUNEBeamInstrument::UnitGauss(y,y_test,fResolution);
@@ -93,7 +93,7 @@ namespace sim{
       fSmearedVar2 = y_test;
 }
     if (name == "CHERENKOV1"){
-      srand (static_cast <unsigned> (time(0)*77));
+//      srand (static_cast <unsigned> (time(0)*77));
       Float_t p_test = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX));
       fSmearedVar1 = 0;
       if (p_test <= fResolution){
@@ -123,7 +123,7 @@ std::cout << "Particle ID: " << fPDGid << std::endl;
 std::cout << "Cherenkov 1: " << fSmearedVar1 << std::endl;
 }
     if (name == "CHERENKOV2"){
-      srand (static_cast <unsigned> (time(0)*97));
+//      srand (static_cast <unsigned> (time(0)*97));
       Float_t p_test = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX));
       fSmearedVar1 = 0;
       if (p_test <= fResolution){
