@@ -295,6 +295,11 @@ namespace evgen{
         float fIntensity; // Number of interactions on the secondary target per SPS spill
         float fReadoutWindow; // Readout window (needs to match the values used in the simulation) in milliseconds
         float fBeamSpillLength; // The SPS spill length in seconds
+
+// Beam monitors resolutions
+        float fT_Resolution;
+        float fPos_Resolution;
+        float fCh_Efficiency;
         
         // Number of beam interactions to overlay.
         int fOverlays;
@@ -327,6 +332,11 @@ evgen::ProtoDUNEBeam::ProtoDUNEBeam(fhicl::ParameterSet const & pset)
     fIntensity = pset.get<float>("Intensity");
     fReadoutWindow = pset.get<float>("ReadoutWindow");
     fBeamSpillLength = pset.get<float>("BeamSpillLength");
+
+// Beam monitors resolutions
+    fT_Resolution = pset.get<float>("T_Resolution");
+    fPos_Resolution = pset.get<float>("Pos_Resolution");
+    fCh_Efficiency = pset.get<float>("Ch_Efficiency");
     
     // Background cut variables
     fBackgroundMomentumCut = pset.get<float>("BkgMomentumCut");
@@ -783,18 +793,18 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
 //                        match::ProtoDUNEBeamToF tof(fGoodTOF1_t,fGoodTRIG2_t);
 
                         
-              sim::ProtoDUNEBeamInstrument tof1("TOF1",fGoodTOF1_x,fGoodTOF1_y,fGoodTOF1_z,fGoodTOF1_t,fGoodTOF1_Px,fGoodTOF1_Py,fGoodTOF1_Pz,fGoodTOF1_PDGid,fGoodTOF1_EventID,fGoodTOF1_TrackID);  
-              sim::ProtoDUNEBeamInstrument trig2("TRIG2",fGoodTRIG2_x,fGoodTRIG2_y,fGoodTRIG2_z,fGoodTRIG2_t,fGoodTRIG2_Px,fGoodTRIG2_Py,fGoodTRIG2_Pz,fGoodTRIG2_PDGid,fGoodTRIG2_EventID,fGoodTRIG2_TrackID);  
-			sim::ProtoDUNEBeamInstrument bprof4("BPROF4",fGoodBPROF4_x,fGoodBPROF4_y,fGoodBPROF4_z,fGoodBPROF4_t,fGoodBPROF4_Px,fGoodBPROF4_Py,fGoodBPROF4_Pz,fGoodBPROF4_PDGid,fGoodBPROF4_EventID,fGoodBPROF4_TrackID);
-			sim::ProtoDUNEBeamInstrument bprofext("BPROFEXT",fGoodBPROFEXT_x,fGoodBPROFEXT_y,fGoodBPROFEXT_z,fGoodBPROFEXT_t,fGoodBPROFEXT_Px,fGoodBPROFEXT_Py,fGoodBPROFEXT_Pz,fGoodBPROFEXT_PDGid,fGoodBPROFEXT_EventID,fGoodBPROFEXT_TrackID);
-			sim::ProtoDUNEBeamInstrument trig1("TRIG1",fGoodTRIG1_x,fGoodTRIG1_y,fGoodTRIG1_z,fGoodTRIG1_t,fGoodTRIG1_Px,fGoodTRIG1_Py,fGoodTRIG1_Pz,fGoodTRIG1_PDGid,fGoodTRIG1_EventID,fGoodTRIG1_TrackID);
-			sim::ProtoDUNEBeamInstrument bprof3("BPROF3",fGoodBPROF3_x,fGoodBPROF3_y,fGoodBPROF3_z,fGoodBPROF3_t,fGoodBPROF3_Px,fGoodBPROF3_Py,fGoodBPROF3_Pz,fGoodBPROF3_PDGid,fGoodBPROF3_EventID,fGoodBPROF3_TrackID);
-			sim::ProtoDUNEBeamInstrument bprof2("BPROF2",fGoodBPROF2_x,fGoodBPROF2_y,fGoodBPROF2_z,fGoodBPROF2_t,fGoodBPROF2_Px,fGoodBPROF2_Py,fGoodBPROF2_Pz,fGoodBPROF2_PDGid,fGoodBPROF2_EventID,fGoodBPROF2_TrackID);
-			sim::ProtoDUNEBeamInstrument bprof1("BPROF1",fGoodBPROF1_x,fGoodBPROF1_y,fGoodBPROF1_z,fGoodBPROF1_t,fGoodBPROF1_Px,fGoodBPROF1_Py,fGoodBPROF1_Pz,fGoodBPROF1_PDGid,fGoodBPROF1_EventID,fGoodBPROF1_TrackID);
+              sim::ProtoDUNEBeamInstrument tof1("TOF1",fGoodTOF1_x,fGoodTOF1_y,fGoodTOF1_z,fGoodTOF1_t,fGoodTOF1_Px,fGoodTOF1_Py,fGoodTOF1_Pz,fGoodTOF1_PDGid,fGoodTOF1_EventID,fGoodTOF1_TrackID,fT_Resolution);  
+              sim::ProtoDUNEBeamInstrument trig2("TRIG2",fGoodTRIG2_x,fGoodTRIG2_y,fGoodTRIG2_z,fGoodTRIG2_t,fGoodTRIG2_Px,fGoodTRIG2_Py,fGoodTRIG2_Pz,fGoodTRIG2_PDGid,fGoodTRIG2_EventID,fGoodTRIG2_TrackID,fT_Resolution);  
+			sim::ProtoDUNEBeamInstrument bprof4("BPROF4",fGoodBPROF4_x,fGoodBPROF4_y,fGoodBPROF4_z,fGoodBPROF4_t,fGoodBPROF4_Px,fGoodBPROF4_Py,fGoodBPROF4_Pz,fGoodBPROF4_PDGid,fGoodBPROF4_EventID,fGoodBPROF4_TrackID,fPos_Resolution);
+			sim::ProtoDUNEBeamInstrument bprofext("BPROFEXT",fGoodBPROFEXT_x,fGoodBPROFEXT_y,fGoodBPROFEXT_z,fGoodBPROFEXT_t,fGoodBPROFEXT_Px,fGoodBPROFEXT_Py,fGoodBPROFEXT_Pz,fGoodBPROFEXT_PDGid,fGoodBPROFEXT_EventID,fGoodBPROFEXT_TrackID,fPos_Resolution);
+			sim::ProtoDUNEBeamInstrument trig1("TRIG1",fGoodTRIG1_x,fGoodTRIG1_y,fGoodTRIG1_z,fGoodTRIG1_t,fGoodTRIG1_Px,fGoodTRIG1_Py,fGoodTRIG1_Pz,fGoodTRIG1_PDGid,fGoodTRIG1_EventID,fGoodTRIG1_TrackID,fT_Resolution);
+			sim::ProtoDUNEBeamInstrument bprof3("BPROF3",fGoodBPROF3_x,fGoodBPROF3_y,fGoodBPROF3_z,fGoodBPROF3_t,fGoodBPROF3_Px,fGoodBPROF3_Py,fGoodBPROF3_Pz,fGoodBPROF3_PDGid,fGoodBPROF3_EventID,fGoodBPROF3_TrackID,fPos_Resolution);
+			sim::ProtoDUNEBeamInstrument bprof2("BPROF2",fGoodBPROF2_x,fGoodBPROF2_y,fGoodBPROF2_z,fGoodBPROF2_t,fGoodBPROF2_Px,fGoodBPROF2_Py,fGoodBPROF2_Pz,fGoodBPROF2_PDGid,fGoodBPROF2_EventID,fGoodBPROF2_TrackID,fPos_Resolution);
+			sim::ProtoDUNEBeamInstrument bprof1("BPROF1",fGoodBPROF1_x,fGoodBPROF1_y,fGoodBPROF1_z,fGoodBPROF1_t,fGoodBPROF1_Px,fGoodBPROF1_Py,fGoodBPROF1_Pz,fGoodBPROF1_PDGid,fGoodBPROF1_EventID,fGoodBPROF1_TrackID,fPos_Resolution);
 
 // Adding Cherenkovs with same variables as BPROFEXT except for their response
-sim::ProtoDUNEBeamInstrument cherenkov1("CHERENKOV1",fGoodBPROFEXT_x,fGoodBPROFEXT_y,fGoodBPROFEXT_z,fGoodBPROFEXT_t,fGoodBPROFEXT_Px,fGoodBPROFEXT_Py,fGoodBPROFEXT_Pz,fGoodBPROFEXT_PDGid,fGoodBPROFEXT_EventID,fGoodBPROFEXT_TrackID);
-sim::ProtoDUNEBeamInstrument cherenkov2("CHERENKOV2",fGoodBPROFEXT_x,fGoodBPROFEXT_y,fGoodBPROFEXT_z,fGoodBPROFEXT_t,fGoodBPROFEXT_Px,fGoodBPROFEXT_Py,fGoodBPROFEXT_Pz,fGoodBPROFEXT_PDGid,fGoodBPROFEXT_EventID,fGoodBPROFEXT_TrackID);
+sim::ProtoDUNEBeamInstrument cherenkov1("CHERENKOV1",fGoodBPROFEXT_x,fGoodBPROFEXT_y,fGoodBPROFEXT_z,fGoodBPROFEXT_t,fGoodBPROFEXT_Px,fGoodBPROFEXT_Py,fGoodBPROFEXT_Pz,fGoodBPROFEXT_PDGid,fGoodBPROFEXT_EventID,fGoodBPROFEXT_TrackID,fCh_Efficiency);
+sim::ProtoDUNEBeamInstrument cherenkov2("CHERENKOV2",fGoodBPROFEXT_x,fGoodBPROFEXT_y,fGoodBPROFEXT_z,fGoodBPROFEXT_t,fGoodBPROFEXT_Px,fGoodBPROFEXT_Py,fGoodBPROFEXT_Pz,fGoodBPROFEXT_PDGid,fGoodBPROFEXT_EventID,fGoodBPROFEXT_TrackID,fCh_Efficiency);
 
 
 			sim::ProtoDUNEbeamsim temp; 
@@ -809,12 +819,13 @@ sim::ProtoDUNEBeamInstrument cherenkov2("CHERENKOV2",fGoodBPROFEXT_x,fGoodBPROFE
                         temp.AddInstrument(cherenkov1);
                         temp.AddInstrument(cherenkov2);
 
-                        std::cout << "ProtoDUNEbeamsim object has " << temp.NInstruments() << " beam instruments" << std::endl;
+//                        std::cout << "ProtoDUNEbeamsim object has " << temp.NInstruments() << " beam instruments" << std::endl;
+//std::cout << "TOF1 resolution: " << fT_Resolution << std::endl;
 
                         beamsimcol.push_back(temp);
-                        std::cout<< beamsimcol.size() << std::endl;
+//                        std::cout<< beamsimcol.size() << std::endl;
                         // std::cout<<" test value beam profile monitor: TTREE   "<<fGoodBPROF4_x<<std::endl;
-                        std::cout<<"From TTree TRIG2_TRACKID: "<<fGoodTRIG2_TrackID<<std::endl;
+//                        std::cout<<"From TTree TRIG2_TRACKID: "<<fGoodTRIG2_TrackID<<std::endl;
 //                        std::cout<<"From ProtoDUNEBeamInstrument: "<<tof1.GetT()<<std::endl;
 //                        std::cout<<"From ProtoDUNEBeamInstrument: "<<tof1.GetSmearedVar1()<<std::endl;
 

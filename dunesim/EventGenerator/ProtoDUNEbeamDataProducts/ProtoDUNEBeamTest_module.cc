@@ -103,8 +103,8 @@ void sim::ProtoDUNEBeamTest::beginJob()
   fUxsHist_zoom = tfs->make<TH1F>("X_DIRECTION_SMEARED_zoom","Ux",100,-0.05,0.05);
   fUysHist_zoom = tfs->make<TH1F>("Y_DIRECTION_SMEARED_zoom","Uy",100,-0.05,0.05);
   fUzsHist_zoom = tfs->make<TH1F>("Z_DIRECTION_SMEARED_zoom","Uz",100,-1,-0.95);
-  fT0FHist = tfs->make<TH1F>("TOF_TRUE","T0F (ns)",100,93,97);
-  fT0FsHist = tfs->make<TH1F>("TOF_SMEARED","T0F (ns)",100,93,97);
+  fT0FHist = tfs->make<TH1F>("TOF_TRUE","T0F (ns)",100,90,100);
+  fT0FsHist = tfs->make<TH1F>("TOF_SMEARED","T0F (ns)",100,90,100);
   fUxHist = tfs->make<TH1F>("X_DIRECTION_TRUE","Ux",100,-1,1);
   fUyHist = tfs->make<TH1F>("Y_DIRECTION_TRUE","Uy",100,-1,1);
   fUzHist = tfs->make<TH1F>("Z_DIRECTION_TRUE","Uz",100,-1,1);
@@ -125,8 +125,8 @@ void sim::ProtoDUNEBeamTest::analyze(art::Event const & evt)
   sim::ProtoDUNEBeamInstrument trig2 = temp.GetInstrument("TRIG2");
   float tof = trig2.GetT() - tof1.GetT();
   float tof_smeared = trig2.GetSmearedVar1() -tof1.GetSmearedVar1();
-  std::cout << "TOF " << tof << std::endl;
-  std::cout << "TOFS " << tof_smeared << std::endl;
+//  std::cout << "TOF " << tof << std::endl;
+//  std::cout << "TOFS " << tof_smeared << std::endl;
 
   sim::ProtoDUNEBeamInstrument bprofext = temp.GetInstrument("BPROFEXT");
   sim::ProtoDUNEBeamInstrument bprof4 = temp.GetInstrument("BPROF4");
@@ -139,9 +139,9 @@ void sim::ProtoDUNEBeamTest::analyze(art::Event const & evt)
   dir_smeared[0] = (bprofext.GetSmearedVar1() -bprof4.GetSmearedVar1())/dummy;
   dir_smeared[1] = (bprofext.GetSmearedVar2() -bprof4.GetSmearedVar2())/dummy;
   dir_smeared[2] = (bprofext.GetZ() -bprof4.GetZ())/dummy;
-  std::cout << "cos" << dir[0]*dir_smeared[0]+dir[1]*dir_smeared[1]+dir[2]*dir_smeared[2] << std::endl;
-  std::cout << bprofext.GetX() << "," << bprofext.GetSmearedVar1() << std::endl;
-  std::cout << dir[0] << "," << dir_smeared[0] << std::endl;
+//  std::cout << "cos" << dir[0]*dir_smeared[0]+dir[1]*dir_smeared[1]+dir[2]*dir_smeared[2] << std::endl;
+//  std::cout << bprofext.GetX() << "," << bprofext.GetSmearedVar1() << std::endl;
+//  std::cout << dir[0] << "," << dir_smeared[0] << std::endl;
 
 //Filling hisotgrams
   fT0FHist_zoom->Fill(tof);

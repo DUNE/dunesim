@@ -25,6 +25,7 @@ namespace sim{
     fTrackID = 0;
     fSmearedVar1 = 0.0;
     fSmearedVar2 = 0.0;
+    fResolution = 0.0;
   }
 
   //-------------------------------default destructor------------------------------------------
@@ -42,7 +43,8 @@ namespace sim{
       Float_t Pz,
       Int_t PDGid,
       Int_t EventID,
-      Int_t TrackID
+      Int_t TrackID,
+      Float_t Resolution
       ){
     fInstrumentName = name;
     fX = x; fY = y; fZ = z; fT = t;
@@ -50,49 +52,51 @@ namespace sim{
     fPDGid = PDGid;
     fEventID = EventID;
     fTrackID = TrackID;	
+    fResolution = Resolution;
     if (name == "TOF1" || name == "TRIG2"){
-      Float_t delta_t = 5.;
-      Float_t resolt = 1.0;
+      Float_t delta_t = 20.;
       srand (static_cast <unsigned> (time(0)));
       if (name == "TOF1") srand (static_cast <unsigned> (time(0)*9));
-      Float_t t_test = t -delta_t + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(delta_t)));
+      Float_t t_test = t - delta_t/2. + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(delta_t)));
       Float_t p_test = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX));
-      Float_t p_gauss = ProtoDUNEBeamInstrument::UnitGauss(t,t_test,resolt);
+      Float_t p_gauss = ProtoDUNEBeamInstrument::UnitGauss(t,t_test,fResolution);
       while (p_test > p_gauss){
         p_test = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX));
-        t_test = t -delta_t + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(delta_t)));
-        p_gauss = ProtoDUNEBeamInstrument::UnitGauss(t,t_test,resolt);
+        t_test = t -delta_t/2. + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(delta_t)));
+        p_gauss = ProtoDUNEBeamInstrument::UnitGauss(t,t_test,fResolution);
       }
       fSmearedVar1 = t_test;
   }
     if (name == "BPROFEXT" || name == "BPROF4"){
-      Float_t delta_x = 10.;
-      Float_t resolx = 2.0/pow(12,0.5);
+      Float_t delta_x = 40.;
       srand (static_cast <unsigned> (time(0)*99));
-      Float_t x_test = x -delta_x + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(delta_x)));
+      Float_t x_test = x -delta_x/2. + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(delta_x)));
       Float_t p_test = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX));
-      Float_t p_gauss = ProtoDUNEBeamInstrument::UnitGauss(x,x_test,resolx);
+      Float_t p_gauss = ProtoDUNEBeamInstrument::UnitGauss(x,x_test,fResolution);
       while (p_test > p_gauss){
         p_test = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX)); 
-        x_test = x -delta_x + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(delta_x)));
-        p_gauss = ProtoDUNEBeamInstrument::UnitGauss(x,x_test,resolx);
+        x_test = x -delta_x/2. + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(delta_x)));
+        p_gauss = ProtoDUNEBeamInstrument::UnitGauss(x,x_test,fResolution);
       }
       fSmearedVar1 = x_test;
 
-      Float_t delta_y = 10.;
-      Float_t resoly = 2.0/pow(12,0.5);
+      Float_t delta_y = 40.;
       srand (static_cast <unsigned> (time(0)*7));
-      Float_t y_test = y -delta_y + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(delta_y)));
+      Float_t y_test = y -delta_y/2. + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(delta_y)));
       p_test = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX));
-      p_gauss = ProtoDUNEBeamInstrument::UnitGauss(y,y_test,resoly);
+      p_gauss = ProtoDUNEBeamInstrument::UnitGauss(y,y_test,fResolution);
       while (p_test > p_gauss){
         p_test = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX));
         y_test = y -delta_y + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(delta_y)));
-        p_gauss = ProtoDUNEBeamInstrument::UnitGauss(y,y_test,resoly);
+        p_gauss = ProtoDUNEBeamInstrument::UnitGauss(y,y_test,fResolution);
       }
       fSmearedVar2 = y_test;
 }
     if (name == "CHERENKOV1"){
+      srand (static_cast <unsigned> (time(0)*77));
+      Float_t p_test = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX));
+      fSmearedVar1 = 0;
+      if (p_test <= fResolution){
       Float_t Ptot = pow(pow(Px,2)+pow(Py,2)+pow(Pz,2),0.5)/1000.;
       if (Ptot <= 2.0){
         if (abs(PDGid) == 2212 || abs(PDGid) == 310) fSmearedVar1 = 0;
@@ -114,10 +118,15 @@ namespace sim{
         if (abs(PDGid) == 11) fSmearedVar1 = 0;
         if (abs(PDGid) == 211) fSmearedVar1 = 1;
 }
+}
 std::cout << "Particle ID: " << fPDGid << std::endl;
 std::cout << "Cherenkov 1: " << fSmearedVar1 << std::endl;
 }
     if (name == "CHERENKOV2"){
+      srand (static_cast <unsigned> (time(0)*97));
+      Float_t p_test = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX));
+      fSmearedVar1 = 0;
+      if (p_test <= fResolution){
       Float_t Ptot = pow(pow(Px,2)+pow(Py,2)+pow(Pz,2),0.5)/1000.;
       if (Ptot <= 2.0){
         if (abs(PDGid) == 2212 || abs(PDGid) == 310) fSmearedVar1 = 0;
@@ -141,7 +150,8 @@ std::cout << "Cherenkov 1: " << fSmearedVar1 << std::endl;
 }
 std::cout << "Cherenkov 2: " << fSmearedVar1 << std::endl;
 }
-  }
+}
+}
 
   /// Vector-based constructor
   ProtoDUNEBeamInstrument::ProtoDUNEBeamInstrument(std::string name,
@@ -150,7 +160,8 @@ std::cout << "Cherenkov 2: " << fSmearedVar1 << std::endl;
       std::vector<Float_t> momentum,
       Int_t PDGid,
       Int_t EventID,
-      Int_t TrackID
+      Int_t TrackID,
+      Float_t Resolution
       ){
     fInstrumentName = name;
     fX = position[0]; fY = position[1]; fZ = position[2]; fT = t;
@@ -158,6 +169,7 @@ std::cout << "Cherenkov 2: " << fSmearedVar1 << std::endl;
     fPDGid = PDGid;
     fEventID = EventID;
     fTrackID = TrackID;
+    fResolution = Resolution;
 
   }
 
@@ -168,7 +180,8 @@ std::cout << "Cherenkov 2: " << fSmearedVar1 << std::endl;
       TVector3 momentum,
       Int_t PDGid,
       Int_t EventID,
-      Int_t TrackID
+      Int_t TrackID,
+      Float_t Resolution
       ){
     fInstrumentName = name;
     fX = position.X(); fY = position.Y(); fZ = position.Z(); fT = t;
@@ -176,6 +189,7 @@ std::cout << "Cherenkov 2: " << fSmearedVar1 << std::endl;
     fPDGid = PDGid;
     fEventID = EventID;
     fTrackID = TrackID;
+    fResolution = Resolution;
 
   }
 
@@ -188,6 +202,7 @@ std::cout << "Cherenkov 2: " << fSmearedVar1 << std::endl;
     fInstrumentName = rhs.fInstrumentName;
     fSmearedVar1 = rhs.fSmearedVar1;
     fSmearedVar2 = rhs.fSmearedVar2;
+    fResolution = rhs.fResolution;
   }
 
 }

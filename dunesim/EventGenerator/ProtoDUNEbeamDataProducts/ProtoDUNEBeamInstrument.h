@@ -31,7 +31,8 @@ namespace sim {
         Float_t Pz,
         Int_t PDGid,
         Int_t EventID,
-        Int_t TrackID
+        Int_t TrackID,
+        Float_t Resolution
       );
 
       /// Vector-based constructor
@@ -41,7 +42,8 @@ namespace sim {
         std::vector<Float_t> momentum,
         Int_t PDGid,
         Int_t EventID,
-        Int_t TrackID
+        Int_t TrackID,
+        Float_t Resolution
       );      
 
       // TVector3-based constructor
@@ -51,7 +53,8 @@ namespace sim {
         TVector3 momentum,
         Int_t PDGid,
         Int_t EventID,
-        Int_t TrackID
+        Int_t TrackID,
+        Float_t Resolution
       );      
 
       // Copy constructor
@@ -70,6 +73,7 @@ namespace sim {
       Int_t GetTrackID() const {return fTrackID;};
       Float_t GetSmearedVar1() const {return fSmearedVar1;};
       Float_t GetSmearedVar2() const {return fSmearedVar2;};
+      Float_t GetResolution() const {return fResolution;};
 
       void SetInstrumentName(std::string name) {fInstrumentName = name;};
       void SetX(Float_t val) {fX = val;};
@@ -84,6 +88,7 @@ namespace sim {
       void SetTrackID(Int_t val) {fTrackID = val;};
       void SetSmearedVar1(Float_t val) {fSmearedVar1 = val;};
       void SetSmearedVar2(Float_t val) {fSmearedVar2 = val;};
+      void SetResolution(Float_t val) {fResolution = val;};
 
 
       Float_t UnitGauss(Float_t mean, Float_t value, Float_t sigma){
@@ -107,6 +112,7 @@ namespace sim {
       Int_t fTrackID;
       Float_t fSmearedVar1;
       Float_t fSmearedVar2;
+      Float_t fResolution;
   };
 }
 
