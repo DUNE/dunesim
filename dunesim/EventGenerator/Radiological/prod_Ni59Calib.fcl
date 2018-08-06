@@ -1,5 +1,5 @@
 #include "services_dune.fcl"
-#include "radiological_gen_dune_full.fcl"
+#include "dune_radiological_model.fcl"
 
 process_name: BackgroundGen
 
@@ -30,7 +30,7 @@ source:
 # Modules are grouped by type.
 
 
-services.Geometry: @local::dune10kt_1x2x6_geo
+services.Geometry: @local::dune10kt_1x2x6_v3_geo
 
 physics:
 {
@@ -59,7 +59,7 @@ physics:
     cpaGen:    @local::dune10kt_1x2x6_CPA
     poGen:     @local::dune10kt_1x2x6_210po
     krGen:     @local::dune10kt_1x2x6_85kr
-    fcGen:     @local::dune10kt_1x2x6_fc
+    neutronGen:     @local::dune10kt_1x2x6_neutron
     rns:       { module_type: "RandomNumberSaver" }
   }
  
@@ -92,4 +92,11 @@ outputs:
   }
 }
 
-
+##########Sync times. We start from 0 to make sure none of the calibration source comes in outside of our readout time. This allows us to do accurate wall time measurements.
+physics.producers.arGen.T0: [ 0.0 ]
+physics.producers.rnGen.T0: [ 0.0 ]
+physics.producers.apaGen.T0: [ 0.0 ]
+physics.producers.cpaGen.T0: [ 0.0 ]
+physics.producers.poGen.T0: [ 0.0 ]
+physics.producers.krGen.T0: [ 0.0 ]
+physics.producers.fcGen.T0: [ 0.0, 0.0, 0.0, 0.0 ]

@@ -1,9 +1,10 @@
 ////////////////////////////////////////////////////////////////////////
-// \file SpaceChargeDUNE35t.cxx
+// \file SpaceCharge3x1x1dphase.cxx
 //
-// \brief implementation of class for storing/accessing space charge distortions for DUNE 35ton
+// \brief implementation of class for storing/accessing space charge distortions for the 3x1x1 detector.
+// \Adapted from SpaceChargeProtoDUNE.cxx
 //
-// \author mrmooney@bnl.gov
+// \author kevin.fusshoeller@cern.ch
 // 
 ////////////////////////////////////////////////////////////////////////
 
@@ -16,13 +17,13 @@
 #include "stdio.h"
 
 // LArSoft includes
-#include "dune/SpaceCharge/SpaceChargeDUNE35t.h"
+#include "dune/SpaceCharge/SpaceCharge3x1x1dphase.h"
 
 // Framework includes
 #include "cetlib_except/exception.h"
 
 //-----------------------------------------------
-spacecharge::SpaceChargeDUNE35t::SpaceChargeDUNE35t(
+spacecharge::SpaceCharge3x1x1dphase::SpaceCharge3x1x1dphase(
   fhicl::ParameterSet const& pset
 )
 {
@@ -30,7 +31,7 @@ spacecharge::SpaceChargeDUNE35t::SpaceChargeDUNE35t(
 }
 
 //------------------------------------------------
-bool spacecharge::SpaceChargeDUNE35t::Configure(fhicl::ParameterSet const& pset)
+bool spacecharge::SpaceCharge3x1x1dphase::Configure(fhicl::ParameterSet const& pset)
 {  
   fEnableSimSpatialSCE = pset.get<bool>("EnableSimSpatialSCE");
   fEnableSimEfieldSCE = pset.get<bool>("EnableSimEfieldSCE");
@@ -46,7 +47,7 @@ bool spacecharge::SpaceChargeDUNE35t::Configure(fhicl::ParameterSet const& pset)
     sp.find_file(fInputFilename,fname);
 
     std::unique_ptr<TFile> infile(new TFile(fname.c_str(), "READ"));
-    if(!infile->IsOpen()) throw cet::exception("SpaceChargeDUNE35t") << "Could not find the space charge effect file '" << fname << "'!\n";
+    if(!infile->IsOpen()) throw cet::exception("SpaceCharge3x1x1dphase") << "Could not find the space charge effect file '" << fname << "'!\n";
 
     if(fRepresentationType == "Parametric")
     {      
@@ -140,7 +141,7 @@ bool spacecharge::SpaceChargeDUNE35t::Configure(fhicl::ParameterSet const& pset)
 }
 
 //------------------------------------------------
-bool spacecharge::SpaceChargeDUNE35t::Update(uint64_t ts) 
+bool spacecharge::SpaceCharge3x1x1dphase::Update(uint64_t ts) 
 {
   if (ts == 0) return false;
 
@@ -150,7 +151,7 @@ bool spacecharge::SpaceChargeDUNE35t::Update(uint64_t ts)
 //----------------------------------------------------------------------------
 /// Return boolean indicating whether or not to turn simulation of SCE on for
 /// spatial distortions
-bool spacecharge::SpaceChargeDUNE35t::EnableSimSpatialSCE() const
+bool spacecharge::SpaceCharge3x1x1dphase::EnableSimSpatialSCE() const
 {
   return fEnableSimSpatialSCE;
 }
@@ -158,14 +159,14 @@ bool spacecharge::SpaceChargeDUNE35t::EnableSimSpatialSCE() const
 //----------------------------------------------------------------------------
 /// Return boolean indicating whether or not to turn simulation of SCE on for
 /// E field distortions
-bool spacecharge::SpaceChargeDUNE35t::EnableSimEfieldSCE() const
+bool spacecharge::SpaceCharge3x1x1dphase::EnableSimEfieldSCE() const
 {
   return fEnableSimEfieldSCE;
 }
 
 //----------------------------------------------------------------------------
 /// Return boolean indicating whether or not to apply SCE corrections
-bool spacecharge::SpaceChargeDUNE35t::EnableCorrSCE() const
+bool spacecharge::SpaceCharge3x1x1dphase::EnableCorrSCE() const
 {
   return fEnableCorrSCE;
 }
@@ -173,7 +174,7 @@ bool spacecharge::SpaceChargeDUNE35t::EnableCorrSCE() const
 //----------------------------------------------------------------------------
 /// Primary working method of service that provides position offsets to be
 /// used in ionization electron drift
-geo::Vector_t spacecharge::SpaceChargeDUNE35t::GetPosOffsets(geo::Point_t const& point) const
+geo::Vector_t spacecharge::SpaceCharge3x1x1dphase::GetPosOffsets(geo::Point_t const& point) const
 {
   std::vector<double> thePosOffsets;
 
@@ -194,7 +195,7 @@ geo::Vector_t spacecharge::SpaceChargeDUNE35t::GetPosOffsets(geo::Point_t const&
 
 //----------------------------------------------------------------------------
 /// Provides position offsets using a parametric representation
-std::vector<double> spacecharge::SpaceChargeDUNE35t::GetPosOffsetsParametric(double xVal, double yVal, double zVal) const
+std::vector<double> spacecharge::SpaceCharge3x1x1dphase::GetPosOffsetsParametric(double xVal, double yVal, double zVal) const
 {
   std::vector<double> thePosOffsetsParametric;
 
@@ -212,7 +213,7 @@ std::vector<double> spacecharge::SpaceChargeDUNE35t::GetPosOffsetsParametric(dou
 //----------------------------------------------------------------------------
 /// Provides one position offset using a parametric representation, for a given
 /// axis
-double spacecharge::SpaceChargeDUNE35t::GetOnePosOffsetParametric(double xValNew, double yValNew, double zValNew, std::string axis) const
+double spacecharge::SpaceCharge3x1x1dphase::GetOnePosOffsetParametric(double xValNew, double yValNew, double zValNew, std::string axis) const
 {      
   double parA[6][7];
   double parB[6];
@@ -301,7 +302,7 @@ double spacecharge::SpaceChargeDUNE35t::GetOnePosOffsetParametric(double xValNew
     parB[4] = f5_x->Eval(aValNew);
   
     fFinal_x->SetParameters(parB);
-    offsetValNew = 100.0*fFinal_x->Eval(bValNew);
+    offsetValNew = -1.*fFinal_x->Eval(bValNew);  // -1 because of line "posOffsets.SetX(-posOffsets.X());" in larsim/LArG4/LArVoxeLReadout.cxx
   }
   else if(axis == "Y")
   {
@@ -313,7 +314,7 @@ double spacecharge::SpaceChargeDUNE35t::GetOnePosOffsetParametric(double xValNew
     parB[5] = f6_y->Eval(aValNew);
   
     fFinal_y->SetParameters(parB);
-    offsetValNew = 100.0*fFinal_y->Eval(bValNew);
+    offsetValNew = fFinal_y->Eval(bValNew);
   }
   else if(axis == "Z")
   {
@@ -323,16 +324,16 @@ double spacecharge::SpaceChargeDUNE35t::GetOnePosOffsetParametric(double xValNew
     parB[3] = f4_z->Eval(aValNew);
   
     fFinal_z->SetParameters(parB);
-    offsetValNew = 100.0*fFinal_z->Eval(bValNew);
+    offsetValNew = fFinal_z->Eval(bValNew);
   }
-  
+   
   return offsetValNew;
 }
 
 //----------------------------------------------------------------------------
 /// Primary working method of service that provides E field offsets to be
 /// used in charge/light yield calculation (e.g.)
-geo::Vector_t spacecharge::SpaceChargeDUNE35t::GetEfieldOffsets(geo::Point_t const& point) const
+geo::Vector_t spacecharge::SpaceCharge3x1x1dphase::GetEfieldOffsets(geo::Point_t const& point) const
 {
   std::vector<double> theEfieldOffsets;
 
@@ -348,12 +349,12 @@ geo::Vector_t spacecharge::SpaceChargeDUNE35t::GetEfieldOffsets(geo::Point_t con
       theEfieldOffsets.resize(3,0.0);
   }
 
-  return { theEfieldOffsets[0], theEfieldOffsets[1], theEfieldOffsets[2] };
+  return { -theEfieldOffsets[0], -theEfieldOffsets[1], -theEfieldOffsets[2] };
 }
 
 //----------------------------------------------------------------------------
 /// Provides E field offsets using a parametric representation
-std::vector<double> spacecharge::SpaceChargeDUNE35t::GetEfieldOffsetsParametric(double xVal, double yVal, double zVal) const
+std::vector<double> spacecharge::SpaceCharge3x1x1dphase::GetEfieldOffsetsParametric(double xVal, double yVal, double zVal) const
 {
   std::vector<double> theEfieldOffsetsParametric;
 
@@ -371,7 +372,7 @@ std::vector<double> spacecharge::SpaceChargeDUNE35t::GetEfieldOffsetsParametric(
 //----------------------------------------------------------------------------
 /// Provides one E field offset using a parametric representation, for a given
 /// axis
-double spacecharge::SpaceChargeDUNE35t::GetOneEfieldOffsetParametric(double xValNew, double yValNew, double zValNew, std::string axis) const
+double spacecharge::SpaceCharge3x1x1dphase::GetOneEfieldOffsetParametric(double xValNew, double yValNew, double zValNew, std::string axis) const
 {      
   double parA[6][7];
   double parB[6];
@@ -489,44 +490,39 @@ double spacecharge::SpaceChargeDUNE35t::GetOneEfieldOffsetParametric(double xVal
 }
 
 //----------------------------------------------------------------------------
-/// Transform X to SCE X coordinate:  [2.275,-0.3] --> [0.0,2.25]
-double spacecharge::SpaceChargeDUNE35t::TransformX(double xVal) const
+/// Transform X to SCE X coordinate:  [0.0,3.6] --> [0.0,3.6]
+double spacecharge::SpaceCharge3x1x1dphase::TransformX(double xVal) const
 {
-  double xValNew;
-  xValNew = 2.25 - (2.25/2.25)*((xVal-2.5)/100.0);
-  xValNew -= 1.125;
+  double xValNew = xVal;
 
   return xValNew;
 }
 
 //----------------------------------------------------------------------------
-/// Transform Y to SCE Y coordinate:  [0.0,2.0] --> [0.0,2.0]
-double spacecharge::SpaceChargeDUNE35t::TransformY(double yVal) const
+/// Transform Y to SCE Y coordinate:  [0.0,6.08] --> [0.0,6.0]
+double spacecharge::SpaceCharge3x1x1dphase::TransformY(double yVal) const
 {
-  double yValNew;
-  yValNew = (2.0/2.0)*(yVal/100.0);
-  yValNew -= 1.0;
+  double yValNew =  yVal;
 
   return yValNew;
 }
 
 //----------------------------------------------------------------------------
-/// Transform Z to SCE Z coordinate:  [0.0,1.6] --> [0.0,1.6]
-double spacecharge::SpaceChargeDUNE35t::TransformZ(double zVal) const
+/// Transform Z to SCE Z coordinate:  [0.0,6.97] --> [0.0,7.2]
+double spacecharge::SpaceCharge3x1x1dphase::TransformZ(double zVal) const
 {
-  double zValNew;
-  zValNew = (1.6/1.6)*(zVal/100.0);
+  double zValNew = zVal;
 
   return zValNew;
 }
 
 //----------------------------------------------------------------------------
 /// Check to see if point is inside boundaries of map (allow to go slightly out of range)
-bool spacecharge::SpaceChargeDUNE35t::IsInsideBoundaries(double xVal, double yVal, double zVal) const
+bool spacecharge::SpaceCharge3x1x1dphase::IsInsideBoundaries(double xVal, double yVal, double zVal) const
 {
   bool isInside = true;
 
-  if((xVal < 2.5) || (xVal > 230.0) || (yVal < -5.0) || (yVal > 205.0) || (zVal < -5.0) || (zVal > 165.0))
+  if((xVal < -360.0) || (xVal > 360.0) || (yVal < -5.0) || (yVal > 615.0) || (zVal < -5.0) || (zVal > 705.0))
   {
     isInside = false;
   }

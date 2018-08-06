@@ -17,13 +17,11 @@ BEGIN_PROLOG
 #  v2.6-05302017/JS: Added fcGen back in, using the Concrete_DUNE1 spectrum (by JR). New spectrum will be in dune_pardata.
 #  v2.7-06062017/JS: Added material specific generation for LAr contaminants.
 #  v2.8-06092017/JS: Reconfigured this to be an include for a typical job. This file will now host generators for the various radiologicals, but will not run a simulation itself.
-#
-#
 
 #The Generator names provided that should be called from other files are:
 #dune10kt_1x2x6_39ar     #Ar39 in LAr
 #dune10kt_1x2x6_APA      #Co60 in APA frame
-#dune10kt_1x2x6_fc       #Originally use for K40 in Field Cage. Now repurposed for Neutrons from concrete.
+#dune10kt_1x2x6_neutron       #Originally use for K40 in Field Cage. Now repurposed for Neutrons from concrete.
 #dune10kt_1x2x6_CPA      #K40 from CPA
 #dune10kt_1x2x6_85kr     #Kr in LAr
 #dune10kt_1x2x6_222rn    #Rn in LAr
@@ -42,8 +40,8 @@ dune10kt_1x2x6_39ar:
  Y1:                    [  800. ]     # in cm in world coordinates, top corner of box
  Z0:                    [  -55. ]     # in cm in world coordinates, bottom corner of box
  Z1:                    [  1500. ]     # in cm in world coordinates, top corner of box
- T0:                    [ -1600000. ] # starting time in ns
- T1:                    [  1600000. ] # ending time in ns
+ T0:                    [ -2246000 ]
+ T1:                    [  2246000. ] # ending time in ns
 }
 
 dune10kt_1x2x6_APA:{
@@ -57,24 +55,24 @@ dune10kt_1x2x6_APA:{
  Y1:                    [  600. ]     # in cm in world coordinates, top corner of box
  Z0:                    [  0    ]     # in cm in world coordinates, bottom corner of box
  Z1:                    [  1395 ]     # in cm in world coordinates, top corner of box
- T0:                    [ -1600000. ] # starting time in ns
- T1:                    [  1600000. ] # ending time in ns
+ T0:                    [ -2246000 ]
+ T1:                    [  2246000. ] # ending time in ns
 }
 
-dune10kt_1x2x6_fc:
+dune10kt_1x2x6_neutron: #Center region is added to simulate neutrons comming in from the rock at the outermost APAs (on the edge of the cryostat) per J. Reichenbacher's request. This should more accurately represent the worst case scenario in the FD.
 {
  module_type:           "RadioGen"
- Nuclide:               ["Concrete_DUNE1", "Concrete_DUNE1", "Concrete_DUNE1", "Concrete_DUNE1" ]
- Material:              [".*",".*",".*",".*"]
- BqPercc:               [ 0.0000076, 0.0000076, 0.0000076, 0.0000076 ]   # activity -- Becquerels per cc. 0.0000076 assumes 10 neutrons/y/g per 10 ppm U-238 in concrete and a density of 2.40 g/cc for 10 cm mean depth in concrete -JReichenbacher (03/21/2017)
- X0:                    [ 0.0,    0.0,    0.0,    0.0    ]     # in cm in world coordinates, bottom corner of box
- X1:                    [  350.,  350.,   350.,   350.   ]     # in cm in world coordinates, top corner of box
- Y0:                    [ -600.,  -600,  -600.,   600.   ]     # in cm in world coordinates, bottom corner of box
- Y1:                    [  600. , 600,   -601.,   601.   ]     # in cm in world coordinates, top corner of box
- Z0:                    [  -0.5,  1394.5, 0,      0      ]     # in cm in world coordinates, bottom corner of box
- Z1:                    [  0.5,   1395.5, 1395,   1395   ]     # in cm in world coordinates, top corner of box
- T0:                    [ -1600000., -1600000., -1600000., -1600000. ] # starting time in ns
- T1:                    [  1600000., 1600000., 1600000., 1600000. ] # ending time in ns
+ Nuclide:               ["Concrete_DUNE1", "Concrete_DUNE1", "Concrete_DUNE1", "Concrete_DUNE1", "Concrete_DUNE1" ]
+ Material:              [".*",".*",".*",".*", ".*"]
+ BqPercc:               [ 0.0000076, 0.0000076, 0.0000076, 0.0000076, 0.0000076 ]   # activity -- Becquerels per cc. 0.0000076 assumes 10 neutrons/y/g per 10 ppm U-238 in concrete and a density of 2.40 g/cc for 10 cm mean depth in concrete -JReichenbacher (03/21/2017)
+ X0:                    [ 0.0,    0.0,    0.0,    0.0 ,  -0.5  ]     # in cm in world coordinates, bottom corner of box
+ X1:                    [  350.,  350.,   350.,   350.,   0.5  ]     # in cm in world coordinates, top corner of box
+ Y0:                    [ -600.,  -600,  -600.,   600.,   -600 ]     # in cm in world coordinates, bottom corner of box
+ Y1:                    [  600. , 600,   -601.,   601.,    600 ]     # in cm in world coordinates, top corner of box
+ Z0:                    [  -0.5,  1394.5, 0,      0,       0   ]     # in cm in world coordinates, bottom corner of box
+ Z1:                    [  0.5,   1395.5, 1395,   1395,    1395]     # in cm in world coordinates, top corner of box
+ T0:                    [ -2246000.,-2246000.,-2246000.,-2246000.,-2246000 ] # ending time in ns
+ T1:                    [  2246000., 2246000., 2246000., 2246000., 2246000 ] # ending time in ns
 }
 
 dune10kt_1x2x6_PDs:{
@@ -88,8 +86,8 @@ dune10kt_1x2x6_PDs:{
  Y1:                    [  600. ]     # in cm in world coordinates, top corner of box
  Z0:                    [  0    ]     # in cm in world coordinates, bottom corner of box
  Z1:                    [  1395 ]     # in cm in world coordinates, top corner of box
- T0:                    [ -1600000. ] # starting time in ns
- T1:                    [  1600000. ] # ending time in ns
+ T0:                    [ -2246000 ]
+ T1:                    [  2246000. ] # ending time in ns
 }
 
 dune10kt_1x2x6_CPA:{
@@ -103,8 +101,8 @@ dune10kt_1x2x6_CPA:{
  Y1:                    [  600. ]     # in cm in world coordinates, top corner of box
  Z0:                    [  0    ]     # in cm in world coordinates, bottom corner of box
  Z1:                    [  1395 ]     # in cm in world coordinates, top corner of box
- T0:                    [ -1600000. ] # starting time in ns
- T1:                    [  1600000. ] # ending time in ns
+ T0:                    [ -2246000 ]
+ T1:                    [  2246000. ] # ending time in ns
 }
 
 dune10kt_1x2x6_42ar:     @local::dune10kt_1x2x6_39ar
