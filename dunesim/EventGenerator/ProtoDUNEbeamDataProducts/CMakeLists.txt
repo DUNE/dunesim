@@ -19,6 +19,7 @@ art_make(
           
           cetlib cetlib_except
           ${ROOT_BASIC_LIB_LIST}
+          ProtoDUNEAnaUtils
         )
 
 install_headers()
