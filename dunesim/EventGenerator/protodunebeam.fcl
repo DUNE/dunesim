@@ -26,6 +26,7 @@ protodune_beam:
  # Background particle cuts
  BkgMomentumCut: 0.0 # Momentum cut in GeV/c on background particles as a crude shielding simulation
  BkgRadiusCut: 20. # 20 cm radius to apply above cut to particles outside the beam pipe area
+
  T_Resolution: 1.0  # sigmas 
  Pos_Resolution: 1.0  # sigmas
  Ch_Efficiency: 1.0  # percentage
