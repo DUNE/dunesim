@@ -79,13 +79,17 @@ namespace evgendp{
       int trackID;
       int pdg;
       double m;
-      double theta;
-      double phi;
+      //double theta;
+      //double phi;
+      double startDirectionX;
+      double startDirectionY;
+      double startDirectionZ;
       double length;
       double startX;
       double startY;
       double startZ;
-      double mom;
+      //double mom;
+      double energy;
 
   }; //end class Track
 
@@ -100,16 +104,14 @@ namespace evgendp{
   }
 
   TLorentzVector Track::getMomentum(){
-
-    double momX = mom*cos(theta);
-    double momY = mom*sin(theta)*sin(phi);
-    double momZ = mom*sin(theta)*sin(phi);
-
     static TDatabasePDG  pdgt;
     TParticlePDG* pdgp = pdgt.GetParticle(pdg);
     if (pdgp) m = pdgp->Mass();
 
-    double energy = sqrt( mom*mom + m*m );
+    double mom = sqrt( energy*energy - m*m );
+    double momX = mom*startDirectionX;
+    double momY = mom*startDirectionY;
+    double momZ = mom*startDirectionZ;
 
     TLorentzVector momentum( momX, momY, momZ, energy );
     return momentum;
@@ -127,19 +129,29 @@ namespace evgendp{
       using Name = fhicl::Name;
       using Comment = fhicl::Comment;
 
-      fhicl::Atom<double> P0{
-        Name("P0"),
-        Comment("central momentum (GeV/c) to generate")
+      fhicl::Atom<int> EventsToProcess{
+        Name("EventsToProcess"),
+        Comment("Number of events to process")
       };
 
-      fhicl::Atom<double> SigmaP{
-        Name("SigmaP"),
-        Comment("variation in momenta (GeV/c)")
+      fhicl::Atom<int> StartEvent{
+        Name("StartEvent"),
+        Comment("First event to process")
       };
 
-      fhicl::Atom<std::string> FName{
-        Name("FileName"),
+      fhicl::Atom<int> PDG{
+        Name("PDG"),
+        Comment("Particle PDG code")
+      };
+
+      fhicl::Atom<std::string> TrackFile{
+        Name("TrackFile"),
         Comment("Track list")
+      };
+
+      fhicl::Atom<std::string> HistFile{
+        Name("HistFile"),
+        Comment("CORSIKA histogram file")
       };
     }; //end struct Config
 
@@ -157,9 +169,11 @@ namespace evgendp{
 
     void beginJob() override;
 
-    double fP0;
-    double fSigmaP;
-    std::string fFName;
+    int fEventsToProcess;
+    int fStartEvent;
+    int fPDG;
+    std::string fTrackFile;
+    std::string fHistFile;
 
     std::map< int, std::vector< Track*> > fEventTrackMap;
 
@@ -171,9 +185,11 @@ namespace evgendp{
 
 evgendp::DataGen311::DataGen311(Parameters const& config)
  :
-   fP0           (config().P0()),
-   fSigmaP       (config().SigmaP()),
-   fFName        (config().FName())
+   fEventsToProcess (config().EventsToProcess()),
+   fStartEvent      (config().StartEvent()),
+   fPDG             (config().PDG()),
+   fTrackFile       (config().TrackFile()),
+   fHistFile        (config().HistFile())
 {
     art::ServiceHandle<rndm::NuRandomService>()->createEngine(*this);
     //art::ServiceHandle<rndm::NuRandomService>()->createEngine(*this, "HepJamesRandom", "gen", p, { "Seed", "SeedGenerator" });
@@ -188,27 +204,61 @@ evgendp::DataGen311::DataGen311(Parameters const& config)
 
 void evgendp::DataGen311::beginJob(){
 
-  //read the external file and store the information on the map
-  std::ifstream file;
-  file.open( fFName );
+  //read the files and store the information on the map
+  std::ifstream trackfile;
+  trackfile.open( fTrackFile );
+  if( !trackfile.is_open() )
+    throw cet::exception("DataGen311") << "Can't open file " << fTrackFile <<"\n";
 
-  if( !file.is_open() )
-    throw cet::exception("DataGen311") << "Can't open file " << fFName <<"\n";
+  TFile *chistfile = new TFile(fHistFile.c_str());
+  if( chistfile->IsOpen() == kFALSE )
+    throw cet::exception("DataGen311") << "Can't open file " << fHistFile <<"\n";
+
+  std::stringstream hetss;
+  hetss << "hEnergyTheta" << fPDG;
+  TH2D *hEnergyTheta = (TH2D*)chistfile->Get(hetss.str().c_str());
 
   int eventBefore=0;
   int eventCounter=0;
+  int trackCounter=0, skippedTrackCounter=0;
   std::string line;
-  while(std::getline( file, line )){
+  std::getline(trackfile, line); // Skip header
+  while(std::getline( trackfile, line )){
     std::stringstream sstream(line);
 
-    Track *track = new Track();
-    sstream >> track->run >> track->subrun >> track->event >> track->trackID >> track->theta >> track->phi >> track->startX >> track->startY >> track->startZ;
-    track->pdg = 13; //<--Hardcoded!
+    int eventID = 9999999;
+    sstream >> eventID;
+    if (eventID < fStartEvent) {
+      continue;
+    } else if (eventID >= fStartEvent+fEventsToProcess) {
+      break;
+    }
 
-    art::ServiceHandle<art::RandomNumberGenerator> rng;
-    CLHEP::HepRandomEngine &engine = rng->getEngine();
-    CLHEP::RandFlat   flat(engine);
-    track->mom = fP0 + fSigmaP*(2.0*flat.fire()-1.0);
+    Track *track = new Track();
+    sstream >> track->run >> track->subrun >> track->event >> track->trackID >> track->startDirectionX >> track->startDirectionY >> track->startDirectionZ >> track->length >> track->startX >> track->startY >> track->startZ;
+    track->pdg = fPDG;
+    trackCounter++;
+
+    // Start direction components might not be perfectly normalized
+    double sdirmag = sqrt(track->startDirectionX*track->startDirectionX + track->startDirectionY*track->startDirectionY + track->startDirectionZ*track->startDirectionZ);
+    track->startDirectionX /= sdirmag;
+    track->startDirectionY /= sdirmag;
+    track->startDirectionZ /= sdirmag;
+
+    // Theta from +X to -X
+    double theta = acos(track->startDirectionX);
+
+    int biny = hEnergyTheta->GetYaxis()->FindBin(theta);
+    TH1D *hEnergyAtTheta = hEnergyTheta->ProjectionX("", biny, biny);
+
+    if( hEnergyAtTheta->GetEntries() < 1 ){
+      skippedTrackCounter++;
+      delete track;
+      continue;
+    }
+
+    double energy = hEnergyAtTheta->GetRandom();
+    track->energy = energy;
 
     if( track->event != eventBefore ){
       eventBefore = track->event;
@@ -219,7 +269,7 @@ void evgendp::DataGen311::beginJob(){
     fEventTrackMap[eventCounter].push_back(track);
   }
 
-  file.close();
+  trackfile.close();
 
   //initialize randomn number seed for
 
@@ -228,8 +278,6 @@ void evgendp::DataGen311::beginJob(){
 ////////////////////////////////////////////////////////////////////////////////
 
 void evgendp::DataGen311::produce(art::Event & e){
-
-
   art::ServiceHandle<art::RandomNumberGenerator> rng;
   CLHEP::HepRandomEngine &engine = rng->getEngine();
   CLHEP::RandFlat flat(engine);
