@@ -302,7 +302,7 @@ double spacecharge::SpaceCharge3x1x1dphase::GetOnePosOffsetParametric(double xVa
     parB[4] = f5_x->Eval(aValNew);
   
     fFinal_x->SetParameters(parB);
-    offsetValNew = -1.*fFinal_x->Eval(bValNew);  // -1 because of line "posOffsets.SetX(-posOffsets.X());" in larsim/LArG4/LArVoxeLReadout.cxx
+    offsetValNew = fFinal_x->Eval(bValNew);
   }
   else if(axis == "Y")
   {
