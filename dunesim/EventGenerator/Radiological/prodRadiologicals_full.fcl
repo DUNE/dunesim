@@ -1,5 +1,5 @@
 #include "services_dune.fcl"
-#include "radiological_gen_dune_full.fcl"
+#include "dune_radiological_model.fcl"
 
 process_name: BackgroundGen
 
@@ -37,20 +37,20 @@ physics:
  
   producers:
   {
-    generator: @local::dune10kt_1x2x6_39ar
+    ar39Gen: @local::dune10kt_1x2x6_39ar
     ar42Gen:   @local::dune10kt_1x2x6_42ar
     rnGen:     @local::dune10kt_1x2x6_222rn
     apaGen:    @local::dune10kt_1x2x6_APA
     cpaGen:    @local::dune10kt_1x2x6_CPA
     poGen:     @local::dune10kt_1x2x6_210po
     krGen:     @local::dune10kt_1x2x6_85kr
-    fcGen:     @local::dune10kt_1x2x6_fc
+    neutronGen:     @local::dune10kt_1x2x6_neutron
     
     rns:       { module_type: "RandomNumberSaver" }
   }
  
   # Define the producer and filter modules for this path, order matters, 
-  simulate:      [ rns, generator, fcGen, rnGen, krGen, poGen, cpaGen, apaGen ]
+  simulate:      [ rns, ar39Gen, fcGen, rnGen, krGen, poGen, cpaGen, apaGen ]
   
   # Define the output stream, there could be more than one if using filters 
   stream1:       [ out1 ]
