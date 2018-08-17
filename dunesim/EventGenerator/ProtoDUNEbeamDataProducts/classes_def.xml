@@ -9,10 +9,14 @@
 
 
 <lcgdict>
- <class name="sim::ProtoDUNEbeamsim" ClassVersion="10">
+ <class name="sim::ProtoDUNEbeamsim" ClassVersion="13">
+  <version ClassVersion="13" checksum="2685158932"/>
+  <version ClassVersion="12" checksum="3817854573"/>
+  <version ClassVersion="11" checksum="4210955202"/>
 <version ClassVersion="10" checksum="4021958745"/>
 
 </class>
+
  <class name="std::vector<sim::ProtoDUNEbeamsim>"                                />
  <class name="std::pair< art::Ptr<sim::ProtoDUNEbeamsim>, art::Ptr<simb::MCTruth> >" />
  <class name="std::pair< art::Ptr<simb::MCTruth>, art::Ptr<sim::ProtoDUNEbeamsim> >" />
@@ -29,4 +33,10 @@
  <class name="art::Wrapper< std::vector<sim::ProtoDUNEbeamsim                   > >" />
  <class name="art::Wrapper< art::Assns<sim::ProtoDUNEbeamsim, simb::MCTruth, void> >" />
  <class name="art::Wrapper< art::Assns<simb::MCTruth, sim::ProtoDUNEbeamsim, void> >" />
+
+  <!-- ProtoDUNEBeamInstrument objects -->
+  <class name="sim::ProtoDUNEBeamInstrument" ClassVersion="0"/>
+  <class name="std::vector<sim::ProtoDUNEBeamInstrument>" />
+
+
 </lcgdict>
