@@ -5,27 +5,26 @@ protodune_beam:
  module_type:  "ProtoDUNEBeam"
  FileName:  "dummy.root"
  GoodParticleTreeName:  "NTuples/GoodParticle"
- AllParticlesTreeName:  "Detector/NP04FieldCage"
+ AllParticlesTreeName:  "Detector/NP04front"
  StartEvent: 0
  # From protoDUNE_gensingle.fcl
- #BeamX: 118.106 # In cm
- #BeamY: 395.649 
- #BeamZ: -196.113
- #RotateXZ: -8.189 # In degrees
- #RotateYZ: 11.229 
  # Updated geometry values:
  BeamX: 8.0757 # In cm
  BeamY: 461.06 
  BeamZ: -196.11
- RotateXZ: -11.844 # In degrees
- RotateYZ: 11.107 
+ RotateXZ: 0.0 #-11.844 # In degrees
+ RotateYZ: 0.0 #11.107 
+ # Rotations for the final beam monitors and background particles
+ RotateMonitorXZ: -10.3 # [Degrees]
+ RotateMonitorYZ: 11.7  # [Degrees]
+ # Position of the beam monitor positions in z in [mm]
+ BPROFEXTPosZ: 707479
+ BPROF4PosZ : 716048
+ NP04frontPosZ: 717243
  # Intensity variables
  Intensity: 1.e6 # Number of interactions on the secondary target in one spill
  ReadoutWindow: 4.0 # In milliseconds
  BeamSpillLength: 4.8 # In seconds
- # Background particle cuts
- BkgMomentumCut: 0.0 # Momentum cut in GeV/c on background particles as a crude shielding simulation
- BkgRadiusCut: 20. # 20 cm radius to apply above cut to particles outside the beam pipe area
 
  T_Resolution: 1.0  # sigmas 
  Pos_Resolution: 1.0  # sigmas

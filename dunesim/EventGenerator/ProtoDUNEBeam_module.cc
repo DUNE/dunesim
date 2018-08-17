@@ -132,7 +132,19 @@ namespace evgen{
         
         // Make the momentum vector, rotating as required.
         TLorentzVector MakeMomentumVector(float px, float py, float pz, int pdg);
-        
+        TLorentzVector MakeMomentumVector(const TVector3 &mom, int pdg);
+
+        // We need to rotate the beam monitor coordinates into the detector frame
+        TLorentzVector ConvertBeamMonitorCoordinates(float x, float y, float z, float t, float offset);
+        TVector3 ConvertBeamMonitorMomentumVec(float px, float py, float pz);
+        // Setup the beam monitor basis vectors in detector coordinates
+        void BeamMonitorBasisVectors();
+        // Apply the rotation
+        void RotateMonitorVector(TVector3 &vec);
+ 
+        // Background particles need to be fired from an upstream position
+        TVector3 GetBackgroundPosition(float x, float y, float z, float px, float py, float pz);
+       
         std::string fFileName;
         std::string fGoodParticleTreeName;
         std::string fAllParticlesTreeName;
@@ -148,32 +160,18 @@ namespace evgen{
         // Input file provides a TTree that we need to read.
         TTree* fGoodParticleTree;
         TTree* fAllParticlesTree;
-        
-        ////////////////////////////////////////////////////////////////////////////////////////////////
-        //////////////////// Good Particle Tree Variables added by Caroline for beam simulation storage
-        ////////////////////////////////////////////////////////////////////////////////////////////////
-        //For the NP04 Cage part
-//        Float_t fGoodNP04FieldCage_x;
-//        Float_t fGoodNP04FieldCage_y;
-//        Float_t fGoodNP04FieldCage_z;
-//        Float_t fGoodNP04FieldCage_t;
-//        Float_t fGoodNP04FieldCage_Px;
-//        Float_t fGoodNP04FieldCage_Py;
-//        Float_t fGoodNP04FieldCage_Pz;
-//        Float_t fGoodNP04FieldCage_PDGid;
-//        Float_t fGoodNP04FieldCage_EventID;
-//        Float_t fGoodNP04FieldCage_TrackID;
-//       
-//        Float_t fGoodNP04front_x;
-//        Float_t fGoodNP04front_y;
-//        Float_t fGoodNP04front_z;
-//        Float_t fGoodNP04front_t;
-//        Float_t fGoodNP04front_Px;
-//        Float_t fGoodNP04front_Py;
-//        Float_t fGoodNP04front_Pz;
-//        Float_t fGoodNP04front_PDGid;
-//        Float_t fGoodNP04front_EventID;
-//        Float_t fGoodNP04front_TrackID;
+
+        // To make sure we can fire the GoodParticles from the correct place        
+        Float_t fGoodNP04front_x;
+        Float_t fGoodNP04front_y;
+        Float_t fGoodNP04front_z;
+        Float_t fGoodNP04front_t;
+        Float_t fGoodNP04front_Px;
+        Float_t fGoodNP04front_Py;
+        Float_t fGoodNP04front_Pz;
+        Float_t fGoodNP04front_PDGid;
+        Float_t fGoodNP04front_EventID;
+        Float_t fGoodNP04front_TrackID;
 
 	// For the TOF part
         Float_t fGoodTOF1_x;
@@ -282,7 +280,7 @@ namespace evgen{
 
         // We need two times: the trigger time, and the time at the entry point
         // to the TPC where we generate the event.
-        float fEntryT, fTriggerT;
+        float fEntryT;
         
         // Define the coordinate transform from the beam frame to the detector frame
         float fBeamX;
@@ -290,7 +288,18 @@ namespace evgen{
         float fBeamZ;
         float fRotateXZ;
         float fRotateYZ;
-        
+        // Rotate the beam monitor coordinate system (those after the last bending magnet)
+        float fRotateMonitorXZ;
+        float fRotateMonitorYZ;
+        // The three beam monitor basis vectors in the detector coordinate system
+        TVector3 fBMBasisX; 
+        TVector3 fBMBasisY; 
+        TVector3 fBMBasisZ; 
+        // The z positions of the important elements along the beam direction
+        float fBPROFEXTPos;
+        float fBPROF4Pos;
+        float fNP04frontPos;
+       
         // Parameters from the .fcl file to deal with overlaying events
         float fIntensity; // Number of interactions on the secondary target per SPS spill
         float fReadoutWindow; // Readout window (needs to match the values used in the simulation) in milliseconds
@@ -303,10 +312,6 @@ namespace evgen{
         
         // Number of beam interactions to overlay.
         int fOverlays;
-        
-        // In the absense of the full shielding in the beam simulation, add a momentum cut away from the beam pipe.
-        float fBackgroundMomentumCut; // Momentum cut in GeV/c
-        float fBackgroundRadiusCut; // Radius away from beam pipe to consider in cm
         
         ifdh_ns::ifdh* fIFDH;
     };
@@ -327,7 +332,7 @@ evgen::ProtoDUNEBeam::ProtoDUNEBeam(fhicl::ParameterSet const & pset)
     fFileName = pset.get< std::string>("FileName");
     fGoodParticleTreeName = pset.get< std::string>("GoodParticleTreeName");
     fAllParticlesTreeName = pset.get< std::string>("AllParticlesTreeName");
-    
+    std::cout << "All particles tree name = " << fAllParticlesTreeName << std::endl;
     // Intensity variables
     fIntensity = pset.get<float>("Intensity");
     fReadoutWindow = pset.get<float>("ReadoutWindow");
@@ -337,10 +342,6 @@ evgen::ProtoDUNEBeam::ProtoDUNEBeam(fhicl::ParameterSet const & pset)
     fT_Resolution = pset.get<float>("T_Resolution");
     fPos_Resolution = pset.get<float>("Pos_Resolution");
     fCh_Efficiency = pset.get<float>("Ch_Efficiency");
-    
-    // Background cut variables
-    fBackgroundMomentumCut = pset.get<float>("BkgMomentumCut");
-    fBackgroundRadiusCut = pset.get<float>("BkgRadiusCut");
     
     // See if the user wants to start at an event other than zero.
     fStartEvent = pset.get<int>("StartEvent");
@@ -375,6 +376,14 @@ evgen::ProtoDUNEBeam::ProtoDUNEBeam(fhicl::ParameterSet const & pset)
     fRotateXZ = pset.get<float>("RotateXZ");
     fRotateYZ = pset.get<float>("RotateYZ");
     
+    fRotateMonitorXZ = pset.get<float>("RotateMonitorXZ");
+    fRotateMonitorYZ = pset.get<float>("RotateMonitorYZ");
+    fBPROFEXTPos     = pset.get<float>("BPROFEXTPosZ");
+    fBPROF4Pos       = pset.get<float>("BPROF4PosZ");
+    fNP04frontPos    = pset.get<float>("NP04frontPosZ");
+    // Setup the beam monitor basis vectors
+    BeamMonitorBasisVectors();   
+
     // Initialise the input file and tree to be null.
     fInputFile = 0x0;
     fGoodParticleTree = 0x0;
@@ -432,7 +441,13 @@ void evgen::ProtoDUNEBeam::beginJob(){
     if(fAllParticlesTree == 0x0){
         throw cet::exception("ProtoDUNEBeam") << "Input tree " << fAllParticlesTreeName << " cannot be read.\n";
     }
-    
+    std::cout << "All particle tree " << fAllParticlesTreeName << " has " << fAllParticlesTree->GetEntries() << " entries" << std::endl;
+   
+    // We need different bits of information for different particles.
+    // The GoodParticles should be fired from the detector front (NP04front)
+    // Background particles should be fired from the first monitor after the final bending magnet in order
+    // to ensure those that should hit the CRT will do so (BPROFEXT)
+ 
     // Since this is technically an ntuple, all objects are floats
     // Position four-vector components
     fAllParticlesTree->SetBranchAddress("x",&fX);
@@ -455,32 +470,20 @@ void evgen::ProtoDUNEBeam::beginJob(){
 
     std::cout << "Name prefix for good particle tree = " << namePrefix << std::endl;
 
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_EventID").c_str(),&fBeamEvent);
-    fGoodParticleTree->SetBranchAddress((namePrefix+"_TrackID").c_str(),&fTrackID);
+//    fGoodParticleTree->SetBranchAddress((namePrefix+"_EventID").c_str(),&fBeamEvent);
+//    fGoodParticleTree->SetBranchAddress((namePrefix+"_TrackID").c_str(),&fTrackID);
  
     ////////************added by Caroline for beam simulation storage for good particles ***************//////////////
-    // add lines for the NP04 part
-//    fGoodParticleTree->SetBranchAddress((namePrefix+"_x").c_str(),&fGoodNP04FieldCage_x);
-//    fGoodParticleTree->SetBranchAddress((namePrefix+"_y").c_str(),&fGoodNP04FieldCage_y);
-//    fGoodParticleTree->SetBranchAddress((namePrefix+"_z").c_str(),&fGoodNP04FieldCage_z);
-//    fGoodParticleTree->SetBranchAddress((namePrefix+"_t").c_str(),&fGoodNP04FieldCage_t);
-//    fGoodParticleTree->SetBranchAddress((namePrefix+"_Px").c_str(),&fGoodNP04FieldCage_Px);
-//    fGoodParticleTree->SetBranchAddress((namePrefix+"_Py").c_str(),&fGoodNP04FieldCage_Py);
-//    fGoodParticleTree->SetBranchAddress((namePrefix+"_Pz").c_str(),&fGoodNP04FieldCage_Pz);
-//    fGoodParticleTree->SetBranchAddress((namePrefix+"_PDGid").c_str(),&fGoodNP04FieldCage_PDGid);
-//    fGoodParticleTree->SetBranchAddress((namePrefix+"_EventID").c_str(),&fGoodNP04FieldCage_EventID);
-//    fGoodParticleTree->SetBranchAddress((namePrefix+"_TrackID").c_str(),&fGoodNP04FieldCage_TrackID);
-//
-//    fGoodParticleTree->SetBranchAddress((namePrefix+"_x").c_str(),&fGoodNP04front_x);
-//    fGoodParticleTree->SetBranchAddress((namePrefix+"_y").c_str(),&fGoodNP04front_y);
-//    fGoodParticleTree->SetBranchAddress((namePrefix+"_z").c_str(),&fGoodNP04front_z);
-//    fGoodParticleTree->SetBranchAddress((namePrefix+"_t").c_str(),&fGoodNP04front_t);
-//    fGoodParticleTree->SetBranchAddress((namePrefix+"_Px").c_str(),&fGoodNP04front_Px);
-//    fGoodParticleTree->SetBranchAddress((namePrefix+"_Py").c_str(),&fGoodNP04front_Py);
-//    fGoodParticleTree->SetBranchAddress((namePrefix+"_Pz").c_str(),&fGoodNP04front_Pz);
-//    fGoodParticleTree->SetBranchAddress((namePrefix+"_PDGid").c_str(),&fGoodNP04front_PDGid);
-//    fGoodParticleTree->SetBranchAddress((namePrefix+"_EventID").c_str(),&fGoodNP04front_EventID);
-//    fGoodParticleTree->SetBranchAddress((namePrefix+"_TrackID").c_str(),&fGoodNP04front_TrackID);
+    fGoodParticleTree->SetBranchAddress("NP04front_x",&fGoodNP04front_x);
+    fGoodParticleTree->SetBranchAddress("NP04front_y",&fGoodNP04front_y);
+    fGoodParticleTree->SetBranchAddress("NP04front_z",&fGoodNP04front_z);
+    fGoodParticleTree->SetBranchAddress("NP04front_t",&fGoodNP04front_t);
+    fGoodParticleTree->SetBranchAddress("NP04front_Px",&fGoodNP04front_Px);
+    fGoodParticleTree->SetBranchAddress("NP04front_Py",&fGoodNP04front_Py);
+    fGoodParticleTree->SetBranchAddress("NP04front_Pz",&fGoodNP04front_Pz);
+    fGoodParticleTree->SetBranchAddress("NP04front_PDGid",&fGoodNP04front_PDGid);
+    fGoodParticleTree->SetBranchAddress("NP04front_EventID",&fGoodNP04front_EventID);
+    fGoodParticleTree->SetBranchAddress("NP04front_TrackID",&fGoodNP04front_TrackID);
     
     // add more lines for the TOF part
     fGoodParticleTree->SetBranchAddress("TOF1_x",&fGoodTOF1_x);
@@ -572,15 +575,13 @@ void evgen::ProtoDUNEBeam::beginJob(){
     fGoodParticleTree->SetBranchAddress("BPROFEXT_PDGid",&fGoodBPROFEXT_PDGid);
     fGoodParticleTree->SetBranchAddress("BPROFEXT_EventID",&fGoodBPROFEXT_EventID);
     fGoodParticleTree->SetBranchAddress("BPROFEXT_TrackID",&fGoodBPROFEXT_TrackID);
- 
-
-   
-        
+         
     // Calculate the number of events to overlay
     CalculateNOverlays();
     
     // Now we need to fill the particle map
     FillParticleMaps();
+
 }
 
 //----------------------------------------------------------------------------------------
@@ -647,16 +648,16 @@ void evgen::ProtoDUNEBeam::FillParticleMaps(){
         
         fGoodParticleTree->GetEntry(i);
 
-//        std::cout << "Tree entry " << i << " corresponds to event " << fBeamEvent << std::endl;
+//        std::cout << "Tree entry " << i << " corresponds to event " << fGoodBPROFEXT_EventID << std::endl;
 
         // Make sure we didn't have two good particles in one event
-        if(std::find(fGoodEventList.begin(),fGoodEventList.end(),(int)fBeamEvent)!=fGoodEventList.end()) continue;
+        if(std::find(fGoodEventList.begin(),fGoodEventList.end(),(int)fGoodBPROFEXT_EventID)!=fGoodEventList.end()) continue;
  
         // NEW APPROACH - construct a ProtoFullSpill object
-        ProtoFullSpill newSpill(fBeamEvent,fTrackID,fTriggerT,i);
+        ProtoFullSpill newSpill(fGoodNP04front_EventID,fGoodNP04front_TrackID,fGoodNP04front_t,i);
         fAllSpills.push_back(newSpill); 
 
-        fGoodEventList.push_back(fBeamEvent);
+        fGoodEventList.push_back(fGoodBPROFEXT_EventID);
 
     }
     
@@ -674,20 +675,23 @@ void evgen::ProtoDUNEBeam::FillParticleMaps(){
         // Look at which good events this should be overlaid with
         std::vector<int> goodEventList = GetAllOverlays(event,fOverlays);
 
-        for(auto const goodEvent : goodEventList){
+        unsigned int nMatches = 0;
+        for(auto &spill : fAllSpills){
+          // Stop looking if we have found all of our matches
+          if(nMatches == goodEventList.size()) break;
 
-            for(auto &spill : fAllSpills){
-              // Does this track belong with this spill?
-              if(spill.fGoodEvent != goodEvent) continue;
-              
-              spill.fAllSpillTracks[event].push_back(i);
-              
-            }
-
-        } // End loop over matching events to overlay (this re-uses beam interactions...)
+          // Is this a spill of interest?
+          if(std::find(goodEventList.begin(),goodEventList.end(),spill.fGoodEvent) == goodEventList.end()) continue;
+          
+          // Yes, so add this track to the spill
+          spill.fAllSpillTracks[event].push_back(i);
+          ++nMatches;
+        }
+        
     } // End loop over the main tree.
     
     mf::LogInfo("ProtoDUNEBeam") << "Found " << fGoodEventList.size() << " good events containing " << goodEventCounter << " good particles.";
+    mf::LogInfo("ProtoDUNEBeam") << "Built " << fAllSpills.size() << " beam spills.";
     mf::LogInfo("ProtoDUNEBeam") << "All maps built, beginning event generation.";
     
 }
@@ -718,13 +722,15 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
    
     // NEW APPROACH
     ProtoFullSpill spill = fAllSpills[fCurrentGoodEvent];
- 
+//    std::cout << "This spill has " << spill.fAllSpillTracks.size() << " contributing events" << std::endl;
+
     // Find the entries that we are interested in.
     //	std::cout << "Finding all particles associated with good particle event " << beamEvent << std::endl;
-//    for(auto const e : fEventParticleMap[beamEvent]){
     for(auto const & event : spill.fAllSpillTracks){
+
+//        std::cout << " - This event has " << event.second.size() << " contributing tracks" << std::endl;
+
         // Is this the event we would have triggered on?
-//        bool trigEvent = (e.first == beamEvent);
         bool trigEvent = (event.first == spill.fGoodEvent);
         float baseTime;
         if(trigEvent){
@@ -749,24 +755,35 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
             
             // Check to see if this should be a primary beam particle (good particle) or beam background
             std::string process="primaryBackground";
+
+            TLorentzVector pos;
+            TLorentzVector mom;
             // If this track is a "good particle", use the usual "primary" tag
             if(trigEvent && (spill.fGoodTrack == (int)fAllTrackID)){
-                process="primary";
+              process="primary";
+              // We also need to build the momentum vector using the correct good particle information
+              fGoodParticleTree->GetEntry(spill.fGoodIndex);
+              pos = ConvertCoordinates(fGoodNP04front_x/10.,fGoodNP04front_y/10.,fGoodNP04front_z/10.,baseTime + fGoodNP04front_t);
+              mom = MakeMomentumVector(fGoodNP04front_Px/1000.,fGoodNP04front_Py/1000.,fGoodNP04front_Pz/1000.,(int)fGoodNP04front_PDGid);           
             }
-            
-            // Get the position four vector, converting mm to cm
-            TLorentzVector pos = ConvertCoordinates(fX/10.,fY/10.,fZ/10.,baseTime + fEntryT);
-            // Get momentum four vector, remembering to convert MeV to GeV
-            TLorentzVector mom = MakeMomentumVector(fPx/1000.,fPy/1000.,fPz/1000.,intPDG);
-            
-            // Apply an energy cut to things outside the beam pipe to represent the shielding.
-            float r = sqrt(fX*fX + fY*fY);
-            r = r / 10.;
-            if(r > fBackgroundRadiusCut && mom.Vect().Mag() < fBackgroundMomentumCut){
-                continue;
+            else{
+              // We just need to shift our background particles upstream to BPROFEXT so they will hit the CRTs
+              TVector3 tempPos = GetBackgroundPosition(fX,fY,fZ,fPx,fPy,fPz); 
+              // At this step the position and momentum matches the GoodPartcle coordinates so apply the same functions
+              pos = ConvertCoordinates(tempPos.X()/10.,tempPos.Y()/10.,tempPos.Z()/10.,baseTime+fEntryT);
+              mom = MakeMomentumVector(fPx/1000.,fPy/1000.,fPz/1000.,intPDG);
+//              if(fabs(intPDG) == 13){
+//                std::cout << "Found a " << process << " muon at time = " << baseTime+fEntryT << ":" << std::endl;
+//                std::cout << fX/10. << ", " << fY/10. << ", " << fZ/10. << std::endl;
+//                pos.Print();
+//                mom.Vect().Unit().Print();
+//              } 
             }
-            
-//            if(process=="primary") std::cout << " - Got the good particle (" << intPDG << ", " << event.first << ", " << (int)fTrackID << ") with momentum = " << mom.Vect().Mag() << std::endl;
+
+//            std::cout << "Information for particle " << intPDG << " with process " << process << std::endl;
+//            pos.Print();
+//            mom.Print();            
+//            mom.Vect().Unit().Print();            
             
             // Track ID needs to be negative for primaries
             int trackID = -1*(mcTruth.NParticles() + 1); //g4trkid in larsoft
@@ -778,25 +795,29 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
             // Add the MCParticle to the MCTruth for the event.
             mcTruth.Add(newParticle);
 
+            // We want to save extra information from the beam monitors for the Good Particle
             if(trigEvent && (spill.fGoodTrack == (int)fAllTrackID)){
 
-                // process="primary";
-                
-//                int EarlierTrackID = fTrackID;
-                for (int i =0; i<fGoodParticleTree->GetEntries();++i){
-                    fGoodParticleTree->GetEntry(i);
-                    if ((int)fTrackID == (int)fAllTrackID && (int)fBeamEvent == (int)fAllEventID){
               fGoodParticleTree->GetEntry(spill.fGoodIndex);
 
-//                      std::cout << "Found the good particle...? " << (int)fTrackID << ", " << fAllTrackID << std::endl;
-
-//                        match::ProtoDUNEBeamToF tof(fGoodTOF1_t,fGoodTRIG2_t);
-
-                        
               sim::ProtoDUNEBeamInstrument tof1("TOF1",fGoodTOF1_x,fGoodTOF1_y,fGoodTOF1_z,fGoodTOF1_t,fGoodTOF1_Px,fGoodTOF1_Py,fGoodTOF1_Pz,fGoodTOF1_PDGid,fGoodTOF1_EventID,fGoodTOF1_TrackID,fT_Resolution);  
               sim::ProtoDUNEBeamInstrument trig2("TRIG2",fGoodTRIG2_x,fGoodTRIG2_y,fGoodTRIG2_z,fGoodTRIG2_t,fGoodTRIG2_Px,fGoodTRIG2_Py,fGoodTRIG2_Pz,fGoodTRIG2_PDGid,fGoodTRIG2_EventID,fGoodTRIG2_TrackID,fT_Resolution);  
-			sim::ProtoDUNEBeamInstrument bprof4("BPROF4",fGoodBPROF4_x,fGoodBPROF4_y,fGoodBPROF4_z,fGoodBPROF4_t,fGoodBPROF4_Px,fGoodBPROF4_Py,fGoodBPROF4_Pz,fGoodBPROF4_PDGid,fGoodBPROF4_EventID,fGoodBPROF4_TrackID,fPos_Resolution);
-			sim::ProtoDUNEBeamInstrument bprofext("BPROFEXT",fGoodBPROFEXT_x,fGoodBPROFEXT_y,fGoodBPROFEXT_z,fGoodBPROFEXT_t,fGoodBPROFEXT_Px,fGoodBPROFEXT_Py,fGoodBPROFEXT_Pz,fGoodBPROFEXT_PDGid,fGoodBPROFEXT_EventID,fGoodBPROFEXT_TrackID,fPos_Resolution);
+
+              // For BPROF4 we want to rotate the coordinates into the detector frame
+              TLorentzVector bprof4Pos = ConvertBeamMonitorCoordinates(fGoodBPROF4_x,fGoodBPROF4_y,fGoodBPROF4_z,fGoodBPROF4_t,fBPROF4Pos);
+              TVector3 bprof4Mom = ConvertBeamMonitorMomentumVec(fGoodBPROF4_Px,fGoodBPROF4_Py,fGoodBPROF4_Pz);
+			        sim::ProtoDUNEBeamInstrument bprof4("BPROF4",bprof4Pos.X(),bprof4Pos.Y(),bprof4Pos.Z(),fGoodBPROF4_t,bprof4Mom.X(),bprof4Mom.Y(),bprof4Mom.Z(),fGoodBPROF4_PDGid,fGoodBPROF4_EventID,fGoodBPROF4_TrackID,fPos_Resolution);
+
+              // Same for BPROFEXT
+              TLorentzVector bprofextPos = ConvertBeamMonitorCoordinates(fGoodBPROFEXT_x,fGoodBPROFEXT_y,fGoodBPROFEXT_z,fGoodBPROFEXT_t,fBPROFEXTPos);
+              TVector3 bprofextMom = ConvertBeamMonitorMomentumVec(fGoodBPROFEXT_Px,fGoodBPROFEXT_Py,fGoodBPROFEXT_Pz);
+        			sim::ProtoDUNEBeamInstrument bprofext("BPROFEXT",bprofextPos.X(),bprofextPos.Y(),bprofextPos.Z(),fGoodBPROFEXT_t,bprofextMom.X(),bprofextMom.Y(),bprofextMom.Z(),fGoodBPROFEXT_PDGid,fGoodBPROFEXT_EventID,fGoodBPROFEXT_TrackID,fPos_Resolution);
+
+//              std::cout << "Predicted detector position" << std::endl;
+//              TVector3 predDir = (bprof4Pos.Vect()-bprofextPos.Vect()).Unit();
+//              float projDist = (fNP04frontPos - fBPROF4Pos) + fabs(fBeamZ*10./fBMBasisZ.Z());
+//              (bprof4Pos.Vect() + projDist*predDir).Print();
+
 			sim::ProtoDUNEBeamInstrument trig1("TRIG1",fGoodTRIG1_x,fGoodTRIG1_y,fGoodTRIG1_z,fGoodTRIG1_t,fGoodTRIG1_Px,fGoodTRIG1_Py,fGoodTRIG1_Pz,fGoodTRIG1_PDGid,fGoodTRIG1_EventID,fGoodTRIG1_TrackID,fT_Resolution);
 			sim::ProtoDUNEBeamInstrument bprof3("BPROF3",fGoodBPROF3_x,fGoodBPROF3_y,fGoodBPROF3_z,fGoodBPROF3_t,fGoodBPROF3_Px,fGoodBPROF3_Py,fGoodBPROF3_Pz,fGoodBPROF3_PDGid,fGoodBPROF3_EventID,fGoodBPROF3_TrackID,fPos_Resolution);
 			sim::ProtoDUNEBeamInstrument bprof2("BPROF2",fGoodBPROF2_x,fGoodBPROF2_y,fGoodBPROF2_z,fGoodBPROF2_t,fGoodBPROF2_Px,fGoodBPROF2_Py,fGoodBPROF2_Pz,fGoodBPROF2_PDGid,fGoodBPROF2_EventID,fGoodBPROF2_TrackID,fPos_Resolution);
@@ -844,9 +865,7 @@ sim::ProtoDUNEBeamInstrument cherenkov2("CHERENKOV2",fGoodBPROFEXT_x,fGoodBPROFE
 			//util::CreateAssn(*this, e, *beamsimcol, newParticle, *beamsimassn)
                         
 
-                    }
-                }
-            }
+            } // End beam instrumentation section
             
         } // End loop over interesting tracks for each event
     } // End loop over the vector of interesting events
@@ -915,7 +934,8 @@ TLorentzVector evgen::ProtoDUNEBeam::ConvertCoordinates(float x, float y, float 
     
     float finalX = x + fBeamX;
     float finalY = y + fBeamY;
-    float finalZ = (z - z) + fBeamZ; // Just use the z position
+//    float finalZ = (z - z) + fBeamZ; // Just use the z position
+    float finalZ = z + fBeamZ; // Just use the z position
     
     TLorentzVector newPos(finalX,finalY,finalZ,t);
     return newPos;
@@ -944,6 +964,11 @@ TLorentzVector evgen::ProtoDUNEBeam::MakeMomentumVector(float px, float py, floa
     return newMom;
 }
 
+TLorentzVector evgen::ProtoDUNEBeam::MakeMomentumVector(const TVector3 &mom, int pdg){
+
+  return MakeMomentumVector(mom.X(),mom.Y(),mom.Z(),pdg);
+
+}
 
 //-----------------------------------------------------------------------------
 
@@ -952,7 +977,7 @@ void evgen::ProtoDUNEBeam::CalculateNOverlays(){
     // The number of events to overlay is as follows:
     // N = Intensity * 2.0 * ReadoutWindow / BeamSpillLength
     fOverlays = fIntensity * (2.0 * fReadoutWindow / 1000.) / fBeamSpillLength;
-    
+    std::cout << "Number of overlays = " << fOverlays << std::endl;   
 }
 
 
@@ -982,5 +1007,74 @@ std::vector<int> evgen::ProtoDUNEBeam::GetAllOverlays(int event, int nOverlay){
     
 }
 //----------------------------------------------------------------------------------
+
+// We need to rotate the beam monitor coordinates into the detector frame (matching NP04front)
+// This means they can later be treated in the same way as the standard NP04front positions
+TLorentzVector evgen::ProtoDUNEBeam::ConvertBeamMonitorCoordinates(float x, float y, float z, float t, float zOffset){
+
+  float off = fNP04frontPos - zOffset;
+
+  TLorentzVector old(x,y,z,t);
+
+  // Convert the coordinates using the rotated basis vectors
+  float newX = x*fBMBasisX.X() + y*fBMBasisY.X() + (z-zOffset)*fBMBasisZ.X() + off*fabs(fBMBasisZ.X());
+  float newY = x*fBMBasisX.Y() + y*fBMBasisY.Y() + (z-zOffset)*fBMBasisZ.Y() + off*fabs(fBMBasisZ.Y());
+  float newZ = x*fBMBasisX.Z() + y*fBMBasisY.Z() + (z-zOffset) - off*fabs(fBMBasisZ.Z());
+
+  // Account for the small differences between NP04front and the detector coordinates
+  newX += fBeamX*10.;
+  newY += fBeamY*10.;
+  newZ += fBeamZ*10.;
+
+  // Make our new beam monitor position in the detector coordinate system
+  TLorentzVector result(newX,newY,newZ,t);
+
+//  std::cout << "Coordinate transform..." << std::endl;
+//  old.Print();
+//  result.Print();
+
+  return result;
+}
+
+TVector3 evgen::ProtoDUNEBeam::ConvertBeamMonitorMomentumVec(float px, float py, float pz){
+
+  TVector3 newMom(px,py,pz);
+//  std::cout << "Momentum transform..." << std::endl;
+//  newMom.Unit().Print();
+  RotateMonitorVector(newMom);
+//  newMom.Unit().Print();
+  return newMom;
+}
+
+void evgen::ProtoDUNEBeam::BeamMonitorBasisVectors(){
+
+  fBMBasisX = TVector3(1.,0.,0.);
+  fBMBasisY = TVector3(0.,1.,0.);
+  fBMBasisZ = TVector3(0.,0.,1.);
+  RotateMonitorVector(fBMBasisX);
+  RotateMonitorVector(fBMBasisY);
+  RotateMonitorVector(fBMBasisZ);
+
+}
+
+void evgen::ProtoDUNEBeam::RotateMonitorVector(TVector3 &vec){
+
+  vec.RotateY(fRotateMonitorXZ * TMath::Pi()/180.);
+  vec.RotateX(fRotateMonitorYZ * TMath::Pi()/180.);
+
+}
+
+TVector3 evgen::ProtoDUNEBeam::GetBackgroundPosition(float x, float y, float z, float px, float py, float pz){
+
+  TVector3 pos(x,y,z);
+  TVector3 dir = TVector3(px,py,pz).Unit();
+
+  // Want to move the position upstream by a distance equal to fNP04frontPos - fBPROFEXTPos
+  // This length is in the beam direction frame unless we account for it
+  float shiftLength = (fNP04frontPos - fBPROFEXTPos)/fBMBasisZ.Z();
+
+  return pos - shiftLength*dir;
+}
+
 DEFINE_ART_MODULE(evgen::ProtoDUNEBeam)
 
