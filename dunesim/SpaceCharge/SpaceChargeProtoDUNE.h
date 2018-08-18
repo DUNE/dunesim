@@ -55,7 +55,9 @@ namespace spacecharge {
       double TransformX(double xVal) const;
       double TransformY(double yVal) const;
       double TransformZ(double zVal) const;
-      bool IsInsideBoundaries(double xVal, double yVal, double zVal) const;
+      bool IsInsideBoundaries(geo::Point_t const& point) const;
+      bool IsTooFarFromBoundaries(geo::Point_t const& point) const;
+      geo::Point_t PretendAtBoundary(geo::Point_t const& point) const;
       
       bool fEnableSimSpatialSCE;
       bool fEnableSimEfieldSCE;

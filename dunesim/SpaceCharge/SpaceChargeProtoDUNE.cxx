@@ -207,32 +207,28 @@ bool spacecharge::SpaceChargeProtoDUNE::EnableCorrSCE() const
 //----------------------------------------------------------------------------
 /// Primary working method of service that provides position offsets to be
 /// used in ionization electron drift
-geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetPosOffsets(geo::Point_t const& point) const
+geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetPosOffsets(geo::Point_t const& tmp_point) const
 {
   std::vector<double> thePosOffsets;
-  if(IsInsideBoundaries(point.X(), point.Y(), point.Z()) == false)
-  {
+  geo::Point_t point = tmp_point;
+  if(IsTooFarFromBoundaries(point)) {
     thePosOffsets.resize(3,0.0);
+    return { -thePosOffsets[0], -thePosOffsets[1], -thePosOffsets[2] };
   }
-  else
-  {
-    if (fRepresentationType == "Voxelized"){
-      if (point.X()>0){
-        thePosOffsets = GetOffsetsVoxel(point, SCEhistograms_posX.at(0), SCEhistograms_posX.at(1), SCEhistograms_posX.at(2));
-        //thePosOffsets[0] = -1.0*thePosOffsets[0];
-      } else {
-        thePosOffsets = GetOffsetsVoxel(point, SCEhistograms_negX.at(0), SCEhistograms_negX.at(1), SCEhistograms_negX.at(2));
-      }
+  if(!IsInsideBoundaries(point)&&!IsTooFarFromBoundaries(point)) point = PretendAtBoundary(point);
+  
+  if (fRepresentationType == "Voxelized"){
+    if (point.X()>0){
+      thePosOffsets = GetOffsetsVoxel(point, SCEhistograms_posX.at(0), SCEhistograms_posX.at(1), SCEhistograms_posX.at(2));
+      //thePosOffsets[0] = -1.0*thePosOffsets[0];
+    } else {
+      thePosOffsets = GetOffsetsVoxel(point, SCEhistograms_negX.at(0), SCEhistograms_negX.at(1), SCEhistograms_negX.at(2));
+    }
       
-    }else if(fRepresentationType == "Parametric")
-      thePosOffsets = GetPosOffsetsParametric(point.X(), point.Y(), point.Z());
-    else
-      thePosOffsets.resize(3,0.0);
-  }
-  
-        
-  std::cout << "Voxel: (" << point.X() << ", " << point.Y() << ", " << point.Z() << ") -> (" << TransformX(point.X()) << ", " << TransformY(point.Y()) << ", " << TransformZ(point.Z()) << ") -> (" << thePosOffsets.at(0) << ", " << thePosOffsets.at(1) << ", " << thePosOffsets.at(2) << ")" << std::endl;
-  
+  }else if(fRepresentationType == "Parametric")
+    thePosOffsets = GetPosOffsetsParametric(point.X(), point.Y(), point.Z());
+  else thePosOffsets.resize(3,0.0); 
+
   return { thePosOffsets[0], thePosOffsets[1], thePosOffsets[2] };
 }
 
@@ -446,26 +442,27 @@ double spacecharge::SpaceChargeProtoDUNE::GetOnePosOffsetParametric(double xValN
 //----------------------------------------------------------------------------
 /// Primary working method of service that provides E field offsets to be
 /// used in charge/light yield calculation (e.g.)
-geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetEfieldOffsets(geo::Point_t const& point) const
+geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetEfieldOffsets(geo::Point_t const& tmp_point) const
 {
   std::vector<double> theEfieldOffsets;
-  if(IsInsideBoundaries(point.X(), point.Y(), point.Z()) == false)
-  {
+  geo::Point_t point = tmp_point;
+  if(IsTooFarFromBoundaries(point)) {
     theEfieldOffsets.resize(3,0.0);
+    return { -theEfieldOffsets[0], -theEfieldOffsets[1], -theEfieldOffsets[2] };
   }
+  if(!IsInsideBoundaries(point)&&!IsTooFarFromBoundaries(point)) point = PretendAtBoundary(point);
+  
+  if (fRepresentationType == "Voxelized"){
+    if (point.X() > 0.0) theEfieldOffsets = GetOffsetsVoxel(point, SCEhistograms_posX.at(3), SCEhistograms_posX.at(4), SCEhistograms_posX.at(5));
+    else {
+      theEfieldOffsets = GetOffsetsVoxel(point, SCEhistograms_negX.at(3), SCEhistograms_negX.at(4), SCEhistograms_negX.at(5));
+      theEfieldOffsets[0] = -1.0*theEfieldOffsets[0];
+    }
+  }else if(fRepresentationType == "Parametric")
+    theEfieldOffsets = GetEfieldOffsetsParametric(point.X(), point.Y(), point.Z());
   else
-  {
-    if (fRepresentationType == "Voxelized"){
-      if (point.X() > 0) theEfieldOffsets = GetOffsetsVoxel(point, SCEhistograms_posX.at(3), SCEhistograms_posX.at(4), SCEhistograms_posX.at(5));
-      else {
-        theEfieldOffsets = GetOffsetsVoxel(point, SCEhistograms_negX.at(3), SCEhistograms_negX.at(4), SCEhistograms_negX.at(5));
-        theEfieldOffsets[0] = -1.0*theEfieldOffsets[0];
-      }
-    }else if(fRepresentationType == "Parametric")
-      theEfieldOffsets = GetEfieldOffsetsParametric(point.X(), point.Y(), point.Z());
-    else
-      theEfieldOffsets.resize(3,0.0);
-  }
+    theEfieldOffsets.resize(3,0.0);
+  
   return { -theEfieldOffsets[0], -theEfieldOffsets[1], -theEfieldOffsets[2] };
 }
 //----------------------------------------------------------------------------
@@ -631,12 +628,36 @@ double spacecharge::SpaceChargeProtoDUNE::TransformZ(double zVal) const
 }
 //----------------------------------------------------------------------------
 /// Check to see if point is inside boundaries of map (allow to go slightly out of range)
-bool spacecharge::SpaceChargeProtoDUNE::IsInsideBoundaries(double xVal, double yVal, double zVal) const
+bool spacecharge::SpaceChargeProtoDUNE::IsInsideBoundaries(geo::Point_t const& point) const
 {
-  bool isInside = true;
-  if((xVal < -360.0) || (xVal > 360.0) || (yVal < -5.0) || (yVal > 615.0) || (zVal < -5.0) || (zVal > 705.0))
-  {
-    isInside = false;
-  }
-  return isInside;
+  return !(
+       (point.X() <= -360.0) || (point.X() >= 360.0)
+    || (point.Y() <=   -0.2) || (point.Y() >= 607.8)
+    || (point.Z() <=   -0.8) || (point.Z() >= 696.2)
+    );
+} 
+  
+bool spacecharge::SpaceChargeProtoDUNE::IsTooFarFromBoundaries(geo::Point_t const& point) const
+{
+  return (
+       (point.X() < -360.851) || (point.X() > 360.851)
+    || (point.Y() <    -10.2) || (point.Y() >   617.8)
+    || (point.Z() <    -10.8) || (point.Z() >   706.2)
+    );
+}
+
+geo::Point_t spacecharge::SpaceChargeProtoDUNE::PretendAtBoundary(geo::Point_t const& point) const
+{
+  double x = point.X(), y = point.Y(), z = point.Z();
+  
+  if      (point.X() <= -360.0) x = -359.99999; 
+  else if (point.X() >=  360.0) x =  359.99999;
+  
+  if      (point.Y() <=  -0.2) y =  -0.19999;
+  else if (point.Y() >= 607.8) y = 607.79999;
+  
+  if      (point.Z() <=  -0.8) z =  -0.79999;
+  else if (point.Z() >= 696.2) z = 696.19999;
+  
+  return {x, y, z};
 }
