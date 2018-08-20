@@ -15,3 +15,4 @@
 // DuneTPC includes
 //#include "/dunetpc/dune/EventGenerator/ProtoDUNEbeamDataProducts/ProtoDUNEbeamsim.h"
 #include "dune/EventGenerator/ProtoDUNEbeamDataProducts/ProtoDUNEbeamsim.h"
+#include "dune/EventGenerator/ProtoDUNEbeamDataProducts/ProtoDUNEBeamInstrument.h"

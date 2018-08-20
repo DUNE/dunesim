@@ -1,0 +1,11 @@
+BEGIN_PROLOG
+
+protodunebeamtpcmatching:
+{
+   module_type:             "ProtoDUNEBeamTPCMatching"
+   BeamTPC_theta: 0.27361019
+   BeamTPC_phi: 3.9651559
+   TrackLabel: "pandoraTrack" 
+}
+
+END_PROLOG

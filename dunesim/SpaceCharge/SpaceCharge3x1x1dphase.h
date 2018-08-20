@@ -1,34 +1,40 @@
 ////////////////////////////////////////////////////////////////////////
-// \file SpaceChargeProtoDUNE.h
+// \file SpaceCharge3x1x1dphase.h
 //
-// \brief header of class for storing/accessing space charge distortions for ProtoDUNE
+// \brief header of class for storing/accessing space charge distortions for the 3x1x1 detector.
+// \Adapted from SpaceChargeProtoDUNE.h
 //
-// \author mrmooney@bnl.gov
+// \author kevin.fusshoeller@cern.ch
 // 
 ////////////////////////////////////////////////////////////////////////
-#ifndef SPACECHARGE_SPACECHARGEPROTODUNE_H
-#define SPACECHARGE_SPACECHARGEPROTODUNE_H
+#ifndef SPACECHARGE_SPACECHARGE3X1X1DPHASE_H
+#define SPACECHARGE_SPACECHARGE3X1X1DPHASE_H
+
 // LArSoft libraries
 #include "larevt/SpaceCharge/SpaceCharge.h"
+
 // FHiCL libraries
 #include "fhiclcpp/ParameterSet.h"
+
 // ROOT includes
 #include "TGraph.h"
 #include "TF1.h"
 #include "TFile.h"
-#include "TH3.h"
-#include "TTree.h"
-#include "TLeaf.h"
+
 // C/C++ standard libraries
 #include <string>
 #include <vector>
+
+
 namespace spacecharge {
-  class SpaceChargeProtoDUNE : public SpaceCharge {
+
+  class SpaceCharge3x1x1dphase : public SpaceCharge {
  
     public:
-      explicit SpaceChargeProtoDUNE(fhicl::ParameterSet const& pset);
-      SpaceChargeProtoDUNE(SpaceChargeProtoDUNE const&) = delete;
-      virtual ~SpaceChargeProtoDUNE() = default;
+
+      explicit SpaceCharge3x1x1dphase(fhicl::ParameterSet const& pset);
+      SpaceCharge3x1x1dphase(SpaceCharge3x1x1dphase const&) = delete;
+      virtual ~SpaceCharge3x1x1dphase() = default;
       
       bool Configure(fhicl::ParameterSet const& pset);
       bool Update(uint64_t ts=0);
@@ -41,24 +47,16 @@ namespace spacecharge {
  
     private:
     protected:
-     
-      std::vector<double> GetOffsetsVoxel(geo::Point_t const& point, TH3F* hX, TH3F* hY, TH3F* hZ) const;
-      std::vector<TH3F*> Build_TH3(TTree* tree, TTree* eTree, std::string xvar, std::string yvar, std::string zvar, std::string posLeaf) const;
-      std::vector<TH3F*> SCEhistograms_posX; //Histograms are Dx, Dy, Dz, dEx/E0, dEy/E0, dEz/E0 
-      std::vector<TH3F*> SCEhistograms_negX;
-      
+
       std::vector<double> GetPosOffsetsParametric(double xVal, double yVal, double zVal) const;
       double GetOnePosOffsetParametric(double xVal, double yVal, double zVal, std::string axis) const;
       std::vector<double> GetEfieldOffsetsParametric(double xVal, double yVal, double zVal) const;
       double GetOneEfieldOffsetParametric(double xVal, double yVal, double zVal, std::string axis) const;
-      
       double TransformX(double xVal) const;
       double TransformY(double yVal) const;
       double TransformZ(double zVal) const;
-      bool IsInsideBoundaries(geo::Point_t const& point) const;
-      bool IsTooFarFromBoundaries(geo::Point_t const& point) const;
-      geo::Point_t PretendAtBoundary(geo::Point_t const& point) const;
-      
+      bool IsInsideBoundaries(double xVal, double yVal, double zVal) const;
+
       bool fEnableSimSpatialSCE;
       bool fEnableSimEfieldSCE;
       bool fEnableCorrSCE;
@@ -104,6 +102,7 @@ namespace spacecharge {
       TF1 *f3_z = new TF1("f3_z","pol4");
       TF1 *f4_z = new TF1("f4_z","pol4");
       TF1 *fFinal_z = new TF1("fFinal_z","pol3");
+
       TGraph **g1_Ex = new TGraph*[7];
       TGraph **g2_Ex = new TGraph*[7];
       TGraph **g3_Ex = new TGraph*[7];
@@ -143,6 +142,6 @@ namespace spacecharge {
       TF1 *f4_Ez = new TF1("f4_Ez","pol4");
       TF1 *fFinal_Ez = new TF1("fFinal_Ez","pol3");
     
-  }; // class SpaceChargeProtoDUNE
+  }; // class SpaceCharge3x1x1dphase
 } //namespace spacecharge
-#endif // SPACECHARGE_SPACECHARGEPROTODUNE_H
+#endif // SPACECHARGE_SPACECHARGE3X1X1DPHASE_H
