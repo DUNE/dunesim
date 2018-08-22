@@ -8,7 +8,7 @@ dunefd_genie:                         @local::standard_genie
 dunefd_genie.BeamName:                "lbnf"
 dunefd_genie.GlobalTimeOffset:        0
 dunefd_genie.RandomTimeOffset:        0
-dunefd_genie.EventGeneratorList:      "Default+CCMEC+NCMEC"
+dunefd_genie.EventGeneratorList:      "Default+CCMEC"
 
 dunefd_genie_hist:                    @local::dunefd_genie
 dunefd_genie_hist.FluxType:           "histogram"
@@ -83,7 +83,7 @@ dune_fd_genie_atmo:                     @local::standard_genie_atmo_flux
 dune_fd_genie_atmo.BeamName:            "atm"
 dune_fd_genie_atmo.GlobalTimeOffset:    0
 dune_fd_genie_atmo.RandomTimeOffset:    0
-dune_fd_genie_atmo.EventGeneratorList:  "Default+CCMEC+NCMEC"
+dune_fd_genie_atmo.EventGeneratorList:  "Default+CCMEC"
 
 dune_fd_genie_atmo_min_flux:            @local::dune_fd_genie_atmo
 dune_fd_genie_atmo_min_flux.TopVolume:  "volCryostat"
