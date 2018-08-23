@@ -86,7 +86,7 @@ DPhaseRealisticNoiseService::DPhaseRealisticNoiseService(fhicl::ParameterSet con
     generateNoise(fNoiseModelFrequenciesX,  fNoiseX[isam], fNoiseHistX, fRandomizeX);
     generateNoise(fNoiseModelFrequenciesY,  fNoiseY[isam], fNoiseHistY, fRandomizeY);
   }
-  
+
   if ( fLogLevel > 1 ) print() << endl;
 } //m_pran(nullptr)
 
@@ -160,7 +160,7 @@ int DPhaseRealisticNoiseService::addNoise(Channel chan, AdcSignalVector& sigs) c
     if(fSetBaseline){
       sigs[itck] += _sin->Eval((double)itck*dt);
     }
-    
+
     sigs[itck] += tnoise;
   }
 
@@ -389,7 +389,7 @@ void DPhaseRealisticNoiseService::generateNoise(std::vector<double> frequencyVec
 
   art::ServiceHandle<util::LArFFT> pfft;
   pfft->ReinitializeFFT( pointFFT ," ", pfft->FFTFitBins() );
-  
+
   unsigned int model_tick = pfft->FFTSize(); //ticks of the time model
   unsigned nbin = model_tick/2 + 1;
   SetModelSize( model_tick );

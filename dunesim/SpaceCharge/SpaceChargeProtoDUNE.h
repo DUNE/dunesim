@@ -8,29 +8,24 @@
 ////////////////////////////////////////////////////////////////////////
 #ifndef SPACECHARGE_SPACECHARGEPROTODUNE_H
 #define SPACECHARGE_SPACECHARGEPROTODUNE_H
-
 // LArSoft libraries
 #include "larevt/SpaceCharge/SpaceCharge.h"
-
 // FHiCL libraries
 #include "fhiclcpp/ParameterSet.h"
-
 // ROOT includes
 #include "TGraph.h"
 #include "TF1.h"
 #include "TFile.h"
-
+#include "TH3.h"
+#include "TTree.h"
+#include "TLeaf.h"
 // C/C++ standard libraries
 #include <string>
 #include <vector>
-
-
 namespace spacecharge {
-
   class SpaceChargeProtoDUNE : public SpaceCharge {
  
     public:
-
       explicit SpaceChargeProtoDUNE(fhicl::ParameterSet const& pset);
       SpaceChargeProtoDUNE(SpaceChargeProtoDUNE const&) = delete;
       virtual ~SpaceChargeProtoDUNE() = default;
@@ -46,16 +41,24 @@ namespace spacecharge {
  
     private:
     protected:
-
+     
+      std::vector<double> GetOffsetsVoxel(geo::Point_t const& point, TH3F* hX, TH3F* hY, TH3F* hZ) const;
+      std::vector<TH3F*> Build_TH3(TTree* tree, TTree* eTree, std::string xvar, std::string yvar, std::string zvar, std::string posLeaf) const;
+      std::vector<TH3F*> SCEhistograms_posX; //Histograms are Dx, Dy, Dz, dEx/E0, dEy/E0, dEz/E0 
+      std::vector<TH3F*> SCEhistograms_negX;
+      
       std::vector<double> GetPosOffsetsParametric(double xVal, double yVal, double zVal) const;
       double GetOnePosOffsetParametric(double xVal, double yVal, double zVal, std::string axis) const;
       std::vector<double> GetEfieldOffsetsParametric(double xVal, double yVal, double zVal) const;
       double GetOneEfieldOffsetParametric(double xVal, double yVal, double zVal, std::string axis) const;
+      
       double TransformX(double xVal) const;
       double TransformY(double yVal) const;
       double TransformZ(double zVal) const;
-      bool IsInsideBoundaries(double xVal, double yVal, double zVal) const;
-
+      bool IsInsideBoundaries(geo::Point_t const& point) const;
+      bool IsTooFarFromBoundaries(geo::Point_t const& point) const;
+      geo::Point_t PretendAtBoundary(geo::Point_t const& point) const;
+      
       bool fEnableSimSpatialSCE;
       bool fEnableSimEfieldSCE;
       bool fEnableCorrSCE;
@@ -101,7 +104,6 @@ namespace spacecharge {
       TF1 *f3_z = new TF1("f3_z","pol4");
       TF1 *f4_z = new TF1("f4_z","pol4");
       TF1 *fFinal_z = new TF1("fFinal_z","pol3");
-
       TGraph **g1_Ex = new TGraph*[7];
       TGraph **g2_Ex = new TGraph*[7];
       TGraph **g3_Ex = new TGraph*[7];
