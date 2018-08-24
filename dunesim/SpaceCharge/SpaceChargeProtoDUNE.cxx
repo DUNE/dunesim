@@ -15,8 +15,10 @@
 #include "stdio.h"
 // LArSoft includes
 #include "dune/SpaceCharge/SpaceChargeProtoDUNE.h"
+#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 // Framework includes
 #include "cetlib_except/exception.h"
+#include "art/Framework/Services/Registry/ServiceHandle.h"
 // ROOT includes
 #include "TFile.h"
 #include "TH3.h"
@@ -35,6 +37,9 @@ bool spacecharge::SpaceChargeProtoDUNE::Configure(fhicl::ParameterSet const& pse
   fEnableSimSpatialSCE = pset.get<bool>("EnableSimSpatialSCE");
   fEnableSimEfieldSCE = pset.get<bool>("EnableSimEfieldSCE");
   fEnableCorrSCE = pset.get<bool>("EnableCorrSCE");
+  
+  auto const *detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
+  fEfield = detprop->Efield();
   
   if((fEnableSimSpatialSCE == true) || (fEnableSimEfieldSCE == true))
   {
@@ -259,7 +264,7 @@ std::vector<TH3F*> spacecharge::SpaceChargeProtoDUNE::Build_TH3
   double cell_size = Lx/numDivisions_x;
   double numDivisions_y = TMath::Nint((Ly/Lx)*((Double_t)numDivisions_x));
   double numDivisions_z = TMath::Nint((Lz/Lx)*((Double_t)numDivisions_x));
-  double E_field = 500.0;
+  
   double E_numDivisions_x = 18.0;
   double E_cell_size = Lx/E_numDivisions_x;
   double E_numDivisions_y = TMath::Nint((Ly/Lx)*((Double_t)E_numDivisions_x));
@@ -287,9 +292,9 @@ std::vector<TH3F*> spacecharge::SpaceChargeProtoDUNE::Build_TH3
     Double_t dz = tree->GetBranch("Dz")->GetLeaf(Form("data_%sDisp",posLeaf.c_str()))->GetValue();
 		
     eTree->GetEntry(ii);
-    Double_t Ex = eTree->GetBranch("Ex")->GetLeaf("data")->GetValue() / E_field;
-    Double_t Ey = eTree->GetBranch("Ey")->GetLeaf("data")->GetValue() / E_field;
-    Double_t Ez = eTree->GetBranch("Ez")->GetLeaf("data")->GetValue() / E_field;
+    Double_t Ex = eTree->GetBranch("Ex")->GetLeaf("data")->GetValue() / (100000.0*fEfield);
+    Double_t Ey = eTree->GetBranch("Ey")->GetLeaf("data")->GetValue() / (100000.0*fEfield);
+    Double_t Ez = eTree->GetBranch("Ez")->GetLeaf("data")->GetValue() / (100000.0*fEfield);
    
     //Fill the histograms		
     hDx->Fill(x,y,z,100.0*dx);
@@ -456,7 +461,7 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetEfieldOffsets(geo::Point_t c
     if (point.X() > 0.0) theEfieldOffsets = GetOffsetsVoxel(point, SCEhistograms_posX.at(3), SCEhistograms_posX.at(4), SCEhistograms_posX.at(5));
     else {
       theEfieldOffsets = GetOffsetsVoxel(point, SCEhistograms_negX.at(3), SCEhistograms_negX.at(4), SCEhistograms_negX.at(5));
-      theEfieldOffsets[0] = -1.0*theEfieldOffsets[0];
+      theEfieldOffsets[0] = theEfieldOffsets[0];
     }
   }else if(fRepresentationType == "Parametric")
     theEfieldOffsets = GetEfieldOffsetsParametric(point.X(), point.Y(), point.Z());
