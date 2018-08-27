@@ -271,8 +271,8 @@ namespace evgen{
         float fPDG; // Input tree has all floats
 
         // Event and TrackID for good particle tree
-        float fBeamEvent;
-        float fTrackID;
+//        float fBeamEvent;
+//        float fTrackID;
 
         // Same for all particles
         float fAllEventID;

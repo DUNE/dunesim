@@ -136,6 +136,19 @@ dprealisticnoise:{
   OldNoiseIndex:    false    #From ExponentialChannelNoiseService. Keep false
 }
 
+dpcoherentnoise:{
+  service_provider: DPhaseCoherentNoiseService
+  NoiseModel:       "$MRB_SOURCE/dunetpc/dune/DetSim/NoiseModels/729-0-model-fft.root"
+  AmplitudeCut:     50                       #select frequencies above this threshold
+  Normalization:    1                        #amplitude normalizations
+  Randomize:        [ 1, 1 ]                 #rms amplitude ( different for every channel and frequency )
+  PhaseShift:       [ -1, 1 ]                #phase shift per group of channels in radiants
+  ChannelGroup:     [ 0, 320, 1280 ]         #list here the first channel of every significant correlation pattern
+  InchoerentNoise:  [ 0.7, 1.1, 0.7, 1.1 ]   #rms and sigma of a small incohrent noise ( or very high frequency )
+  NumberOfPhases:   1000                     #number of random phases array to produce
+  LogLevel:         0                        #Verbosity level
+}
+
 chnoiseprotodune: {
   service_provider: ProtoDUNEChannelNoiseService
   LowCutoffU:    0.0

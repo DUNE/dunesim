@@ -82,7 +82,8 @@ float fBeamTPC_phi;
 float beam_true_bprof4_pos[4], beam_true_tof,    beam_true_dir[3];
 float beam_smeared_bprof4_pos[4], beam_smeared_tof, beam_smeared_dir[3];
 
-float tpc_true_startpos[4], tpc_true_E, tpc_true_mom, tpc_true_dir[3], dummy;
+float tpc_true_startpos[4], tpc_true_dir[3];
+//float tpc_true_E, tpc_true_mom, dummy;
 float tpc_reco_startpos[4], tpc_reco_dir[3];
 TVector3 tpc_pos, tpc_dir;
 
