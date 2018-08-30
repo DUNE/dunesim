@@ -63,6 +63,8 @@ namespace spacecharge {
       bool fEnableSimEfieldSCE;
       bool fEnableCorrSCE;
       
+      double fEfield;
+      
       std::string fRepresentationType;
       std::string fInputFilename;
       
