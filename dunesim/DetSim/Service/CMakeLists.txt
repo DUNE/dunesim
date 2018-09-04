@@ -67,6 +67,19 @@ simple_plugin(DPhaseRealisticNoiseService   "service"
                ${ROOT_BASIC_LIB_LIST}
              )
 
+ simple_plugin(DPhaseCoherentNoiseService   "service"
+                larcorealg_Geometry
+                SignalShapingServiceDUNEDPhase_service
+                ${ART_FRAMEWORK_SERVICES_OPTIONAL}
+                ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
+                nutools_RandomUtils_NuRandomService_service
+                ${ART_FRAMEWORK_CORE}
+                art_Utilities canvas
+                cetlib cetlib_except
+                ${CLHEP}
+                ${ROOT_BASIC_LIB_LIST}
+              )
+
 simple_plugin(ProtoDUNEChannelNoiseService   "service"
                 larcorealg_Geometry
                 SignalShapingServiceDUNE_service
@@ -137,7 +150,7 @@ simple_plugin(StuckBitAdcDistortionService   "service"
                 ${ART_FRAMEWORK_CORE}
                 art_Utilities canvas
                 ${MF_MESSAGELOGGER}
-                
+
                 cetlib cetlib_except
                 ${CLHEP}
                 ${ROOT_BASIC_LIB_LIST}
