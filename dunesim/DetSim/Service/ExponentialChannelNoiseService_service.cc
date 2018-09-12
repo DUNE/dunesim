@@ -185,11 +185,21 @@ generateNoise(float aNoiseNorm, float aNoiseWidth, float aLowCutoff,
   double rnd[2] = {0.};
   // width of frequencyBin in kHz
   double binWidth = 1.0/(ntick*sampleRate*1.0e-6);
+  bool flatAtLowFreq = aLowCutoff < 0.0;
+  double frqCutoff = flatAtLowFreq ? -aLowCutoff : 0.0;
   for ( unsigned int i=0; i<ntick/2+1; ++i ) {
+    double frq = double(i)*binWidth;
+    // For aLowCutoff < 0, we have constant noise below -aLowCutoff.
+    // For positive values, we keep the old albeit questionable behavior.
+    if ( flatAtLowFreq ) {
+      lofilter = 1.0;
+      if ( frq < frqCutoff ) frq = frqCutoff;
+    } else {
+      lofilter = 1.0/(1.0+exp(-(i-aLowCutoff/binWidth)/0.5));
+    }
     // exponential noise spectrum 
-    pval = aNoiseNorm*exp(-(double)i*binWidth/aNoiseWidth);
+    pval = aNoiseNorm*exp(-frq/aNoiseWidth);
     // low frequency cutoff     
-    lofilter = 1.0/(1.0+exp(-(i-aLowCutoff/binWidth)/0.5));
     // randomize 10%
     flat.fireArray(2, rnd, 0, 1);
     pval *= lofilter*(0.9 + 0.2*rnd[0]);
