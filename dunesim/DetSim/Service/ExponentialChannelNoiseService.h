@@ -9,6 +9,11 @@
 //
 // DLA Feb 2016: Change normalization so RMS does not vary with FFT size.
 // See https://cdcvs.fnal.gov/redmine/issues/11470.
+//
+// DLA Aug 2018: Add new option for low frequency cutoff that has constant noise
+// level below that frequency matched to the height of the exponential.
+// It is selected with a negative value (-freq) in LowCutoffX (X= U, V, Z).
+// See https://cdcvs.fnal.gov/redmine/issues/20621.
 
 #ifndef ExponentialChannelNoiseService_H
 #define ExponentialChannelNoiseService_H

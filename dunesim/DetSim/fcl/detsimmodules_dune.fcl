@@ -120,6 +120,27 @@ chnoise35t: {
   OldNoiseIndex: false
 }
 
+# Tune from August 2018. Based on protoDUNE run 3775.
+# Requires dunetpc v07_05_00 or later.
+# See https://cdcvs.fnal.gov/redmine/issues/20621.
+pdsp_chnoiseAug2018: {
+  service_provider: ExponentialChannelNoiseService
+  NoiseNormU:   25
+  NoiseNormV:   25
+  NoiseNormZ:   20
+  LowCutoffU: -180
+  LowCutoffV: -180
+  LowCutoffZ: -180
+  WhiteNoiseU:  0.8
+  WhiteNoiseV:  0.8
+  WhiteNoiseZ:  0.8
+  NoiseWidthU: 150.0
+  NoiseWidthV: 150.0
+  NoiseWidthZ: 150.0
+  NoiseArrayPoints: 1000
+  OldNoiseIndex: false
+}
+
 #Configure realistic noise service for DP detectors based on the 311 data
 #A.Scarpelli andrea.scarpelli@cern.ch November 2017
 #NB: Hardcoded unrotated geometry:
