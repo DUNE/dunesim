@@ -144,6 +144,16 @@ namespace evgendp{
         Comment("Particle PDG code")
       };
 
+      fhicl::Atom<bool> GetEnergyFromCORSIKA{
+        Name("GetEnergyFromCORSIKA"),
+        Comment("true: read particle energy from CORSIKA histograms as a fucntion of azimuth angle")
+      };
+
+      fhicl::Atom<double> FixedEnergy{
+        Name("FixedEnergy"),
+        Comment("Fixed particle energy")
+      };
+
       fhicl::Atom<std::string> TrackFile{
         Name("TrackFile"),
         Comment("Track list")
@@ -172,6 +182,8 @@ namespace evgendp{
     int fEventsToProcess;
     int fStartEvent;
     int fPDG;
+    bool fGetEnergyFromCORSIKA;
+    int fFixedEnergy;
     std::string fTrackFile;
     std::string fHistFile;
 
@@ -185,11 +197,13 @@ namespace evgendp{
 
 evgendp::DataGen311::DataGen311(Parameters const& config)
  :
-   fEventsToProcess (config().EventsToProcess()),
-   fStartEvent      (config().StartEvent()),
-   fPDG             (config().PDG()),
-   fTrackFile       (config().TrackFile()),
-   fHistFile        (config().HistFile())
+   fEventsToProcess 		(config().EventsToProcess()),
+   fStartEvent      		(config().StartEvent()),
+   fPDG             		(config().PDG()),
+   fGetEnergyFromCORSIKA	(config().GetEnergyFromCORSIKA()),
+   fFixedEnergy			(config().FixedEnergy()),
+   fTrackFile       		(config().TrackFile()),
+   fHistFile        		(config().HistFile())
 {
     art::ServiceHandle<rndm::NuRandomService>()->createEngine(*this);
     //art::ServiceHandle<rndm::NuRandomService>()->createEngine(*this, "HepJamesRandom", "gen", p, { "Seed", "SeedGenerator" });
@@ -245,20 +259,28 @@ void evgendp::DataGen311::beginJob(){
     track->startDirectionY /= sdirmag;
     track->startDirectionZ /= sdirmag;
 
-    // Theta from +X to -X
-    double theta = acos(track->startDirectionX);
 
-    int biny = hEnergyTheta->GetYaxis()->FindBin(theta);
-    TH1D *hEnergyAtTheta = hEnergyTheta->ProjectionX("", biny, biny);
+    if(fGetEnergyFromCORSIKA)
+    {
+      // Theta from +X to -X
+      double theta = acos(track->startDirectionX);
 
-    if( hEnergyAtTheta->GetEntries() < 1 ){
-      skippedTrackCounter++;
-      delete track;
-      continue;
+      int biny = hEnergyTheta->GetYaxis()->FindBin(theta);
+      TH1D *hEnergyAtTheta = hEnergyTheta->ProjectionX("", biny, biny);
+
+      if( hEnergyAtTheta->GetEntries() < 1 ){
+        skippedTrackCounter++;
+        delete track;
+        continue;
+      }
+
+      double energy = hEnergyAtTheta->GetRandom();
+      track->energy = energy;
     }
-
-    double energy = hEnergyAtTheta->GetRandom();
-    track->energy = energy;
+    else //get energy from .fcl parameter
+    {
+      track->energy = fFixedEnergy;
+    }
 
     if( track->event != eventBefore ){
       eventBefore = track->event;
