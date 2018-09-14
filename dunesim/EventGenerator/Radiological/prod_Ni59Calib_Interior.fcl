@@ -57,7 +57,7 @@ physics:
   }
  
   # Define the producer and filter modules for this path, order matters, 
-  simulate:      [ rns, generator] #, arGen, ar42Gen, fcGen, rnGen, krGen, poGen, cpaGen, apaGen ]
+  simulate:      [ rns, generator] #, arGen, ar42Gen, neutronGen, rnGen, krGen, poGen, cpaGen, apaGen ]
   
   # Define the output stream, there could be more than one if using filters 
   stream1:       [ out1 ]
@@ -94,4 +94,4 @@ physics.producers.apaGen.T0: [ 0.0 ]
 physics.producers.cpaGen.T0: [ 0.0 ]
 physics.producers.poGen.T0: [ 0.0 ]
 physics.producers.krGen.T0: [ 0.0 ]
-physics.producers.fcGen.T0: [ 0.0, 0.0, 0.0, 0.0 ]
+physics.producers.neutronGen.T0: [ 0.0, 0.0, 0.0, 0.0 ]
