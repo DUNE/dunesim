@@ -38,11 +38,11 @@ physics:
   producers:
   {
     generator: {
-         BqPercc:  [ 10000  ]
+         BqPercc:  [ 2000  ]
          Material: [ ".*"   ]
          Nuclide:  [ "59Ni" ]
-         T0:       [ 0.0 ]
-         T1:       [  1.6e6 ]
+         T0:       [ -2246000 ]
+         T1:       [  2246000 ]
          X0:       [  219.5 ]
          X1:       [  220.5 ]
          Y0:       [  299.5 ]
