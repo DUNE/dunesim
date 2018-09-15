@@ -38,11 +38,11 @@ physics:
   producers:
   {
     generator: {
-         BqPercc:  [ 10000  ]
+         BqPercc:  [ 2000  ]
          Material: [ ".*"   ]
          Nuclide:  [ "59Ni" ]
-         T0:       [ 0.0 ]
-         T1:       [  1.6e6 ]
+         T0:       [ -2246000 ]
+         T1:       [  2246000 ]
          X0:       [  219.5 ]
          X1:       [  220.5 ]
          Y0:       [  299.5 ]
@@ -51,6 +51,7 @@ physics:
          Z1:       [ -39.5  ]
          module_label: "apaGen"
          module_type: "RadioGen"
+         IsFirstSignalSpecial: true
       }
     
     arGen:     @local::dune10kt_1x2x6_39ar 
@@ -65,7 +66,7 @@ physics:
   }
  
   # Define the producer and filter modules for this path, order matters, 
-  simulate:      [ rns, generator, arGen, ar42Gen, fcGen, rnGen, krGen, poGen, cpaGen, apaGen ]
+  simulate:      [ rns, generator, arGen, ar42Gen, neutronGen, rnGen, krGen, poGen, cpaGen, apaGen ]
   
   # Define the output stream, there could be more than one if using filters 
   stream1:       [ out1 ]
@@ -95,11 +96,12 @@ outputs:
 
 
 
+#This is not needed with fIsFirstSignalSpecial
 ##########Sync times. We start from 0 to make sure none of the calibration source comes in outside of our readout time. This allows us to do accurate wall time measurements.
-physics.producers.arGen.T0: [ 0.0 ]
-physics.producers.rnGen.T0: [ 0.0 ]
-physics.producers.apaGen.T0: [ 0.0 ]
-physics.producers.cpaGen.T0: [ 0.0 ]
-physics.producers.poGen.T0: [ 0.0 ]
-physics.producers.krGen.T0: [ 0.0 ]
-physics.producers.fcGen.T0: [ 0.0, 0.0, 0.0, 0.0 ]
+#physics.producers.arGen.T0: [ 0.0 ]
+#physics.producers.rnGen.T0: [ 0.0 ]
+#physics.producers.apaGen.T0: [ 0.0 ]
+#physics.producers.cpaGen.T0: [ 0.0 ]
+#physics.producers.poGen.T0: [ 0.0 ]
+#physics.producers.krGen.T0: [ 0.0 ]
+#physics.producers.neutronGen.T0: [ 0.0, 0.0, 0.0, 0.0 ]
