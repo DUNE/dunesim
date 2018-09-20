@@ -14,7 +14,7 @@ BEGIN_PROLOG
 #  v2.3-03212017/JR: include neutrons emitted from concrete of membrane cryostat structure (temporarily placed at aluminum field cage positions in sim.)
 #  v2.4-05122017/JS: Removed the LAr cut out. Added in the 210po generation near the PDs. Disabled FC (Until Neutrons can be pushed to LArData.)
 #  v2.5-05252017/JS: Added in 85Kr as a background in LAr using the WARP collaboration rates. https://arxiv.org/pdf/astro-ph/0603131.pdf
-#  v2.6-05302017/JS: Added fcGen back in, using the Concrete_DUNE1 spectrum (by JR). New spectrum will be in dune_pardata.
+#  v2.6-05302017/JS: Added neutronGen back in, using the Concrete_DUNE1 spectrum (by JR). New spectrum will be in dune_pardata.
 #  v2.7-06062017/JS: Added material specific generation for LAr contaminants.
 #  v2.8-06092017/JS: Reconfigured this to be an include for a typical job. This file will now host generators for the various radiologicals, but will not run a simulation itself.
 
