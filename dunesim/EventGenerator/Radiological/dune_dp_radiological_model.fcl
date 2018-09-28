@@ -21,10 +21,10 @@ BEGIN_PROLOG
 
 
 dunedp10kt_39ar: @local::dune10kt_1x2x6_39ar
-dunedp10kt_39ar.X0: [ -755.0  ]
-dunedp10kt_39ar.X1: [  755.0  ]
-dunedp10kt_39ar.Y0: [ -810.0  ]
-dunedp10kt_39ar.Y1: [  700.0  ]
+dunedp10kt_39ar.X0: [ -810.0  ]
+dunedp10kt_39ar.X1: [  700.0  ]
+dunedp10kt_39ar.Y0: [ -755.0  ]
+dunedp10kt_39ar.Y1: [  755.0  ]
 dunedp10kt_39ar.Z0: [ -100.0  ]
 dunedp10kt_39ar.Z1: [  6100.0 ]
 dunedp10kt_39ar.T0: [ -7500000 ]
@@ -69,10 +69,10 @@ dunedp10kt_neutron:
     Nuclide:     ["Concrete_DUNE1","Concrete_DUNE1","Concrete_DUNE1","Concrete_DUNE1","Concrete_DUNE1","Concrete_DUNE1"]
     Material:    [".*",".*",".*",".*",".*",".*"]
     BqPercc:     [0.0000076,0.0000076,0.0000076,0.0000076,0.0000076,0.0000076] #NOTE* This value is hard coded (due to different number of producing volumes than single phase.
-    X0: [ -755.0, 754.0, -755.0, -755.0, -755.0, -755.0  ]
-    X1: [ -754.0, 755.0, 755.0, 755.0, 755.0, 755.0 ]
-    Y0: [ -810.0, -810.0, -810.0, 699.0, -810.0, -810.0 ]
-    Y1: [  700.0, 700.0, -809.0, 700.0, 700.0, 700.0 ]
+    X0: [ -810.0, -810.0, -810.0, 699.0, -810.0, -810.0 ]
+    X1: [  700.0, 700.0, -809.0, 700.0, 700.0, 700.0 ]
+    Y0: [ -755.0, 754.0, -755.0, -755.0, -755.0, -755.0  ]
+    Y1: [ -754.0, 755.0, 755.0, 755.0, 755.0, 755.0 ]
     Z0: [ -100.0, -100.0, -100.0, -100.0, -100.0, 6099.0 ]
     Z1: [  6100.0, 6100.0, 6100.0, 6100.0, -109.0, 6100.0 ]
     T0: [ @sequence::dunedp10kt_39ar.T0,
