@@ -45,12 +45,16 @@ private:
   art::ServiceHandle<geo::Geometry> m_hgeo;
 
   // Pedestal value.
+  float m_PedMeanX;
   float m_PedMeanY;
   float m_PedMeanZ;
+  float m_PedRmsX;
   float m_PedRmsY;
   float m_PedRmsZ;
+  float m_PedMeanErrX;
   float m_PedMeanErrY;
   float m_PedMeanErrZ;
+  float m_PedRmsErrX;
   float m_PedRmsErrY;
   float m_PedRmsErrZ;
 

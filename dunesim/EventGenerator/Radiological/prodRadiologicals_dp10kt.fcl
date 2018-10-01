@@ -1,5 +1,5 @@
 #include "services_dune.fcl"
-#include "dune_radiological_model.fcl"
+#include "dune_dp_radiological_model.fcl"
 
 process_name: BackgroundGen
 
@@ -11,7 +11,7 @@ services:
   #MemoryTracker:         { ignoreTotal: 1 } # default is one
   RandomNumberGenerator: {}                 # ART native random number generator
   FileCatalogMetadata:  @local::art_file_catalog_mc
-                        @table::dunefd_services
+                        @table::dunefddphase_simulation_services
 }
 
 # Start each new event with an empty event.
@@ -30,34 +30,22 @@ source:
 # Modules are grouped by type.
 
 
-services.Geometry: @local::dune10kt_1x2x6_v3_geo
-
 physics:
 {
  
   producers:
   {
-    generator: {
-         BqPercc:  [ 10000  ]
-         Material: [ ".*"   ]
-         Nuclide:  [ "59Ni" ]
-         T0:       [ 0.0 ]
-         T1:       [  1.6e6 ]
-         X0:       [  219.5 ]
-         X1:       [  220.5 ]
-         Y0:       [  299.5 ]
-         Y1:       [  300.5 ]
-         Z0:       [  240.5 ]
-         Z1:       [  239.5 ]
-         module_label: "apaGen"
-         module_type: "RadioGen"
-      }
+    ar39Gen:      @local::dunedp10kt_39ar
+    ar42Gen:      @local::dunedp10kt_42ar
+    rnGen:        @local::dunedp10kt_222rn
+    krGen:        @local::dunedp10kt_85kr
+    neutronGen:   @local::dunedp10kt_neutron
     
     rns:       { module_type: "RandomNumberSaver" }
   }
  
   # Define the producer and filter modules for this path, order matters, 
-  simulate:      [ rns, generator] #, arGen, ar42Gen, neutronGen, rnGen, krGen, poGen, cpaGen, apaGen ]
+  simulate:      [ rns, ar39Gen, neutronGen, rnGen, krGen ]
   
   # Define the output stream, there could be more than one if using filters 
   stream1:       [ out1 ]
@@ -79,19 +67,10 @@ outputs:
   out1:
   {
     module_type: RootOutput
-    fileName:    "prodbackground_dune10kt_1x2x6_gen.root" # Default file name, can override from command line with -o or --output
+    fileName:    "prodbackground_dunedphase_10kt.root" # Default file name, can override from command line with -o or --output
     dataTier:    "generated"
     compressionLevel: 1
   }
 }
 
 
-
-##########Sync times. We start from 0 to make sure none of the calibration source comes in outside of our readout time. This allows us to do accurate wall time measurements.
-physics.producers.arGen.T0: [ 0.0 ]
-physics.producers.rnGen.T0: [ 0.0 ]
-physics.producers.apaGen.T0: [ 0.0 ]
-physics.producers.cpaGen.T0: [ 0.0 ]
-physics.producers.poGen.T0: [ 0.0 ]
-physics.producers.krGen.T0: [ 0.0 ]
-physics.producers.neutronGen.T0: [ 0.0, 0.0, 0.0, 0.0 ]
