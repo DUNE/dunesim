@@ -149,9 +149,14 @@ namespace evgendp{
         Comment("true: read particle energy from CORSIKA histograms as a fucntion of azimuth angle")
       };
 
-      fhicl::Atom<double> FixedEnergy{
-        Name("FixedEnergy"),
-        Comment("Fixed particle energy")
+      fhicl::Atom<double> UniformEnergyMin{
+        Name("UniformEnergyMin"),
+        Comment("Minimum particle energy")
+      };
+
+      fhicl::Atom<double> UniformEnergyMax{
+        Name("UniformEnergyMax"),
+        Comment("Maximum particle energy")
       };
 
       fhicl::Atom<std::string> TrackFile{
@@ -183,7 +188,8 @@ namespace evgendp{
     int fStartEvent;
     int fPDG;
     bool fGetEnergyFromCORSIKA;
-    int fFixedEnergy;
+    double fUniformEnergyMin;
+    double fUniformEnergyMax;
     std::string fTrackFile;
     std::string fHistFile;
 
@@ -201,7 +207,8 @@ evgendp::DataGen311::DataGen311(Parameters const& config)
    fStartEvent      		(config().StartEvent()),
    fPDG             		(config().PDG()),
    fGetEnergyFromCORSIKA	(config().GetEnergyFromCORSIKA()),
-   fFixedEnergy			(config().FixedEnergy()),
+   fUniformEnergyMin		(config().UniformEnergyMin()),
+   fUniformEnergyMax		(config().UniformEnergyMax()),
    fTrackFile       		(config().TrackFile()),
    fHistFile        		(config().HistFile())
 {
@@ -217,6 +224,9 @@ evgendp::DataGen311::DataGen311(Parameters const& config)
 
 
 void evgendp::DataGen311::beginJob(){
+
+  //Random number generator for particle energy
+  gRandom = new TRandom3();
 
   //read the files and store the information on the map
   std::ifstream trackfile;
@@ -274,12 +284,15 @@ void evgendp::DataGen311::beginJob(){
         continue;
       }
 
-      double energy = hEnergyAtTheta->GetRandom();
-      track->energy = energy;
+      track->energy = hEnergyAtTheta->GetRandom();
     }
+    else if(fUniformEnergyMin == fUniformEnergyMax) //get energy from .fcl parameter
+    {
+      track->energy = fUniformEnergyMin;
+    }  
     else //get energy from .fcl parameter
     {
-      track->energy = fFixedEnergy;
+      track->energy = gRandom->Uniform(fUniformEnergyMin, fUniformEnergyMax);
     }
 
     if( track->event != eventBefore ){

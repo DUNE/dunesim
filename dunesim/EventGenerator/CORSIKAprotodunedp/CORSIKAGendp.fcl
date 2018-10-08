@@ -66,7 +66,8 @@ standard_311_fake_data:
   StartEvent:     	3000
   PDG:            	13
   GetEnergyFromCORSIKA: true  # Get particle energy from CORSIKA histograms
-  FixedEnergy:		1     # Particle energy when GetEnergyFromCORSIKA = false
+  UniformEnergyMin:	1     # Minimum particle energy when GetEnergyFromCORSIKA = false. Particle energy is uniformly distributed between FixedEnergyMin and FixedEnergyMax.
+  UniformEnergyMax:	1     # Maximum particle energy when GetEnergyFromCORSIKA = false. Particle energy is uniformly distributed between FixedEnergyMin and FixedEnergyMax.
   TrackFile:      	"/eos/user/a/ascarpel/selectedTrack/run840to842_subrun0to117_50cm_selected_tracks.txt"
   HistFile:       	"/eos/user/a/amedcalf/corsika_hist/corsika_hist.root"
 }
