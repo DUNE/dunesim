@@ -1,0 +1,92 @@
+##dune_dp_radiological_model.fcl
+# parameters for a radiological generation generator.  Currently, it generates radiologicals within rectangular prisms
+# with sides parallel to the x, y, and z axes, and within a specified time window.  The parameters Nuclide through
+# T1 are arrays, so that many volumes can be specified to be radioactive with different nuclides.
+
+# Author: Jason Stock (jason.stock@mines.sdsmt.edu)
+# 2018-09-27 Version 1. Only bulk contaminants are considered here, using rates matched exactly to the Single Phase LAr radiological model.
+# Dimensions provided by Jose Soto ( jsoto@fnal.gov )
+#
+# We source the generators from the SP so that the bulk contaminant rates are the same between the SP and DP (LAr is LAr)
+#
+
+
+
+
+
+#include "services_dune.fcl"
+#include "dune_radiological_model.fcl"
+
+BEGIN_PROLOG
+
+
+dunedp10kt_4x2_workspace_39ar: @local::dune10kt_1x2x6_39ar
+dunedp10kt_4x2_workspace_39ar.X0: [ -810.0  ]
+dunedp10kt_4x2_workspace_39ar.X1: [  700.0  ]
+dunedp10kt_4x2_workspace_39ar.Y0: [ -400.0  ]
+dunedp10kt_4x2_workspace_39ar.Y1: [  400.0  ]
+dunedp10kt_4x2_workspace_39ar.Z0: [ -100.0  ]
+dunedp10kt_4x2_workspace_39ar.Z1: [  1305.0 ]
+dunedp10kt_4x2_workspace_39ar.T0: [ -7500000 ]
+dunedp10kt_4x2_workspace_39ar.T1: [  7500000 ]
+
+dunedp10kt_4x2_workspace_42ar: @local::dune10kt_1x2x6_42ar
+dunedp10kt_4x2_workspace_42ar.X0: [ @sequence::dunedp10kt_4x2_workspace_39ar.X0 ]
+dunedp10kt_4x2_workspace_42ar.X1: [ @sequence::dunedp10kt_4x2_workspace_39ar.X1 ]
+dunedp10kt_4x2_workspace_42ar.Y0: [ @sequence::dunedp10kt_4x2_workspace_39ar.Y0 ]
+dunedp10kt_4x2_workspace_42ar.Y1: [ @sequence::dunedp10kt_4x2_workspace_39ar.Y1 ]
+dunedp10kt_4x2_workspace_42ar.Z0: [ @sequence::dunedp10kt_4x2_workspace_39ar.Z0 ]
+dunedp10kt_4x2_workspace_42ar.Z1: [ @sequence::dunedp10kt_4x2_workspace_39ar.Z1 ]
+dunedp10kt_4x2_workspace_42ar.T0: [ @sequence::dunedp10kt_4x2_workspace_39ar.T0 ]
+dunedp10kt_4x2_workspace_42ar.T1: [ @sequence::dunedp10kt_4x2_workspace_39ar.T1 ]
+
+dunedp10kt_4x2_workspace_85kr: @local::dune10kt_1x2x6_85kr
+dunedp10kt_4x2_workspace_85kr.X0: [ @sequence::dunedp10kt_4x2_workspace_39ar.X0 ]
+dunedp10kt_4x2_workspace_85kr.X1: [ @sequence::dunedp10kt_4x2_workspace_39ar.X1 ]
+dunedp10kt_4x2_workspace_85kr.Y0: [ @sequence::dunedp10kt_4x2_workspace_39ar.Y0 ]
+dunedp10kt_4x2_workspace_85kr.Y1: [ @sequence::dunedp10kt_4x2_workspace_39ar.Y1 ]
+dunedp10kt_4x2_workspace_85kr.Z0: [ @sequence::dunedp10kt_4x2_workspace_39ar.Z0 ]
+dunedp10kt_4x2_workspace_85kr.Z1: [ @sequence::dunedp10kt_4x2_workspace_39ar.Z1 ]
+dunedp10kt_4x2_workspace_85kr.T0: [ @sequence::dunedp10kt_4x2_workspace_39ar.T0 ]
+dunedp10kt_4x2_workspace_85kr.T1: [ @sequence::dunedp10kt_4x2_workspace_39ar.T1 ]
+
+dunedp10kt_4x2_workspace_222rn: @local::dune10kt_1x2x6_222rn
+dunedp10kt_4x2_workspace_222rn.X0: [ @sequence::dunedp10kt_4x2_workspace_39ar.X0 ]
+dunedp10kt_4x2_workspace_222rn.X1: [ @sequence::dunedp10kt_4x2_workspace_39ar.X1 ]
+dunedp10kt_4x2_workspace_222rn.Y0: [ @sequence::dunedp10kt_4x2_workspace_39ar.Y0 ]
+dunedp10kt_4x2_workspace_222rn.Y1: [ @sequence::dunedp10kt_4x2_workspace_39ar.Y1 ]
+dunedp10kt_4x2_workspace_222rn.Z0: [ @sequence::dunedp10kt_4x2_workspace_39ar.Z0 ]
+dunedp10kt_4x2_workspace_222rn.Z1: [ @sequence::dunedp10kt_4x2_workspace_39ar.Z1 ]
+dunedp10kt_4x2_workspace_222rn.T0: [ @sequence::dunedp10kt_4x2_workspace_39ar.T0 ]
+dunedp10kt_4x2_workspace_222rn.T1: [ @sequence::dunedp10kt_4x2_workspace_39ar.T1 ]
+
+#neutron can't copy single phase because we have a different number of dimensions.
+#dunedp10kt_4x2_workspace_neutron: @local::dune10kt_1x2x6_neutron
+
+dunedp10kt_4x2_workspace_neutron:
+{
+    module_type: "RadioGen"
+    Nuclide:     ["Concrete_DUNE1","Concrete_DUNE1","Concrete_DUNE1","Concrete_DUNE1","Concrete_DUNE1","Concrete_DUNE1"]
+    Material:    [".*",".*",".*",".*",".*",".*"]
+    BqPercc:     [0.0000076,0.0000076,0.0000076,0.0000076,0.0000076,0.0000076] #NOTE* This value is hard coded (due to different number of producing volumes than single phase.
+    X0: [ -810.0, -810.0, -810.0, 699.0, -810.0, -810.0 ]
+    X1: [  700.0, 700.0, -809.0, 700.0, 700.0, 700.0 ]
+    Y0: [ -755.0, 754.0, -755.0, -755.0, -755.0, -755.0  ]
+    Y1: [ -754.0, 755.0, 755.0, 755.0, 755.0, 755.0 ]
+    Z0: [ -100.0, -100.0, -100.0, -100.0, -100.0, 6099.0 ]
+    Z1: [  6100.0, 6100.0, 6100.0, 6100.0, -109.0, 6100.0 ]
+    T0: [ @sequence::dunedp10kt_4x2_workspace_39ar.T0,
+          @sequence::dunedp10kt_4x2_workspace_39ar.T0,
+          @sequence::dunedp10kt_4x2_workspace_39ar.T0,
+          @sequence::dunedp10kt_4x2_workspace_39ar.T0,
+          @sequence::dunedp10kt_4x2_workspace_39ar.T0,
+          @sequence::dunedp10kt_4x2_workspace_39ar.T0 ]
+    T1: [ @sequence::dunedp10kt_4x2_workspace_39ar.T1,
+          @sequence::dunedp10kt_4x2_workspace_39ar.T1,
+          @sequence::dunedp10kt_4x2_workspace_39ar.T1,
+          @sequence::dunedp10kt_4x2_workspace_39ar.T1,
+          @sequence::dunedp10kt_4x2_workspace_39ar.T1,
+          @sequence::dunedp10kt_4x2_workspace_39ar.T1 ]
+}
+
+END_PROLOG
