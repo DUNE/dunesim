@@ -633,7 +633,8 @@ namespace detsim {
 
     // Add all channels  
     art::ServiceHandle<art::RandomNumberGenerator> rng;
-    CLHEP::HepRandomEngine &engine = rng->getEngine();
+    CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
+                                                    moduleDescription().moduleLabel());
     CLHEP::RandFlat flat(engine);
 
     std::map<int,double>::iterator mapIter;      
@@ -925,7 +926,8 @@ namespace detsim {
 	//std::cout << "Xin " << fASICGain << " " << fShapingTime << " " << fNoiseFactVec[0] << " " << fNoiseFactVec[1] << std::endl;
 
 	art::ServiceHandle<art::RandomNumberGenerator> rng;
-	CLHEP::HepRandomEngine &engine = rng->getEngine();
+	CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
+                                                        moduleDescription().moduleLabel());
 	CLHEP::RandGaussQ rGauss_Ind(engine, 0.0, fNoiseFactVec[0]);
 	CLHEP::RandGaussQ rGauss_Col(engine, 0.0, fNoiseFactVec[1]);
 
@@ -973,7 +975,8 @@ namespace detsim {
 	{
 	  if(ped_rms>0){
 	    art::ServiceHandle<art::RandomNumberGenerator> rng;
-	    CLHEP::HepRandomEngine &engine = rng->getEngine();
+	    CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
+                                                            moduleDescription().moduleLabel());
 	    CLHEP::RandGaussQ rGauss_Ped(engine, 0.0, ped_rms);
 	    for(unsigned int i = 0; i < signalSize; ++i){
 	      float ped_variation = rGauss_Ped.fire();
@@ -1018,7 +1021,8 @@ namespace detsim {
 	  for(size_t i = 0; i < adcvec.size(); ++i){
 
 	    art::ServiceHandle<art::RandomNumberGenerator> rng;
-	    CLHEP::HepRandomEngine &engine = rng->getEngine();
+	    CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
+                                                            moduleDescription().moduleLabel());
 	    CLHEP::RandFlat flat(engine);
 	    
 	    
@@ -1248,7 +1252,8 @@ namespace detsim {
   void SimWireDUNE35t::GenNoise(std::vector<float>& noise)
   {
     art::ServiceHandle<art::RandomNumberGenerator> rng;
-    CLHEP::HepRandomEngine &engine = rng->getEngine();
+    CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
+                                                    moduleDescription().moduleLabel());
     CLHEP::RandFlat flat(engine);
 
     noise.clear();

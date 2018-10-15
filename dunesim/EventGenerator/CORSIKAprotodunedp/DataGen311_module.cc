@@ -301,7 +301,8 @@ void evgendp::DataGen311::beginJob(){
 
 void evgendp::DataGen311::produce(art::Event & e){
   art::ServiceHandle<art::RandomNumberGenerator> rng;
-  CLHEP::HepRandomEngine &engine = rng->getEngine();
+  CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
+                                                  moduleDescription().moduleLabel());
   CLHEP::RandFlat flat(engine);
 
   std::unique_ptr< std::vector<simb::MCTruth> > truthcol(new std::vector<simb::MCTruth>);

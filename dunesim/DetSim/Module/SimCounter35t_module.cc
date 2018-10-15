@@ -140,7 +140,9 @@ void detsim::SimCounter35t::produce(art::Event & e)
   int skippedHitsOutRange = 0;
 
   art::ServiceHandle<art::RandomNumberGenerator> rng;
-  CLHEP::HepRandomEngine &engine = rng->getEngine("rand");
+  CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
+                                                  moduleDescription().moduleLabel(),
+						  "rand");
   CLHEP::RandFlat flat(engine,0,1);
 
   auto const *ts = lar::providerFrom<detinfo::DetectorClocksService>();

@@ -714,7 +714,9 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
     
     // Get the random number generator service and make some CLHEP generators
     art::ServiceHandle<art::RandomNumberGenerator> rng;
-    CLHEP::HepRandomEngine &engine = rng->getEngine("protoDUNEBeam");
+    CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
+                                                    moduleDescription().moduleLabel(),
+						    "protoDUNEBeam");
     CLHEP::RandFlat flatRnd(engine);
     
     // A single particle seems the most accurate description.

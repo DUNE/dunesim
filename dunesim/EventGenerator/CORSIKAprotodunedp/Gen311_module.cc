@@ -329,7 +329,9 @@ namespace evgendp{
     //sqlite3_stmt *statement;
     //get rng engine
     art::ServiceHandle<art::RandomNumberGenerator> rng;
-    CLHEP::HepRandomEngine &engine = rng->getEngine("gen");
+    CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
+                                                    moduleDescription().moduleLabel(),
+						    "gen");
     CLHEP::RandFlat flat(engine);
 
     if(fUseIFDH){
@@ -648,10 +650,14 @@ void evgendp::Gen311::openDBs(){
 
     //get rng engine
     art::ServiceHandle<art::RandomNumberGenerator> rng;
-    CLHEP::HepRandomEngine &engine = rng->getEngine("gen");
+    CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
+                                                    moduleDescription().moduleLabel(),
+						    "gen");
     CLHEP::RandFlat flat(engine);
 
-    CLHEP::HepRandomEngine &engine_pois = rng->getEngine("pois");
+    CLHEP::HepRandomEngine &engine_pois = rng->getEngine(art::ScheduleID::first(),
+                                                         moduleDescription().moduleLabel(),
+							 "pois");
     CLHEP::RandPoissonQ randpois(engine_pois);
 
     // get geometry and figure where to project particles to, based on CRYHelper
@@ -1015,7 +1021,9 @@ void evgendp::Trigger::MakeTrigger(){
 
     //get the random engine:
     art::ServiceHandle<art::RandomNumberGenerator> rng;
-    CLHEP::HepRandomEngine &engine = rng->getEngine("gen");
+    CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
+                                                    moduleDescription().moduleLabel(),
+						    "gen");
     CLHEP::RandFlat flat(engine);
 
     //choose a random muon
