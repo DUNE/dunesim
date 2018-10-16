@@ -5,11 +5,12 @@ standard_neutimport:
   module_type: "NEUTImport"
 
   LogLevel:		0
+  StartEvent:		0
+  NumberOfEvents:	100
   StartPositionX:	0.
   StartPositionY:	 0.
   StartPositionZ:	150.
-  NumberOfEvents:	100
-  FileName:		"/eos/user/c/chalt/NucleonDecay/ProtonToPositronAndPi0/NEUT/NEUT_ptoe+pi0_RooTracker.root"
+  FileName:		"/eos/user/c/chalt/NucleonDecay/ProtonToKaonToMuon/v0/LArSoft/FullSimulation/rootracker_K+_antinu_300k.root"
 }
 
 END_PROLOG
