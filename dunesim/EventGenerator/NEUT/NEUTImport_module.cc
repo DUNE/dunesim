@@ -118,6 +118,16 @@ namespace evgendp{
         Comment("LogLevel")
       };
 
+      fhicl::Atom<double> StartEvent{
+        Name("StartEvent"),
+        Comment("StartEvent")
+      };
+
+      fhicl::Atom<double> NumberOfEvents{
+        Name("NumberOfEvents"),
+        Comment("NumberOfEvents")
+      };
+
       fhicl::Atom<double> StartPositionX{
         Name("StartPositionX"),
         Comment("StartPositionX")
@@ -131,11 +141,6 @@ namespace evgendp{
       fhicl::Atom<double> StartPositionZ{
         Name("StartPositionZ"),
         Comment("StartPositionZ")
-      };
-
-      fhicl::Atom<double> NumberOfEvents{
-        Name("NumberOfEvents"),
-        Comment("NumberOfEvents")
       };
 
       fhicl::Atom<std::string> FileName{
@@ -159,10 +164,11 @@ namespace evgendp{
     void beginJob() override;
 
     int fLogLevel;
+    int fStartEvent;
+    int fNumberOfEvents;
     double fStartPositionX;
     double fStartPositionY;
     double fStartPositionZ;
-    int fNumberOfEvents;
     std::string fFileName;
 
     std::map< int, std::vector< NDecayParticle*> > NDecayEventMap;
@@ -176,10 +182,11 @@ namespace evgendp{
 evgendp::NEUTImport::NEUTImport(Parameters const& config)
  :
    fLogLevel		(config().LogLevel()),
+   fStartEvent		(config().StartEvent()),
+   fNumberOfEvents	(config().NumberOfEvents()),
    fStartPositionX	(config().StartPositionX()),
    fStartPositionY	(config().StartPositionY()),
    fStartPositionZ	(config().StartPositionZ()),
-   fNumberOfEvents	(config().NumberOfEvents()),
    fFileName		(config().FileName())
 {
     art::ServiceHandle<rndm::NuRandomService>()->createEngine(*this);
@@ -199,7 +206,7 @@ void evgendp::NEUTImport::beginJob(){
 
   TFile *neutFile = new TFile(fFileName.c_str(), "READ");
   TTree *neutTree = (TTree*)neutFile->Get("nRooTracker"); //should always be the same
-  int NEvents= std::min(fNumberOfEvents, (int)neutTree->GetEntries());
+  int NEvents = (int)neutTree->GetEntries();
   std::cout << "Reading in " << NEvents << " NEUT events. " << std::endl;
 
 
@@ -214,7 +221,7 @@ void evgendp::NEUTImport::beginJob(){
   neutTree->SetBranchAddress("StdHepP4",&tStdHepP4);
 
 
-  for(int i=0; i<NEvents; i++) //Event loop
+  for(int i=fStartEvent; i<fStartEvent+fNumberOfEvents; i++) //Event loop
   {
     neutTree->GetEntry(i);
 
@@ -243,11 +250,13 @@ void evgendp::NEUTImport::beginJob(){
 	ndecayparticle->momY = tStdHepP4[4*j+1];
 	ndecayparticle->momZ = tStdHepP4[4*j+2];
 	ndecayparticle->energy = tStdHepP4[4*j+3];
-    	NDecayEventMap[i].push_back(ndecayparticle);
+    	NDecayEventMap[i-fStartEvent].push_back(ndecayparticle);
 
 	if(fLogLevel == 1)
 	{
+	  double fAbsoluteParticleMomentum = sqrt( pow(tStdHepP4[4*j],2) + pow(tStdHepP4[4*j+1],2) + pow(tStdHepP4[4*j+2],2) );
 	  std::cout << std::endl;
+	  std::cout << "Event #" << i-fStartEvent << " in LArSoft, event #" << i << " in ROOT file." << std::endl;
 	  std::cout << "Status particle " << j << ":\t" << tStdHepStatus[j] << std::endl;
 	  std::cout << "PDG particle " << j << ":\t" << ndecayparticle->pdg << std::endl;
 	  std::cout << "Mass particle " << j << "\t" << ndecayparticle->mass << std::endl;
@@ -258,6 +267,7 @@ void evgendp::NEUTImport::beginJob(){
 	  std::cout << "StartMomentumY particle " << j << ":\t" <<ndecayparticle->momY << std::endl;
 	  std::cout << "StartMomentumZ particle " << j << ":\t" << ndecayparticle->momZ << std::endl;
 	  std::cout << "StartEnergy particle " << j << ":\t" << tStdHepP4[4*j+3] << std::endl;
+	  std::cout << "Absolute momentum particle " << j << ":\t" << fAbsoluteParticleMomentum << std::endl;
 	}
       }
     }
