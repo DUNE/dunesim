@@ -141,6 +141,62 @@ dune_fd_genie_atmo: {
   # specify the volume here as well (the dimensions are in the cartoon above):
   TopVolume:  "volCryostat"
   
+  
+  # now, about the orientation:
+  # the flux is defined and interpreted by GENIE in a geographical reference
+  # frame where z is orthogonal to earth surface pointing to the zenith,
+  # x points toward south and y toward east (right-handed coordinate system).
+  # DUNE geometry points z along the LBNF beam, and y in the plane containing z
+  # and the vertical (see the axis triad in the cartoon above).
+  # The flux needs to be rotated in that system, and GENIEHelper allows us to
+  # express a rotation as in: what are the coordinates of the new axes,
+  # expressed in the old reference frame.
+  # Here we are rotating the geographical local frame ("old") into DUNE frame
+  # ("new"). The rotation is complicate, and here we take heavy shortcuts:
+  # * DUNE y axis should be the direction of the vertical (which makes the
+  #   beam come with an angle); so this is effectively the geographic z axis
+  # * DUNE z axis roughly points to Fermilab; since Fermilab is east-south-east
+  #   of DUNE, the angle to Fermilab from the geographical x axis as defined
+  #   above is positive and close to 90 degrees (in fact, roughly 81 degrees);
+  #   but z verse is the opposite, from Fermilab (LBNF) to DUNE FD,
+  #   effectively pointing WNW.
+  # * DUNE x axis will have enough good taste to adapt and make the frame
+  #   right-handed; this would mean pointing SSW.
+  # My shortcuts so far: z becomes from ESE becomes just E, and# x axis goes
+  # south. Defining phi as the angle from south, measured toward west
+  # (counterclockwise), which is the geographical convention ("old"), this is
+  # equivalent to Fermilab being at phi = pi/2 (again, z points backward).
+  # 
+  # To be tested: complete rotation is:
+  # [
+  #   +sin(phi), -cos(phi), +0.000,
+  #     +0.000,    +0.000,  +1.000, # new y is old z
+  #   -cos(phi), -sin(phi), +0.000  # new z
+  # ]
+  #
+  # A rough estimation of the actual phi is +81 degrees, or +1.414 rad.
+  # Finally, note that the Bartol flux the most standard producton picks
+  # (from http://www-pnp.physics.ox.ac.uk/~barr/fluxfiles)
+  # have no azimut parametrization, so phi does not really matter yet.
+  # Honda flux, on the other hand, does have such parametrization.
+  #
+  FluxRotCfg: "newxyz"
+  FluxRotValues: [
+    +1.0, +0.0, +0.0,  # new x axis in old coordinates: be nice and fix things (ends up the same)
+    +0.0, +0.0, +1.0,  # new y axis in old coordinates: vertical
+    +0.0, -1.0, +0.0   # new z axis in old coordinates: westward
+    ]
+  # TODO: verify and test the rotation with phi = 1.414 rad:
+  # FluxRotValues: [
+  #   +0.9877, -0.1564, +0.0000,  # new x axis in old coordinates: be nice and fix things (ends up the same)
+  #   +0.0000, +0.0000, +1.0000,  # new y axis in old coordinates: vertical
+  #   -0.1564, -0.9877, +0.0000   # new z axis in old coordinates: away from Batavia, IL
+  #   ]
+  #
+  # NOTE: these rotations will need to be removed or fixed if feature request
+  # 21185 (https://cdcvs.fnal.gov/redmine/issues/21185) is implemented.
+  #
+  
 } # dune_fd_genie_atmo
 
 
