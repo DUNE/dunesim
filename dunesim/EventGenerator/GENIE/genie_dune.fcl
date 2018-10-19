@@ -79,11 +79,70 @@ dune_fd_genie_anu_simple_flux_1x2x6_window_rotated_tpc.FluxFiles: ["gsimple_dune
 
 #atmospheric neutrino configurations
 
-dune_fd_genie_atmo:                     @local::standard_genie_atmo_flux
-dune_fd_genie_atmo.BeamName:            "atm"
-dune_fd_genie_atmo.GlobalTimeOffset:    0
-dune_fd_genie_atmo.RandomTimeOffset:    0
-dune_fd_genie_atmo.EventGeneratorList:  "Default+CCMEC"
+# this configuration is tuned on the full geometry (10 kton) of the far detector:
+dune_fd_genie_atmo: { 
+  @table::standard_genie_atmo_flux    # inherit from the standard configuration
+  
+  BeamName:            "atm"
+  GlobalTimeOffset:    0
+  RandomTimeOffset:    0
+  EventGeneratorList:  "Default+CCMEC"
+  
+  #
+  # now fix the flux window parameters; from GENIE manual:
+  #
+  # "For a given direction, determined by the zenith angle and the azimuth angle,
+  # the flux generation surface is a circular area, with radius RT,
+  # which is tangent to a sphere of radius RL centered at the coordinate system origin."
+  #
+  # NOTE: in `GENIEHelper` (nutools `v2_26_00`) `BeamCenter` is not used
+  # for the atmospheric neutrino flux (probably, because GENIE does not know
+  # whet to do with it).
+  #
+  # Rl is how far from the origin the circular flux window is;
+  # in GENIE style, this is meters; and it should be large enough to include
+  # all the active volume of the detector (in principle, even more).
+  # Now, this radius and center of the circle are pivoting around the origin
+  # of the coordinate system, which in DUNE FD is on one of the faces
+  # (the upstream face of the neutrino beam).
+  # Unfortunately there are like 60 more meters of detector on one side of
+  # that origin, which means we need a large radius Rl (more than 60 meters,
+  # and in fact closer to the size of the diagonal, 5 (+) 5 (+) 60 m),
+  # and the radius of the circle must be large enough that when the circle is
+  # facing down (and since the origin is on a side of the detector,
+  # half of the circle does not see any detector at all), that is 60 meters
+  # of radius. Now, art:
+  #
+  #       _.     _________________________________________________
+  #       /|    /!                                               /|
+  #     15m    / !                                              / |
+  #     /     /  !                                             /  |
+  #   _L     /________________________________________________/   |       y
+  #   ^      |   !                                            |   |      ^
+  #   |      | * !                                            |   |      |     z
+  #   |      |   !............................................|...|      .---->
+  #  14m     |  ,                                             |  /      /
+  #   |      | ,                                              | /      L x      
+  #   v      |,                                               |/ 
+  #   _      '________________________________________________/ 
+  #         
+  #          |<-- - - - - - - - - - 62 m - - - - - - - - - -->|
+  #
+  #       <========= LBNF is there; beam neutrinos go: -------->
+  #
+  # The origin of the DUNE coordinate system, which is the pivot GENIE rotates
+  # the flux window around, is marked by (*).
+  #
+  Rl: 70 # meters
+  # Rt is the radius of the circular flux window; again, should be large enough
+  # that its "shadow" covers the detector
+  Rt: 70 # meters
+  # given that we picked a window specific to a volume, it makes sense to
+  # specify the volume here as well (the dimensions are in the cartoon above):
+  TopVolume:  "volCryostat"
+  
+} # dune_fd_genie_atmo
+
 
 dune_fd_genie_atmo_min_flux:            @local::dune_fd_genie_atmo
 dune_fd_genie_atmo_min_flux.TopVolume:  "volCryostat"
