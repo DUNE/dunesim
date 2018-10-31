@@ -1,4 +1,3 @@
-
 ////////////////////////////////////////////////////////////////////////
 // Class:       ProtoDUNEBeam
 // Module Type: producer
@@ -321,6 +320,7 @@ namespace evgen{
 //---------------------------------------------------------------------------------
 //----------------------------------------constructors-----------------------------
 evgen::ProtoDUNEBeam::ProtoDUNEBeam(fhicl::ParameterSet const & pset)
+  : EDProducer{pset}
 {
     
     // Call appropriate produces<>() functions here.
@@ -1079,4 +1079,3 @@ TVector3 evgen::ProtoDUNEBeam::GetBackgroundPosition(float x, float y, float z, 
 }
 
 DEFINE_ART_MODULE(evgen::ProtoDUNEBeam)
-

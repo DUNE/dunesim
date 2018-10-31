@@ -196,7 +196,7 @@ namespace evgendp{
 ////////////////////////////////////////////////////////////////////////////////
 
 evgendp::DataGen311::DataGen311(Parameters const& config)
- :
+ : EDProducer{config},
    fEventsToProcess 		(config().EventsToProcess()),
    fStartEvent      		(config().StartEvent()),
    fPDG             		(config().PDG()),

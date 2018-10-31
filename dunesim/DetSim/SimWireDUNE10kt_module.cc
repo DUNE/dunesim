@@ -123,6 +123,7 @@ namespace detsim {
 
   //-------------------------------------------------
   SimWireDUNE10kt::SimWireDUNE10kt(fhicl::ParameterSet const& pset)
+    : EDProducer{pset}
   {
 
     this->reconfigure(pset);

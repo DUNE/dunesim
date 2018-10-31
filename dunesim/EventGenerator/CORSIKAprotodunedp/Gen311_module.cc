@@ -246,7 +246,8 @@ namespace evgendp{
 
 
   evgendp::Gen311::Gen311(fhicl::ParameterSet const & p)
-    : fProjectToHeight(p.get< double >("ProjectToHeight",0.)),
+    : EDProducer{p},
+      fProjectToHeight(p.get< double >("ProjectToHeight",0.)),
       fShowerInputFiles(p.get< std::vector< std::string > >("ShowerInputFiles")),
       fShowerFluxConstants(p.get< std::vector< double > >("ShowerFluxConstants")),
       fSampleTime(p.get< double >("SampleTime",0.)),

@@ -191,6 +191,7 @@ namespace detsim {
 
   //-------------------------------------------------
   SimWireDUNE35t::SimWireDUNE35t(fhicl::ParameterSet const& pset)
+    : EDProducer{pset}
   {
 
     this->reconfigure(pset);
@@ -1546,4 +1547,3 @@ namespace detsim {
 
 
 */
-  

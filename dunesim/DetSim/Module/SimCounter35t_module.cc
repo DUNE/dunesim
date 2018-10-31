@@ -119,6 +119,7 @@ private:
 
 detsim::SimCounter35t::SimCounter35t(fhicl::ParameterSet const & p)
   :
+  EDProducer{p},
   fLArG4ModuleLabel(p.get<std::string>("LArGeantModuleLabel", "largeant")),
   fMakeTree(p.get<bool>("MakeTree",false)),
   fBSUTriggerThreshold(p.get<double>("BSUTriggerThreshold",0.5)),// MeV

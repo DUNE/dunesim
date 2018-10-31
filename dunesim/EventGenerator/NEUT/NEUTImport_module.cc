@@ -156,7 +156,7 @@ namespace evgendp{
 ////////////////////////////////////////////////////////////////////////////////
 
 evgendp::NEUTImport::NEUTImport(Parameters const& config)
- :
+  : EDProducer{config},
    fP0           (config().P0()),
    fSigmaP       (config().SigmaP()),
    fFName        (config().FName())
