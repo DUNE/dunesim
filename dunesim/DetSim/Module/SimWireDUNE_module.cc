@@ -84,9 +84,12 @@ private:
   bool fDistortOn;         ///< switch for simulation of stuck bits
   bool fSuppressOn;        ///< switch for simulation of zero suppression
   bool fKeepEmptyChannels; ///< Write out empty channels iff true.
-
+  bool fUseRawDigitInput;  ///< Use (presumably noise-free) RawDigits for input instead of SimChannels
+  std::string fRawDigitInputLabel; ///< The module label for the RawDigits to read in
   // Tools.
   std::string fAdcSimulatorName;
+
+
   std::unique_ptr<AdcSimulator> m_pads;
 
   // Services.
@@ -124,7 +127,10 @@ void SimWireDUNE::reconfigure(fhicl::ParameterSet const& p) {
   fDistortOn         = p.get<bool>("DistortOn");
   fSuppressOn        = p.get<bool>("SuppressOn");
   fKeepEmptyChannels = p.get<bool>("KeepEmptyChannels");
+  fUseRawDigitInput  = p.get<bool>("UseRawDigitInput", false);
+  fRawDigitInputLabel= p.get<string>("RawDigitInputLabel", "");
   fAdcSimulatorName = p.get<string>("AdcSimulator");
+
   DuneToolManager* pdtm = DuneToolManager::instance();
   m_pads = pdtm == nullptr ? nullptr : pdtm->getPrivate<AdcSimulator>(fAdcSimulatorName);
   ostringstream out;
@@ -194,6 +200,17 @@ void SimWireDUNE::produce(art::Event& evt) {
     simChannels[chanHandle[c]->Channel()] = chanHandle[c];
   }
 
+  // Do the same as above, but for the RawDigits, so we can map from channel number to digit
+  std::vector<const raw::RawDigit*> inputDigitsHandle;
+  std::vector<const raw::RawDigit*> inputDigits(m_pgeo->Nchannels(), nullptr);
+  if(fUseRawDigitInput){
+    evt.getView(fRawDigitInputLabel, inputDigitsHandle);
+    for ( size_t c=0; c<inputDigitsHandle.size(); ++c ) {
+      const raw::RawDigit* dig=inputDigitsHandle[c];
+      inputDigits[dig->Channel()] = dig;
+    }
+  }
+
   // make an unique_ptr of sim::SimDigits that allows ownership of the produced
   // digits to be transferred to the art::Event after the put statement below
   std::unique_ptr<std::vector<raw::RawDigit>>  digcol(new std::vector<raw::RawDigit>);
@@ -212,8 +229,14 @@ void SimWireDUNE::produce(art::Event& evt) {
     // Create vector that holds the floating ADC count for each tick.
     std::vector<AdcSignal> fChargeWork;
 
-    // Extract the floating ADC count from the SimChannel for each tick in the channel.
-    m_pscx->extract(psc, fChargeWork);
+    if(fUseRawDigitInput){
+      const raw::RawDigit* dig=inputDigits[chan];
+      fChargeWork.insert(fChargeWork.end(), dig->ADCs().begin(), dig->ADCs().end());
+    }
+    else{
+      // Extract the floating ADC count from the SimChannel for each tick in the channel.
+      m_pscx->extract(psc, fChargeWork);
+    }
 
     // Add noise to each tick in the channel.
     if ( fNoiseOn ) {
