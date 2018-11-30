@@ -246,8 +246,8 @@ void sim::ProtoDUNEBeamTPCMatching::analyze(art::Event const & evt)
   TVector3 pos, dir_start, dir_end;
   for(unsigned int t = 0; t < recoTracks->size(); ++t){
     const recob::Track thisTrack = (*recoTracks)[t];
-    tpc_pos		= thisTrack.Vertex();
-    tpc_dir		= thisTrack.VertexDirection();
+    tpc_pos		= thisTrack.Vertex<TVector3>();
+    tpc_dir		= thisTrack.VertexDirection<TVector3>();
     std::vector<anab::T0>  trackT0 = trackUtil.GetRecoTrackT0(thisTrack,evt,fpandoraTrack);
     tpc_reco_startpos[3] = trackT0[0].fTime;
     tpc_reco_startpos[0] = tpc_pos.X();
