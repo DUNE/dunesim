@@ -113,17 +113,37 @@ namespace evgendp{
       using Name = fhicl::Name;
       using Comment = fhicl::Comment;
 
-      fhicl::Atom<double> P0{
-        Name("P0"),
-        Comment("central momentum (GeV/c) to generate")
+      fhicl::Atom<double> LogLevel{
+        Name("LogLevel"),
+        Comment("LogLevel")
       };
 
-      fhicl::Atom<double> SigmaP{
-        Name("SigmaP"),
-        Comment("variation in momenta (GeV/c)")
+      fhicl::Atom<double> StartEvent{
+        Name("StartEvent"),
+        Comment("StartEvent")
       };
 
-      fhicl::Atom<std::string> FName{
+      fhicl::Atom<double> NumberOfEvents{
+        Name("NumberOfEvents"),
+        Comment("NumberOfEvents")
+      };
+
+      fhicl::Atom<double> StartPositionX{
+        Name("StartPositionX"),
+        Comment("StartPositionX")
+      };
+
+      fhicl::Atom<double> StartPositionY{
+        Name("StartPositionY"),
+        Comment("StartPositionY")
+      };
+
+      fhicl::Atom<double> StartPositionZ{
+        Name("StartPositionZ"),
+        Comment("StartPositionZ")
+      };
+
+      fhicl::Atom<std::string> FileName{
         Name("FileName"),
         Comment("NEUT output")
       };
@@ -143,9 +163,13 @@ namespace evgendp{
 
     void beginJob() override;
 
-    double fP0;
-    double fSigmaP;
-    std::string fFName;
+    int fLogLevel;
+    int fStartEvent;
+    int fNumberOfEvents;
+    double fStartPositionX;
+    double fStartPositionY;
+    double fStartPositionZ;
+    std::string fFileName;
 
     std::map< int, std::vector< NDecayParticle*> > NDecayEventMap;
 
@@ -156,10 +180,14 @@ namespace evgendp{
 ////////////////////////////////////////////////////////////////////////////////
 
 evgendp::NEUTImport::NEUTImport(Parameters const& config)
-  : EDProducer{config},
-   fP0           (config().P0()),
-   fSigmaP       (config().SigmaP()),
-   fFName        (config().FName())
+ : EDProducer{config},
+   fLogLevel		(config().LogLevel()),
+   fStartEvent		(config().StartEvent()),
+   fNumberOfEvents	(config().NumberOfEvents()),
+   fStartPositionX	(config().StartPositionX()),
+   fStartPositionY	(config().StartPositionY()),
+   fStartPositionZ	(config().StartPositionZ()),
+   fFileName		(config().FileName())
 {
     art::ServiceHandle<rndm::NuRandomService>()->createEngine(*this);
     //art::ServiceHandle<rndm::NuRandomService>()->createEngine(*this, "HepJamesRandom", "gen", p, { "Seed", "SeedGenerator" });
@@ -176,9 +204,9 @@ void evgendp::NEUTImport::beginJob(){
 
   const int NMaxParticlesPerEvent = 1000;
 
-  TFile *neutFile = new TFile(fFName.c_str(), "READ");
+  TFile *neutFile = new TFile(fFileName.c_str(), "READ");
   TTree *neutTree = (TTree*)neutFile->Get("nRooTracker"); //should always be the same
-  int NEvents= (int)neutTree->GetEntries();
+  int NEvents = (int)neutTree->GetEntries();
   std::cout << "Reading in " << NEvents << " NEUT events. " << std::endl;
 
 
@@ -193,13 +221,17 @@ void evgendp::NEUTImport::beginJob(){
   neutTree->SetBranchAddress("StdHepP4",&tStdHepP4);
 
 
-  for(int i=0; i<NEvents; i++) //Event loop
+  for(int i=fStartEvent; i<fStartEvent+fNumberOfEvents; i++) //Event loop
   {
     neutTree->GetEntry(i);
-    std::cout << std::endl;
-    std::cout << std::endl;
-    std::cout << "Event " << i << std::endl;
-    std::cout << "NParticles: " << tStdHepN << std::endl;
+
+    if(fLogLevel == 1)
+    {
+      std::cout << std::endl;
+      std::cout << std::endl;
+      std::cout << "Event:\t" <<  i << std::endl;
+      std::cout << "NParticles:\t" << tStdHepN << std::endl;
+    }
 
     for(int j=0; j<tStdHepN; j++)
     {
@@ -211,25 +243,32 @@ void evgendp::NEUTImport::beginJob(){
     	NDecayParticle *ndecayparticle = new NDecayParticle();
 	ndecayparticle->pdg = tStdHepPdg[j];
 	ndecayparticle->mass = pdgp->Mass();
-	ndecayparticle->startX = 0;
-	ndecayparticle->startY = -150;
-	ndecayparticle->startZ = 150;
+	ndecayparticle->startX = fStartPositionX;
+	ndecayparticle->startY = fStartPositionY;
+	ndecayparticle->startZ = fStartPositionZ;
 	ndecayparticle->momX = tStdHepP4[4*j];
 	ndecayparticle->momY = tStdHepP4[4*j+1];
 	ndecayparticle->momZ = tStdHepP4[4*j+2];
 	ndecayparticle->energy = tStdHepP4[4*j+3];
-    	NDecayEventMap[i].push_back(ndecayparticle);
-    	std::cout << std::endl;
-	std::cout << "Status " << j << ":\t" << tStdHepStatus[j] << std::endl;
-	std::cout << "PDG " << j << ":\t" << ndecayparticle->pdg << std::endl;
-	std::cout << "Mas " << j << ":\t" << ndecayparticle->mass << std::endl;
-	std::cout << "Start.X " << j << ":\t" << ndecayparticle->startX << std::endl;
-	std::cout << "Start.Y " << j << ":\t" <<ndecayparticle->startY << std::endl;
-	std::cout << "Start.Z " << j << ":\t" << ndecayparticle->startZ << std::endl;
-	std::cout << "Mom.X " << j << ":\t" << ndecayparticle->momX << std::endl;
-	std::cout << "Mom.Y " << j << ":\t" <<ndecayparticle->momY << std::endl;
-	std::cout << "Mom.Z " << j << ":\t" << ndecayparticle->momZ << std::endl;
-	std::cout << "Energy " << j << ":\t" << tStdHepP4[4*j+3] << std::endl;
+    	NDecayEventMap[i-fStartEvent].push_back(ndecayparticle);
+
+	if(fLogLevel == 1)
+	{
+	  double fAbsoluteParticleMomentum = sqrt( pow(tStdHepP4[4*j],2) + pow(tStdHepP4[4*j+1],2) + pow(tStdHepP4[4*j+2],2) );
+	  std::cout << std::endl;
+	  std::cout << "Event #" << i-fStartEvent << " in LArSoft, event #" << i << " in ROOT file." << std::endl;
+	  std::cout << "Status particle " << j << ":\t" << tStdHepStatus[j] << std::endl;
+	  std::cout << "PDG particle " << j << ":\t" << ndecayparticle->pdg << std::endl;
+	  std::cout << "Mass particle " << j << "\t" << ndecayparticle->mass << std::endl;
+	  std::cout << "StartPositionX particle " << j << ":\t" << ndecayparticle->startX << std::endl;
+	  std::cout << "StartPositionY particle " << j << ":\t" <<ndecayparticle->startY << std::endl;
+	  std::cout << "StartPositionZ particle " << j << ":\t" << ndecayparticle->startZ << std::endl;
+	  std::cout << "StartMomentumX particle " << j << ":\t" << ndecayparticle->momX << std::endl;
+	  std::cout << "StartMomentumY particle " << j << ":\t" <<ndecayparticle->momY << std::endl;
+	  std::cout << "StartMomentumZ particle " << j << ":\t" << ndecayparticle->momZ << std::endl;
+	  std::cout << "StartEnergy particle " << j << ":\t" << tStdHepP4[4*j+3] << std::endl;
+	  std::cout << "Absolute momentum particle " << j << ":\t" << fAbsoluteParticleMomentum << std::endl;
+	}
       }
     }
   }
