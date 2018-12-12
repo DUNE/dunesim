@@ -38,37 +38,13 @@ int test_FixedDetPedestalService() {
 
   cout << myname << line << endl;
   cout << myname << "Create top-level FCL." << endl;
-  string fclfile = "test_FixedDetPedestalService.fcl";
-  ofstream fout(fclfile.c_str());
-  fout << "#include \"pedestals_dune.fcl\"" << endl;
-  fout << "#include \"geometry_dune.fcl\"" << endl;
-  fout << "services.DetPedestalService: @local::dune_fixedpeds" << endl;
-  fout << "services.Geometry: @local::dune35t_geo" << endl;
-  fout << "services.ExptGeoHelperInterface: @local::dune_geometry_helper" << endl;
-  fout.close();
-
-  cout << myname << "Fetch art service helper." << endl;
-  ArtServiceHelper& ash = ArtServiceHelper::instance();
-  ash.print();
-
-  cout << myname << line << endl;
-  cout << myname << "Add pedestal service." << endl;
-  assert( ash.addService("DetPedestalService", fclfile, true) == 0 );
-  ash.print();
-
-  cout << myname << line << endl;
-  cout << myname << "Add geometry service." << endl;
-  assert( ash.addService("Geometry", fclfile, true) == 0 );
-  ash.print();
-
-  cout << myname << line << endl;
-  cout << myname << "Add the DUNE geometry helper service (required to load DUNE geometry)." << endl;
-  assert( ash.addService("ExptGeoHelperInterface", fclfile, true) == 0 );
-
-  cout << myname << line << endl;
-  cout << myname << "Load services." << endl;
-  assert( ash.loadServices() == 1 );
-  ash.print();
+  std::ostringstream oss;
+  oss << "#include \"pedestals_dune.fcl\"" << endl;
+  oss << "#include \"geometry_dune.fcl\"" << endl;
+  oss << "services.DetPedestalService: @local::dune_fixedpeds" << endl;
+  oss << "services.Geometry: @local::dune35t_geo" << endl;
+  oss << "services.ExptGeoHelperInterface: @local::dune_geometry_helper" << endl;
+  ArtServiceHelper::load_services(oss.str());
 
   cout << myname << line << endl;
   cout << myname << "Fetch geometry service." << endl;
