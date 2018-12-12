@@ -67,8 +67,8 @@ dune10kt_1x2x6_neutron: #Center region is added to simulate neutrons comming in 
  BqPercc:               [ 0.0000076, 0.0000076, 0.0000076, 0.0000076, 0.0000076 ]   # activity -- Becquerels per cc. 0.0000076 assumes 10 neutrons/y/g per 10 ppm U-238 in concrete and a density of 2.40 g/cc for 10 cm mean depth in concrete -JReichenbacher (03/21/2017)
  X0:                    [ 0.0,    0.0,    0.0,    0.0 ,  -0.5  ]     # in cm in world coordinates, bottom corner of box
  X1:                    [  350.,  350.,   350.,   350.,   0.5  ]     # in cm in world coordinates, top corner of box
- Y0:                    [ -600.,  -600,  -600.,   600.,   -600 ]     # in cm in world coordinates, bottom corner of box
- Y1:                    [  600. , 600,   -601.,   601.,    600 ]     # in cm in world coordinates, top corner of box
+ Y0:                    [ -600.,  -600,  -601.,   600.,   -600 ]     # in cm in world coordinates, bottom corner of box
+ Y1:                    [  600. , 600,   -600.,   601.,    600 ]     # in cm in world coordinates, top corner of box
  Z0:                    [  -0.5,  1394.5, 0,      0,       0   ]     # in cm in world coordinates, bottom corner of box
  Z1:                    [  0.5,   1395.5, 1395,   1395,    1395]     # in cm in world coordinates, top corner of box
  T0:                    [ -2246000.,-2246000.,-2246000.,-2246000.,-2246000 ] # ending time in ns
