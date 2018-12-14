@@ -1,4 +1,3 @@
-
 ////////////////////////////////////////////////////////////////////////
 // Class:       ProtoDUNEBeam
 // Module Type: producer
@@ -321,6 +320,7 @@ namespace evgen{
 //---------------------------------------------------------------------------------
 //----------------------------------------constructors-----------------------------
 evgen::ProtoDUNEBeam::ProtoDUNEBeam(fhicl::ParameterSet const & pset)
+  : EDProducer{pset}
 {
     
     // Call appropriate produces<>() functions here.
@@ -714,7 +714,9 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
     
     // Get the random number generator service and make some CLHEP generators
     art::ServiceHandle<art::RandomNumberGenerator> rng;
-    CLHEP::HepRandomEngine &engine = rng->getEngine("protoDUNEBeam");
+    CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
+                                                    moduleDescription().moduleLabel(),
+						    "protoDUNEBeam");
     CLHEP::RandFlat flatRnd(engine);
     
     // A single particle seems the most accurate description.
@@ -1077,4 +1079,3 @@ TVector3 evgen::ProtoDUNEBeam::GetBackgroundPosition(float x, float y, float z, 
 }
 
 DEFINE_ART_MODULE(evgen::ProtoDUNEBeam)
-

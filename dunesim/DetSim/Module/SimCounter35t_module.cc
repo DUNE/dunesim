@@ -119,6 +119,7 @@ private:
 
 detsim::SimCounter35t::SimCounter35t(fhicl::ParameterSet const & p)
   :
+  EDProducer{p},
   fLArG4ModuleLabel(p.get<std::string>("LArGeantModuleLabel", "largeant")),
   fMakeTree(p.get<bool>("MakeTree",false)),
   fBSUTriggerThreshold(p.get<double>("BSUTriggerThreshold",0.5)),// MeV
@@ -140,7 +141,9 @@ void detsim::SimCounter35t::produce(art::Event & e)
   int skippedHitsOutRange = 0;
 
   art::ServiceHandle<art::RandomNumberGenerator> rng;
-  CLHEP::HepRandomEngine &engine = rng->getEngine("rand");
+  CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
+                                                  moduleDescription().moduleLabel(),
+						  "rand");
   CLHEP::RandFlat flat(engine,0,1);
 
   auto const *ts = lar::providerFrom<detinfo::DetectorClocksService>();
