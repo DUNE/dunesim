@@ -123,6 +123,7 @@ namespace detsim {
 
   //-------------------------------------------------
   SimWireDUNE10kt::SimWireDUNE10kt(fhicl::ParameterSet const& pset)
+    : EDProducer{pset}
   {
 
     this->reconfigure(pset);
@@ -309,7 +310,8 @@ namespace detsim {
 
     // Add all channels  
     art::ServiceHandle<art::RandomNumberGenerator> rng;
-    CLHEP::HepRandomEngine &engine = rng->getEngine();
+    CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
+                                                    moduleDescription().moduleLabel());
     CLHEP::RandFlat flat(engine);
 
     std::map<int,double>::iterator mapIter;
@@ -507,7 +509,8 @@ namespace detsim {
 	//	std::cout << "Xin " << fASICGain << " " << fShapingTime << " " << fNoiseFactVec[0] << " " << fNoiseFactVec[1] << std::endl;
 		
 	art::ServiceHandle<art::RandomNumberGenerator> rng;
-	CLHEP::HepRandomEngine &engine = rng->getEngine();
+	CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
+                                                        moduleDescription().moduleLabel());
 	CLHEP::RandGaussQ rGauss_Ind(engine, 0.0, fNoiseFactVec[0]);
 	CLHEP::RandGaussQ rGauss_Col(engine, 0.0, fNoiseFactVec[1]);
 
@@ -650,7 +653,8 @@ namespace detsim {
   void SimWireDUNE10kt::GenNoise(std::vector<float>& noise)
   {
     art::ServiceHandle<art::RandomNumberGenerator> rng;
-    CLHEP::HepRandomEngine &engine = rng->getEngine();
+    CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
+                                                    moduleDescription().moduleLabel());
     CLHEP::RandFlat flat(engine);
 
     noise.clear();

@@ -6,14 +6,18 @@
 // Test ExponentialChannelNoiseService.
 
 #include "../ExponentialChannelNoiseService.h"
-#include <string>
-#include <iostream>
-#include <sstream>
+
 #include <fstream>
 #include <iomanip>
+#include <iostream>
+#include <map>
+#include <sstream>
+#include <string>
+
 #include "dune/ArtSupport/ArtServiceHelper.h"
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "art/Framework/Services/Optional/RandomNumberGenerator.h"
+#include "fhiclcpp/ParameterSet.h"
 #include "lardata/Utilities/LArFFT.h"
 #include "larcore/Geometry/Geometry.h"
 #include "lardataobj/RawData/raw.h"
@@ -37,76 +41,49 @@ typedef std::vector<short> AdcVector;
 extern const std::string LArPropertiesServiceConfigurationString;
 extern const std::string DetectorPropertiesServiceConfigurationString;
 
-void load_services(int fftsize =0) {
-  const string myname = "load_services: ";
-  const string line = "-----------------------------";
+namespace {
 
-  static bool loaded = false;
-  if ( loaded ) return;
-  loaded = true;
+  std::string map_to_string(std::map<std::string, std::string> const& configs)
+  {
+    std::string full_config;
+    for (auto const& [service, config] : configs) {
+      full_config.append(service)
+        .append(": {")
+        .append(config)
+        .append("}\n");
+    }
+    return full_config;
+  }
 
-  cout << myname << line << endl;
-  cout << myname << "Fetch art service helper." << endl;
-  ArtServiceHelper& ash = ArtServiceHelper::instance();
-  ash.print();
+  void load_services(int fftsize =0) {
+    const string myname = "load_services: ";
+    const string line = "-----------------------------";
 
-  cout << line << endl;
-  cout << myname << "Add TFileService." << endl;
-  string scfg = "fileName: \"test.root\" service_type: \"TFileService\"";
-  assert( ash.addService("TFileService", scfg) == 0 );
+    cout << myname << line << endl;
+    cout << myname << "Fetch art service helper." << endl;
 
-  cout << myname << line << endl;
-  string gname = "dune35t4apa_v6";
-  cout << myname << "Add Geometry service." << endl;
-  scfg = "DisableWiresInG4: true GDML: \"dune35t4apa_v6.gdml\" Name: \"" + gname +
-         "\" ROOT: \"" + gname + "\""
-         " SortingParameters: { DetectorVersion: \"" + gname + "\""
-         " ChannelsPerOpDet: 12" +
-         "} SurfaceY: 0";
-  cout << myname << "Configuration: " << scfg << endl;
-  assert( ash.addService("Geometry", scfg) == 0 );
+    std::map<std::string, std::string> service_configs;
+    service_configs.emplace("TFileService", "fileName: 'test.root'");
+    string gname = "dune35t4apa_v6";
+    service_configs.emplace("Geometry",
+                            "DisableWiresInG4: true GDML: \"dune35t4apa_v6.gdml\" Name: \"" + gname +
+                            "\" ROOT: \"" + gname + "\""
+                            " SortingParameters: { DetectorVersion: \"" + gname + "\""
+                            " ChannelsPerOpDet: 12" +
+                            "} SurfaceY: 0");
+    service_configs.emplace("ExptGeoHelperInterface", "service_provider: \"DUNEGeometryHelper\"");
+    service_configs.emplace("LArPropertiesService", LArPropertiesServiceConfigurationString);
+    service_configs.emplace("DetectorPropertiesService", DetectorPropertiesServiceConfigurationString);
+    service_configs.emplace("DetectorClocksService", "ClockSpeedExternal: 3.125e1 ClockSpeedOptical: 128 ClockSpeedTPC: 2 ClockSpeedTrigger: 16 DefaultBeamTime: 0 DefaultTrigTime: 0 FramePeriod: 1600 G4RefTime: 0 InheritClockConfig: false TrigModuleName: \"\" TriggerOffsetTPC: 0 service_provider: \"DetectorClocksServiceStandard\" ");
+    ostringstream sscfg;
+    sscfg << "FFTOption: \"\" FFTSize: " << fftsize << " FitBins: 5";
 
-  cout << myname << line << endl;
-  cout << myname << "Add the DUNE geometry helper service (required to load DUNE geometry)." << endl;
-  scfg = "service_provider: \"DUNEGeometryHelper\"";
-  cout << myname << "Configuration: " << scfg << endl;
-  assert( ash.addService("ExptGeoHelperInterface", scfg) == 0 );
+    service_configs.emplace("LArFFT", sscfg.str());
+    ArtServiceHelper::load_services(map_to_string(service_configs));
 
-  cout << myname << line << endl;
-  cout << myname << "Add LArPropertiesService service." << endl;
-  scfg = LArPropertiesServiceConfigurationString;
-  cout << myname << "Configuration: " << scfg << endl;
-  assert( ash.addService("LArPropertiesService", scfg) == 0 );
-
-  cout << myname << line << endl;
-  cout << myname << "Add DetectorPropertiesService service." << endl;
-  scfg = DetectorPropertiesServiceConfigurationString;
-  cout << myname << "Configuration: " << scfg << endl;
-  assert( ash.addService("DetectorPropertiesService", scfg) == 0 );
-
-  cout << myname << line << endl;
-  cout << myname << "Add the DetectorClocksService service." << endl;
-  scfg = "ClockSpeedExternal: 3.125e1 ClockSpeedOptical: 128 ClockSpeedTPC: 2 ClockSpeedTrigger: 16 DefaultBeamTime: 0 DefaultTrigTime: 0 FramePeriod: 1600 G4RefTime: 0 InheritClockConfig: false TrigModuleName: \"\" TriggerOffsetTPC: 0 service_type: \"DetectorClocksService\" service_provider: \"DetectorClocksServiceStandard\" ";
-  cout << myname << "Configuration: " << scfg << endl;
-  assert( ash.addService("DetectorClocksService", scfg) == 0 );
-
-  // Work around defect in larsoft: https://cdcvs.fnal.gov/redmine/issues/10618.
-  TH1::AddDirectory(kFALSE);
-
-  cout << myname << line << endl;
-  ostringstream sscfg;
-  sscfg << "FFTOption: \"\" FFTSize: " << fftsize << " FitBins: 5";
-  scfg = sscfg.str();
-  cout << myname << "Add the FFT service." << endl;
-  //assert( ash.addService("LArFFT", scfg, isFile) == 0 );
-  assert( ash.addService("LArFFT", scfg) == 0 );
-
-  cout << myname << line << endl;
-  cout << myname << "Load services." << endl;
-  assert( ash.loadServices() == 1 );
-  ash.print();
-
-  return;
+    // Work around defect in larsoft: https://cdcvs.fnal.gov/redmine/issues/10618.
+    TH1::AddDirectory(kFALSE);
+  }
 }
 
 int test_ExponentialChannelNoiseService(unsigned int ntick, unsigned int maxchan =100) {
@@ -269,7 +246,6 @@ int main(int argc, char* argv[]) {
   test_ExponentialChannelNoiseService(ntick, maxchan);
   // We must close TFileService to write out histograms.
   cout << "Close services." << endl;
-  ArtServiceHelper::close();
   return 0;
 }
 
@@ -293,7 +269,7 @@ extern const std::string LArPropertiesServiceConfigurationString { R"cfg(
 # switch them off for faster simulation
  Argon39DecayRate: 0.0
 
- # Optical properties	
+ # Optical properties
  # Fast and slow scintillation emission spectra, from [J Chem Phys vol 91 (1989) 1469]
  FastScintEnergies:    [ 6.0,  6.7,  7.1,  7.4,  7.7, 7.9,  8.1,  8.4,  8.5,  8.6,  8.8,  9.0,  9.1,  9.4,  9.8,  10.4,  10.7]
  SlowScintEnergies:    [ 6.0,  6.7,  7.1,  7.4,  7.7, 7.9,  8.1,  8.4,  8.5,  8.6,  8.8,  9.0,  9.1,  9.4,  9.8,  10.4,  10.7]
@@ -303,7 +279,7 @@ extern const std::string LArPropertiesServiceConfigurationString { R"cfg(
  ScintFastTimeConst:   6.     # fast scintillation time constant (ns)
  ScintSlowTimeConst:   1590.  # slow scintillation time constant (ns)
  ScintBirksConstant:   0.069  # birks constant for LAr (1/MeV cm)
- ScintYield:           24000. # total scintillation yield (ph/Mev)         
+ ScintYield:           24000. # total scintillation yield (ph/Mev)
  ScintPreScale:        0.03   # Scale factor to reduce number of photons simulated
                               # Later QE should be corrected for this scale
  ScintYieldRatio:      0.3    # fast / slow scint ratio (needs revisitting)
@@ -314,11 +290,11 @@ extern const std::string LArPropertiesServiceConfigurationString { R"cfg(
 
 
 
- # Scintillation yields and fast/slow ratios per particle type 
+ # Scintillation yields and fast/slow ratios per particle type
  MuonScintYield:          24000
  MuonScintYieldRatio:     0.23
  PionScintYield:          24000
- PionScintYieldRatio:     0.23 
+ PionScintYieldRatio:     0.23
  ElectronScintYield:      20000
  ElectronScintYieldRatio: 0.27
  KaonScintYield:          24000
@@ -334,8 +310,8 @@ extern const std::string LArPropertiesServiceConfigurationString { R"cfg(
  RIndexSpectrum: [ 1.232,  1.236,  1.240,  1.261,  1.282,  1.306,  1.353,  1.387,  1.404,  1.423,  1.434,  1.446,  1.459,  1.473,  1.488,  1.505,  1.524,  1.569,  1.627,  1.751,  1.879 ]
 
  # absorption length as function of energy
- AbsLengthEnergies: [ 4,     5,     6,     7,     8,     9,     10,    11   ]       
- AbsLengthSpectrum: [ 2000., 2000., 2000., 2000., 2000., 2000., 2000., 2000.] 
+ AbsLengthEnergies: [ 4,     5,     6,     7,     8,     9,     10,    11   ]
+ AbsLengthSpectrum: [ 2000., 2000., 2000., 2000., 2000., 2000., 2000., 2000.]
 
  # Rayleigh scattering length (cm) @ 90K as a function of energy (eV) from arXiv:1502.04213
  RayleighEnergies: [   2.80,   3.00,   3.50,   4.00,  5.00,  6.00,  7.00,  8.00,  8.50,  9.00,  9.20,  9.40,  9.50,  9.60,  9.70,  9.80,  9.90,  10.0,  10.2,  10.4,  10.6, 10.8 ]
@@ -343,10 +319,10 @@ extern const std::string LArPropertiesServiceConfigurationString { R"cfg(
 
  # Surface reflectivity data - vector of energy spectrum per
  #   surface type
- ReflectiveSurfaceEnergies:           [ 7, 9, 10 ]             
- ReflectiveSurfaceNames:            [ "STEEL_STAINLESS_Fe7Cr2Ni" ]  
- ReflectiveSurfaceReflectances:     [ [ 0.25, 0.25, 0.25 ] ]        
- ReflectiveSurfaceDiffuseFractions: [ [ 0.5,  0.5,  0.5  ] ]        
+ ReflectiveSurfaceEnergies:           [ 7, 9, 10 ]
+ ReflectiveSurfaceNames:            [ "STEEL_STAINLESS_Fe7Cr2Ni" ]
+ ReflectiveSurfaceReflectances:     [ [ 0.25, 0.25, 0.25 ] ]
+ ReflectiveSurfaceDiffuseFractions: [ [ 0.5,  0.5,  0.5  ] ]
 
  # Information related with the simulation of the Wavelength Shifter (TPB)
  LoadExtraMatProperties: false
@@ -366,7 +342,7 @@ extern const std::string LArPropertiesServiceConfigurationString { R"cfg(
 extern const std::string DetectorPropertiesServiceConfigurationString { R"cfg(
 service_provider: "DetectorPropertiesServiceStandard"
 
-# Drift properties 
+# Drift properties
 SternheimerA:     0.1956  # Ar Sternheimer parameter a.
 SternheimerK:     3.0000  # Ar Sternheimer parameter k.
 SternheimerX0:    0.2000  # Ar Sternheimer parameter x0.

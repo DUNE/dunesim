@@ -100,7 +100,8 @@ namespace evgendp{
 namespace evgendp{
 
   CORSIKAGendp::CORSIKAGendp(fhicl::ParameterSet const& p)
-    : fProjectToHeight(p.get< double >("ProjectToHeight",0.)),
+    : EDProducer{p},
+      fProjectToHeight(p.get< double >("ProjectToHeight",0.)),
       fShowerInputFiles(p.get< std::vector< std::string > >("ShowerInputFiles")),
       fShowerFluxConstants(p.get< std::vector< double > >("ShowerFluxConstants")),
       fSampleTime(p.get< double >("SampleTime",0.)),
@@ -200,7 +201,9 @@ namespace evgendp{
     //sqlite3_stmt *statement;
     //get rng engine
     art::ServiceHandle<art::RandomNumberGenerator> rng;
-    CLHEP::HepRandomEngine &engine = rng->getEngine("gen");
+    CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
+                                                    moduleDescription().moduleLabel(),
+						    "gen");
     CLHEP::RandFlat flat(engine);
 
     //setup ifdh object
@@ -412,10 +415,14 @@ namespace evgendp{
 
     //get rng engine
     art::ServiceHandle<art::RandomNumberGenerator> rng;
-    CLHEP::HepRandomEngine &engine = rng->getEngine("gen");
+    CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
+                                                    moduleDescription().moduleLabel(),
+						    "gen");
     CLHEP::RandFlat flat(engine);
 
-    CLHEP::HepRandomEngine &engine_pois = rng->getEngine("pois");
+    CLHEP::HepRandomEngine &engine_pois = rng->getEngine(art::ScheduleID::first(),
+                                                         moduleDescription().moduleLabel(),
+							 "pois");
     CLHEP::RandPoissonQ randpois(engine_pois);
 
     // get geometry and figure where to project particles to, based on CRYHelper

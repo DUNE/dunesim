@@ -180,7 +180,7 @@ namespace evgendp{
 ////////////////////////////////////////////////////////////////////////////////
 
 evgendp::NEUTImport::NEUTImport(Parameters const& config)
- :
+ : EDProducer{config},
    fLogLevel		(config().LogLevel()),
    fStartEvent		(config().StartEvent()),
    fNumberOfEvents	(config().NumberOfEvents()),
@@ -280,7 +280,8 @@ void evgendp::NEUTImport::produce(art::Event & e){
 
 
   art::ServiceHandle<art::RandomNumberGenerator> rng;
-  CLHEP::HepRandomEngine &engine = rng->getEngine();
+  CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
+                                                  moduleDescription().moduleLabel());
   CLHEP::RandFlat flat(engine);
 
   std::unique_ptr< std::vector<simb::MCTruth> > truthcol(new std::vector<simb::MCTruth>);
