@@ -43,6 +43,12 @@
 #include "CLHEP/Random/RandPoissonQ.h"
 #include "ifdh.h"  //to handle flux files
 
+// c/c++ includes
+#include <sqlite3.h>
+#include <memory>
+#include <stdio.h>
+#include <dirent.h>
+
 namespace evgendp{
 
   /// A module to check the results from the Monte Carlo generator
@@ -58,7 +64,7 @@ namespace evgendp{
 
 
   private:
-    void openDBs();
+    void openDBs(std::string const& module_label);
     void populateNShowers();
     void populateTOffset();
     void GetSample(simb::MCTruth&);
@@ -92,7 +98,8 @@ namespace evgendp{
     double fShowerAreaExtension=0.; ///< Extend distribution of corsika particles in x,z by this much (e.g. 1000 will extend 10 m in -x, +x, -z, and +z) [cm]
     sqlite3* fdb[5]; ///< Pointers to sqlite3 database object, max of 5
     double fRandomXZShift=0.; ///< Each shower will be shifted by a random amount in xz so that showers won't repeatedly sample the same space [cm]
-    bool fDualphase; //is dualphase?
+    bool fDoRotation; //do rotation?
+    bool fUseIFDH; ///<< use ifdh protocol?
 
   };
 }
@@ -100,7 +107,8 @@ namespace evgendp{
 namespace evgendp{
 
   CORSIKAGendp::CORSIKAGendp(fhicl::ParameterSet const& p)
-    : fProjectToHeight(p.get< double >("ProjectToHeight",0.)),
+    : EDProducer{p},
+      fProjectToHeight(p.get< double >("ProjectToHeight",0.)),
       fShowerInputFiles(p.get< std::vector< std::string > >("ShowerInputFiles")),
       fShowerFluxConstants(p.get< std::vector< double > >("ShowerFluxConstants")),
       fSampleTime(p.get< double >("SampleTime",0.)),
@@ -108,7 +116,8 @@ namespace evgendp{
       fBuffBox(p.get< std::vector< double > >("BufferBox",{0.0, 0.0, 0.0, 0.0, 0.0, 0.0})),
       fShowerAreaExtension(p.get< double >("ShowerAreaExtension",0.)),
       fRandomXZShift(p.get< double >("RandomXZShift",0.)),
-      fDualphase(p.get< bool >("DoRotation"))
+      fDoRotation(p.get< bool >("DoRotation")),
+      fUseIFDH(p.get< bool >("UseIFDH"))
   {
 
     if(fShowerInputFiles.size() != fShowerFluxConstants.size() || fShowerInputFiles.size()==0 || fShowerFluxConstants.size()==0)
@@ -126,7 +135,7 @@ namespace evgendp{
 
     this->reconfigure(p);
 
-    this->openDBs();
+    this->openDBs(p.get<std::string>("module_label"));
     this->populateNShowers();
     this->populateTOffset();
 
@@ -195,20 +204,24 @@ namespace evgendp{
 
   }
 
-  void CORSIKAGendp::openDBs(){
+  void CORSIKAGendp::openDBs(std::string const& module_label){
     //choose files based on fShowerInputFiles, copy them with ifdh, open them
     //sqlite3_stmt *statement;
     //get rng engine
     art::ServiceHandle<art::RandomNumberGenerator> rng;
-    CLHEP::HepRandomEngine &engine = rng->getEngine("gen");
+    CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
+                                                    module_label,
+						    "gen");
     CLHEP::RandFlat flat(engine);
 
     //setup ifdh object
-    if ( ! fIFDH ) fIFDH = new ifdh_ns::ifdh;
-    const char* ifdh_debug_env = std::getenv("IFDH_DEBUG_LEVEL");
-    if ( ifdh_debug_env ) {
-      mf::LogInfo("CORSIKAGendp") << "IFDH_DEBUG_LEVEL: " << ifdh_debug_env<<"\n";
-      fIFDH->set_debug(ifdh_debug_env);
+    if(fUseIFDH){
+      if ( ! fIFDH ) fIFDH = new ifdh_ns::ifdh;
+      const char* ifdh_debug_env = std::getenv("IFDH_DEBUG_LEVEL");
+      if ( ifdh_debug_env ) {
+        mf::LogInfo("CORSIKAGendp") << "IFDH_DEBUG_LEVEL: " << ifdh_debug_env<<"\n";
+        fIFDH->set_debug(ifdh_debug_env);
+      }
     }
 
     //get ifdh path for each file in fShowerInputFiles, put into selectedflist
@@ -216,60 +229,101 @@ namespace evgendp{
     //if >1 file returned, randomly select one file
     //if 0 returned, make exeption for missing files
     std::vector<std::pair<std::string,long>> selectedflist;
-    for(int i=0; i<fShowerInputs; i++){
-      if(fShowerInputFiles[i].find("*")==std::string::npos){
+    for(int i=0; i<fShowerInputs; i++)
+    {
+      if(fShowerInputFiles[i].find("*")==std::string::npos)
+      {
         //if there are no wildcards, don't call findMatchingFiles
         selectedflist.push_back(std::make_pair(fShowerInputFiles[i],0));
         mf::LogInfo("CorsikaGendp") << "Selected"<<selectedflist.back().first<<"\n";
-	  }else{
+      }
+      else
+      {
         //use findMatchingFiles
         std::vector<std::pair<std::string,long>> flist;
-		std::string path(gSystem->DirName(fShowerInputFiles[i].c_str()));
-		std::string pattern(gSystem->BaseName(fShowerInputFiles[i].c_str()));
-    //pattern="/"+pattern;
+	std::string path(gSystem->DirName(fShowerInputFiles[i].c_str()));
+	std::string pattern(gSystem->BaseName(fShowerInputFiles[i].c_str()));
+        //pattern="/"+pattern;
+        std::cout << path << " " << pattern << std::endl;
 
+	if(fUseIFDH)
+	{
+	  //acess the files using ifdh
+	  flist = fIFDH->findMatchingFiles(path,pattern);
+	}
+	else
+	{
+          //access the files using drent
+          auto wildcardPosition = pattern.find("*");
+          pattern = pattern.substr( 0, wildcardPosition );
 
-    std::cout << path << " " << pattern << std::endl;
+          DIR *dir;
+          struct dirent *ent;
+          int index=0;
+          if ((dir = opendir( path.c_str() )) != NULL)
+	  {
+            while ((ent = readdir (dir)) != NULL)
+	    {
+	      index++;
+	      std::pair<std::string,long> name;
+	      std::string parsename(ent->d_name);
 
-		flist = fIFDH->findMatchingFiles(path,pattern);
-		unsigned int selIndex=-1;
-		if(flist.size()==1){ //0th element is the search path:pattern
-			selIndex=0;
-		}else if(flist.size()>1){
-			selIndex= (unsigned int) (flat()*(flist.size()-1)+0.5); //rnd with rounding, dont allow picking the 0th element
-		}else{
-			throw cet::exception("CORSIKAGendp") << "No files returned for path:pattern: "<<path<<":"<<pattern<<std::endl;
-		}
+              if( parsename.substr(0, wildcardPosition) == pattern )
+	      {
+		name.first= path+"/"+parsename;
+		name.second = index;
+		flist.push_back( name );
+	      }
+	    }
+            closedir (dir);
+	  }
+	  else
+	  {
+	    throw cet::exception("Gen311") << "Can't open directory with pattern: "<<path<<":"<<pattern<<std::endl;
+	  }
+	}
 
-		selectedflist.push_back(flist[selIndex]);
-		mf::LogInfo("CorsikaGendp") << "For "<<fShowerInputFiles[i]<<":"<<pattern
+	unsigned int selIndex=-1;
+	if(flist.size()==1) //0th element is the search path:pattern
+	{
+	  selIndex=0;
+	}
+	else if(flist.size()>1)
+	{
+	  selIndex= (unsigned int) (flat()*(flist.size()-1)+0.5); //rnd with rounding, dont allow picking the 0th element
+	}
+	else
+	{
+	  throw cet::exception("CORSIKAGendp") << "No files returned for path:pattern: "<<path<<":"<<pattern<<std::endl;
+	}
+
+	selectedflist.push_back(flist[selIndex]);
+	mf::LogInfo("CorsikaGendp") << "For "<<fShowerInputFiles[i]<<":"<<pattern
         <<"\nFound "<< flist.size() << " candidate files"
 	<<"\nChoosing file number "<< selIndex << "\n"
         <<"\nSelected "<<selectedflist.back().first<<"\n";
-     }
-
-    }
-
-    //do the fetching, store local filepaths in locallist
-    std::vector<std::string> locallist;
-    for(unsigned int i=0; i<selectedflist.size(); i++){
-      mf::LogInfo("CorsikaGendp")
-        << "Fetching: "<<selectedflist[i].first<<" "<<selectedflist[i].second<<"\n";
-      std::string fetchedfile(fIFDH->fetchInput(selectedflist[i].first));
-      LOG_DEBUG("CorsikaGendp") << "Fetched; local path: "<<fetchedfile;
-      locallist.push_back(fetchedfile);
+      }
     }
 
     //open the files in fShowerInputFilesLocalPaths with sqlite3
+    std::vector<std::string> locallist;
+    for(unsigned int i=0; i<selectedflist.size(); i++){
+      mf::LogInfo("Gen311")
+        << "Fetching: "<<selectedflist[i].first<<" "<<selectedflist[i].second<<"\n";
+      std::string fetchedfile(selectedflist[i].first);
+      LOG_DEBUG("Gen311") << "Fetched; local path: "<<fetchedfile;
+      locallist.push_back(fetchedfile);
+    }
+
     for(unsigned int i=0; i<locallist.size(); i++){
       //prepare and execute statement to attach db file
       int res=sqlite3_open(locallist[i].c_str(),&fdb[i]);
       if (res!= SQLITE_OK)
-        throw cet::exception("CORSIKAGendp") << "Error opening db: (" <<locallist[i].c_str()<<") ("<<res<<"): " << sqlite3_errmsg(fdb[i]) << "; memory used:<<"<<sqlite3_memory_used()<<"/"<<sqlite3_memory_highwater(0)<<"\n";
+        throw cet::exception("Gen311") << "Error opening db: (" <<locallist[i].c_str()<<") ("<<res<<"): " << sqlite3_errmsg(fdb[i]) << "; memory used:<<"<<sqlite3_memory_used()<<"/"<<sqlite3_memory_highwater(0)<<"\n";
       else
-        mf::LogInfo("CORSIKAGendp")<<"Attached db "<< locallist[i]<<"\n";
+        mf::LogInfo("Gen311")<<"Attached db "<< locallist[i]<<"\n";
     }
-  }
+  }//end openDBs
 
   double CORSIKAGendp::wrapvar( const double var, const double low, const double high){
     //wrap variable so that it's always between low and high
@@ -412,10 +466,15 @@ namespace evgendp{
 
     //get rng engine
     art::ServiceHandle<art::RandomNumberGenerator> rng;
-    CLHEP::HepRandomEngine &engine = rng->getEngine("gen");
+    auto const& module_label = moduleDescription().moduleLabel();
+    CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
+                                                    module_label,
+						    "gen");
     CLHEP::RandFlat flat(engine);
 
-    CLHEP::HepRandomEngine &engine_pois = rng->getEngine("pois");
+    CLHEP::HepRandomEngine &engine_pois = rng->getEngine(art::ScheduleID::first(),
+                                                         module_label,
+							 "pois");
     CLHEP::RandPoissonQ randpois(engine_pois);
 
     // get geometry and figure where to project particles to, based on CRYHelper
@@ -435,7 +494,7 @@ namespace evgendp{
     z1 += fBoxDelta;
     z2 -= fBoxDelta;
 
-    if(fDualphase)
+    if(fDoRotation)
     {
       geom->WorldBox(&y1, &y2, &x1, &x2, &z1, &z2);
       y1 += fBoxDelta;
@@ -492,7 +551,7 @@ namespace evgendp{
 
               //Note: position/momentum in db have north=-x and west=+z, rotate so that +z is north and +x is west
               //get momentum components
-              if(fDualphase)
+              if(fDoRotation)
               {
                 py = sqlite3_column_double(statement,4);
                 px=sqlite3_column_double(statement,3);
@@ -507,7 +566,7 @@ namespace evgendp{
 
               //get/calculate position components
               int boxnoX=0,boxnoZ=0;
-              if(fDualphase) y = wrapvarBoxNo(sqlite3_column_double(statement,6)+showerXOffset,fShowerBounds[0],fShowerBounds[1],boxnoX);
+              if(fDoRotation) y = wrapvarBoxNo(sqlite3_column_double(statement,6)+showerXOffset,fShowerBounds[0],fShowerBounds[1],boxnoX);
               else x=wrapvarBoxNo(sqlite3_column_double(statement,6)+showerXOffset,fShowerBounds[0],fShowerBounds[1],boxnoX);
               z=wrapvarBoxNo(-sqlite3_column_double(statement,5)+showerZOffset,fShowerBounds[4],fShowerBounds[5],boxnoZ);
               tParticleTime=sqlite3_column_double(statement,7); //time offset, includes propagation time from top of atmosphere
@@ -525,7 +584,7 @@ namespace evgendp{
               //project back to wordvol/fProjectToHeight
               double xyzo[3];
               double x0[3];
-              if(fDualphase){
+              if(fDoRotation){
                  x0[0]=fShowerBounds[3];
                  x0[1]=y;
                  x0[2]=z;
@@ -539,7 +598,7 @@ namespace evgendp{
               double dx[3]={px,py,pz};
 
           // non pare funzionare molto bene...
-          //    if(fDualphase)
+          //    if(fDoRotation)
           //   {
                 //add an additional rotation to this vectors to match the DP geom: x'=y x and y'=-x (90^ rotation)
               //  this->DoRotation(x0);
