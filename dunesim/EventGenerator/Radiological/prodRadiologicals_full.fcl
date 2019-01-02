@@ -50,7 +50,7 @@ physics:
   }
  
   # Define the producer and filter modules for this path, order matters, 
-  simulate:      [ rns, ar39Gen, fcGen, rnGen, krGen, poGen, cpaGen, apaGen ]
+  simulate:      [ rns, ar39Gen, neutronGen, rnGen, krGen, poGen, cpaGen, apaGen ]
   
   # Define the output stream, there could be more than one if using filters 
   stream1:       [ out1 ]

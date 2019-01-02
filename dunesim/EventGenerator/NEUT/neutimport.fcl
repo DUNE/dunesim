@@ -4,9 +4,13 @@ standard_neutimport:
 {
   module_type: "NEUTImport"
 
-  P0:             10.
-  SigmaP:         5.
-  FileName:       "/eos/user/a/ascarpel/selectedTrack/run840to842_subrun0to117_50cm_selected_tracks.txt"
+  LogLevel:		0
+  StartEvent:		0
+  NumberOfEvents:	100
+  StartPositionX:	0.
+  StartPositionY:	 0.
+  StartPositionZ:	150.
+  FileName:		"/eos/user/c/chalt/NucleonDecay/ProtonToKaonToMuon/v0/LArSoft/FullSimulation/rootracker_K+_antinu_300k.root"
 }
 
 END_PROLOG

@@ -3,22 +3,23 @@ BEGIN_PROLOG
 standard_CORSIKAGendp_protons:
 {
  module_type:         "CORSIKAGendp"
- SampleTime:           8.0e-3               #integration time in seconds
- TimeOffset:          -4.0e-3             #time in seconds before a spill to begin the interactions, -1.6e-3 (TPC Trig. offset) - 0.2e-3 (g4 rise time)
+ SampleTime:           8.0e-3              #integration time in seconds
+ TimeOffset:          -4.0e-3              #time in seconds before a spill to begin the interactions, -1.6e-3 (TPC Trig. offset) - 0.2e-3 (g4 rise time)
  ProjectToHeight:      856                 #height to which particles are projected [cm]
  ShowerInputFiles:     [ "/pnfs/dune/persistent/users/mibass/corsika/sqShowers/DAT1*.db" ]
- ShowerFluxConstants:  [ 1.8e4 ]            #list of flux constants per shower file
+ ShowerFluxConstants:  [ 1.8e4 ]           #list of flux constants per shower file
  BufferBox:            [ -250.0,250.0,-250.0,250.0,-250.0,250.0 ] #list of buffer box extensions to cryo volume in each dimension/dir (-x,+x,-y,+y,-z,+z)
- ShowerAreaExtension:  2000                 #amount to extend the shower area beyond the cryo dimensions
- RandomXZShift:        1000                 #amount to randomly shift shower start point in x & z [cm]
- DoRotation:           true                #perform flux rotation for DP
+ ShowerAreaExtension:  2000                #amount to extend the shower area beyond the cryo dimensions
+ RandomXZShift:        1000                #amount to randomly shift shower start point in x & z [cm]
+ DoRotation:           true                #perform flux rotation for DP with drift in X
+ UseIFDH:              false               #true for jobs at FNAL, false for jobs at CERN
 }
 
 standard_CORSIKAGendp_CMC:
 {
  module_type:         "CORSIKAGendp"
- SampleTime:           8.0e-3               #integration time in seconds
- TimeOffset:          -4.0e-3             #time in seconds before a spill to begin the interactions, -1.6e-3 (TPC Trig. offset) - 0.2e-3 (g4 rise time)
+ SampleTime:           8.0e-3              #integration time in seconds
+ TimeOffset:          -4.0e-3              #time in seconds before a spill to begin the interactions, -1.6e-3 (TPC Trig. offset) - 0.2e-3 (g4 rise time)
  ProjectToHeight:      856                 #height to which particles are projected [cm]
  ShowerInputFiles:     [
                           "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/p_showers_*db",
@@ -29,10 +30,10 @@ standard_CORSIKAGendp_CMC:
                         ] #list of sqlite dbs with corsika showers
  ShowerFluxConstants:  [ 1.72e4, 9.2e3, 6.2e3, 9.2e3, 6.2e3] #list of flux constants per shower file
  BufferBox:            [ -300.0, 300.0, -300.0, 300.0, -300.0, 300.0 ] #list of buffer box extensions to cryo volume in each dimension/dir (-x,+x,-y,+y,-z,+z)
- ShowerAreaExtension:  2000                 #amount to extend the shower area beyond the cryo dimensions
- RandomXZShift:        1000                 #amount to randomly shift shower start point in x & z [cm]
- DoRotation: 	         true
-
+ ShowerAreaExtension:  2000                #amount to extend the shower area beyond the cryo dimensions
+ RandomXZShift:        1000                #amount to randomly shift shower start point in x & z [cm]
+ DoRotation: 	       true		   #perform flux rotation for DP with drift in X
+ UseIFDH:              false                #true for jobs at FNAL, false for jobs at CERN
 }
 
 standard_311_trigger:
@@ -62,11 +63,14 @@ standard_311_fake_data:
 {
   module_type: "DataGen311"
 
-  EventsToProcess:100
-  StartEvent:     3000
-  PDG:            13
-  TrackFile:      "/eos/user/a/ascarpel/selectedTrack/run840to842_subrun0to117_50cm_selected_tracks.txt"
-  HistFile:       "/eos/user/a/amedcalf/corsika_hist/corsika_hist.root"
+  EventsToProcess:	100
+  StartEvent:     	3000
+  PDG:            	13
+  GetEnergyFromCORSIKA: true  # Get particle energy from CORSIKA histograms
+  UniformEnergyMin:	1     # Minimum particle energy when GetEnergyFromCORSIKA = false. Particle energy is uniformly distributed between FixedEnergyMin and FixedEnergyMax.
+  UniformEnergyMax:	1     # Maximum particle energy when GetEnergyFromCORSIKA = false. Particle energy is uniformly distributed between FixedEnergyMin and FixedEnergyMax.
+  TrackFile:      	"/eos/user/a/ascarpel/selectedTrack/run840to842_subrun0to117_50cm_selected_tracks.txt"
+  HistFile:       	"/eos/user/a/amedcalf/corsika_hist/corsika_hist.root"
 }
 
 END_PROLOG

@@ -144,6 +144,21 @@ namespace evgendp{
         Comment("Particle PDG code")
       };
 
+      fhicl::Atom<bool> GetEnergyFromCORSIKA{
+        Name("GetEnergyFromCORSIKA"),
+        Comment("true: read particle energy from CORSIKA histograms as a fucntion of azimuth angle")
+      };
+
+      fhicl::Atom<double> UniformEnergyMin{
+        Name("UniformEnergyMin"),
+        Comment("Minimum particle energy")
+      };
+
+      fhicl::Atom<double> UniformEnergyMax{
+        Name("UniformEnergyMax"),
+        Comment("Maximum particle energy")
+      };
+
       fhicl::Atom<std::string> TrackFile{
         Name("TrackFile"),
         Comment("Track list")
@@ -172,6 +187,9 @@ namespace evgendp{
     int fEventsToProcess;
     int fStartEvent;
     int fPDG;
+    bool fGetEnergyFromCORSIKA;
+    double fUniformEnergyMin;
+    double fUniformEnergyMax;
     std::string fTrackFile;
     std::string fHistFile;
 
@@ -184,12 +202,15 @@ namespace evgendp{
 ////////////////////////////////////////////////////////////////////////////////
 
 evgendp::DataGen311::DataGen311(Parameters const& config)
- :
-   fEventsToProcess (config().EventsToProcess()),
-   fStartEvent      (config().StartEvent()),
-   fPDG             (config().PDG()),
-   fTrackFile       (config().TrackFile()),
-   fHistFile        (config().HistFile())
+ : EDProducer{config},
+   fEventsToProcess 		(config().EventsToProcess()),
+   fStartEvent      		(config().StartEvent()),
+   fPDG             		(config().PDG()),
+   fGetEnergyFromCORSIKA	(config().GetEnergyFromCORSIKA()),
+   fUniformEnergyMin		(config().UniformEnergyMin()),
+   fUniformEnergyMax		(config().UniformEnergyMax()),
+   fTrackFile       		(config().TrackFile()),
+   fHistFile        		(config().HistFile())
 {
     art::ServiceHandle<rndm::NuRandomService>()->createEngine(*this);
     //art::ServiceHandle<rndm::NuRandomService>()->createEngine(*this, "HepJamesRandom", "gen", p, { "Seed", "SeedGenerator" });
@@ -203,6 +224,9 @@ evgendp::DataGen311::DataGen311(Parameters const& config)
 
 
 void evgendp::DataGen311::beginJob(){
+
+  //Random number generator for particle energy
+  gRandom = new TRandom3();
 
   //read the files and store the information on the map
   std::ifstream trackfile;
@@ -245,20 +269,31 @@ void evgendp::DataGen311::beginJob(){
     track->startDirectionY /= sdirmag;
     track->startDirectionZ /= sdirmag;
 
-    // Theta from +X to -X
-    double theta = acos(track->startDirectionX);
 
-    int biny = hEnergyTheta->GetYaxis()->FindBin(theta);
-    TH1D *hEnergyAtTheta = hEnergyTheta->ProjectionX("", biny, biny);
+    if(fGetEnergyFromCORSIKA)
+    {
+      // Theta from +X to -X
+      double theta = acos(track->startDirectionX);
 
-    if( hEnergyAtTheta->GetEntries() < 1 ){
-      skippedTrackCounter++;
-      delete track;
-      continue;
+      int biny = hEnergyTheta->GetYaxis()->FindBin(theta);
+      TH1D *hEnergyAtTheta = hEnergyTheta->ProjectionX("", biny, biny);
+
+      if( hEnergyAtTheta->GetEntries() < 1 ){
+        skippedTrackCounter++;
+        delete track;
+        continue;
+      }
+
+      track->energy = hEnergyAtTheta->GetRandom();
     }
-
-    double energy = hEnergyAtTheta->GetRandom();
-    track->energy = energy;
+    else if(fUniformEnergyMin == fUniformEnergyMax) //get energy from .fcl parameter
+    {
+      track->energy = fUniformEnergyMin;
+    }  
+    else //get energy from .fcl parameter
+    {
+      track->energy = gRandom->Uniform(fUniformEnergyMin, fUniformEnergyMax);
+    }
 
     if( track->event != eventBefore ){
       eventBefore = track->event;
@@ -279,7 +314,8 @@ void evgendp::DataGen311::beginJob(){
 
 void evgendp::DataGen311::produce(art::Event & e){
   art::ServiceHandle<art::RandomNumberGenerator> rng;
-  CLHEP::HepRandomEngine &engine = rng->getEngine();
+  CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
+                                                  moduleDescription().moduleLabel());
   CLHEP::RandFlat flat(engine);
 
   std::unique_ptr< std::vector<simb::MCTruth> > truthcol(new std::vector<simb::MCTruth>);
