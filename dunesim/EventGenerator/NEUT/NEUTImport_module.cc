@@ -3,8 +3,13 @@
 // Module Type: producer
 // File:        NEUTImport_module.cc
 //
-// Get input list of selected reco track, generates primary MCParticles
-// matching each of them
+// author: Christoph Alt
+// email: christoph.alt@cern.ch
+//
+// Reads in events from NeutToRooTracker files and generates art events,
+// selecting final state particles only.
+// NeutToRooTracker: https://github.com/luketpickering/NeutToRooTracker (by Luke Pickering)
+// 
 ////////////////////////////////////////////////////////////////////////
 
 // ROOT includes
@@ -235,7 +240,9 @@ void evgendp::NEUTImport::beginJob(){
 
     for(int j=0; j<tStdHepN; j++)
     {
-      if( tStdHepPdg[j]!=0 && tStdHepStatus[j] == 1 && std::abs(tStdHepP4[4*j]) + std::abs(tStdHepP4[4*j+1]) + std::abs(tStdHepP4[4*j+2]) > 0 )
+      //Only take particles with real PDG code (!=0), status 1 and momentum > 0.
+      //Also ignore first particle (j=0): this is the decaying nucleon in case of nucleon decay or incoming neutrino in case of atmospheric neutrino background.
+      if( tStdHepPdg[j]!=0 && tStdHepStatus[j] == 1 && j>0 && std::abs(tStdHepP4[4*j]) + std::abs(tStdHepP4[4*j+1]) + std::abs(tStdHepP4[4*j+2]) > 0 )
       {
     	static TDatabasePDG  pdgt;
     	TParticlePDG* pdgp = pdgt.GetParticle(tStdHepPdg[j]);
