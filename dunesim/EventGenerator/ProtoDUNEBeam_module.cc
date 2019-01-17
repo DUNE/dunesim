@@ -923,7 +923,7 @@ void evgen::ProtoDUNEBeam::OpenInputFile()
         mf::LogInfo("ProtoDUNEBeam")
         << "Fetching: " << f.first << " " << f.second <<"\n";
         std::string fetchedfile(fIFDH->fetchInput(f.first));
-        LOG_DEBUG("ProtoDUNEBeam") << " Fetched; local path: " << fetchedfile;
+        MF_LOG_DEBUG("ProtoDUNEBeam") << " Fetched; local path: " << fetchedfile;
         
         fFileName = fetchedfile;
     }
