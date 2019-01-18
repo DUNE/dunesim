@@ -1,7 +1,10 @@
 art_make( NO_PLUGINS
           
           LIB_LIBRARIES
+          				lardataobj_RecoBase
                         lardata_Utilities
+                         lardataalg_DetectorInfo
+              larevt_SpaceCharge
 			larcorealg_Geometry
                         ${MF_MESSAGELOGGER}
                         

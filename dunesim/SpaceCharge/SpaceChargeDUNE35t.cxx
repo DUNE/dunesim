@@ -34,6 +34,8 @@ bool spacecharge::SpaceChargeDUNE35t::Configure(fhicl::ParameterSet const& pset)
 {  
   fEnableSimSpatialSCE = pset.get<bool>("EnableSimSpatialSCE");
   fEnableSimEfieldSCE = pset.get<bool>("EnableSimEfieldSCE");
+  fEnableCalSpatialSCE = pset.get<bool>("EnableCalSpatialSCE");
+  fEnableCalEfieldSCE = pset.get<bool>("EnableCalEfieldSCE");
   fEnableCorrSCE = pset.get<bool>("EnableCorrSCE");
 
   if((fEnableSimSpatialSCE == true) || (fEnableSimEfieldSCE == true))
@@ -170,6 +172,18 @@ bool spacecharge::SpaceChargeDUNE35t::EnableCorrSCE() const
   return fEnableCorrSCE;
 }
 
+/// Return boolean indicating whether or not to apply SCE corrections
+bool spacecharge::SpaceChargeDUNE35t::EnableCalSpatialSCE() const
+{
+  return fEnableCalSpatialSCE;
+}
+
+/// Return boolean indicating whether or not to apply SCE corrections
+bool spacecharge::SpaceChargeDUNE35t::EnableCalEfieldSCE() const
+{
+  return fEnableCalEfieldSCE;
+}
+
 //----------------------------------------------------------------------------
 /// Primary working method of service that provides position offsets to be
 /// used in ionization electron drift
@@ -190,6 +204,12 @@ geo::Vector_t spacecharge::SpaceChargeDUNE35t::GetPosOffsets(geo::Point_t const&
   }
 
   return { thePosOffsets[0], thePosOffsets[1], thePosOffsets[2] };
+}
+
+geo::Vector_t spacecharge::SpaceChargeDUNE35t::GetCalPosOffsets(geo::Point_t const& point) const
+{
+
+  return { 0.0, 0.0, 0.0 };
 }
 
 //----------------------------------------------------------------------------
@@ -349,6 +369,11 @@ geo::Vector_t spacecharge::SpaceChargeDUNE35t::GetEfieldOffsets(geo::Point_t con
   }
 
   return { theEfieldOffsets[0], theEfieldOffsets[1], theEfieldOffsets[2] };
+}
+
+geo::Vector_t spacecharge::SpaceChargeDUNE35t::GetCalEfieldOffsets(geo::Point_t const& point) const
+{
+  return { 0.0, 0.0, 0.0 };
 }
 
 //----------------------------------------------------------------------------
