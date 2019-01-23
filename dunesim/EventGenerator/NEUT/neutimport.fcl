@@ -4,13 +4,14 @@ standard_neutimport:
 {
   module_type: "NEUTImport"
 
-  LogLevel:		0
-  StartEvent:		0
-  NumberOfEvents:	100
-  StartPositionX:	0.
-  StartPositionY:	 0.
-  StartPositionZ:	150.
-  FileName:		"/eos/user/c/chalt/NucleonDecay/ProtonToKaonToMuon/v0/LArSoft/FullSimulation/rootracker_K+_antinu_300k.root"
+  LogLevel:			0
+  StartEvent:			0
+  NumberOfEvents:		100
+  StartPositionX:		0.
+  StartPositionY:	 	0.
+  StartPositionZ:		150.
+  FileName:			"/eos/user/c/chalt/NucleonDecay/ProtonToKaonToMuon/v0/LArSoft/FullSimulation/rootracker_K+_antinu_300k.root"
+  UseRotatedStartMomentum: 	false
 }
 
 END_PROLOG
