@@ -39,13 +39,9 @@
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "art/Framework/Services/Optional/TFileDirectory.h"
-#include "art/Framework/Services/Optional/RandomNumberGenerator.h"
 #include "art/Framework/Core/ModuleMacros.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 #include "cetlib_except/exception.h"
-
-// art extensions
-#include "nutools/RandomUtils/NuRandomService.h"
 
 // nutools includes
 #include "nusimdata/SimulationBase/MCTruth.h"
@@ -56,8 +52,6 @@
 #include "larcore/Geometry/Geometry.h"
 #include "larcoreobj/SummaryData/RunData.h"
 #include "TDatabasePDG.h"
-
-#include "CLHEP/Random/RandFlat.h"
 
 #include <stdio.h>
 #include <iostream>
@@ -70,14 +64,8 @@ namespace evgendp{
 
   //----------------------------------------------------------------------------
 
-  class RooTrackerParticle{
+  struct RooTrackerParticle{
     //holds RooTrackerParticle input parameters from file
-
-  public:
-
-      RooTrackerParticle();
-      ~RooTrackerParticle();
-
       TLorentzVector getPosition();
       TLorentzVector getMomentum();
 
@@ -92,21 +80,14 @@ namespace evgendp{
       double momZ;
       double energy;
 
-  }; //end class RooTrackerParticle
-
-  RooTrackerParticle::RooTrackerParticle(){
-
-  }
-  RooTrackerParticle::~RooTrackerParticle(){}
+  }; //end struct RooTrackerParticle
 
   TLorentzVector RooTrackerParticle::getPosition(){
-    TLorentzVector position(startX, startY, startZ, 0);
-    return position;
+    return TLorentzVector(startX, startY, startZ, 0);
   }
 
   TLorentzVector RooTrackerParticle::getMomentum(){
-    TLorentzVector momentum( 0.001*momX, 0.001*momY, 0.001*momZ, 0.001*energy );
-    return momentum;
+    return TLorentzVector( 0.001*momX, 0.001*momY, 0.001*momZ, 0.001*energy );
   }
 
   //----------------------------------------------------------------------------
@@ -204,9 +185,6 @@ evgendp::NEUTImport::NEUTImport(Parameters const& config)
    fFileName			(config().FileName()),
    fUseRotatedStartMomentum	(config().UseRotatedStartMomentum())
 {
-    art::ServiceHandle<rndm::NuRandomService>()->createEngine(*this);
-    //art::ServiceHandle<rndm::NuRandomService>()->createEngine(*this, "HepJamesRandom", "gen", p, { "Seed", "SeedGenerator" });
-
     produces< std::vector<simb::MCTruth> >();
     produces< sumdata::RunData, art::InRun >();
 }
@@ -309,13 +287,6 @@ void evgendp::NEUTImport::beginJob(){
 ////////////////////////////////////////////////////////////////////////////////
 
 void evgendp::NEUTImport::produce(art::Event & e){
-
-
-  art::ServiceHandle<art::RandomNumberGenerator> rng;
-  CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
-                                                  moduleDescription().moduleLabel());
-  CLHEP::RandFlat flat(engine);
-
   std::unique_ptr< std::vector<simb::MCTruth> > truthcol(new std::vector<simb::MCTruth>);
 
   simb::MCTruth truth;
