@@ -260,10 +260,10 @@ namespace evgendp{
       fUseIFDH(p.get< bool >("UseIFDH")),
       // create a default random engine; obtain the random seed from NuRandomService,
       // unless overridden in configuration with key "Seed"
-      fGenEngine{art::ServiceHandle<rndm::NuRandomService>()
-                 ->createEngine(*this, "HepJamesRandom", "gen", p, { "Seed", "SeedGenerator" })},
-      fPoisEngine{art::ServiceHandle<rndm::NuRandomService>()
-                  ->createEngine(*this, "HepJamesRandom", "pois", p, "SeedPoisson")}
+      fGenEngine(art::ServiceHandle<rndm::NuRandomService>()
+                 ->createEngine(*this, "HepJamesRandom", "gen", p, { "Seed", "SeedGenerator" })),
+      fPoisEngine(art::ServiceHandle<rndm::NuRandomService>()
+                  ->createEngine(*this, "HepJamesRandom", "pois", p, "SeedPoisson"))
    {
 
     if(fShowerInputFiles.size() != fShowerFluxConstants.size() || fShowerInputFiles.size()==0 || fShowerFluxConstants.size()==0)
