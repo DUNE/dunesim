@@ -39,7 +39,6 @@ bool spacecharge::SpaceChargeProtoDUNE::Configure(fhicl::ParameterSet const& pse
   fEnableSimEfieldSCE = pset.get<bool>("EnableSimEfieldSCE");
   fEnableCalSpatialSCE = pset.get<bool>("EnableCalSpatialSCE");
   fEnableCalEfieldSCE = pset.get<bool>("EnableCalEfieldSCE");
-  fEnableCorrSCE = pset.get<bool>("EnableCorrSCE");
   
   //auto const *detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
   fEfield = detprop->Efield();
@@ -266,12 +265,68 @@ bool spacecharge::SpaceChargeProtoDUNE::Configure(fhicl::ParameterSet const& pse
     
     std::string fname;
     cet::search_path sp("FW_SEARCH_PATH");
-    sp.find_file(fInputFilename,fname);
+    sp.find_file(fCalInputFilename,fname);
     
     std::unique_ptr<TFile> infile(new TFile(fname.c_str(), "READ"));
     if(!infile->IsOpen()) throw cet::exception("SpaceChargeProtoDUNE") << "Could not find the space charge effect file '" << fname << "'!\n";
   
-      if (fRepresentationType == "Voxelized_TH3") { 
+   if (fRepresentationType == "Voxelized") {
+    
+      //Load files and read in trees
+      if (fCalInputFilename.find("NegX")<fCalInputFilename.length()){
+        
+        TTree* treeD_negX = (TTree*)infile->Get("SpaCEtree_bkwdDisp");
+        TTree* treeE_negX = (TTree*)infile->Get("SpaCEtree");
+        
+        fCalInputFilename.replace(fCalInputFilename.find("NegX"),3,"Pos");
+        
+        std::string fname2;
+        sp.find_file(fCalInputFilename,fname2);
+        std::unique_ptr<TFile> infile2(new TFile(fname2.c_str(), "READ"));
+        if(!infile2->IsOpen()) throw cet::exception("SpaceChargeProtoDUNE") << "Could not find the space charge effect file '" << fname2 << "'!\n";
+        
+        TTree* treeD_posX = (TTree*)infile2->Get("SpaCEtree_bkwdDisp");
+        TTree* treeE_posX = (TTree*)infile2->Get("SpaCEtree");
+        
+        CalSCEhistograms_negX = Build_TH3(treeD_negX,treeE_negX,"x_reco","y_reco","z_reco","bkwd");
+        CalSCEhistograms_posX = Build_TH3(treeD_posX,treeE_posX,"x_reco","y_reco","z_reco","bkwd");
+        
+        infile2->Close();
+      
+      }else if (fCalInputFilename.find("PosX")<fCalInputFilename.length()){
+      
+        TTree* treeD_posX = (TTree*)infile->Get("SpaCEtree_bkwdDisp");
+        TTree* treeE_posX = (TTree*)infile->Get("SpaCEtree");
+        
+        fCalInputFilename.replace(fCalInputFilename.find("PosX"),3,"Neg");
+        
+        std::string fname2;
+        sp.find_file(fCalInputFilename,fname2);
+        std::unique_ptr<TFile> infile2(new TFile(fname2.c_str(), "READ"));
+        if(!infile2->IsOpen()) throw cet::exception("SpaceChargeProtoDUNE") << "Could not find the space charge effect file '" << fname2 << "'!\n";
+        
+        TTree* treeD_negX = (TTree*)infile2->Get("SpaCEtree_bkwdDisp");
+        TTree* treeE_negX = (TTree*)infile2->Get("SpaCEtree");
+      
+        CalSCEhistograms_negX = Build_TH3(treeD_negX,treeE_negX,"x_reco","y_reco","z_reco","bkwd");
+        CalSCEhistograms_posX = Build_TH3(treeD_posX,treeE_posX,"x_reco","y_reco","z_reco","bkwd");
+        
+        infile2->Close();
+      
+      }else{
+      
+        TTree* treeD_negX = (TTree*)infile->Get("SpaCEtree_bkwdDisp");
+        TTree* treeE_negX = (TTree*)infile->Get("SpaCEtree");
+               
+        TTree* treeD_posX = (TTree*)infile->Get("SpaCEtree_bkwdDisp");
+        TTree* treeE_posX = (TTree*)infile->Get("SpaCEtree");
+        
+        CalSCEhistograms_negX = Build_TH3(treeD_negX,treeE_negX,"x_reco","y_reco","z_reco","bkwd");
+        CalSCEhistograms_posX = Build_TH3(treeD_posX,treeE_posX,"x_reco","y_reco","z_reco","bkwd");
+      
+      }
+      
+    } else if (fRepresentationType == "Voxelized_TH3") { 
    
       if(fCalInputFilename.find("NegX")<fCalInputFilename.length()){
       	//Load in files
@@ -345,63 +400,7 @@ bool spacecharge::SpaceChargeProtoDUNE::Configure(fhicl::ParameterSet const& pse
       
       }
     
-   } else if (fRepresentationType == "Voxelized") {
-    
-      //Load files and read in trees
-      if (fCalInputFilename.find("NegX")<fCalInputFilename.length()){
-        
-        TTree* treeD_negX = (TTree*)infile->Get("SpaCEtree_bkwdDisp");
-        TTree* treeE_negX = (TTree*)infile->Get("SpaCEtree");
-        
-        fCalInputFilename.replace(fCalInputFilename.find("NegX"),3,"Pos");
-        
-        std::string fname2;
-        sp.find_file(fCalInputFilename,fname2);
-        std::unique_ptr<TFile> infile2(new TFile(fname2.c_str(), "READ"));
-        if(!infile2->IsOpen()) throw cet::exception("SpaceChargeProtoDUNE") << "Could not find the space charge effect file '" << fname2 << "'!\n";
-        
-        TTree* treeD_posX = (TTree*)infile2->Get("SpaCEtree_bkwdDisp");
-        TTree* treeE_posX = (TTree*)infile2->Get("SpaCEtree");
-        
-        CalSCEhistograms_negX = Build_TH3(treeD_negX,treeE_negX,"x_reco","y_reco","z_reco","bkwd");
-        CalSCEhistograms_posX = Build_TH3(treeD_posX,treeE_posX,"x_reco","y_reco","z_reco","bkwd");
-        
-        infile2->Close();
-      
-      }else if (fCalInputFilename.find("PosX")<fCalInputFilename.length()){
-      
-        TTree* treeD_posX = (TTree*)infile->Get("SpaCEtree_bkwdDisp");
-        TTree* treeE_posX = (TTree*)infile->Get("SpaCEtree");
-        
-        fCalInputFilename.replace(fCalInputFilename.find("PosX"),3,"Neg");
-        
-        std::string fname2;
-        sp.find_file(fCalInputFilename,fname2);
-        std::unique_ptr<TFile> infile2(new TFile(fname2.c_str(), "READ"));
-        if(!infile2->IsOpen()) throw cet::exception("SpaceChargeProtoDUNE") << "Could not find the space charge effect file '" << fname2 << "'!\n";
-        
-        TTree* treeD_negX = (TTree*)infile2->Get("SpaCEtree_bkwdDisp");
-        TTree* treeE_negX = (TTree*)infile2->Get("SpaCEtree");
-      
-        CalSCEhistograms_negX = Build_TH3(treeD_negX,treeE_negX,"x_reco","y_reco","z_reco","bkwd");
-        CalSCEhistograms_posX = Build_TH3(treeD_posX,treeE_posX,"x_reco","y_reco","z_reco","bkwd");
-        
-        infile2->Close();
-      
-      }else{
-      
-        TTree* treeD_negX = (TTree*)infile->Get("SpaCEtree_bkwdDisp");
-        TTree* treeE_negX = (TTree*)infile->Get("SpaCEtree");
-               
-        TTree* treeD_posX = (TTree*)infile->Get("SpaCEtree_bkwdDisp");
-        TTree* treeE_posX = (TTree*)infile->Get("SpaCEtree");
-        
-        SCEhistograms_negX = Build_TH3(treeD_negX,treeE_negX,"x_reco","y_reco","z_reco","bkwd");
-        SCEhistograms_posX = Build_TH3(treeD_posX,treeE_posX,"x_reco","y_reco","z_reco","bkwd");
-      
-      }
-      
-    } else { std::cout << "No space charge representation type chosen." << std::endl;} 
+   } else { std::cout << "No space charge representation type chosen." << std::endl;} 
     
     infile->Close();
   }
@@ -430,10 +429,10 @@ bool spacecharge::SpaceChargeProtoDUNE::EnableSimEfieldSCE() const
 }
 //----------------------------------------------------------------------------
 /// Return boolean indicating whether or not to apply SCE corrections
-bool spacecharge::SpaceChargeProtoDUNE::EnableCorrSCE() const
-{
-  return fEnableCorrSCE;
-}
+//bool spacecharge::SpaceChargeProtoDUNE::EnableCorrSCE() const
+//{
+//  return fEnableCorrSCE;
+//}
 
 /// Return boolean indicating whether or not to apply SCE corrections
 bool spacecharge::SpaceChargeProtoDUNE::EnableCalSpatialSCE() const
@@ -476,8 +475,10 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetPosOffsets(geo::Point_t cons
 
 geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetCalPosOffsets(geo::Point_t const& tmp_point) const
 {
-   std::vector<double> thePosOffsets;
+	
+  std::vector<double> thePosOffsets;
   geo::Point_t point = tmp_point;
+  
   if(IsTooFarFromBoundaries(point)) {
     thePosOffsets.resize(3,0.0);
     return { -thePosOffsets[0], -thePosOffsets[1], -thePosOffsets[2] };
@@ -493,6 +494,8 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetCalPosOffsets(geo::Point_t c
     }
       
   }else thePosOffsets.resize(3,0.0); 
+  
+  //std::cout << "\tHere's the space charge position offsets in reco: (" << tmp_point.X() << ", " << tmp_point.Y() << ", " << tmp_point.Z() << ") --> (" << thePosOffsets[0] << ", " << thePosOffsets[1] << ", " << thePosOffsets[2] << ")" << std::endl;
 
   return { thePosOffsets[0], thePosOffsets[1], thePosOffsets[2] };
 }
@@ -502,6 +505,7 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetCalPosOffsets(geo::Point_t c
 std::vector<double> spacecharge::SpaceChargeProtoDUNE::GetOffsetsVoxel
   (geo::Point_t const& point, TH3F* hX, TH3F* hY, TH3F* hZ) const
 {
+
   double xnew = TransformX(point.X());
   double ynew = TransformY(point.Y());
   double znew = TransformZ(point.Z());
@@ -550,16 +554,23 @@ std::vector<TH3F*> spacecharge::SpaceChargeProtoDUNE::Build_TH3
     Double_t dx = tree->GetBranch("Dx")->GetLeaf(Form("data_%sDisp",posLeaf.c_str()))->GetValue();
     Double_t dy = tree->GetBranch("Dy")->GetLeaf(Form("data_%sDisp",posLeaf.c_str()))->GetValue();
     Double_t dz = tree->GetBranch("Dz")->GetLeaf(Form("data_%sDisp",posLeaf.c_str()))->GetValue();
+    
+    hDx->Fill(x,y,z,100.0*dx);
+    hDy->Fill(x,y,z,100.0*dy);
+    hDz->Fill(x,y,z,100.0*dz);
+  }
+  
+  for(int ii = 0; ii<eTree->GetEntries(); ii++){
 		
     eTree->GetEntry(ii);
+    Double_t x = eTree->GetBranch("xpoint")->GetLeaf("data")->GetValue();
+    Double_t y = eTree->GetBranch("ypoint")->GetLeaf("data")->GetValue();
+    Double_t z = eTree->GetBranch("zpoint")->GetLeaf("data")->GetValue();
     Double_t Ex = eTree->GetBranch("Ex")->GetLeaf("data")->GetValue() / (100000.0*fEfield);
     Double_t Ey = eTree->GetBranch("Ey")->GetLeaf("data")->GetValue() / (100000.0*fEfield);
     Double_t Ez = eTree->GetBranch("Ez")->GetLeaf("data")->GetValue() / (100000.0*fEfield);
    
     //Fill the histograms		
-    hDx->Fill(x,y,z,100.0*dx);
-    hDy->Fill(x,y,z,100.0*dy);
-    hDz->Fill(x,y,z,100.0*dz);
     hEx->Fill(x,y,z,Ex);
     hEy->Fill(x,y,z,Ey);
     hEz->Fill(x,y,z,Ez);
@@ -717,7 +728,8 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetEfieldOffsets(geo::Point_t c
   }
   if(!IsInsideBoundaries(point)&&!IsTooFarFromBoundaries(point)) point = PretendAtBoundary(point);
   
-  if (fRepresentationType == "Voxelized"){
+  if (fRepresentationType == "Voxelized"||fRepresentationType=="Voxelized_TH3"){
+     //std::cout << "Correcting sce efield in service." << std::endl;
     if (point.X() > 0.0) theEfieldOffsets = GetOffsetsVoxel(point, SCEhistograms_posX.at(3), SCEhistograms_posX.at(4), SCEhistograms_posX.at(5));
     else {
       theEfieldOffsets = GetOffsetsVoxel(point, SCEhistograms_negX.at(3), SCEhistograms_negX.at(4), SCEhistograms_negX.at(5));

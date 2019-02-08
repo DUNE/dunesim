@@ -37,7 +37,7 @@ bool spacecharge::SpaceCharge3x1x1dphase::Configure(fhicl::ParameterSet const& p
   fEnableSimEfieldSCE = pset.get<bool>("EnableSimEfieldSCE");
   fEnableCalSpatialSCE = pset.get<bool>("EnableCalSpatialSCE");
   fEnableCalEfieldSCE = pset.get<bool>("EnableCalEfieldSCE");
-  fEnableCorrSCE = pset.get<bool>("EnableCorrSCE");
+  //fEnableCorrSCE = pset.get<bool>("EnableCorrSCE");
 
   if((fEnableSimSpatialSCE == true) || (fEnableSimEfieldSCE == true))
   {
@@ -168,10 +168,10 @@ bool spacecharge::SpaceCharge3x1x1dphase::EnableSimEfieldSCE() const
 
 //----------------------------------------------------------------------------
 /// Return boolean indicating whether or not to apply SCE corrections
-bool spacecharge::SpaceCharge3x1x1dphase::EnableCorrSCE() const
-{
-  return fEnableCorrSCE;
-}
+//bool spacecharge::SpaceCharge3x1x1dphase::EnableCorrSCE() const
+//{
+//  return fEnableCorrSCE;
+//}
 
 /// Return boolean indicating whether or not to apply SCE corrections
 bool spacecharge::SpaceCharge3x1x1dphase::EnableCalSpatialSCE() const

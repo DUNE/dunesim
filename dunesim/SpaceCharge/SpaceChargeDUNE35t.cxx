@@ -36,7 +36,7 @@ bool spacecharge::SpaceChargeDUNE35t::Configure(fhicl::ParameterSet const& pset)
   fEnableSimEfieldSCE = pset.get<bool>("EnableSimEfieldSCE");
   fEnableCalSpatialSCE = pset.get<bool>("EnableCalSpatialSCE");
   fEnableCalEfieldSCE = pset.get<bool>("EnableCalEfieldSCE");
-  fEnableCorrSCE = pset.get<bool>("EnableCorrSCE");
+  //fEnableCorrSCE = pset.get<bool>("EnableCorrSCE");
 
   if((fEnableSimSpatialSCE == true) || (fEnableSimEfieldSCE == true))
   {
@@ -167,10 +167,10 @@ bool spacecharge::SpaceChargeDUNE35t::EnableSimEfieldSCE() const
 
 //----------------------------------------------------------------------------
 /// Return boolean indicating whether or not to apply SCE corrections
-bool spacecharge::SpaceChargeDUNE35t::EnableCorrSCE() const
-{
-  return fEnableCorrSCE;
-}
+//bool spacecharge::SpaceChargeDUNE35t::EnableCorrSCE() const
+//{
+//  return fEnableCorrSCE;
+//}
 
 /// Return boolean indicating whether or not to apply SCE corrections
 bool spacecharge::SpaceChargeDUNE35t::EnableCalSpatialSCE() const
