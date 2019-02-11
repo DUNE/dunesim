@@ -522,7 +522,7 @@ bool spacecharge::SpaceCharge3x1x1dphase::IsInsideBoundaries(double xVal, double
 {
   bool isInside = true;
 
-  if((xVal < -360.0) || (xVal > 360.0) || (yVal < -5.0) || (yVal > 615.0) || (zVal < -5.0) || (zVal > 705.0))
+  if((xVal < -50.0) || (xVal > 50.0) || (yVal < -50.0) || (yVal > 50.0) || (zVal < 0.0) || (zVal > 300.0))
   {
     isInside = false;
   }
