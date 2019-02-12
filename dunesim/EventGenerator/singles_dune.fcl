@@ -30,6 +30,12 @@ dune35t_singlep.X0:                      [ 100.0 ]     # move it into a region o
 dune35t_singlep.Y0:                      [ 50.0 ]      # move it above the APA vertical gap
 dune35t_singlep.Z0:                      [ 0.0 ]       # move it up a touch just in case
 
+iceberg_singlep: @local::standard_singlep
+iceberg_singlep.Theta0YZ: [ 0.0 ]  # particle gun pointed along z axis
+iceberg_singlep.Theta0XZ: [ 0.0 ]
+iceberg_singlep.X0:                      [ 50.0 ]     # move it into a region of x covering a drift volume
+iceberg_singlep.Y0:                      [ 130.0 ]    # put it 40 cm from the top
+iceberg_singlep.Z0:                      [ 0.0 ]      # going in +z so start at the side
 
 
 
