@@ -101,6 +101,8 @@ namespace evgendp{
     bool fDoRotation; //do rotation?
     bool fUseIFDH; ///<< use ifdh protocol?
 
+    CLHEP::HepRandomEngine& fGenEngine;
+    CLHEP::HepRandomEngine& fPoisEngine;
   };
 }
 
@@ -117,7 +119,13 @@ namespace evgendp{
       fShowerAreaExtension(p.get< double >("ShowerAreaExtension",0.)),
       fRandomXZShift(p.get< double >("RandomXZShift",0.)),
       fDoRotation(p.get< bool >("DoRotation")),
-      fUseIFDH(p.get< bool >("UseIFDH"))
+      fUseIFDH(p.get< bool >("UseIFDH")),
+      // create a default random engine; obtain the random seed from NuRandomService,
+      // unless overridden in configuration with key "Seed"
+      fGenEngine(art::ServiceHandle<rndm::NuRandomService>()
+                 ->createEngine(*this, "HepJamesRandom", "gen", p, { "Seed", "SeedGenerator" })),
+      fPoisEngine(art::ServiceHandle<rndm::NuRandomService>()
+                  ->createEngine(*this, "HepJamesRandom", "pois", p, "SeedPoisson"))
   {
 
     if(fShowerInputFiles.size() != fShowerFluxConstants.size() || fShowerInputFiles.size()==0 || fShowerFluxConstants.size()==0)
@@ -128,10 +136,6 @@ namespace evgendp{
 
     if(fProjectToHeight==0.) mf::LogInfo("CORSIKAGendp")<<"Using 0. for fProjectToHeight!"
     ;
-    // create a default random engine; obtain the random seed from NuRandomService,
-    // unless overridden in configuration with key "Seed"
-    art::ServiceHandle<rndm::NuRandomService>()->createEngine(*this, "HepJamesRandom", "gen", p, { "Seed", "SeedGenerator" });
-    art::ServiceHandle<rndm::NuRandomService>()->createEngine(*this, "HepJamesRandom", "pois", p, "SeedPoisson");
 
     this->reconfigure(p);
 
@@ -207,12 +211,7 @@ namespace evgendp{
   void CORSIKAGendp::openDBs(std::string const& module_label){
     //choose files based on fShowerInputFiles, copy them with ifdh, open them
     //sqlite3_stmt *statement;
-    //get rng engine
-    art::ServiceHandle<art::RandomNumberGenerator> rng;
-    CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
-                                                    module_label,
-						    "gen");
-    CLHEP::RandFlat flat(engine);
+    CLHEP::RandFlat flat(fGenEngine);
 
     //setup ifdh object
     if(fUseIFDH){
@@ -409,10 +408,7 @@ namespace evgendp{
     double upperLimitOfEnergyRange=0.,lowerLimitOfEnergyRange=0.,energySlope=0.,oneMinusGamma=0.,EiToOneMinusGamma=0.,EfToOneMinusGamma=0.;
 
     /*
-    // get random number generator engine... currently unused here
-    art::ServiceHandle<art::RandomNumberGenerator> rng;
-    CLHEP::HepRandomEngine &engine = rng->getEngine("gen");
-    CLHEP::RandFlat flat(engine);
+    CLHEP::RandFlat flat(fGenEngine);
     */
 
     for(int i=0; i<fShowerInputs; i++){
@@ -465,17 +461,8 @@ namespace evgendp{
     const TString kStatement("select shower,pdg,px,py,pz,x,z,t,e from particles where shower in (select id from showers ORDER BY substr(id*%f,length(id)+2) limit %d) ORDER BY substr(shower*%f,length(shower)+2)");
 
     //get rng engine
-    art::ServiceHandle<art::RandomNumberGenerator> rng;
-    auto const& module_label = moduleDescription().moduleLabel();
-    CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
-                                                    module_label,
-						    "gen");
-    CLHEP::RandFlat flat(engine);
-
-    CLHEP::HepRandomEngine &engine_pois = rng->getEngine(art::ScheduleID::first(),
-                                                         module_label,
-							 "pois");
-    CLHEP::RandPoissonQ randpois(engine_pois);
+    CLHEP::RandFlat flat(fGenEngine);
+    CLHEP::RandPoissonQ randpois(fPoisEngine);
 
     // get geometry and figure where to project particles to, based on CRYHelper
     art::ServiceHandle<geo::Geometry> geom;

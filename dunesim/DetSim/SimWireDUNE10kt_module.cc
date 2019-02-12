@@ -65,7 +65,6 @@ namespace detsim {
   public:
         
     explicit SimWireDUNE10kt(fhicl::ParameterSet const& pset); 
-    virtual ~SimWireDUNE10kt();
     
     // read/write access to event
     void produce (art::Event& evt);
@@ -116,14 +115,15 @@ namespace detsim {
     bool                   fSaveEmptyChannel;  // switch for saving channels with all zero entries
     float                  fCollectionPed;    ///< ADC value of baseline for collection plane
     float                  fInductionPed;     ///< ADC value of baseline for induction plane
-    
+    CLHEP::HepRandomEngine& fEngine;
   }; // class SimWireDUNE10kt
-
-  DEFINE_ART_MODULE(SimWireDUNE10kt)
 
   //-------------------------------------------------
   SimWireDUNE10kt::SimWireDUNE10kt(fhicl::ParameterSet const& pset)
     : EDProducer{pset}
+      // create a default random engine; obtain the random seed from NuRandomService,
+      // unless overridden in configuration with key "Seed"
+    , fEngine(art::ServiceHandle<rndm::NuRandomService>()->createEngine(*this, pset, "Seed"))
   {
 
     this->reconfigure(pset);
@@ -138,29 +138,6 @@ namespace detsim {
     TString compression(pset.get< std::string >("CompressionType"));
     if(compression.Contains("Huffman",TString::kIgnoreCase)) fCompression = raw::kHuffman;    
     if(compression.Contains("ZeroSuppression",TString::kIgnoreCase)) fCompression = raw::kZeroSuppression;      
-
-    // create a default random engine; obtain the random seed from NuRandomService,
-    // unless overridden in configuration with key "Seed"
-    art::ServiceHandle<rndm::NuRandomService>()
-      ->createEngine(*this, pset, "Seed");
-    
-  }
-
-  //-------------------------------------------------
-  SimWireDUNE10kt::~SimWireDUNE10kt()
-  {
-
-    fChargeWork.clear();
- 
-    for(unsigned int i = 0; i < fNoiseZ.size(); ++i) fNoiseZ[i].clear();
-    fNoiseZ.clear();
-   
-    for(unsigned int i = 0; i < fNoiseU.size(); ++i) fNoiseU[i].clear();
-    fNoiseU.clear();
-   
-    for(unsigned int i = 0; i < fNoiseV.size(); ++i) fNoiseV[i].clear();
-    fNoiseV.clear();
-
   }
 
   //-------------------------------------------------
@@ -309,10 +286,7 @@ namespace detsim {
     art::ServiceHandle<util::LArFFT> fFFT;
 
     // Add all channels  
-    art::ServiceHandle<art::RandomNumberGenerator> rng;
-    CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
-                                                    moduleDescription().moduleLabel());
-    CLHEP::RandFlat flat(engine);
+    CLHEP::RandFlat flat(fEngine);
 
     std::map<int,double>::iterator mapIter;
 
@@ -508,11 +482,8 @@ namespace detsim {
 	}
 	//	std::cout << "Xin " << fASICGain << " " << fShapingTime << " " << fNoiseFactVec[0] << " " << fNoiseFactVec[1] << std::endl;
 		
-	art::ServiceHandle<art::RandomNumberGenerator> rng;
-	CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
-                                                        moduleDescription().moduleLabel());
-	CLHEP::RandGaussQ rGauss_Ind(engine, 0.0, fNoiseFactVec[0]);
-	CLHEP::RandGaussQ rGauss_Col(engine, 0.0, fNoiseFactVec[1]);
+        CLHEP::RandGaussQ rGauss_Ind(fEngine, 0.0, fNoiseFactVec[0]);
+        CLHEP::RandGaussQ rGauss_Col(fEngine, 0.0, fNoiseFactVec[1]);
 
 
 	for(unsigned int i = 0; i < signalSize; ++i){
@@ -652,10 +623,7 @@ namespace detsim {
   //-------------------------------------------------
   void SimWireDUNE10kt::GenNoise(std::vector<float>& noise)
   {
-    art::ServiceHandle<art::RandomNumberGenerator> rng;
-    CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
-                                                    moduleDescription().moduleLabel());
-    CLHEP::RandFlat flat(engine);
+    CLHEP::RandFlat flat(fEngine);
 
     noise.clear();
     noise.resize(fNTicks,0.0);
@@ -696,7 +664,7 @@ namespace detsim {
     // divides each bin by fNTicks assuming that a forward FFT
     // has already been done.
     for(unsigned int i = 0; i < noise.size(); ++i) noise[i] *= 1.*fNTicks;
-
-    return;
   }
 }
+
+DEFINE_ART_MODULE(detsim::SimWireDUNE10kt)

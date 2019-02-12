@@ -71,7 +71,6 @@ namespace detsim {
   public:
         
     explicit SimWireDUNE35t(fhicl::ParameterSet const& pset); 
-    virtual ~SimWireDUNE35t();
     
     // read/write access to event
     void produce (art::Event& evt);
@@ -184,14 +183,16 @@ namespace detsim {
 
     double               fOverflowProbs[64];       ///< array of probabilities of 6 LSF bits getting stuck at 000000
     double               fUnderflowProbs[64];     ///< array of probabilities of 6 LSF bits getting stuck at 111111
+    CLHEP::HepRandomEngine& fEngine;
 
   }; // class SimWireDUNE35t
-
-  DEFINE_ART_MODULE(SimWireDUNE35t)
 
   //-------------------------------------------------
   SimWireDUNE35t::SimWireDUNE35t(fhicl::ParameterSet const& pset)
     : EDProducer{pset}
+      // create a default random engine; obtain the random seed from NuRandomService,
+      // unless overridden in configuration with key "Seed"
+    , fEngine(art::ServiceHandle<rndm::NuRandomService>()->createEngine(*this, pset, "Seed"))
   {
 
     this->reconfigure(pset);
@@ -202,28 +203,6 @@ namespace detsim {
     TString compression(pset.get< std::string >("CompressionType"));
     if(compression.Contains("Huffman",TString::kIgnoreCase)) fCompression = raw::kHuffman;    
     if(compression.Contains("ZeroSuppression",TString::kIgnoreCase)) fCompression = raw::kZeroSuppression;
-
-// create a default random engine; obtain the random seed from NuRandomService,
-// unless overridden in configuration with key "Seed"
-    art::ServiceHandle<rndm::NuRandomService>()
-      ->createEngine(*this, pset, "Seed");
-
-  }
-
-  //-------------------------------------------------
-  SimWireDUNE35t::~SimWireDUNE35t()
-  {
-
-    fChargeWork.clear();
- 
-    for(unsigned int i = 0; i < fNoiseZ.size(); ++i) fNoiseZ[i].clear();
-    fNoiseZ.clear();
-   
-    for(unsigned int i = 0; i < fNoiseU.size(); ++i) fNoiseU[i].clear();
-    fNoiseU.clear();
-   
-    for(unsigned int i = 0; i < fNoiseV.size(); ++i) fNoiseV[i].clear();
-    fNoiseV.clear();
 
   }
 
@@ -633,10 +612,7 @@ namespace detsim {
     art::ServiceHandle<util::LArFFT> fFFT;
 
     // Add all channels  
-    art::ServiceHandle<art::RandomNumberGenerator> rng;
-    CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
-                                                    moduleDescription().moduleLabel());
-    CLHEP::RandFlat flat(engine);
+    CLHEP::RandFlat flat(fEngine);
 
     std::map<int,double>::iterator mapIter;      
 
@@ -926,11 +902,8 @@ namespace detsim {
 	}
 	//std::cout << "Xin " << fASICGain << " " << fShapingTime << " " << fNoiseFactVec[0] << " " << fNoiseFactVec[1] << std::endl;
 
-	art::ServiceHandle<art::RandomNumberGenerator> rng;
-	CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
-                                                        moduleDescription().moduleLabel());
-	CLHEP::RandGaussQ rGauss_Ind(engine, 0.0, fNoiseFactVec[0]);
-	CLHEP::RandGaussQ rGauss_Col(engine, 0.0, fNoiseFactVec[1]);
+        CLHEP::RandGaussQ rGauss_Ind(fEngine, 0.0, fNoiseFactVec[0]);
+        CLHEP::RandGaussQ rGauss_Col(fEngine, 0.0, fNoiseFactVec[1]);
 
 
 	for(unsigned int i = 0; i < signalSize; ++i){
@@ -975,10 +948,7 @@ namespace detsim {
       if(fPedestalOn)
 	{
 	  if(ped_rms>0){
-	    art::ServiceHandle<art::RandomNumberGenerator> rng;
-	    CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
-                                                            moduleDescription().moduleLabel());
-	    CLHEP::RandGaussQ rGauss_Ped(engine, 0.0, ped_rms);
+            CLHEP::RandGaussQ rGauss_Ped(fEngine, 0.0, ped_rms);
 	    for(unsigned int i = 0; i < signalSize; ++i){
 	      float ped_variation = rGauss_Ped.fire();
 	      tmpfv = adcvec_a[i] + ped_mean + ped_variation;
@@ -1020,11 +990,7 @@ namespace detsim {
       	{
 
 	  for(size_t i = 0; i < adcvec.size(); ++i){
-
-	    art::ServiceHandle<art::RandomNumberGenerator> rng;
-	    CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
-                                                            moduleDescription().moduleLabel());
-	    CLHEP::RandFlat flat(engine);
+            CLHEP::RandFlat flat(fEngine);
 	    
 	    
 	    double rnd = flat.fire(0,1);
@@ -1252,10 +1218,7 @@ namespace detsim {
   //-------------------------------------------------
   void SimWireDUNE35t::GenNoise(std::vector<float>& noise)
   {
-    art::ServiceHandle<art::RandomNumberGenerator> rng;
-    CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
-                                                    moduleDescription().moduleLabel());
-    CLHEP::RandFlat flat(engine);
+    CLHEP::RandFlat flat(fEngine);
 
     noise.clear();
     noise.resize(fNTicks,0.0);
@@ -1375,6 +1338,8 @@ namespace detsim {
   }
 
 }
+
+DEFINE_ART_MODULE(detsim::SimWireDUNE35t)
 
 
 /* -------------------------------------------------
