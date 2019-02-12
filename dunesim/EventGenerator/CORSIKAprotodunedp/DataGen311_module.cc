@@ -31,13 +31,9 @@
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "art/Framework/Services/Optional/TFileDirectory.h"
-#include "art/Framework/Services/Optional/RandomNumberGenerator.h"
 #include "art/Framework/Core/ModuleMacros.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 #include "cetlib_except/exception.h"
-
-// art extensions
-#include "nutools/RandomUtils/NuRandomService.h"
 
 // nutools includes
 #include "nusimdata/SimulationBase/MCTruth.h"
@@ -48,8 +44,6 @@
 #include "larcore/Geometry/Geometry.h"
 #include "larcoreobj/SummaryData/RunData.h"
 #include "TDatabasePDG.h"
-
-#include "CLHEP/Random/RandFlat.h"
 
 #include <stdio.h>
 #include <iostream>
@@ -212,9 +206,6 @@ evgendp::DataGen311::DataGen311(Parameters const& config)
    fTrackFile       		(config().TrackFile()),
    fHistFile        		(config().HistFile())
 {
-    art::ServiceHandle<rndm::NuRandomService>()->createEngine(*this);
-    //art::ServiceHandle<rndm::NuRandomService>()->createEngine(*this, "HepJamesRandom", "gen", p, { "Seed", "SeedGenerator" });
-
     produces< std::vector<simb::MCTruth> >();
     produces< sumdata::RunData, art::InRun >();
 }
@@ -313,11 +304,6 @@ void evgendp::DataGen311::beginJob(){
 ////////////////////////////////////////////////////////////////////////////////
 
 void evgendp::DataGen311::produce(art::Event & e){
-  art::ServiceHandle<art::RandomNumberGenerator> rng;
-  CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
-                                                  moduleDescription().moduleLabel());
-  CLHEP::RandFlat flat(engine);
-
   std::unique_ptr< std::vector<simb::MCTruth> > truthcol(new std::vector<simb::MCTruth>);
 
   simb::MCTruth truth;
