@@ -1,5 +1,6 @@
 simple_plugin(SpaceChargeServiceProtoDUNE "service"
               dune_SpaceCharge
+              lardataalg_DetectorInfo
 	      ${ART_FRAMEWORK_CORE}
 	      ${ART_FRAMEWORK_PRINCIPAL}
 	      ${ART_FRAMEWORK_SERVICES_REGISTRY}

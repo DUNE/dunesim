@@ -10,6 +10,8 @@
 #define SPACECHARGE_SPACECHARGEPROTODUNE_H
 // LArSoft libraries
 #include "larevt/SpaceCharge/SpaceCharge.h"
+#include "larcoreobj/SimpleTypesAndConstants/geo_vectors.h"
+#include "lardataalg/DetectorInfo/DetectorProperties.h"
 // FHiCL libraries
 #include "fhiclcpp/ParameterSet.h"
 // ROOT includes
@@ -30,14 +32,20 @@ namespace spacecharge {
       SpaceChargeProtoDUNE(SpaceChargeProtoDUNE const&) = delete;
       virtual ~SpaceChargeProtoDUNE() = default;
       
-      bool Configure(fhicl::ParameterSet const& pset);
+      bool Configure(fhicl::ParameterSet const& pset, detinfo::DetectorProperties const*);
       bool Update(uint64_t ts=0);
       
       bool EnableSimSpatialSCE() const override;
       bool EnableSimEfieldSCE() const override;
-      bool EnableCorrSCE() const override;
+      bool EnableCalSpatialSCE() const override;
+      bool EnableCalEfieldSCE() const override;
+      
+      bool EnableCorrSCE() const override {return (EnableCalSpatialSCE()||EnableCalEfieldSCE()) ;}
+      
       geo::Vector_t GetPosOffsets(geo::Point_t const& point) const override;
       geo::Vector_t GetEfieldOffsets(geo::Point_t const& point) const override;
+      geo::Vector_t GetCalPosOffsets(geo::Point_t const& point) const override;
+      geo::Vector_t GetCalEfieldOffsets(geo::Point_t const& point) const override;
  
     private:
     protected:
@@ -46,6 +54,8 @@ namespace spacecharge {
       std::vector<TH3F*> Build_TH3(TTree* tree, TTree* eTree, std::string xvar, std::string yvar, std::string zvar, std::string posLeaf) const;
       std::vector<TH3F*> SCEhistograms_posX; //Histograms are Dx, Dy, Dz, dEx/E0, dEy/E0, dEz/E0 
       std::vector<TH3F*> SCEhistograms_negX;
+      std::vector<TH3F*> CalSCEhistograms_posX; 
+      std::vector<TH3F*> CalSCEhistograms_negX; 
       
       std::vector<double> GetPosOffsetsParametric(double xVal, double yVal, double zVal) const;
       double GetOnePosOffsetParametric(double xVal, double yVal, double zVal, std::string axis) const;
@@ -61,12 +71,15 @@ namespace spacecharge {
       
       bool fEnableSimSpatialSCE;
       bool fEnableSimEfieldSCE;
+      bool fEnableCalSpatialSCE;
+      bool fEnableCalEfieldSCE;
       bool fEnableCorrSCE;
       
       double fEfield;
       
       std::string fRepresentationType;
       std::string fInputFilename;
+      std::string fCalInputFilename;
       
       TGraph **g1_x = new TGraph*[7];
       TGraph **g2_x = new TGraph*[7];
