@@ -35,7 +35,9 @@ bool spacecharge::SpaceCharge3x1x1dphase::Configure(fhicl::ParameterSet const& p
 {  
   fEnableSimSpatialSCE = pset.get<bool>("EnableSimSpatialSCE");
   fEnableSimEfieldSCE = pset.get<bool>("EnableSimEfieldSCE");
-  fEnableCorrSCE = pset.get<bool>("EnableCorrSCE");
+  fEnableCalSpatialSCE = pset.get<bool>("EnableCalSpatialSCE");
+  fEnableCalEfieldSCE = pset.get<bool>("EnableCalEfieldSCE");
+  //fEnableCorrSCE = pset.get<bool>("EnableCorrSCE");
 
   if((fEnableSimSpatialSCE == true) || (fEnableSimEfieldSCE == true))
   {
@@ -166,9 +168,21 @@ bool spacecharge::SpaceCharge3x1x1dphase::EnableSimEfieldSCE() const
 
 //----------------------------------------------------------------------------
 /// Return boolean indicating whether or not to apply SCE corrections
-bool spacecharge::SpaceCharge3x1x1dphase::EnableCorrSCE() const
+//bool spacecharge::SpaceCharge3x1x1dphase::EnableCorrSCE() const
+//{
+//  return fEnableCorrSCE;
+//}
+
+/// Return boolean indicating whether or not to apply SCE corrections
+bool spacecharge::SpaceCharge3x1x1dphase::EnableCalSpatialSCE() const
 {
-  return fEnableCorrSCE;
+  return fEnableCalSpatialSCE;
+}
+
+/// Return boolean indicating whether or not to apply SCE corrections
+bool spacecharge::SpaceCharge3x1x1dphase::EnableCalEfieldSCE() const
+{
+  return fEnableCalEfieldSCE;
 }
 
 //----------------------------------------------------------------------------
@@ -191,6 +205,11 @@ geo::Vector_t spacecharge::SpaceCharge3x1x1dphase::GetPosOffsets(geo::Point_t co
   }
 
   return { thePosOffsets[0], thePosOffsets[1], thePosOffsets[2] };
+}
+
+geo::Vector_t spacecharge::SpaceCharge3x1x1dphase::GetCalPosOffsets(geo::Point_t const& point) const
+{
+  return { 0.0, 0.0, 0.0 };
 }
 
 //----------------------------------------------------------------------------
@@ -350,6 +369,11 @@ geo::Vector_t spacecharge::SpaceCharge3x1x1dphase::GetEfieldOffsets(geo::Point_t
   }
 
   return { -theEfieldOffsets[0], -theEfieldOffsets[1], -theEfieldOffsets[2] };
+}
+
+geo::Vector_t spacecharge::SpaceCharge3x1x1dphase::GetCalEfieldOffsets(geo::Point_t const& point) const
+{
+  return { 0.0, 0.0, 0.0 };
 }
 
 //----------------------------------------------------------------------------
