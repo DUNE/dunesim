@@ -12,6 +12,7 @@
 
 // LArSoft includes
 #include "dune/SpaceChargeServices/SpaceChargeServiceProtoDUNE.h"
+#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 
 // ROOT includes
 #include "TMath.h"
@@ -24,6 +25,9 @@
 spacecharge::SpaceChargeServiceProtoDUNE::SpaceChargeServiceProtoDUNE(fhicl::ParameterSet const& pset, art::ActivityRegistry &reg)
 {
   fProp.reset(new spacecharge::SpaceChargeProtoDUNE(pset));
+  
+  auto const *detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
+  fProp->Configure(pset,detprop);
 
   reg.sPreBeginRun.watch(this, &SpaceChargeServiceProtoDUNE::preBeginRun);
 }
@@ -37,7 +41,8 @@ void spacecharge::SpaceChargeServiceProtoDUNE::preBeginRun(const art::Run& run)
 //------------------------------------------------
 void spacecharge::SpaceChargeServiceProtoDUNE::reconfigure(fhicl::ParameterSet const& pset)
 {
-  fProp->Configure(pset);  
+  auto const *detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();  
+  fProp->Configure(pset,detprop);  
   return;
 }
 
