@@ -358,6 +358,7 @@ ReadOutWindowSize: 4492         # drift length/drift velocity*sampling rate = (3
 TimeOffsetU:       0.
 TimeOffsetV:       0.
 TimeOffsetZ:       0.
+DriftVelFudgeFactor: 1.
 
 SimpleBoundaryProcess: true  #enable opticalBoundaryProcessSimple instead of G4 default
 
