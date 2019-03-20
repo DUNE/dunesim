@@ -1,0 +1,22 @@
+BEGIN_PROLOG
+
+standard_nuescattergen:
+{
+   module_type:  "generator"
+
+   MinEnu:       "0.005" # min neutrino energy in GeV
+   MaxEnu:       "0.070" # max neutrino energy in GeV
+
+   MinX:         "-360"  # min X coordinate of generating volume
+   MaxX:         "360"   # max X coordinate of generating volume
+   MinY:         "-600"  # min Y coordinate of generating volume
+   MaxY:         "600"   # max Y coordinate of generating volume
+   MinZ:         "0"     # min Z coordinate of generating volume
+   MaxZ:         "1400"  # max Z coordinate of generating volume
+
+   NueFluxFrac:  "0.33"  # fraction of neutrino flux that is nue
+}
+
+
+END_PROLOG
+
