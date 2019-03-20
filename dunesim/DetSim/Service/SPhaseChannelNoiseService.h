@@ -1,6 +1,6 @@
 // SPhaseChannelNoiseService
 
-// Jingbo Wang
+// Jingbo Wang (jiowang@ucdavis.edu)
 // March 2019
 //
 // Implementation of a general TPC channel noise model with:
@@ -8,10 +8,12 @@
 // (2) Inherent Gaussian noise in frequency
 // (3) MicroBooNE noise in frequency
 // (4) Coherent noise (exponential + Gaussian) in frequency 
-//     (Note a: phase at eacch frequency bin is randamized at the moment. Will be updated soon
-//      Note b: Currently, every 32 offline channels are grouped together and the same coherent noise
-//      waveform is assigned to channels within the same group. )
-// The default parameters are obtained from the ProtoDUNE-SP read data (run 4096)
+//     (Note a: phase at each frequency bin is randamized at the moment. Will be updated soon
+//      Note b: Currently, consecutive offline channels (configurable) are grouped together and 
+//              the same coherent noise waveform is assigned to channels within the same group. )
+//
+// The default parameters are obtained from the ProtoDUNE-SP data (run 4096)
+// fcl file: dunetpc/fcl/protodune/detsim/protoDUNE_detsim_data_driven_noise.fcl
 //
 
 #ifndef SPhaseChannelNoiseService_H
@@ -71,9 +73,6 @@ private:
   unsigned int getCohNoiseChanFromGroup(unsigned int cohgroup) const;
   
   // General parameters
-  float        fLowCutoffZ;        ///< low frequency filter cutoff (kHz) for Z (collection) plane
-  float        fLowCutoffU;        ///< low frequency filter cutoff (kHz)  for U plane
-  float        fLowCutoffV;        ///< low frequency filter cutoff (kHz)  for V plane
   unsigned int fNoiseArrayPoints;  ///< number of points in randomly generated noise array
   int          fRandomSeed;        ///< Seed for random number service. If absent or zero, use SeedSvc.
   int          fLogLevel;          ///< Log message level: 0=quiet, 1=init only, 2+=every event
@@ -139,7 +138,6 @@ private:
   TH1* fGausNoiseHistV;     ///< distribution of noise counts for V
   TH1* fGausNoiseChanHist;  ///< distribution of accessed noise samples
 
-  TH1* fMicroBooNoiseHist;      ///< distribution of noise counts
   TH1* fMicroBooNoiseHistZ;     ///< distribution of noise counts for Z
   TH1* fMicroBooNoiseHistU;     ///< distribution of noise counts for U
   TH1* fMicroBooNoiseHistV;     ///< distribution of noise counts for V
