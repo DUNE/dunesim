@@ -132,7 +132,6 @@ private:
 
   // Histograms.
   
-  TH1* fGausNoiseHist;      ///< distribution of noise counts
   TH1* fGausNoiseHistZ;     ///< distribution of noise counts for Z
   TH1* fGausNoiseHistU;     ///< distribution of noise counts for U
   TH1* fGausNoiseHistV;     ///< distribution of noise counts for V
