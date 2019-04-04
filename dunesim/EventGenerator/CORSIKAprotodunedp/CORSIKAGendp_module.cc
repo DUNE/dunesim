@@ -24,7 +24,6 @@
 #include "art_root_io/TFileService.h"
 #include "art_root_io/TFileDirectory.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
-#include "art/Framework/Services/Optional/RandomNumberGenerator.h"
 
 // art extensions
 #include "nutools/RandomUtils/NuRandomService.h"

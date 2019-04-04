@@ -84,14 +84,7 @@ int WhiteChannelNoiseService::addNoise(Channel chan, AdcSignalVector& sigs) cons
   }
   art::ServiceHandle<geo::Geometry> geo;
   const geo::View_t view = geo->View(chan);
-#ifdef UseSeedService
-  art::ServiceHandle<art::RandomNumberGenerator> rng;
-  CLHEP::HepRandomEngine& engine = rng->getEngine(art::ScheduleID::first(),
-                                                  moduleDescription().moduleLabel(),
-						  "WhiteChannelNoiseService");
-#else
   CLHEP::HepRandomEngine& engine = *m_pran;
-#endif
   CLHEP::RandGaussQ rGauss_Ind(engine, 0.0, fNoiseFactVec[0]);
   CLHEP::RandGaussQ rGauss_Col(engine, 0.0, fNoiseFactVec[1]);
   for ( AdcSignal& sig : sigs ) {
