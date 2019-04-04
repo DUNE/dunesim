@@ -7,8 +7,8 @@ simple_plugin(SpaceChargeServiceProtoDUNE "service"
 	      art_Persistency_Common canvas
 	      art_Persistency_Provenance canvas
 	      ${ART_FRAMEWORK_SERVICES_BASIC}
-	      ${ART_FRAMEWORK_SERVICES_OPTIONAL}
-	      ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
+	      ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
+	      ${ART_ROOT_IO_TFILESERVICE_SERVICE}
 	      ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}
 	      art_Utilities canvas
 	      ${MF_MESSAGELOGGER}
@@ -26,8 +26,8 @@ simple_plugin(SpaceChargeServiceDUNE35t "service"
 	      art_Persistency_Common canvas
 	      art_Persistency_Provenance canvas
 	      ${ART_FRAMEWORK_SERVICES_BASIC}
-	      ${ART_FRAMEWORK_SERVICES_OPTIONAL}
-	      ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
+	      ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
+	      ${ART_ROOT_IO_TFILESERVICE_SERVICE}
 	      ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}
 	      art_Utilities canvas
 	      ${MF_MESSAGELOGGER}
@@ -45,8 +45,8 @@ simple_plugin(SpaceChargeService3x1x1dphase "service"
 	      art_Persistency_Common canvas
 	      art_Persistency_Provenance canvas
 	      ${ART_FRAMEWORK_SERVICES_BASIC}
-	      ${ART_FRAMEWORK_SERVICES_OPTIONAL}
-	      ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
+	      ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
+	      ${ART_ROOT_IO_TFILESERVICE_SERVICE}
 	      ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}
 	      art_Utilities canvas
 	      ${MF_MESSAGELOGGER}

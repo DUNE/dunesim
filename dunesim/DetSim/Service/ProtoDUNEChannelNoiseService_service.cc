@@ -6,7 +6,7 @@
 #include "lardata/Utilities/LArFFT.h"
 #include "larcore/Geometry/Geometry.h"
 #include "nutools/RandomUtils/NuRandomService.h"
-#include "art/Framework/Services/Optional/TFileService.h"
+#include "art_root_io/TFileService.h"
 #include "CLHEP/Random/JamesRandom.h"
 #include "CLHEP/Random/RandFlat.h"
 #include "CLHEP/Random/RandGauss.h"

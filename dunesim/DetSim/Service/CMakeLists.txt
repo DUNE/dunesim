@@ -44,8 +44,8 @@ simple_plugin(DPhaseSimChannelExtractService   "service"
 simple_plugin(ExponentialChannelNoiseService   "service"
                 larcorealg_Geometry
                 SignalShapingServiceDUNE_service
-                ${ART_FRAMEWORK_SERVICES_OPTIONAL}
-                ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
+                ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
+                ${ART_ROOT_IO_TFILESERVICE_SERVICE}
                 nutools_RandomUtils_NuRandomService_service
                 ${ART_FRAMEWORK_CORE}
                 art_Utilities canvas
@@ -57,8 +57,8 @@ simple_plugin(ExponentialChannelNoiseService   "service"
 simple_plugin(DPhaseRealisticNoiseService   "service"
                larcorealg_Geometry
                SignalShapingServiceDUNEDPhase_service
-               ${ART_FRAMEWORK_SERVICES_OPTIONAL}
-               ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
+               ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
+               ${ART_ROOT_IO_TFILESERVICE_SERVICE}
                nutools_RandomUtils_NuRandomService_service
                ${ART_FRAMEWORK_CORE}
                art_Utilities canvas
@@ -70,8 +70,8 @@ simple_plugin(DPhaseRealisticNoiseService   "service"
  simple_plugin(DPhaseCoherentNoiseService   "service"
                 larcorealg_Geometry
                 SignalShapingServiceDUNEDPhase_service
-                ${ART_FRAMEWORK_SERVICES_OPTIONAL}
-                ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
+                ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
+                ${ART_ROOT_IO_TFILESERVICE_SERVICE}
                 nutools_RandomUtils_NuRandomService_service
                 ${ART_FRAMEWORK_CORE}
                 art_Utilities canvas
@@ -83,8 +83,8 @@ simple_plugin(DPhaseRealisticNoiseService   "service"
 simple_plugin(ProtoDUNEChannelNoiseService   "service"
                 larcorealg_Geometry
                 SignalShapingServiceDUNE_service
-                ${ART_FRAMEWORK_SERVICES_OPTIONAL}
-                ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
+                ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
+                ${ART_ROOT_IO_TFILESERVICE_SERVICE}
                 nutools_RandomUtils_NuRandomService_service
                 ${ART_FRAMEWORK_CORE}
                 art_Utilities canvas
@@ -96,8 +96,8 @@ simple_plugin(ProtoDUNEChannelNoiseService   "service"
 simple_plugin(SPhaseChannelNoiseService   "service"
                 larcorealg_Geometry
                 SignalShapingServiceDUNE_service
-                ${ART_FRAMEWORK_SERVICES_OPTIONAL}
-                ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
+                ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
+                ${ART_ROOT_IO_TFILESERVICE_SERVICE}
                 nutools_RandomUtils_NuRandomService_service
                 ${ART_FRAMEWORK_CORE}
                 art_Utilities canvas
@@ -111,8 +111,8 @@ simple_plugin(WhiteChannelNoiseService   "service"
                 larcorealg_Geometry
                 SignalShapingServiceDUNE_service
                 nutools_RandomUtils_NuRandomService_service
-                ${ART_FRAMEWORK_SERVICES_OPTIONAL}
-                ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
+                ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
+                ${ART_ROOT_IO_TFILESERVICE_SERVICE}
                 ${ART_FRAMEWORK_CORE}
                 art_Utilities canvas
                 cetlib cetlib_except
@@ -122,8 +122,8 @@ simple_plugin(WhiteChannelNoiseService   "service"
 
 simple_plugin(ProvidedPedestalAdditionService "service"
                 nutools_RandomUtils_NuRandomService_service
-                ${ART_FRAMEWORK_SERVICES_OPTIONAL}
-                ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
+                ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
+                ${ART_ROOT_IO_TFILESERVICE_SERVICE}
                 ${ART_FRAMEWORK_CORE}
                 art_Utilities canvas
                 cetlib cetlib_except
@@ -158,7 +158,7 @@ simple_plugin(LarsoftHuffmanCompressService "service"
 
 simple_plugin(StuckBitAdcDistortionService   "service"
                 larcorealg_Geometry
-                ${ART_FRAMEWORK_SERVICES_OPTIONAL}
+                ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
                 nutools_RandomUtils_NuRandomService_service
                 ${ART_FRAMEWORK_CORE}
                 art_Utilities canvas
