@@ -186,18 +186,56 @@ dune_fd_genie_atmo: {
     +0.0, +0.0, +1.0,  # new y axis in old coordinates: vertical
     +0.0, -1.0, +0.0   # new z axis in old coordinates: westward
     ]
-  # TODO: verify and test the rotation with phi = 1.414 rad:
-  # FluxRotValues: [
-  #   +0.9877, -0.1564, +0.0000,  # new x axis in old coordinates: be nice and fix things (ends up the same)
-  #   +0.0000, +0.0000, +1.0000,  # new y axis in old coordinates: vertical
-  #   -0.1564, -0.9877, +0.0000   # new z axis in old coordinates: away from Batavia, IL
-  #   ]
+  # 
+  # A more complete rotation is available as
+  # `dune_fd_atmo_flux_rotation_precise` below.
   #
   # NOTE: these rotations will need to be removed or fixed if feature request
   # 21185 (https://cdcvs.fnal.gov/redmine/issues/21185) is implemented.
   #
   
 } # dune_fd_genie_atmo
+
+
+#
+# the following snipper can be added to an existing configuration
+# (including the ones with `dune_fd_genie_atmo` above) to test a
+# more precise rotation which correctly aligns the detector to
+# the geographic coordinates (see issue #20034).
+# Usage: plug it at the end of the generator configuration:
+#     
+#     physics: {
+#       producers: {
+#         generator: {
+#           ...
+#           @table::dune_fd_atmo_flux_rotation_precise
+#         }
+#       }
+#     }
+#
+# or overwrite the existing configuration like in:
+#     
+#     physics.producers.generator: {
+#       @table::physics.producers.generator
+#       @table::dune_fd_atmo_flux_rotation_precise
+#     }
+#     
+# WARNING: this configuration was, at the time it was added
+#          (October 29, 2018), UNTESTED.
+#
+dune_fd_atmo_flux_rotation_precise: {
+  # the details of this rotation are explained in `dune_fd_genie_atmo`;
+  # the imparted rotation is phi = 1.414 rad (81.016 degrees)
+  # from southward direction counterclockwise
+  # (and rounded to 4 significant digits).
+  FluxRotCfg: "newxyz"
+  FluxRotValues: [
+    +0.9877, -0.1564, +0.0000,  # new x axis in old coordinates: be nice and fix things (ends up the same)
+    +0.0000, +0.0000, +1.0000,  # new y axis in old coordinates: vertical
+    -0.1564, -0.9877, +0.0000   # new z axis in old coordinates: away from Batavia, IL
+    ]
+
+} # dune_fd_atmo_flux_rotation_precise
 
 
 dune_fd_genie_atmo_min_flux:            @local::dune_fd_genie_atmo
