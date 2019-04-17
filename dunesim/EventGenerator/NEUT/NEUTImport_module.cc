@@ -212,7 +212,7 @@ void evgendp::NEUTImport::beginJob(){
   neutTree->SetBranchAddress("StdHepStatus",&tStdHepStatus);
   neutTree->SetBranchAddress("StdHepPdg",&tStdHepPdg);
 
-  TTree *neutTreeRot;
+  TTree *neutTreeRot = NULL;
 
   if(fUseRotatedStartMomentum)
   {
