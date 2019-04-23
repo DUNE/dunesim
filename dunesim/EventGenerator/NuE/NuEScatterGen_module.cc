@@ -63,7 +63,7 @@ private:
 };
 
 //------------------------------------------------------------------------------
-evgen::NuEScatterGen::NuEScatterGen(fhicl::ParameterSet const & p)
+evgen::NuEScatterGen::NuEScatterGen(fhicl::ParameterSet const & p) : EDProducer{p}
 {
   this->reconfigure(p);
 
