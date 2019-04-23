@@ -6,6 +6,8 @@ BEGIN_PROLOG
 
 dunefd_genie:                         @local::standard_genie
 dunefd_genie.BeamName:                "lbnf"
+dunefd_genie.EventsPerSpill:          1
+dunefd_genie.POTPerSpill:             0
 dunefd_genie.GlobalTimeOffset:        0
 dunefd_genie.RandomTimeOffset:        0
 dunefd_genie.EventGeneratorList:      "Default+CCMEC"
