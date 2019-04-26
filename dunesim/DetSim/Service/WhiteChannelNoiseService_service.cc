@@ -3,7 +3,7 @@
 #include "dune/DetSim/Service/WhiteChannelNoiseService.h"
 #include "larcore/Geometry/Geometry.h"
 #include "nutools/RandomUtils/NuRandomService.h"
-#include "art/Framework/Services/Optional/TFileService.h"
+#include "art_root_io/TFileService.h"
 #include "dune/Utilities/SignalShapingServiceDUNE.h"
 #include "CLHEP/Random/JamesRandom.h"
 #include "CLHEP/Random/RandGaussQ.h"
@@ -84,14 +84,7 @@ int WhiteChannelNoiseService::addNoise(Channel chan, AdcSignalVector& sigs) cons
   }
   art::ServiceHandle<geo::Geometry> geo;
   const geo::View_t view = geo->View(chan);
-#ifdef UseSeedService
-  art::ServiceHandle<art::RandomNumberGenerator> rng;
-  CLHEP::HepRandomEngine& engine = rng->getEngine(art::ScheduleID::first(),
-                                                  moduleDescription().moduleLabel(),
-						  "WhiteChannelNoiseService");
-#else
   CLHEP::HepRandomEngine& engine = *m_pran;
-#endif
   CLHEP::RandGaussQ rGauss_Ind(engine, 0.0, fNoiseFactVec[0]);
   CLHEP::RandGaussQ rGauss_Col(engine, 0.0, fNoiseFactVec[1]);
   for ( AdcSignal& sig : sigs ) {

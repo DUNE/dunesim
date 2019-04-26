@@ -5,8 +5,6 @@
 #include "larcore/Geometry/Geometry.h"
 #include "lardataobj/Simulation/sim.h" // GetRandomNumberSeed()
 
-#include "art/Framework/Services/Optional/RandomNumberGenerator.h"
-
 #include "CLHEP/Random/RandFlat.h"
 
 namespace detvar
@@ -195,9 +193,8 @@ namespace detvar
     // TODO don't seem to be able to access the RandomNumberGenerator service
     // from here, let alone anything to do with seeds.
     //    const unsigned int seed = pset.get<unsigned int>("Seed", sim::GetRandomNumberSeed());
-    //    createEngine(seed);
-    //    art::ServiceHandle<art::RandomNumberGenerator> rng;
-    //    CLHEP::RandFlat r(rng->getEngine());
+    //    auto& engine = createEngine(seed);
+    //    CLHEP::RandFlat r(engine);
 
     const unsigned int target = badfrac*geom->Nchannels();
 

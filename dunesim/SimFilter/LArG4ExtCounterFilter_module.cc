@@ -47,7 +47,7 @@ namespace filt{
 
   };
 
-  LArG4ExtCounterFilter::LArG4ExtCounterFilter::LArG4ExtCounterFilter(fhicl::ParameterSet const & pset)
+  LArG4ExtCounterFilter::LArG4ExtCounterFilter::LArG4ExtCounterFilter(fhicl::ParameterSet const & pset) : EDFilter{pset}
   {
     this->reconfigure(pset);
   }

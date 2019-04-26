@@ -107,7 +107,7 @@ DEFINE_ART_MODULE(SimWireDUNE)
 
 //**********************************************************************
 
-SimWireDUNE::SimWireDUNE(fhicl::ParameterSet const& pset) {
+SimWireDUNE::SimWireDUNE(fhicl::ParameterSet const& pset) : EDProducer{pset} {
   reconfigure(pset);
   produces< std::vector<raw::RawDigit> >();
 }
