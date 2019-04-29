@@ -51,7 +51,7 @@ namespace filt{
   };
 
 
-  GenFilter::GenFilter::GenFilter(fhicl::ParameterSet const & pset)
+  GenFilter::GenFilter::GenFilter(fhicl::ParameterSet const & pset) : EDFilter{pset}
   {
     this->reconfigure(pset);
   }
