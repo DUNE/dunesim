@@ -68,7 +68,7 @@ private:
 };
 
 
-NoiseAdder::NoiseAdder(fhicl::ParameterSet const & p)
+NoiseAdder::NoiseAdder(fhicl::ParameterSet const & p) : EDProducer{p}
 
 // Initialize member data here.
 {

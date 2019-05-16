@@ -144,6 +144,8 @@ namespace evgen{
         // Background particles need to be fired from an upstream position
         TVector3 GetBackgroundPosition(float x, float y, float z, float px, float py, float pz);
        
+        CLHEP::RandFlat fFlatRnd;
+
         std::string fFileName;
         std::string fGoodParticleTreeName;
         std::string fAllParticlesTreeName;
@@ -316,13 +318,21 @@ namespace evgen{
     };
 }
 
+// Create the random number generator
+namespace {
+  std::string const instanceName = "protoDUNEBeam";
+}
+
 
 //---------------------------------------------------------------------------------
 //----------------------------------------constructors-----------------------------
 evgen::ProtoDUNEBeam::ProtoDUNEBeam(fhicl::ParameterSet const & pset)
   : EDProducer{pset}
+    // now create the engine (for example, use art); seed will be set
+    // by calling declareEngine
+  , fFlatRnd(createEngine(art::ServiceHandle<rndm::NuRandomService>{}->declareEngine(instanceName),
+                          "HepJamesRandom", instanceName))
 {
-    
     // Call appropriate produces<>() functions here.
     produces< std::vector<simb::MCTruth> >();
     produces<std::vector<sim::ProtoDUNEbeamsim>>();
@@ -394,21 +404,6 @@ evgen::ProtoDUNEBeam::ProtoDUNEBeam(fhicl::ParameterSet const & pset)
     
     // Make sure we use ifdh to open the beam input file.
     OpenInputFile();
-    
-    // Create the random number generator
-    std::string const instanceName = "protoDUNEBeam";
-    auto& Seeds = *(art::ServiceHandle<rndm::NuRandomService>());
-    
-    // declare an engine; NuRandomService associates an (unknown) engine, in
-    // the current module and an instance name, with a seed (returned)
-    auto const seed = Seeds.declareEngine(instanceName);
-    
-    // now create the engine (for example, use art); seed will be set
-    createEngine(seed, "HepJamesRandom", instanceName);
-    
-    // finally, complete the registration; seed will be set again
-    //	art::ServiceHandle<art::RandomNumberGenerator> RNG;
-    //	Seeds.defineEngine(RNG->getEngine(instanceName));
 }
 
 
@@ -712,13 +707,6 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
     // Get the list of entries for the current event
 //    int beamEvent = fGoodEventList[fCurrentGoodEvent];
     
-    // Get the random number generator service and make some CLHEP generators
-    art::ServiceHandle<art::RandomNumberGenerator> rng;
-    CLHEP::HepRandomEngine &engine = rng->getEngine(art::ScheduleID::first(),
-                                                    moduleDescription().moduleLabel(),
-						    "protoDUNEBeam");
-    CLHEP::RandFlat flatRnd(engine);
-    
     // A single particle seems the most accurate description.
     mcTruth.SetOrigin(simb::kSingleParticle);
    
@@ -742,7 +730,7 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
         }
         else{
             // Get a random time from -fReadoutWindow to +fReadoutWindow in ns (fReadoutWindow value is in ms).
-            baseTime = (flatRnd.fire() - 0.5)*2.0*(fReadoutWindow*1000.*1000.);
+            baseTime = (fFlatRnd.fire() - 0.5)*2.0*(fReadoutWindow*1000.*1000.);
         }
         for(auto const t : event.second){
             // Get the entry from the tree for this event and track.
