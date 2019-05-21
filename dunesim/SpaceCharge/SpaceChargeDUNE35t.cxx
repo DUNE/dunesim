@@ -206,7 +206,7 @@ geo::Vector_t spacecharge::SpaceChargeDUNE35t::GetPosOffsets(geo::Point_t const&
   return { thePosOffsets[0], thePosOffsets[1], thePosOffsets[2] };
 }
 
-geo::Vector_t spacecharge::SpaceChargeDUNE35t::GetCalPosOffsets(geo::Point_t const& point) const
+geo::Vector_t spacecharge::SpaceChargeDUNE35t::GetCalPosOffsets(geo::Point_t const& point, int const& TPCid) const
 {
 
   return { 0.0, 0.0, 0.0 };
@@ -371,7 +371,7 @@ geo::Vector_t spacecharge::SpaceChargeDUNE35t::GetEfieldOffsets(geo::Point_t con
   return { theEfieldOffsets[0], theEfieldOffsets[1], theEfieldOffsets[2] };
 }
 
-geo::Vector_t spacecharge::SpaceChargeDUNE35t::GetCalEfieldOffsets(geo::Point_t const& point) const
+geo::Vector_t spacecharge::SpaceChargeDUNE35t::GetCalEfieldOffsets(geo::Point_t const& point, int const& TPCid) const
 {
   return { 0.0, 0.0, 0.0 };
 }

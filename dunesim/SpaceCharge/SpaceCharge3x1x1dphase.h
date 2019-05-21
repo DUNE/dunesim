@@ -48,8 +48,8 @@ namespace spacecharge {
       
       geo::Vector_t GetPosOffsets(geo::Point_t const& point) const override;
       geo::Vector_t GetEfieldOffsets(geo::Point_t const& point) const override;
-      geo::Vector_t GetCalPosOffsets(geo::Point_t const& point) const override;
-      geo::Vector_t GetCalEfieldOffsets(geo::Point_t const& point) const override;
+      geo::Vector_t GetCalPosOffsets(geo::Point_t const& point, int const& TPCid) const override;
+      geo::Vector_t GetCalEfieldOffsets(geo::Point_t const& point, int const& TPCid) const override;
  
     private:
     protected:
