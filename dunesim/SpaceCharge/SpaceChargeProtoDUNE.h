@@ -44,18 +44,16 @@ namespace spacecharge {
       
       geo::Vector_t GetPosOffsets(geo::Point_t const& point) const override;
       geo::Vector_t GetEfieldOffsets(geo::Point_t const& point) const override;
-      geo::Vector_t GetCalPosOffsets(geo::Point_t const& point) const override;
-      geo::Vector_t GetCalEfieldOffsets(geo::Point_t const& point) const override;
+      geo::Vector_t GetCalPosOffsets(geo::Point_t const& point, int const& TPCid) const override;
+      geo::Vector_t GetCalEfieldOffsets(geo::Point_t const& point, int const& TPCid) const override;
  
     private:
     protected:
      
       std::vector<double> GetOffsetsVoxel(geo::Point_t const& point, TH3F* hX, TH3F* hY, TH3F* hZ) const;
-      std::vector<TH3F*> Build_TH3(TTree* tree, TTree* eTree, std::string xvar, std::string yvar, std::string zvar, std::string posLeaf) const;
-      std::vector<TH3F*> SCEhistograms_posX; //Histograms are Dx, Dy, Dz, dEx/E0, dEy/E0, dEz/E0 
-      std::vector<TH3F*> SCEhistograms_negX;
-      std::vector<TH3F*> CalSCEhistograms_posX; 
-      std::vector<TH3F*> CalSCEhistograms_negX; 
+      std::vector<TH3F*> Build_TH3(TTree* tree_pos, TTree* eTree_pos, TTree* tree_neg, TTree* eTree_neg, std::string xvar, std::string yvar, std::string zvar, std::string posLeaf) const;
+      std::vector<TH3F*> SCEhistograms = std::vector<TH3F*>(12); //Histograms are Dx, Dy, Dz, dEx/E0, dEy/E0, dEz/E0 (positive; repeat for negative)
+      std::vector<TH3F*> CalSCEhistograms = std::vector<TH3F*>(12); 
       
       std::vector<double> GetPosOffsetsParametric(double xVal, double yVal, double zVal) const;
       double GetOnePosOffsetParametric(double xVal, double yVal, double zVal, std::string axis) const;
@@ -79,7 +77,7 @@ namespace spacecharge {
       
       std::string fRepresentationType;
       std::string fInputFilename;
-      std::string fCalInputFilename;
+      std::string fCalInputFilename; 
       
       TGraph **g1_x = new TGraph*[7];
       TGraph **g2_x = new TGraph*[7];
