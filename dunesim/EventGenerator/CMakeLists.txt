@@ -11,8 +11,8 @@ art_make( BASENAME_ONLY
                         ${ART_FRAMEWORK_CORE}
                         ${ART_FRAMEWORK_PRINCIPAL}
                         ${ART_FRAMEWORK_SERVICES_REGISTRY}
-                        ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
-                        ${ART_ROOT_IO_TFILESERVICE_SERVICE}
+                        ${ART_FRAMEWORK_SERVICES_OPTIONAL}
+                        ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
                         ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
                         art_Persistency_Common
                         art_Persistency_Provenance
@@ -40,3 +40,4 @@ add_subdirectory(CORSIKAprotodunedp)
 add_subdirectory(ProtoDUNEbeamDataProducts)
 add_subdirectory(NEUT)
 add_subdirectory(MUSUN)
+add_subdirectory(NuE)
