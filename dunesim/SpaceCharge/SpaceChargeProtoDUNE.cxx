@@ -435,7 +435,7 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetPosOffsets(geo::Point_t cons
       
   }else if(fRepresentationType == "Parametric") thePosOffsets = GetPosOffsetsParametric(point.X(), point.Y(), point.Z());
   else thePosOffsets.resize(3,0.0); 
-  
+ 
   return { thePosOffsets[0], thePosOffsets[1], thePosOffsets[2] };
 }
 
@@ -742,6 +742,7 @@ double spacecharge::SpaceChargeProtoDUNE::GetOnePosOffsetParametric(double xValN
 /// used in charge/light yield calculation (e.g.)
 geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetEfieldOffsets(geo::Point_t const& tmp_point) const
 {
+
   std::vector<double> theEfieldOffsets;
   geo::Point_t point = tmp_point;
   if(IsTooFarFromBoundaries(point)) {
@@ -757,7 +758,7 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetEfieldOffsets(geo::Point_t c
   }else if(fRepresentationType == "Parametric") theEfieldOffsets = GetEfieldOffsetsParametric(point.X(), point.Y(), point.Z());
   else theEfieldOffsets.resize(3,0.0);
     
-  return { -theEfieldOffsets[0], -theEfieldOffsets[1], -theEfieldOffsets[2] };
+   return { -theEfieldOffsets[0], -theEfieldOffsets[1], -theEfieldOffsets[2] };
 }
 //----------------------------------------------------------------------------
 /// Primary working method of service that provides E field offsets to be
@@ -989,9 +990,9 @@ geo::Point_t spacecharge::SpaceChargeProtoDUNE::PretendAtBoundary(geo::Point_t c
   
   if(fRepresentationType=="Voxelized_TH3"){ 
   
-    if      (TMath::Abs(point.X()) ==    0.0) x =                           -0.00001;
-    else if (TMath::Abs(point.X()) <	 0.0) x =   TMath::Sign(point.X(),1)*0.00001; 
-    else if (TMath::Abs(point.X()) >=  360.0) x = TMath::Sign(point.X(),1)*359.99999;
+    if      (TMath::Abs(point.X()) ==    0.0    ) x =                           -0.00001;
+    else if (TMath::Abs(point.X()) <	 0.00001) x =   TMath::Sign(point.X(),1)*0.00001; 
+    else if (TMath::Abs(point.X()) >=    360.0  ) x = TMath::Sign(point.X(),1)*359.99999;
   
     if      (point.Y() <=   5.2) y =   5.20001;
     else if (point.Y() >= 604.0) y = 603.99999;
