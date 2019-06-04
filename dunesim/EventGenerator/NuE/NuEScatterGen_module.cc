@@ -43,7 +43,7 @@ private:
   double fMinEnu;
   double fMaxEnu;
 
-  double fGF; // Fermi constant in GeV^-2
+  //dla double fGF; // Fermi constant in GeV^-2
   double fWMA; // sin^2 (Weak mixing angle)
 
   // Detector coordinates, in cm
