@@ -6,9 +6,11 @@ dunefd_spacecharge:   @local::standard_spacecharge
 
 dunefddphase_spacecharge:   @local::standard_spacecharge
 
-protodune_spacecharge:   @local::standard_spacecharge
-protodune_spacecharge.InputFilename:  "SpaceChargeProtoDUNE/SCEoffsets_ProtoDUNE_E500.root"
-protodune_spacecharge.service_provider:  SpaceChargeServiceProtoDUNE
+protodune_spacecharge:   						@local::standard_spacecharge
+protodune_spacecharge.InputFilename:  			"SpaceChargeProtoDUNE/dispOutput_ProtoDUNE_E500.root"
+protodune_spacecharge.CalibrationInputFilename:	"SpaceChargeProtoDUNE/dispOutput_ProtoDUNE_E500.root"
+protodune_spacecharge.RepresentationType:       "Voxelized"
+protodune_spacecharge.service_provider:  		SpaceChargeServiceProtoDUNE
 
 dune35t_spacecharge:   @local::standard_spacecharge
 dune35t_spacecharge.InputFilename:  "SpaceCharge35t/SCEoffsets_DUNE35t_E500.root"

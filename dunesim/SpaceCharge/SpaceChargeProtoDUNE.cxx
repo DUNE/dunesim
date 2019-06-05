@@ -35,6 +35,7 @@ spacecharge::SpaceChargeProtoDUNE::SpaceChargeProtoDUNE(
 bool spacecharge::SpaceChargeProtoDUNE::Configure(fhicl::ParameterSet const& pset, 
 							detinfo::DetectorProperties const* detprop)
 {  
+
   fEnableSimSpatialSCE = pset.get<bool>("EnableSimSpatialSCE");
   fEnableSimEfieldSCE = pset.get<bool>("EnableSimEfieldSCE");
   fEnableCalSpatialSCE = pset.get<bool>("EnableCalSpatialSCE");
@@ -56,79 +57,52 @@ bool spacecharge::SpaceChargeProtoDUNE::Configure(fhicl::ParameterSet const& pse
     if(!infile->IsOpen()) throw cet::exception("SpaceChargeProtoDUNE") << "Could not find the space charge effect file '" << fname << "'!\n";
     
    if (fRepresentationType == "Voxelized_TH3") { 
-   
-      if(fInputFilename.find("NegX")<fInputFilename.length()){
-      	//Load in files
-        TH3F* hDx_neg = (TH3F*)infile->Get("hDx");
-        TH3F* hDy_neg = (TH3F*)infile->Get("hDy");
-        TH3F* hDz_neg = (TH3F*)infile->Get("hDz");
-        TH3F* hEx_neg = (TH3F*)infile->Get("hEx");
-        TH3F* hEy_neg = (TH3F*)infile->Get("hEy");
-        TH3F* hEz_neg = (TH3F*)infile->Get("hEz");
         
-        fInputFilename.replace(fInputFilename.find("NegX"),3,"Pos");
-        
-        std::string fname2;
-        sp.find_file(fInputFilename,fname2);
-        std::unique_ptr<TFile> infile2(new TFile(fname2.c_str(), "READ"));
-        if(!infile2->IsOpen()) throw cet::exception("SpaceChargeProtoDUNE") << "Could not find the space charge effect file '" << fname2 << "'!\n";
-        
-        TH3F* hDx_pos = (TH3F*)infile2->Get("hDx");
-        TH3F* hDy_pos = (TH3F*)infile2->Get("hDy");
-        TH3F* hDz_pos = (TH3F*)infile2->Get("hDz");
-        TH3F* hEx_pos = (TH3F*)infile2->Get("hEx");
-        TH3F* hEy_pos = (TH3F*)infile2->Get("hEy");
-        TH3F* hEz_pos = (TH3F*)infile2->Get("hEz");
+      //Load in files
+      TH3F* hDx_sim_pos_orig = (TH3F*)infile->Get("RecoFwd_Displacement_X_Pos");
+      TH3F* hDy_sim_pos_orig = (TH3F*)infile->Get("RecoFwd_Displacement_Y_Pos");
+      TH3F* hDz_sim_pos_orig = (TH3F*)infile->Get("RecoFwd_Displacement_Z_Pos");
+      TH3F* hEx_sim_pos_orig = (TH3F*)infile->Get("Reco_ElecField_X_Pos");
+      TH3F* hEy_sim_pos_orig = (TH3F*)infile->Get("Reco_ElecField_Y_Pos");
+      TH3F* hEz_sim_pos_orig = (TH3F*)infile->Get("Reco_ElecField_Z_Pos");
       
-      	SCEhistograms_negX = {hDx_neg, hDy_neg, hDz_neg, hEx_neg, hEy_neg, hEz_neg};
-      	SCEhistograms_posX = {hDx_pos, hDy_pos, hDz_pos, hEx_pos, hEy_pos, hEz_pos};
-      	
-      	infile2->Close();
-      	      
-      } else if (fInputFilename.find("PosX")<fInputFilename.length()){
-      
-      	//Load in files
-        TH3F* hDx_pos = (TH3F*)infile->Get("hDx");
-        TH3F* hDy_pos = (TH3F*)infile->Get("hDy");
-        TH3F* hDz_pos = (TH3F*)infile->Get("hDz");
-        TH3F* hEx_pos = (TH3F*)infile->Get("hEx");
-        TH3F* hEy_pos = (TH3F*)infile->Get("hEy");
-        TH3F* hEz_pos = (TH3F*)infile->Get("hEz");
+      TH3F* hDx_sim_neg_orig = (TH3F*)infile->Get("RecoFwd_Displacement_X_Neg");
+      TH3F* hDy_sim_neg_orig = (TH3F*)infile->Get("RecoFwd_Displacement_Y_Neg");
+      TH3F* hDz_sim_neg_orig = (TH3F*)infile->Get("RecoFwd_Displacement_Z_Neg");
+      TH3F* hEx_sim_neg_orig = (TH3F*)infile->Get("Reco_ElecField_X_Neg");
+      TH3F* hEy_sim_neg_orig = (TH3F*)infile->Get("Reco_ElecField_Y_Neg");
+      TH3F* hEz_sim_neg_orig = (TH3F*)infile->Get("Reco_ElecField_Z_Neg");
         
-        fInputFilename.replace(fInputFilename.find("PosX"),3,"Neg");
+      TH3F* hDx_sim_pos = (TH3F*)hDx_sim_pos_orig->Clone("hDx_pos");
+      TH3F* hDy_sim_pos = (TH3F*)hDy_sim_pos_orig->Clone("hDy_pos");
+      TH3F* hDz_sim_pos = (TH3F*)hDz_sim_pos_orig->Clone("hDz_pos");
+      TH3F* hEx_sim_pos = (TH3F*)hEx_sim_pos_orig->Clone("hEx_pos");
+      TH3F* hEy_sim_pos = (TH3F*)hEy_sim_pos_orig->Clone("hEy_pos");
+      TH3F* hEz_sim_pos = (TH3F*)hEz_sim_pos_orig->Clone("hEz_pos");
+      
+      TH3F* hDx_sim_neg = (TH3F*)hDx_sim_neg_orig->Clone("hDx_neg");
+      TH3F* hDy_sim_neg = (TH3F*)hDy_sim_neg_orig->Clone("hDy_neg");
+      TH3F* hDz_sim_neg = (TH3F*)hDz_sim_neg_orig->Clone("hDz_neg");
+      TH3F* hEx_sim_neg = (TH3F*)hEx_sim_neg_orig->Clone("hEx_neg");
+      TH3F* hEy_sim_neg = (TH3F*)hEy_sim_neg_orig->Clone("hEy_neg");
+      TH3F* hEz_sim_neg = (TH3F*)hEz_sim_neg_orig->Clone("hEz_neg");
         
-        std::string fname2;
-        sp.find_file(fInputFilename,fname2);
-        std::unique_ptr<TFile> infile2(new TFile(fname2.c_str(), "READ"));
-        if(!infile2->IsOpen()) throw cet::exception("SpaceChargeProtoDUNE") << "Could not find the space charge effect file '" << fname2 << "'!\n";
+      hDx_sim_pos->SetDirectory(0);
+      hDy_sim_pos->SetDirectory(0);
+      hDz_sim_pos->SetDirectory(0);
+      hEx_sim_pos->SetDirectory(0);
+      hEy_sim_pos->SetDirectory(0);
+      hEz_sim_pos->SetDirectory(0);
+      
+      hDx_sim_neg->SetDirectory(0);
+      hDy_sim_neg->SetDirectory(0);
+      hDz_sim_neg->SetDirectory(0);
+      hEx_sim_neg->SetDirectory(0);
+      hEy_sim_neg->SetDirectory(0);
+      hEz_sim_neg->SetDirectory(0);
         
-        TH3F* hDx_neg = (TH3F*)infile2->Get("hDx");
-        TH3F* hDy_neg = (TH3F*)infile2->Get("hDy");
-        TH3F* hDz_neg = (TH3F*)infile2->Get("hDz");
-        TH3F* hEx_neg = (TH3F*)infile2->Get("hEx");
-        TH3F* hEy_neg = (TH3F*)infile2->Get("hEy");
-        TH3F* hEz_neg = (TH3F*)infile2->Get("hEz");
-      
-      	SCEhistograms_negX = {hDx_neg, hDy_neg, hDz_neg, hEx_neg, hEy_neg, hEz_neg};
-      	SCEhistograms_posX = {hDx_pos, hDy_pos, hDz_pos, hEx_pos, hEy_pos, hEz_pos};	
-      	
-      	infile2->Close();
-      
-      } else {
-      
-        //Load in files
-        TH3F* hDx = (TH3F*)infile->Get("hDx");
-        TH3F* hDy = (TH3F*)infile->Get("hDy");
-        TH3F* hDz = (TH3F*)infile->Get("hDz");
-        TH3F* hEx = (TH3F*)infile->Get("hEx");
-        TH3F* hEy = (TH3F*)infile->Get("hEy");
-        TH3F* hEz = (TH3F*)infile->Get("hEz");
-        
-        SCEhistograms_negX = {hDx, hDy, hDz, hEx, hEy, hEz};
-        SCEhistograms_posX = {hDx, hDy, hDz, hEx, hEy, hEz};
-      
-      }
-    
+      SCEhistograms = {hDx_sim_pos, hDy_sim_pos, hDz_sim_pos, hEx_sim_pos, hEy_sim_pos, hEz_sim_pos, hDx_sim_neg, hDy_sim_neg, hDz_sim_neg, hEx_sim_neg, hEy_sim_neg, hEz_sim_neg};
+                  
    } else if (fRepresentationType == "Voxelized") {
     
       //Load files and read in trees
@@ -147,8 +121,13 @@ bool spacecharge::SpaceChargeProtoDUNE::Configure(fhicl::ParameterSet const& pse
         TTree* treeD_posX = (TTree*)infile2->Get("SpaCEtree_fwdDisp");
         TTree* treeE_posX = (TTree*)infile2->Get("SpaCEtree");
         
-        SCEhistograms_negX = Build_TH3(treeD_negX,treeE_negX,"x_true","y_true","z_true","fwd");
-        SCEhistograms_posX = Build_TH3(treeD_posX,treeE_posX,"x_true","y_true","z_true","fwd");
+        std::vector<TH3F*> temp = Build_TH3(treeD_posX, treeE_posX, treeD_negX, treeE_negX, "x_true", "y_true", "z_true", "fwd");
+        
+        for (size_t ii = 0; ii<temp.size(); ii++){
+        	SCEhistograms.at(ii) = (TH3F*)temp.at(ii)->Clone(TString::Format("%s",temp.at(ii)->GetName()));
+        	SCEhistograms.at(ii)->SetDirectory(0);
+        }   
+        
         
         infile2->Close();
       
@@ -167,8 +146,12 @@ bool spacecharge::SpaceChargeProtoDUNE::Configure(fhicl::ParameterSet const& pse
         TTree* treeD_negX = (TTree*)infile2->Get("SpaCEtree_fwdDisp");
         TTree* treeE_negX = (TTree*)infile2->Get("SpaCEtree");
       
-        SCEhistograms_negX = Build_TH3(treeD_negX,treeE_negX,"x_true","y_true","z_true","fwd");
-        SCEhistograms_posX = Build_TH3(treeD_posX,treeE_posX,"x_true","y_true","z_true","fwd");
+        std::vector<TH3F*> temp = Build_TH3(treeD_posX, treeE_posX, treeD_negX, treeE_negX, "x_true", "y_true", "z_true", "fwd");
+        
+        for (size_t ii = 0; ii<temp.size(); ii++){
+        	SCEhistograms.at(ii) = (TH3F*)temp.at(ii)->Clone(TString::Format("%s",temp.at(ii)->GetName()));
+        	SCEhistograms.at(ii)->SetDirectory(0);
+        }   
         
         infile2->Close();
       
@@ -180,9 +163,13 @@ bool spacecharge::SpaceChargeProtoDUNE::Configure(fhicl::ParameterSet const& pse
         TTree* treeD_posX = (TTree*)infile->Get("SpaCEtree_fwdDisp");
         TTree* treeE_posX = (TTree*)infile->Get("SpaCEtree");
         
-        SCEhistograms_negX = Build_TH3(treeD_negX,treeE_negX,"x_true","y_true","z_true","fwd");
-        SCEhistograms_posX = Build_TH3(treeD_posX,treeE_posX,"x_true","y_true","z_true","fwd");
-      
+        std::vector<TH3F*> temp = Build_TH3(treeD_posX, treeE_posX, treeD_negX, treeE_negX, "x_true", "y_true", "z_true", "fwd");
+        
+        for (size_t ii = 0; ii<temp.size(); ii++){
+        	SCEhistograms.at(ii) = (TH3F*)temp.at(ii)->Clone(TString::Format("%s",temp.at(ii)->GetName()));
+        	SCEhistograms.at(ii)->SetDirectory(0);
+        }           
+            
       }
       
     } else if(fRepresentationType == "Parametric")
@@ -256,7 +243,8 @@ bool spacecharge::SpaceChargeProtoDUNE::Configure(fhicl::ParameterSet const& pse
       g5_Ex[6] = (TGraph*)infile->Get("deltaExOverE/g5_6");
     }
     infile->Close();
-  }
+  }  
+  
   if((fEnableCalSpatialSCE == true) || (fEnableCalEfieldSCE == true))
   {
   
@@ -270,7 +258,54 @@ bool spacecharge::SpaceChargeProtoDUNE::Configure(fhicl::ParameterSet const& pse
     std::unique_ptr<TFile> infile(new TFile(fname.c_str(), "READ"));
     if(!infile->IsOpen()) throw cet::exception("SpaceChargeProtoDUNE") << "Could not find the space charge effect file '" << fname << "'!\n";
   
-   if (fRepresentationType == "Voxelized") {
+   if (fRepresentationType == "Voxelized_TH3") { 
+   
+      //Load in files
+      TH3F* hDx_cal_pos_orig = (TH3F*)infile->Get("RecoBkwd_Displacement_X_Pos");
+      TH3F* hDy_cal_pos_orig = (TH3F*)infile->Get("RecoBkwd_Displacement_Y_Pos");
+      TH3F* hDz_cal_pos_orig = (TH3F*)infile->Get("RecoBkwd_Displacement_Z_Pos");
+      TH3F* hEx_cal_pos_orig = (TH3F*)infile->Get("Reco_ElecField_X_Pos");
+      TH3F* hEy_cal_pos_orig = (TH3F*)infile->Get("Reco_ElecField_Y_Pos");
+      TH3F* hEz_cal_pos_orig = (TH3F*)infile->Get("Reco_ElecField_Z_Pos");
+      
+      TH3F* hDx_cal_neg_orig = (TH3F*)infile->Get("RecoBkwd_Displacement_X_Neg");
+      TH3F* hDy_cal_neg_orig = (TH3F*)infile->Get("RecoBkwd_Displacement_Y_Neg");
+      TH3F* hDz_cal_neg_orig = (TH3F*)infile->Get("RecoBkwd_Displacement_Z_Neg");
+      TH3F* hEx_cal_neg_orig = (TH3F*)infile->Get("Reco_ElecField_X_Neg");
+      TH3F* hEy_cal_neg_orig = (TH3F*)infile->Get("Reco_ElecField_Y_Neg");
+      TH3F* hEz_cal_neg_orig = (TH3F*)infile->Get("Reco_ElecField_Z_Neg");
+        
+      TH3F* hDx_cal_pos = (TH3F*)hDx_cal_pos_orig->Clone("hDx_pos");
+      TH3F* hDy_cal_pos = (TH3F*)hDy_cal_pos_orig->Clone("hDy_pos");
+      TH3F* hDz_cal_pos = (TH3F*)hDz_cal_pos_orig->Clone("hDz_pos");
+      TH3F* hEx_cal_pos = (TH3F*)hEx_cal_pos_orig->Clone("hEx_pos");
+      TH3F* hEy_cal_pos = (TH3F*)hEy_cal_pos_orig->Clone("hEy_pos");
+      TH3F* hEz_cal_pos = (TH3F*)hEz_cal_pos_orig->Clone("hEz_pos");
+      
+      TH3F* hDx_cal_neg = (TH3F*)hDx_cal_neg_orig->Clone("hDx_neg");
+      TH3F* hDy_cal_neg = (TH3F*)hDy_cal_neg_orig->Clone("hDy_neg");
+      TH3F* hDz_cal_neg = (TH3F*)hDz_cal_neg_orig->Clone("hDz_neg");
+      TH3F* hEx_cal_neg = (TH3F*)hEx_cal_neg_orig->Clone("hEx_neg");
+      TH3F* hEy_cal_neg = (TH3F*)hEy_cal_neg_orig->Clone("hEy_neg");
+      TH3F* hEz_cal_neg = (TH3F*)hEz_cal_neg_orig->Clone("hEz_neg");
+        
+      hDx_cal_pos->SetDirectory(0);
+      hDy_cal_pos->SetDirectory(0);
+      hDz_cal_pos->SetDirectory(0);
+      hEx_cal_pos->SetDirectory(0);
+      hEy_cal_pos->SetDirectory(0);
+      hEz_cal_pos->SetDirectory(0);
+      
+      hDx_cal_neg->SetDirectory(0);
+      hDy_cal_neg->SetDirectory(0);
+      hDz_cal_neg->SetDirectory(0);
+      hEx_cal_neg->SetDirectory(0);
+      hEy_cal_neg->SetDirectory(0);
+      hEz_cal_neg->SetDirectory(0);
+        
+      CalSCEhistograms = {hDx_cal_pos, hDy_cal_pos, hDz_cal_pos, hEx_cal_pos, hEy_cal_pos, hEz_cal_pos, hDx_cal_neg, hDy_cal_neg, hDz_cal_neg, hEx_cal_neg, hEy_cal_neg, hEz_cal_neg};
+      
+    } else if (fRepresentationType == "Voxelized") {
     
       //Load files and read in trees
       if (fCalInputFilename.find("NegX")<fCalInputFilename.length()){
@@ -288,8 +323,11 @@ bool spacecharge::SpaceChargeProtoDUNE::Configure(fhicl::ParameterSet const& pse
         TTree* treeD_posX = (TTree*)infile2->Get("SpaCEtree_bkwdDisp");
         TTree* treeE_posX = (TTree*)infile2->Get("SpaCEtree");
         
-        CalSCEhistograms_negX = Build_TH3(treeD_negX,treeE_negX,"x_reco","y_reco","z_reco","bkwd");
-        CalSCEhistograms_posX = Build_TH3(treeD_posX,treeE_posX,"x_reco","y_reco","z_reco","bkwd");
+        std::vector<TH3F*> temp = Build_TH3(treeD_posX, treeE_posX, treeD_negX,treeE_negX, "x_reco", "y_reco", "z_reco", "bkwd");        
+        for (size_t ii = 0; ii<temp.size(); ii++){
+        	CalSCEhistograms.at(ii) = (TH3F*)temp.at(ii)->Clone(TString::Format("%s",temp.at(ii)->GetName()));
+        	CalSCEhistograms.at(ii)->SetDirectory(0);
+        }   
         
         infile2->Close();
       
@@ -308,8 +346,11 @@ bool spacecharge::SpaceChargeProtoDUNE::Configure(fhicl::ParameterSet const& pse
         TTree* treeD_negX = (TTree*)infile2->Get("SpaCEtree_bkwdDisp");
         TTree* treeE_negX = (TTree*)infile2->Get("SpaCEtree");
       
-        CalSCEhistograms_negX = Build_TH3(treeD_negX,treeE_negX,"x_reco","y_reco","z_reco","bkwd");
-        CalSCEhistograms_posX = Build_TH3(treeD_posX,treeE_posX,"x_reco","y_reco","z_reco","bkwd");
+        std::vector<TH3F*> temp = Build_TH3(treeD_posX, treeE_posX, treeD_negX,treeE_negX, "x_reco", "y_reco", "z_reco", "bkwd");        
+        for (size_t ii = 0; ii<temp.size(); ii++){
+        	CalSCEhistograms.at(ii) = (TH3F*)temp.at(ii)->Clone(TString::Format("%s",temp.at(ii)->GetName()));
+        	CalSCEhistograms.at(ii)->SetDirectory(0);
+        }   
         
         infile2->Close();
       
@@ -321,90 +362,19 @@ bool spacecharge::SpaceChargeProtoDUNE::Configure(fhicl::ParameterSet const& pse
         TTree* treeD_posX = (TTree*)infile->Get("SpaCEtree_bkwdDisp");
         TTree* treeE_posX = (TTree*)infile->Get("SpaCEtree");
         
-        CalSCEhistograms_negX = Build_TH3(treeD_negX,treeE_negX,"x_reco","y_reco","z_reco","bkwd");
-        CalSCEhistograms_posX = Build_TH3(treeD_posX,treeE_posX,"x_reco","y_reco","z_reco","bkwd");
+        std::vector<TH3F*> temp = Build_TH3(treeD_posX, treeE_posX, treeD_negX,treeE_negX, "x_reco", "y_reco", "z_reco", "bkwd");        
+        for (size_t ii = 0; ii<temp.size(); ii++){
+        	CalSCEhistograms.at(ii) = (TH3F*)temp.at(ii)->Clone(TString::Format("%s",temp.at(ii)->GetName()));
+        	CalSCEhistograms.at(ii)->SetDirectory(0);
+        }   
       
       }
       
-    } else if (fRepresentationType == "Voxelized_TH3") { 
-   
-      if(fCalInputFilename.find("NegX")<fCalInputFilename.length()){
-      	//Load in files
-        TH3F* hDx_neg = (TH3F*)infile->Get("hDx");
-        TH3F* hDy_neg = (TH3F*)infile->Get("hDy");
-        TH3F* hDz_neg = (TH3F*)infile->Get("hDz");
-        TH3F* hEx_neg = (TH3F*)infile->Get("hEx");
-        TH3F* hEy_neg = (TH3F*)infile->Get("hEy");
-        TH3F* hEz_neg = (TH3F*)infile->Get("hEz");
-        
-        fCalInputFilename.replace(fCalInputFilename.find("NegX"),3,"Pos");
-        
-        std::string fname2;
-        sp.find_file(fCalInputFilename,fname2);
-        std::unique_ptr<TFile> infile2(new TFile(fname2.c_str(), "READ"));
-        if(!infile2->IsOpen()) throw cet::exception("SpaceChargeProtoDUNE") << "Could not find the space charge effect file '" << fname2 << "'!\n";
-        
-        TH3F* hDx_pos = (TH3F*)infile2->Get("hDx");
-        TH3F* hDy_pos = (TH3F*)infile2->Get("hDy");
-        TH3F* hDz_pos = (TH3F*)infile2->Get("hDz");
-        TH3F* hEx_pos = (TH3F*)infile2->Get("hEx");
-        TH3F* hEy_pos = (TH3F*)infile2->Get("hEy");
-        TH3F* hEz_pos = (TH3F*)infile2->Get("hEz");
-      
-      	CalSCEhistograms_negX = {hDx_neg, hDy_neg, hDz_neg, hEx_neg, hEy_neg, hEz_neg};
-      	CalSCEhistograms_posX = {hDx_pos, hDy_pos, hDz_pos, hEx_pos, hEy_pos, hEz_pos};
-      	
-      	infile2->Close();
-      	      
-      } else if (fCalInputFilename.find("PosX")<fCalInputFilename.length()){
-      
-      	//Load in files
-        TH3F* hDx_pos = (TH3F*)infile->Get("hDx");
-        TH3F* hDy_pos = (TH3F*)infile->Get("hDy");
-        TH3F* hDz_pos = (TH3F*)infile->Get("hDz");
-        TH3F* hEx_pos = (TH3F*)infile->Get("hEx");
-        TH3F* hEy_pos = (TH3F*)infile->Get("hEy");
-        TH3F* hEz_pos = (TH3F*)infile->Get("hEz");
-        
-        fCalInputFilename.replace(fCalInputFilename.find("PosX"),3,"Neg");
-        
-        std::string fname2;
-        sp.find_file(fCalInputFilename,fname2);
-        std::unique_ptr<TFile> infile2(new TFile(fname2.c_str(), "READ"));
-        if(!infile2->IsOpen()) throw cet::exception("SpaceChargeProtoDUNE") << "Could not find the space charge effect file '" << fname2 << "'!\n";
-        
-        TH3F* hDx_neg = (TH3F*)infile2->Get("hDx");
-        TH3F* hDy_neg = (TH3F*)infile2->Get("hDy");
-        TH3F* hDz_neg = (TH3F*)infile2->Get("hDz");
-        TH3F* hEx_neg = (TH3F*)infile2->Get("hEx");
-        TH3F* hEy_neg = (TH3F*)infile2->Get("hEy");
-        TH3F* hEz_neg = (TH3F*)infile2->Get("hEz");
-      
-      	CalSCEhistograms_negX = {hDx_neg, hDy_neg, hDz_neg, hEx_neg, hEy_neg, hEz_neg};
-      	CalSCEhistograms_posX = {hDx_pos, hDy_pos, hDz_pos, hEx_pos, hEy_pos, hEz_pos};	
-      	
-      	infile2->Close();
-      
-      } else {
-      
-        //Load in files
-        TH3F* hDx = (TH3F*)infile->Get("hDx");
-        TH3F* hDy = (TH3F*)infile->Get("hDy");
-        TH3F* hDz = (TH3F*)infile->Get("hDz");
-        TH3F* hEx = (TH3F*)infile->Get("hEx");
-        TH3F* hEy = (TH3F*)infile->Get("hEy");
-        TH3F* hEz = (TH3F*)infile->Get("hEz");
-        
-        CalSCEhistograms_negX = {hDx, hDy, hDz, hEx, hEy, hEz};
-        CalSCEhistograms_posX = {hDx, hDy, hDz, hEx, hEy, hEz};
-      
-      }
-    
    } else { std::cout << "No space charge representation type chosen." << std::endl;} 
     
     infile->Close();
   }
-  
+   
   return true;
 }
 //------------------------------------------------
@@ -450,6 +420,7 @@ bool spacecharge::SpaceChargeProtoDUNE::EnableCalEfieldSCE() const
 /// used in ionization electron drift
 geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetPosOffsets(geo::Point_t const& tmp_point) const
 {
+
   std::vector<double> thePosOffsets;
   geo::Point_t point = tmp_point;
   if(IsTooFarFromBoundaries(point)) {
@@ -459,21 +430,19 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetPosOffsets(geo::Point_t cons
   if(!IsInsideBoundaries(point)&&!IsTooFarFromBoundaries(point)) point = PretendAtBoundary(point);
   
   if ((fRepresentationType == "Voxelized")||(fRepresentationType=="Voxelized_TH3")){
-    if (point.X()>0){
-      thePosOffsets = GetOffsetsVoxel(point, SCEhistograms_posX.at(0), SCEhistograms_posX.at(1), SCEhistograms_posX.at(2));
-      //thePosOffsets[0] = -1.0*thePosOffsets[0];
-    } else {
-      thePosOffsets = GetOffsetsVoxel(point, SCEhistograms_negX.at(0), SCEhistograms_negX.at(1), SCEhistograms_negX.at(2));
-    }
+    if (point.X() > 0.) thePosOffsets = GetOffsetsVoxel(point, SCEhistograms.at(0), SCEhistograms.at(1), SCEhistograms.at(2));
+    else thePosOffsets = GetOffsetsVoxel(point, SCEhistograms.at(6), SCEhistograms.at(7), SCEhistograms.at(8));
       
-  }else if(fRepresentationType == "Parametric")
-    thePosOffsets = GetPosOffsetsParametric(point.X(), point.Y(), point.Z());
+  }else if(fRepresentationType == "Parametric") thePosOffsets = GetPosOffsetsParametric(point.X(), point.Y(), point.Z());
   else thePosOffsets.resize(3,0.0); 
-
+ 
   return { thePosOffsets[0], thePosOffsets[1], thePosOffsets[2] };
 }
 
-geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetCalPosOffsets(geo::Point_t const& tmp_point) const
+//----------------------------------------------------------------------------
+/// Primary working method of service that provides position offsets to be
+/// used in calibration of space charge
+geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetCalPosOffsets(geo::Point_t const& tmp_point, int const& TPCid) const
 {
 	
   std::vector<double> thePosOffsets;
@@ -483,20 +452,22 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetCalPosOffsets(geo::Point_t c
     thePosOffsets.resize(3,0.0);
     return { -thePosOffsets[0], -thePosOffsets[1], -thePosOffsets[2] };
   }
-  if(!IsInsideBoundaries(point)&&!IsTooFarFromBoundaries(point)) point = PretendAtBoundary(point);
+  if(!IsInsideBoundaries(point)&&!IsTooFarFromBoundaries(point)){ 
+  	point = PretendAtBoundary(point); 
+  }
   
-  if ((fRepresentationType == "Voxelized")||(fRepresentationType=="Voxelized_TH3")){
-    if (point.X()>0){
-      thePosOffsets = GetOffsetsVoxel(point, CalSCEhistograms_posX.at(0), CalSCEhistograms_posX.at(1), CalSCEhistograms_posX.at(2));
-      //thePosOffsets[0] = -1.0*thePosOffsets[0];
-    } else {
-      thePosOffsets = GetOffsetsVoxel(point, CalSCEhistograms_negX.at(0), CalSCEhistograms_negX.at(1), CalSCEhistograms_negX.at(2));
-    }
+  if ((fRepresentationType == "Voxelized_TH3")||(fRepresentationType=="Voxelized")){
+    if ((TPCid == 2 || TPCid == 6 || TPCid == 10)&&point.X()>-20.){
+      if (point.X()<0.) point = {0.00001, point.Y(), point.Z()};
+      thePosOffsets = GetOffsetsVoxel(point, CalSCEhistograms.at(0), CalSCEhistograms.at(1), CalSCEhistograms.at(2));
+      thePosOffsets[0] = -1.0*thePosOffsets[0];
+    } else if((TPCid == 1 || TPCid == 5 || TPCid == 9)&&point.X()<20.) {
+    	if (point.X()>0.) point= {-0.00001, point.Y(), point.Z()};
+      thePosOffsets = GetOffsetsVoxel(point, CalSCEhistograms.at(6), CalSCEhistograms.at(7), CalSCEhistograms.at(8));
+    } else thePosOffsets = {0., 0., 0,};
       
-  }else thePosOffsets.resize(3,0.0); 
+  }else thePosOffsets.resize(3,0.0);
   
-  //std::cout << "\tHere's the space charge position offsets in reco: (" << tmp_point.X() << ", " << tmp_point.Y() << ", " << tmp_point.Z() << ") --> (" << thePosOffsets[0] << ", " << thePosOffsets[1] << ", " << thePosOffsets[2] << ")" << std::endl;
-
   return { thePosOffsets[0], thePosOffsets[1], thePosOffsets[2] };
 }
 
@@ -505,21 +476,30 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetCalPosOffsets(geo::Point_t c
 std::vector<double> spacecharge::SpaceChargeProtoDUNE::GetOffsetsVoxel
   (geo::Point_t const& point, TH3F* hX, TH3F* hY, TH3F* hZ) const
 {
-
-  double xnew = TransformX(point.X());
-  double ynew = TransformY(point.Y());
-  double znew = TransformZ(point.Z());
+  if (fRepresentationType == "Voxelized_TH3"){
   
-  return {
-    hX->Interpolate(xnew,ynew,znew),
-    hY->Interpolate(xnew,ynew,znew),
-    hZ->Interpolate(xnew,ynew,znew)
-   };
+    return {
+      hX->Interpolate(point.X(),point.Y(),point.Z()),
+      hY->Interpolate(point.X(),point.Y(),point.Z()),
+      hZ->Interpolate(point.X(),point.Y(),point.Z())
+    };
+    
+  } else {
+    double xnew = TransformX(point.X());
+    double ynew = TransformY(point.Y());
+    double znew = TransformZ(point.Z());
+  
+    return {
+      hX->Interpolate(xnew,ynew,znew),
+      hY->Interpolate(xnew,ynew,znew),
+      hZ->Interpolate(xnew,ynew,znew)
+    };
+  }
 }
 
 /// Build 3d histograms for voxelized interpolation
 std::vector<TH3F*> spacecharge::SpaceChargeProtoDUNE::Build_TH3
-  (TTree* tree, TTree* eTree, std::string xvar, std::string yvar, std::string zvar, std::string posLeaf) const
+  (TTree* tree_pos, TTree* eTree_pos, TTree* tree_neg, TTree* eTree_neg, std::string xvar, std::string yvar, std::string zvar, std::string posLeaf) const
 {
 
   //Define the protoDUNE detector
@@ -534,49 +514,91 @@ std::vector<TH3F*> spacecharge::SpaceChargeProtoDUNE::Build_TH3
   double E_numDivisions_y = TMath::Nint((Ly/Lx)*((Double_t)E_numDivisions_x));
   double E_numDivisions_z = TMath::Nint((Lz/Lx)*((Double_t)E_numDivisions_x));
   
-  //initialized histograms for Dx, Dy, Dz, and electric field
-  TH3F* hDx = new TH3F("hDx", "", numDivisions_x+1, -0.5*cell_size, Lx+0.5*cell_size, numDivisions_y+1 ,-0.5*cell_size, Ly+0.5*cell_size, numDivisions_z+1, -0.5*cell_size, Lz+0.5*cell_size);
-  TH3F* hDy = new TH3F("hDy", "", numDivisions_x+1, -0.5*cell_size, Lx+0.5*cell_size, numDivisions_y+1, -0.5*cell_size, Ly+0.5*cell_size, numDivisions_z+1, -0.5*cell_size, Lz+0.5*cell_size);
-  TH3F* hDz = new TH3F("hDz", "", numDivisions_x+1, -0.5*cell_size, Lx+0.5*cell_size, numDivisions_y+1, -0.5*cell_size, Ly+0.5*cell_size, numDivisions_z+1, -0.5*cell_size, Lz+0.5*cell_size);
+  //initialized histograms for Dx, Dy, Dz, and electric field (pos x)
+  TH3F* hDx_pos = new TH3F("hDx_pos", "", numDivisions_x+1, -0.5*cell_size, Lx+0.5*cell_size, numDivisions_y+1 ,-0.5*cell_size, Ly+0.5*cell_size, numDivisions_z+1, -0.5*cell_size, Lz+0.5*cell_size);
+  TH3F* hDy_pos = new TH3F("hDy_pos", "", numDivisions_x+1, -0.5*cell_size, Lx+0.5*cell_size, numDivisions_y+1, -0.5*cell_size, Ly+0.5*cell_size, numDivisions_z+1, -0.5*cell_size, Lz+0.5*cell_size);
+  TH3F* hDz_pos = new TH3F("hDz_pos", "", numDivisions_x+1, -0.5*cell_size, Lx+0.5*cell_size, numDivisions_y+1, -0.5*cell_size, Ly+0.5*cell_size, numDivisions_z+1, -0.5*cell_size, Lz+0.5*cell_size);
   
-  TH3F* hEx = new TH3F("hEx", "", E_numDivisions_x+1, -0.5*E_cell_size, Lx+0.5*E_cell_size, E_numDivisions_y+1, -0.5*E_cell_size, Ly+0.5*E_cell_size, E_numDivisions_z+1, -0.5*E_cell_size, Lz+0.5*E_cell_size);
-  TH3F* hEy = new TH3F("hEy", "", E_numDivisions_x+1, -0.5*E_cell_size, Lx+0.5*E_cell_size, E_numDivisions_y+1, -0.5*E_cell_size, Ly+0.5*E_cell_size, E_numDivisions_z+1, -0.5*E_cell_size, Lz+0.5*E_cell_size);
-  TH3F* hEz = new TH3F("hez", "", E_numDivisions_x+1, -0.5*E_cell_size, Lx+0.5*E_cell_size, E_numDivisions_y+1, -0.5*E_cell_size, Ly+0.5*E_cell_size, E_numDivisions_z+1, -0.5*E_cell_size, Lz+0.5*E_cell_size);
+  TH3F* hEx_pos = new TH3F("hEx_pos", "", E_numDivisions_x+1, -0.5*E_cell_size, Lx+0.5*E_cell_size, E_numDivisions_y+1, -0.5*E_cell_size, Ly+0.5*E_cell_size, E_numDivisions_z+1, -0.5*E_cell_size, Lz+0.5*E_cell_size);
+  TH3F* hEy_pos = new TH3F("hEy_pos", "", E_numDivisions_x+1, -0.5*E_cell_size, Lx+0.5*E_cell_size, E_numDivisions_y+1, -0.5*E_cell_size, Ly+0.5*E_cell_size, E_numDivisions_z+1, -0.5*E_cell_size, Lz+0.5*E_cell_size);
+  TH3F* hEz_pos = new TH3F("hEz_pos", "", E_numDivisions_x+1, -0.5*E_cell_size, Lx+0.5*E_cell_size, E_numDivisions_y+1, -0.5*E_cell_size, Ly+0.5*E_cell_size, E_numDivisions_z+1, -0.5*E_cell_size, Lz+0.5*E_cell_size);
+  
+  //initialized histograms for Dx, Dy, Dz, and electric field (neg x)
+  TH3F* hDx_neg = new TH3F("hDx_neg", "", numDivisions_x+1, -0.5*cell_size, Lx+0.5*cell_size, numDivisions_y+1 ,-0.5*cell_size, Ly+0.5*cell_size, numDivisions_z+1, -0.5*cell_size, Lz+0.5*cell_size);
+  TH3F* hDy_neg = new TH3F("hDy_neg", "", numDivisions_x+1, -0.5*cell_size, Lx+0.5*cell_size, numDivisions_y+1, -0.5*cell_size, Ly+0.5*cell_size, numDivisions_z+1, -0.5*cell_size, Lz+0.5*cell_size);
+  TH3F* hDz_neg = new TH3F("hDz_neg", "", numDivisions_x+1, -0.5*cell_size, Lx+0.5*cell_size, numDivisions_y+1, -0.5*cell_size, Ly+0.5*cell_size, numDivisions_z+1, -0.5*cell_size, Lz+0.5*cell_size);
+  
+  TH3F* hEx_neg = new TH3F("hEx_neg", "", E_numDivisions_x+1, -0.5*E_cell_size, Lx+0.5*E_cell_size, E_numDivisions_y+1, -0.5*E_cell_size, Ly+0.5*E_cell_size, E_numDivisions_z+1, -0.5*E_cell_size, Lz+0.5*E_cell_size);
+  TH3F* hEy_neg = new TH3F("hEy_neg", "", E_numDivisions_x+1, -0.5*E_cell_size, Lx+0.5*E_cell_size, E_numDivisions_y+1, -0.5*E_cell_size, Ly+0.5*E_cell_size, E_numDivisions_z+1, -0.5*E_cell_size, Lz+0.5*E_cell_size);
+  TH3F* hEz_neg = new TH3F("hEz_neg", "", E_numDivisions_x+1, -0.5*E_cell_size, Lx+0.5*E_cell_size, E_numDivisions_y+1, -0.5*E_cell_size, Ly+0.5*E_cell_size, E_numDivisions_z+1, -0.5*E_cell_size, Lz+0.5*E_cell_size);
  
-  //For each event, read the tree and fill each histogram
-  for (int ii = 0; ii<tree->GetEntries(); ii++){
+  //For each event, read the tree and fill each histogram (pos x)
+  for (int ii = 0; ii<tree_pos->GetEntries(); ii++){
 
     //Read the trees
-    tree->GetEntry(ii);
-    Double_t x = tree->GetBranch(xvar.c_str())->GetLeaf(Form("data_%sDisp",posLeaf.c_str()))->GetValue();
-    Double_t y = tree->GetBranch(yvar.c_str())->GetLeaf(Form("data_%sDisp",posLeaf.c_str()))->GetValue();
-    Double_t z = tree->GetBranch(zvar.c_str())->GetLeaf(Form("data_%sDisp",posLeaf.c_str()))->GetValue();
-    Double_t dx = tree->GetBranch("Dx")->GetLeaf(Form("data_%sDisp",posLeaf.c_str()))->GetValue();
-    Double_t dy = tree->GetBranch("Dy")->GetLeaf(Form("data_%sDisp",posLeaf.c_str()))->GetValue();
-    Double_t dz = tree->GetBranch("Dz")->GetLeaf(Form("data_%sDisp",posLeaf.c_str()))->GetValue();
+    tree_pos->GetEntry(ii);
+    Double_t x = tree_pos->GetBranch(xvar.c_str())->GetLeaf(Form("data_%sDisp",posLeaf.c_str()))->GetValue();
+    Double_t y = tree_pos->GetBranch(yvar.c_str())->GetLeaf(Form("data_%sDisp",posLeaf.c_str()))->GetValue();
+    Double_t z = tree_pos->GetBranch(zvar.c_str())->GetLeaf(Form("data_%sDisp",posLeaf.c_str()))->GetValue();
+    Double_t dx = tree_pos->GetBranch("Dx")->GetLeaf(Form("data_%sDisp",posLeaf.c_str()))->GetValue();
+    Double_t dy = tree_pos->GetBranch("Dy")->GetLeaf(Form("data_%sDisp",posLeaf.c_str()))->GetValue();
+    Double_t dz = tree_pos->GetBranch("Dz")->GetLeaf(Form("data_%sDisp",posLeaf.c_str()))->GetValue();
     
-    hDx->Fill(x,y,z,100.0*dx);
-    hDy->Fill(x,y,z,100.0*dy);
-    hDz->Fill(x,y,z,100.0*dz);
+    hDx_pos->Fill(x,y,z,100.0*dx);
+    hDy_pos->Fill(x,y,z,100.0*dy);
+    hDz_pos->Fill(x,y,z,100.0*dz);
   }
   
-  for(int ii = 0; ii<eTree->GetEntries(); ii++){
+  for(int ii = 0; ii<eTree_pos->GetEntries(); ii++){
 		
-    eTree->GetEntry(ii);
-    Double_t x = eTree->GetBranch("xpoint")->GetLeaf("data")->GetValue();
-    Double_t y = eTree->GetBranch("ypoint")->GetLeaf("data")->GetValue();
-    Double_t z = eTree->GetBranch("zpoint")->GetLeaf("data")->GetValue();
-    Double_t Ex = eTree->GetBranch("Ex")->GetLeaf("data")->GetValue() / (100000.0*fEfield);
-    Double_t Ey = eTree->GetBranch("Ey")->GetLeaf("data")->GetValue() / (100000.0*fEfield);
-    Double_t Ez = eTree->GetBranch("Ez")->GetLeaf("data")->GetValue() / (100000.0*fEfield);
+    eTree_pos->GetEntry(ii);
+    Double_t x = eTree_pos->GetBranch("xpoint")->GetLeaf("data")->GetValue();
+    Double_t y = eTree_pos->GetBranch("ypoint")->GetLeaf("data")->GetValue();
+    Double_t z = eTree_pos->GetBranch("zpoint")->GetLeaf("data")->GetValue();
+    Double_t Ex = eTree_pos->GetBranch("Ex")->GetLeaf("data")->GetValue() / (100000.0*fEfield);
+    Double_t Ey = eTree_pos->GetBranch("Ey")->GetLeaf("data")->GetValue() / (100000.0*fEfield);
+    Double_t Ez = eTree_pos->GetBranch("Ez")->GetLeaf("data")->GetValue() / (100000.0*fEfield);
    
     //Fill the histograms		
-    hEx->Fill(x,y,z,Ex);
-    hEy->Fill(x,y,z,Ey);
-    hEz->Fill(x,y,z,Ez);
+    hEx_pos->Fill(x,y,z,Ex);
+    hEy_pos->Fill(x,y,z,Ey);
+    hEz_pos->Fill(x,y,z,Ez);
   }
   
-  return  {hDx, hDy, hDz, hEx, hEy, hEz};
+  //For each event, read the tree and fill each histogram (neg x)
+  for (int ii = 0; ii<tree_neg->GetEntries(); ii++){
+
+    //Read the trees
+    tree_neg->GetEntry(ii);
+    Double_t x = tree_neg->GetBranch(xvar.c_str())->GetLeaf(Form("data_%sDisp",posLeaf.c_str()))->GetValue();
+    Double_t y = tree_neg->GetBranch(yvar.c_str())->GetLeaf(Form("data_%sDisp",posLeaf.c_str()))->GetValue();
+    Double_t z = tree_neg->GetBranch(zvar.c_str())->GetLeaf(Form("data_%sDisp",posLeaf.c_str()))->GetValue();
+    Double_t dx = tree_neg->GetBranch("Dx")->GetLeaf(Form("data_%sDisp",posLeaf.c_str()))->GetValue();
+    Double_t dy = tree_neg->GetBranch("Dy")->GetLeaf(Form("data_%sDisp",posLeaf.c_str()))->GetValue();
+    Double_t dz = tree_neg->GetBranch("Dz")->GetLeaf(Form("data_%sDisp",posLeaf.c_str()))->GetValue();
+    
+    hDx_neg->Fill(x,y,z,100.0*dx);
+    hDy_neg->Fill(x,y,z,100.0*dy);
+    hDz_neg->Fill(x,y,z,100.0*dz);
+  }
+  
+  for(int ii = 0; ii<eTree_neg->GetEntries(); ii++){
+		
+    eTree_neg->GetEntry(ii);
+    Double_t x = eTree_neg->GetBranch("xpoint")->GetLeaf("data")->GetValue();
+    Double_t y = eTree_neg->GetBranch("ypoint")->GetLeaf("data")->GetValue();
+    Double_t z = eTree_neg->GetBranch("zpoint")->GetLeaf("data")->GetValue();
+    Double_t Ex = eTree_neg->GetBranch("Ex")->GetLeaf("data")->GetValue() / (100000.0*fEfield);
+    Double_t Ey = eTree_neg->GetBranch("Ey")->GetLeaf("data")->GetValue() / (100000.0*fEfield);
+    Double_t Ez = eTree_neg->GetBranch("Ez")->GetLeaf("data")->GetValue() / (100000.0*fEfield);
+   
+    //Fill the histograms		
+    hEx_neg->Fill(x,y,z,Ex);
+    hEy_neg->Fill(x,y,z,Ey);
+    hEz_neg->Fill(x,y,z,Ez);
+  }
+  
+  return {hDx_pos, hDy_pos, hDz_pos, hEx_pos, hEy_pos, hEz_pos, hDx_neg, hDy_neg, hDz_neg, hEx_neg, hEy_neg, hEz_neg};
 
 }
 
@@ -720,6 +742,7 @@ double spacecharge::SpaceChargeProtoDUNE::GetOnePosOffsetParametric(double xValN
 /// used in charge/light yield calculation (e.g.)
 geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetEfieldOffsets(geo::Point_t const& tmp_point) const
 {
+
   std::vector<double> theEfieldOffsets;
   geo::Point_t point = tmp_point;
   if(IsTooFarFromBoundaries(point)) {
@@ -729,21 +752,18 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetEfieldOffsets(geo::Point_t c
   if(!IsInsideBoundaries(point)&&!IsTooFarFromBoundaries(point)) point = PretendAtBoundary(point);
   
   if (fRepresentationType == "Voxelized"||fRepresentationType=="Voxelized_TH3"){
-     //std::cout << "Correcting sce efield in service." << std::endl;
-    if (point.X() > 0.0) theEfieldOffsets = GetOffsetsVoxel(point, SCEhistograms_posX.at(3), SCEhistograms_posX.at(4), SCEhistograms_posX.at(5));
-    else {
-      theEfieldOffsets = GetOffsetsVoxel(point, SCEhistograms_negX.at(3), SCEhistograms_negX.at(4), SCEhistograms_negX.at(5));
-      theEfieldOffsets[0] = theEfieldOffsets[0];
-    }
-  }else if(fRepresentationType == "Parametric")
-    theEfieldOffsets = GetEfieldOffsetsParametric(point.X(), point.Y(), point.Z());
-  else
-    theEfieldOffsets.resize(3,0.0);
-  
-  return { -theEfieldOffsets[0], -theEfieldOffsets[1], -theEfieldOffsets[2] };
+    if (point.X() > 0.) theEfieldOffsets = GetOffsetsVoxel(point, SCEhistograms.at(3), SCEhistograms.at(4), SCEhistograms.at(5));
+    else theEfieldOffsets = GetOffsetsVoxel(point, SCEhistograms.at(9), SCEhistograms.at(10), SCEhistograms.at(11));
+         
+  }else if(fRepresentationType == "Parametric") theEfieldOffsets = GetEfieldOffsetsParametric(point.X(), point.Y(), point.Z());
+  else theEfieldOffsets.resize(3,0.0);
+    
+   return { -theEfieldOffsets[0], -theEfieldOffsets[1], -theEfieldOffsets[2] };
 }
-
-geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetCalEfieldOffsets(geo::Point_t const& tmp_point) const
+//----------------------------------------------------------------------------
+/// Primary working method of service that provides E field offsets to be
+/// used in charge/light yield calculation (e.g.) for calibration
+geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetCalEfieldOffsets(geo::Point_t const& tmp_point, int const& TPCid) const
 { 
   std::vector<double> theEfieldOffsets;
   geo::Point_t point = tmp_point;
@@ -754,11 +774,13 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetCalEfieldOffsets(geo::Point_
   if(!IsInsideBoundaries(point)&&!IsTooFarFromBoundaries(point)) point = PretendAtBoundary(point);
   
   if ((fRepresentationType == "Voxelized")||(fRepresentationType == "Voxelized_TH3")){
-    if (point.X() > 0.0) theEfieldOffsets = GetOffsetsVoxel(point, CalSCEhistograms_posX.at(3), CalSCEhistograms_posX.at(4), CalSCEhistograms_posX.at(5));
-    else {
-      theEfieldOffsets = GetOffsetsVoxel(point, CalSCEhistograms_negX.at(3), CalSCEhistograms_negX.at(4), CalSCEhistograms_negX.at(5));
-      theEfieldOffsets[0] = theEfieldOffsets[0];
-    }
+    if ((TPCid == 2 || TPCid == 6 || TPCid == 10)&&point.X()>-20.){
+      if (point.X()<0.) point = {0.00001, point.Y(), point.Z()};
+      theEfieldOffsets = GetOffsetsVoxel(point, CalSCEhistograms.at(3), CalSCEhistograms.at(4), CalSCEhistograms.at(5));
+    }else if ((TPCid == 1 || TPCid == 5 || TPCid == 9)&&point.X()<20.){
+      if (point.X()>0.) point = {-0.00001, point.Y(), point.Z()};
+      theEfieldOffsets = GetOffsetsVoxel(point, CalSCEhistograms.at(9), CalSCEhistograms.at(10), CalSCEhistograms.at(11));
+    } else theEfieldOffsets = {0., 0., 0.};
   }else
     theEfieldOffsets.resize(3,0.0);
   
@@ -930,34 +952,66 @@ double spacecharge::SpaceChargeProtoDUNE::TransformZ(double zVal) const
 /// Check to see if point is inside boundaries of map (allow to go slightly out of range)
 bool spacecharge::SpaceChargeProtoDUNE::IsInsideBoundaries(geo::Point_t const& point) const
 {
-  return !(
-       (point.X() <= -360.0) || (point.X() >= 360.0)
-    || (point.Y() <=   -0.2) || (point.Y() >= 607.8)
-    || (point.Z() <=   -0.8) || (point.Z() >= 696.2)
+  if(fRepresentationType=="Voxelized_TH3"){
+  	return !(
+         (TMath::Abs(point.X()) <= 0.0) || (TMath::Abs(point.X()) >= 360.0)
+      || (point.Y()             <= 5.2) || (point.Y()             >= 604.0)
+      || (point.Z()             <= 0.7) || (point.Z()             >= 694.7)
     );
+  } else{
+  	return !(
+         (TMath::Abs(point.X()) <=  0.0) || (TMath::Abs(point.X()) >= 360.0)
+      || (point.Y()             <= -0.2) || (point.Y()             >= 607.8)
+      || (point.Z()             <= -0.8) || (point.Z()             >= 696.2)
+    );
+  }
 } 
   
 bool spacecharge::SpaceChargeProtoDUNE::IsTooFarFromBoundaries(geo::Point_t const& point) const
 {
-  return (
-       (point.X() < -360.851) || (point.X() > 360.851)
-    || (point.Y() <    -10.2) || (point.Y() >   617.8)
-    || (point.Z() <    -10.8) || (point.Z() >   706.2)
+  if(fRepresentationType=="Voxelized_TH3"){
+    return (
+         (TMath::Abs(point.X()) < -20.0) || (TMath::Abs(point.X())  >= 360.0)
+      || (point.Y()             < -14.8) || (point.Y()              >  624.0)
+      || (point.Z()             < -19.3) || (point.Z()              >  714.7)
     );
+  } else {
+    return (
+         (TMath::Abs(point.X()) < -20.0) || (TMath::Abs(point.X())  >= 360.0)
+      || (point.Y()             < -20.2) || (point.Y()              >  627.8)
+      || (point.Z()             < -20.8) || (point.Z()              >  716.2)
+    );
+  }
 }
 
 geo::Point_t spacecharge::SpaceChargeProtoDUNE::PretendAtBoundary(geo::Point_t const& point) const
 {
   double x = point.X(), y = point.Y(), z = point.Z();
   
-  if      (point.X() <= -360.0) x = -359.99999; 
-  else if (point.X() >=  360.0) x =  359.99999;
+  if(fRepresentationType=="Voxelized_TH3"){ 
   
-  if      (point.Y() <=  -0.2) y =  -0.19999;
-  else if (point.Y() >= 607.8) y = 607.79999;
+    if      (TMath::Abs(point.X()) ==    0.0    ) x =                           -0.00001;
+    else if (TMath::Abs(point.X()) <	 0.00001) x =   TMath::Sign(point.X(),1)*0.00001; 
+    else if (TMath::Abs(point.X()) >=    360.0  ) x = TMath::Sign(point.X(),1)*359.99999;
   
-  if      (point.Z() <=  -0.8) z =  -0.79999;
-  else if (point.Z() >= 696.2) z = 696.19999;
+    if      (point.Y() <=   5.2) y =   5.20001;
+    else if (point.Y() >= 604.0) y = 603.99999;
   
+    if      (point.Z() <=   0.7) z =   0.70001;
+    else if (point.Z() >= 694.7) z = 694.69999;
+    
+  } else { 
+  
+    if      (TMath::Abs(point.X()) ==    0.0) x =                           -0.00001;
+    else if (TMath::Abs(point.X()) <	 0.0) x =   TMath::Sign(point.X(),1)*0.00001; 
+    else if (TMath::Abs(point.X()) >=  360.0) x = TMath::Sign(point.X(),1)*359.99999;
+  
+    if      (point.Y() <=  -0.2) y =  -0.19999;
+    else if (point.Y() >= 607.8) y = 607.79999;
+  
+    if      (point.Z() <=  -0.8) z =  -0.79999;
+    else if (point.Z() >= 696.2) z = 696.19999;
+    
+  }
   return {x, y, z};
 }
