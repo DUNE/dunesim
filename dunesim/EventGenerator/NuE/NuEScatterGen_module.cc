@@ -102,13 +102,7 @@ evgen::NuEScatterGen::~NuEScatterGen()
 //------------------------------------------------------------------------------
 void evgen::NuEScatterGen::beginJob()
 {
-  // Must load up event rate distributions used for generating neutrinos
-  cet::search_path sp("FW_SEARCH_PATH");
-  std::cout << fEventRateFileName << std::endl;
-  std::string NameEventRates;
-  sp.find_file(fEventRateFileName, NameEventRates);
-
-  TFile* eventrates = TFile::Open(NameEventRates.c_str());
+  TFile* eventrates = TFile::Open(fEventRateFileName.c_str());
   eventrates->cd();
 
   fNueE   = (TF1*)eventrates->Get("NueE");
@@ -182,12 +176,12 @@ std::vector<simb::MCParticle> evgen::NuEScatterGen::GenerateEventKinematics(bool
   int flav = 0;
   double Enu = 0;
 
-  double totNueE   = fNueE  ->Integral(fMinEnu,fMaxEnu);
-  double totNumuE  = fNumuE ->Integral(fMinEnu,fMaxEnu);
-  double totNutauE = fNutauE->Integral(fMinEnu,fMaxEnu);
-  double totNuebarE   = fNuebarE  ->Integral(fMinEnu,fMaxEnu);
-  double totNumubarE  = fNumubarE ->Integral(fMinEnu,fMaxEnu);
-  double totNutaubarE = fNutaubarE->Integral(fMinEnu,fMaxEnu);
+  double totNueE   = fNueE  ->Integral(fMinEnu,fMaxEnu,1e-2);
+  double totNumuE  = fNumuE ->Integral(fMinEnu,fMaxEnu,1e-2);
+  double totNutauE = fNutauE->Integral(fMinEnu,fMaxEnu,1e-2);
+  double totNuebarE   = fNuebarE  ->Integral(fMinEnu,fMaxEnu,1e-2);
+  double totNumubarE  = fNumubarE ->Integral(fMinEnu,fMaxEnu,1e-2);
+  double totNutaubarE = fNutaubarE->Integral(fMinEnu,fMaxEnu,1e-2);
   double tot = totNueE + totNumuE + totNutauE +
                totNuebarE + totNumubarE + totNutaubarE;
 
