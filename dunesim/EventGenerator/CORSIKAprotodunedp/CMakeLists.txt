@@ -4,7 +4,7 @@ art_make(
                         larcoreobj_SummaryData
                         larcore_Geometry_Geometry_service
 			                  larcorealg_Geometry
-                        nutools_RandomUtils_NuRandomService_service
+                        nurandom_RandomUtils_NuRandomService_service
                         larsim_Simulation lardataobj_Simulation
                         nusimdata_SimulationBase
                         ${ART_FRAMEWORK_CORE}

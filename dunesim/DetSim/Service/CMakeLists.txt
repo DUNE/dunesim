@@ -37,7 +37,7 @@ simple_plugin(DPhaseSimChannelExtractService   "service"
 		${ART_FRAMEWORK_CORE}
                 cetlib cetlib_except
                 ${ROOT_BASIC_LIB_LIST}
-		nutools_RandomUtils_NuRandomService_service
+		nurandom_RandomUtils_NuRandomService_service
 		${CLHEP}
              )
 
@@ -46,7 +46,7 @@ simple_plugin(ExponentialChannelNoiseService   "service"
                 SignalShapingServiceDUNE_service
                 ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
                 ${ART_ROOT_IO_TFILESERVICE_SERVICE}
-                nutools_RandomUtils_NuRandomService_service
+                nurandom_RandomUtils_NuRandomService_service
                 ${ART_FRAMEWORK_CORE}
                 art_Utilities canvas
                 cetlib cetlib_except
@@ -59,7 +59,7 @@ simple_plugin(DPhaseRealisticNoiseService   "service"
                SignalShapingServiceDUNEDPhase_service
                ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
                ${ART_ROOT_IO_TFILESERVICE_SERVICE}
-               nutools_RandomUtils_NuRandomService_service
+               nurandom_RandomUtils_NuRandomService_service
                ${ART_FRAMEWORK_CORE}
                art_Utilities canvas
                cetlib cetlib_except
@@ -72,7 +72,7 @@ simple_plugin(DPhaseRealisticNoiseService   "service"
                 SignalShapingServiceDUNEDPhase_service
                 ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
                 ${ART_ROOT_IO_TFILESERVICE_SERVICE}
-                nutools_RandomUtils_NuRandomService_service
+                nurandom_RandomUtils_NuRandomService_service
                 ${ART_FRAMEWORK_CORE}
                 art_Utilities canvas
                 cetlib cetlib_except
@@ -85,7 +85,7 @@ simple_plugin(ProtoDUNEChannelNoiseService   "service"
                 SignalShapingServiceDUNE_service
                 ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
                 ${ART_ROOT_IO_TFILESERVICE_SERVICE}
-                nutools_RandomUtils_NuRandomService_service
+                nurandom_RandomUtils_NuRandomService_service
                 ${ART_FRAMEWORK_CORE}
                 art_Utilities canvas
                 cetlib cetlib_except
@@ -98,7 +98,7 @@ simple_plugin(SPhaseChannelNoiseService   "service"
                 SignalShapingServiceDUNE_service
                 ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
                 ${ART_ROOT_IO_TFILESERVICE_SERVICE}
-                nutools_RandomUtils_NuRandomService_service
+                nurandom_RandomUtils_NuRandomService_service
                 ${ART_FRAMEWORK_CORE}
                 art_Utilities canvas
                 cetlib cetlib_except
@@ -110,7 +110,7 @@ simple_plugin(SPhaseChannelNoiseService   "service"
 simple_plugin(WhiteChannelNoiseService   "service"
                 larcorealg_Geometry
                 SignalShapingServiceDUNE_service
-                nutools_RandomUtils_NuRandomService_service
+                nurandom_RandomUtils_NuRandomService_service
                 ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
                 ${ART_ROOT_IO_TFILESERVICE_SERVICE}
                 ${ART_FRAMEWORK_CORE}
@@ -121,7 +121,7 @@ simple_plugin(WhiteChannelNoiseService   "service"
              )
 
 simple_plugin(ProvidedPedestalAdditionService "service"
-                nutools_RandomUtils_NuRandomService_service
+                nurandom_RandomUtils_NuRandomService_service
                 ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
                 ${ART_ROOT_IO_TFILESERVICE_SERVICE}
                 ${ART_FRAMEWORK_CORE}
@@ -159,7 +159,7 @@ simple_plugin(LarsoftHuffmanCompressService "service"
 simple_plugin(StuckBitAdcDistortionService   "service"
                 larcorealg_Geometry
                 ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
-                nutools_RandomUtils_NuRandomService_service
+                nurandom_RandomUtils_NuRandomService_service
                 ${ART_FRAMEWORK_CORE}
                 art_Utilities canvas
                 ${MF_MESSAGELOGGER}
