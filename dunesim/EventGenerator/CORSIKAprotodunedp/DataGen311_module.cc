@@ -38,7 +38,7 @@
 // nutools includes
 #include "nusimdata/SimulationBase/MCTruth.h"
 #include "nusimdata/SimulationBase/MCParticle.h"
-#include "nutools/EventGeneratorBase/evgenbase.h"
+#include "nugen/EventGeneratorBase/evgenbase.h"
 
 // lar includes
 #include "larcore/Geometry/Geometry.h"

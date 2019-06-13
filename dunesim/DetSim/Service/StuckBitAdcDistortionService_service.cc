@@ -2,7 +2,7 @@
 
 #include "dune/DetSim/Service/StuckBitAdcDistortionService.h"
 #include "fhiclcpp/ParameterSet.h"
-#include "nutools/RandomUtils/NuRandomService.h"
+#include "nurandom/RandomUtils/NuRandomService.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "CLHEP/Random/JamesRandom.h"
 #include "CLHEP/Random/RandFlat.h"
