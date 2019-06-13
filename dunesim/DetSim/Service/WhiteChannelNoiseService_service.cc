@@ -2,7 +2,7 @@
 
 #include "dune/DetSim/Service/WhiteChannelNoiseService.h"
 #include "larcore/Geometry/Geometry.h"
-#include "nutools/RandomUtils/NuRandomService.h"
+#include "nurandom/RandomUtils/NuRandomService.h"
 #include "art_root_io/TFileService.h"
 #include "dune/Utilities/SignalShapingServiceDUNE.h"
 #include "CLHEP/Random/JamesRandom.h"

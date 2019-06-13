@@ -17,7 +17,7 @@ art_make(
     lardataobj_RawData
     SignalShapingServiceDUNE_service
     SignalShapingServiceDUNEDPhase_service
-    nutools_RandomUtils_NuRandomService_service
+    nurandom_RandomUtils_NuRandomService_service
     ${ART_FRAMEWORK_CORE}
     ${ART_FRAMEWORK_PRINCIPAL}
     ${ART_FRAMEWORK_SERVICES_REGISTRY}
