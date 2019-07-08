@@ -429,7 +429,16 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetPosOffsets(geo::Point_t cons
   }
   if(!IsInsideBoundaries(point)&&!IsTooFarFromBoundaries(point)) point = PretendAtBoundary(point);
   
-  if ((fRepresentationType == "Voxelized")||(fRepresentationType=="Voxelized_TH3")){
+  if (fRepresentationType=="Voxelized_TH3"){
+    if (point.X() > 0.) {
+    	thePosOffsets = GetOffsetsVoxel(point, SCEhistograms.at(0), SCEhistograms.at(1), SCEhistograms.at(2));
+    	thePosOffsets[0] = -1.0*thePosOffsets[0];
+    } else {
+    	thePosOffsets = GetOffsetsVoxel(point, SCEhistograms.at(6), SCEhistograms.at(7), SCEhistograms.at(8));
+    	thePosOffsets[0] = -1.0*thePosOffsets[0];
+    }
+      
+  }else if (fRepresentationType == "Voxelized"){
     if (point.X() > 0.) thePosOffsets = GetOffsetsVoxel(point, SCEhistograms.at(0), SCEhistograms.at(1), SCEhistograms.at(2));
     else thePosOffsets = GetOffsetsVoxel(point, SCEhistograms.at(6), SCEhistograms.at(7), SCEhistograms.at(8));
       
@@ -456,7 +465,7 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetCalPosOffsets(geo::Point_t c
   	point = PretendAtBoundary(point); 
   }
   
-  if ((fRepresentationType == "Voxelized_TH3")||(fRepresentationType=="Voxelized")){
+  if (fRepresentationType == "Voxelized_TH3"){
     if ((TPCid == 2 || TPCid == 6 || TPCid == 10)&&point.X()>-20.){
       if (point.X()<0.) point = {0.00001, point.Y(), point.Z()};
       thePosOffsets = GetOffsetsVoxel(point, CalSCEhistograms.at(0), CalSCEhistograms.at(1), CalSCEhistograms.at(2));
@@ -464,9 +473,20 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetCalPosOffsets(geo::Point_t c
     } else if((TPCid == 1 || TPCid == 5 || TPCid == 9)&&point.X()<20.) {
     	if (point.X()>0.) point= {-0.00001, point.Y(), point.Z()};
       thePosOffsets = GetOffsetsVoxel(point, CalSCEhistograms.at(6), CalSCEhistograms.at(7), CalSCEhistograms.at(8));
-    } else thePosOffsets = {0., 0., 0,};
+      thePosOffsets[0] = -1.0*thePosOffsets[0];
+    } else thePosOffsets = {0., 0., 0.};
+    
+  } else if (fRepresentationType=="Voxelized"){
+    if ((TPCid == 2 || TPCid == 6 || TPCid == 10)&&point.X()>-20.){
+      if (point.X()<0.) point = {0.00001, point.Y(), point.Z()};
+      thePosOffsets = GetOffsetsVoxel(point, CalSCEhistograms.at(0), CalSCEhistograms.at(1), CalSCEhistograms.at(2));
+      thePosOffsets[0] = -1.0*thePosOffsets[0];
+    } else if((TPCid == 1 || TPCid == 5 || TPCid == 9)&&point.X()<20.) {
+    	if (point.X()>0.) point= {-0.00001, point.Y(), point.Z()};
+      thePosOffsets = GetOffsetsVoxel(point, CalSCEhistograms.at(6), CalSCEhistograms.at(7), CalSCEhistograms.at(8));
+    } else thePosOffsets = {0., 0., 0.};
       
-  }else thePosOffsets.resize(3,0.0);
+  } else thePosOffsets.resize(3,0.0);
   
   return { thePosOffsets[0], thePosOffsets[1], thePosOffsets[2] };
 }
@@ -751,10 +771,15 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetEfieldOffsets(geo::Point_t c
   }
   if(!IsInsideBoundaries(point)&&!IsTooFarFromBoundaries(point)) point = PretendAtBoundary(point);
   
-  if (fRepresentationType == "Voxelized"||fRepresentationType=="Voxelized_TH3"){
+  if (fRepresentationType=="Voxelized_TH3"){
     if (point.X() > 0.) theEfieldOffsets = GetOffsetsVoxel(point, SCEhistograms.at(3), SCEhistograms.at(4), SCEhistograms.at(5));
     else theEfieldOffsets = GetOffsetsVoxel(point, SCEhistograms.at(9), SCEhistograms.at(10), SCEhistograms.at(11));
-         
+    theEfieldOffsets[0] = -1.0*theEfieldOffsets[0];
+    theEfieldOffsets[1] = -1.0*theEfieldOffsets[1];
+    theEfieldOffsets[2] = -1.0*theEfieldOffsets[2];
+  }else if (fRepresentationType == "Voxelized"){
+    if (point.X() > 0.) theEfieldOffsets = GetOffsetsVoxel(point, SCEhistograms.at(3), SCEhistograms.at(4), SCEhistograms.at(5));
+    else theEfieldOffsets = GetOffsetsVoxel(point, SCEhistograms.at(9), SCEhistograms.at(10), SCEhistograms.at(11));
   }else if(fRepresentationType == "Parametric") theEfieldOffsets = GetEfieldOffsetsParametric(point.X(), point.Y(), point.Z());
   else theEfieldOffsets.resize(3,0.0);
     
@@ -773,7 +798,18 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetCalEfieldOffsets(geo::Point_
   }
   if(!IsInsideBoundaries(point)&&!IsTooFarFromBoundaries(point)) point = PretendAtBoundary(point);
   
-  if ((fRepresentationType == "Voxelized")||(fRepresentationType == "Voxelized_TH3")){
+  if (fRepresentationType == "Voxelized_TH3"){
+    if ((TPCid == 2 || TPCid == 6 || TPCid == 10)&&point.X()>-20.){
+      if (point.X()<0.) point = {0.00001, point.Y(), point.Z()};
+      theEfieldOffsets = GetOffsetsVoxel(point, CalSCEhistograms.at(3), CalSCEhistograms.at(4), CalSCEhistograms.at(5));
+    }else if ((TPCid == 1 || TPCid == 5 || TPCid == 9)&&point.X()<20.){
+      if (point.X()>0.) point = {-0.00001, point.Y(), point.Z()};
+      theEfieldOffsets = GetOffsetsVoxel(point, CalSCEhistograms.at(9), CalSCEhistograms.at(10), CalSCEhistograms.at(11));
+    } else theEfieldOffsets = {0., 0., 0.};
+    theEfieldOffsets[0] = -1.0*theEfieldOffsets[0];
+    theEfieldOffsets[1] = -1.0*theEfieldOffsets[1];
+    theEfieldOffsets[2] = -1.0*theEfieldOffsets[2];
+  }else if (fRepresentationType == "Voxelized"){
     if ((TPCid == 2 || TPCid == 6 || TPCid == 10)&&point.X()>-20.){
       if (point.X()<0.) point = {0.00001, point.Y(), point.Z()};
       theEfieldOffsets = GetOffsetsVoxel(point, CalSCEhistograms.at(3), CalSCEhistograms.at(4), CalSCEhistograms.at(5));
