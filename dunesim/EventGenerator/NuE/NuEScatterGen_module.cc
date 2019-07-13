@@ -153,6 +153,8 @@ void evgen::NuEScatterGen::reconfigure(fhicl::ParameterSet const & p)
   fMinEnu = p.get<double>("MinEnu");
   fMaxEnu = p.get<double>("MaxEnu");
 
+  fWMA  = p.get<double>("WMA");
+
   fMinX = p.get<double>("MinX");
   fMaxX = p.get<double>("MaxX");
   fMinY = p.get<double>("MinY");
