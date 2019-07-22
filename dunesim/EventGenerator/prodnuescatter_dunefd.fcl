@@ -16,6 +16,8 @@ services:
   FileCatalogMetadata:  @local::art_file_catalog_mc
   @table::dunefd_simulation_services
 }
+services.OpDigiProperties:        @local::dunefd_opdigiproperties
+services.PhotonVisibilityService.XMin: 0.0
 
 #Start each new event with an empty event.
 source:
