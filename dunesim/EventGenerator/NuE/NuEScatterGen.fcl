@@ -21,7 +21,7 @@ standard_nuescattergen_solar:
    IsSupernova:  "false"
    NNu:          "1"
 
-   EventRateFileName: "/dune/data/users/dpershey/NuEScatter/solar_nue_rates.root"
+   EventRateFileName: "/pnfs/dune/resilient/users/dpershey/solar_nue_rates.root"
 }
 
 standard_nuescattergen_supernova:
@@ -45,7 +45,7 @@ standard_nuescattergen_supernova:
    IsSupernova:  "true"
    NNu:          "250"
 
-   EventRateFileName: "/dune/data/users/dpershey/NuEScatter/supernova_nue_rates.root"
+   EventRateFileName: "/pnfs/dune/resilient/users/dpershey/supernova_nue_rates.root"
 }
 
 
