@@ -10,7 +10,7 @@
 simple_plugin(Dune35tSimChannelExtractService   "service"
                 dune_DetSim
                 larcorealg_Geometry
-                larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
+                larsim_Simulation nug4_ParticleNavigation lardataobj_Simulation
                 lardata_Utilities
                 SignalShapingServiceDUNE_service
                 art_Utilities canvas
@@ -20,7 +20,7 @@ simple_plugin(Dune35tSimChannelExtractService   "service"
 
 simple_plugin(GenericSimChannelExtractService   "service"
                 dune_DetSim
-                larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
+                larsim_Simulation nug4_ParticleNavigation lardataobj_Simulation
                 lardata_Utilities
                 SignalShapingServiceDUNE_service
                 art_Utilities canvas
@@ -30,7 +30,7 @@ simple_plugin(GenericSimChannelExtractService   "service"
 
 simple_plugin(DPhaseSimChannelExtractService   "service"
                 dune_DetSim
-                larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
+                larsim_Simulation nug4_ParticleNavigation lardataobj_Simulation
                 lardata_Utilities
                 SignalShapingServiceDUNEDPhase_service
                 art_Utilities canvas
