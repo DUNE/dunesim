@@ -10,7 +10,7 @@ art_make(
     dune_DetSim
     dune_Geometry
     larcore_Geometry_Geometry_service
-    larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
+    larsim_Simulation nug4_ParticleNavigation lardataobj_Simulation
     lardata_Utilities
     larevt_Filters
     larcorealg_Geometry
