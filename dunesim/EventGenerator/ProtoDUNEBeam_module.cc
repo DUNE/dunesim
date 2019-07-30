@@ -44,7 +44,7 @@
 //#include "dune/EventGenerator/ProtoDUNEbeamTPCmatching/ProtoDUNEBeamToF.h"
 #include "lardata/Utilities/AssociationUtil.h"
 // art extensions
-#include "nutools/RandomUtils/NuRandomService.h"
+#include "nurandom/RandomUtils/NuRandomService.h"
 #include <TFile.h>
 #include <TTree.h>
 #include <TVector3.h>

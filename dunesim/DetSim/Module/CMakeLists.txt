@@ -10,14 +10,14 @@ art_make(
     dune_DetSim
     dune_Geometry
     larcore_Geometry_Geometry_service
-    larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
+    larsim_Simulation nug4_ParticleNavigation lardataobj_Simulation
     lardata_Utilities
     larevt_Filters
     larcorealg_Geometry
     lardataobj_RawData
     SignalShapingServiceDUNE_service
     SignalShapingServiceDUNEDPhase_service
-    nutools_RandomUtils_NuRandomService_service
+    nurandom_RandomUtils_NuRandomService_service
     ${ART_FRAMEWORK_CORE}
     ${ART_FRAMEWORK_PRINCIPAL}
     ${ART_FRAMEWORK_SERVICES_REGISTRY}
