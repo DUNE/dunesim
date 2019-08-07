@@ -3,7 +3,7 @@
 //
 // \brief implementation of class for storing/accessing space charge distortions for ProtoDUNE
 //
-// \author mrmooney@bnl.gov
+// \author mrmooney@colostate.edu
 // 
 ////////////////////////////////////////////////////////////////////////
 // C++ language includes
@@ -992,7 +992,7 @@ bool spacecharge::SpaceChargeProtoDUNE::IsInsideBoundaries(geo::Point_t const& p
   	return !(
          (TMath::Abs(point.X()) <= 0.0) || (TMath::Abs(point.X()) >= 360.0)
       || (point.Y()             <= 5.2) || (point.Y()             >= 604.0)
-      || (point.Z()             <= 0.7) || (point.Z()             >= 694.7)
+      || (point.Z()             <= 0.0) || (point.Z()             >= 694.7)
     );
   } else{
   	return !(
@@ -1009,7 +1009,7 @@ bool spacecharge::SpaceChargeProtoDUNE::IsTooFarFromBoundaries(geo::Point_t cons
     return (
          (TMath::Abs(point.X()) < -20.0) || (TMath::Abs(point.X())  >= 360.0)
       || (point.Y()             < -14.8) || (point.Y()              >  624.0)
-      || (point.Z()             < -19.3) || (point.Z()              >  714.7)
+      || (point.Z()             < -20.0) || (point.Z()              >  714.7)
     );
   } else {
     return (
@@ -1033,7 +1033,7 @@ geo::Point_t spacecharge::SpaceChargeProtoDUNE::PretendAtBoundary(geo::Point_t c
     if      (point.Y() <=   5.2) y =   5.20001;
     else if (point.Y() >= 604.0) y = 603.99999;
   
-    if      (point.Z() <=   0.7) z =   0.70001;
+    if      (point.Z() <=   0.0) z =   0.00001;
     else if (point.Z() >= 694.7) z = 694.69999;
     
   } else { 
