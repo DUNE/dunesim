@@ -273,9 +273,9 @@ std::vector<simb::MCParticle> evgen::NuEScatterGen::GenerateEventKinematics(bool
   // arguments are particle#, pdg code, process, mother, mass, status
   // status must be 1 to tel GEANT to propogate
   simb::MCParticle mcNu(0, flav, "primary", 0, 0, 1);
-  mcNu.AddTrajectoryPoint(vtx, e4d);
+  mcNu.AddTrajectoryPoint(vtx, nu4d);
   simb::MCParticle mcE(1, 11, "primary", 0, eMass, 1);
-  mcE.AddTrajectoryPoint(vtx, nu4d);
+  mcE.AddTrajectoryPoint(vtx, e4d);
 
   std::vector<simb::MCParticle> ret;
   ret.push_back(mcNu);

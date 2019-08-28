@@ -3,7 +3,7 @@
 //
 // \brief implementation of class for storing/accessing space charge distortions for ProtoDUNE
 //
-// \author mrmooney@bnl.gov
+// \author mrmooney@colostate.edu
 // 
 ////////////////////////////////////////////////////////////////////////
 // C++ language includes
@@ -432,7 +432,7 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetPosOffsets(geo::Point_t cons
   if (fRepresentationType=="Voxelized_TH3"){
     if (point.X() > 0.) {
     	thePosOffsets = GetOffsetsVoxel(point, SCEhistograms.at(0), SCEhistograms.at(1), SCEhistograms.at(2));
-    	thePosOffsets[0] = -1.0*thePosOffsets[0];
+    	thePosOffsets[0] = thePosOffsets[0];
     } else {
     	thePosOffsets = GetOffsetsVoxel(point, SCEhistograms.at(6), SCEhistograms.at(7), SCEhistograms.at(8));
     	thePosOffsets[0] = -1.0*thePosOffsets[0];
@@ -992,7 +992,7 @@ bool spacecharge::SpaceChargeProtoDUNE::IsInsideBoundaries(geo::Point_t const& p
   	return !(
          (TMath::Abs(point.X()) <= 0.0) || (TMath::Abs(point.X()) >= 360.0)
       || (point.Y()             <= 5.2) || (point.Y()             >= 604.0)
-      || (point.Z()             <= 0.7) || (point.Z()             >= 694.7)
+      || (point.Z()             <= -0.5) || (point.Z()             >= 695.3)
     );
   } else{
   	return !(
@@ -1009,7 +1009,7 @@ bool spacecharge::SpaceChargeProtoDUNE::IsTooFarFromBoundaries(geo::Point_t cons
     return (
          (TMath::Abs(point.X()) < -20.0) || (TMath::Abs(point.X())  >= 360.0)
       || (point.Y()             < -14.8) || (point.Y()              >  624.0)
-      || (point.Z()             < -19.3) || (point.Z()              >  714.7)
+      || (point.Z()             < -20.5) || (point.Z()              >  715.3)
     );
   } else {
     return (
@@ -1033,8 +1033,8 @@ geo::Point_t spacecharge::SpaceChargeProtoDUNE::PretendAtBoundary(geo::Point_t c
     if      (point.Y() <=   5.2) y =   5.20001;
     else if (point.Y() >= 604.0) y = 603.99999;
   
-    if      (point.Z() <=   0.7) z =   0.70001;
-    else if (point.Z() >= 694.7) z = 694.69999;
+    if      (point.Z() <=   -0.5) z =   -0.49999;
+    else if (point.Z() >= 695.3) z = 695.29999;
     
   } else { 
   

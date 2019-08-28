@@ -2,7 +2,7 @@
 art_make( BASENAME_ONLY
           MODULE_LIBRARIES larcorealg_Geometry
 			larcore_Geometry_Geometry_service
-			larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
+			larsim_Simulation nug4_ParticleNavigation lardataobj_Simulation
 			nusimdata_SimulationBase
 			${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}
