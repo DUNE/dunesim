@@ -115,7 +115,8 @@ dune10kt_1x2x6_85kr.BqPercc: [ 0.00016 ] #Rate tied to LAr using rates establish
 
 dune10kt_1x2x6_222rn: @local::dune10kt_1x2x6_39ar
 dune10kt_1x2x6_222rn.Nuclide: [ "222Rn" ]
-dune10kt_1x2x6_222rn.BqPercc: [ 0.000005584  ] # DUNE FD requirement of 10 mBq/kg times 4 (to emulate the 4 subsequent alpha decays in secular equilibrium)  -JReichenbacher (01/11/2017)
+dune10kt_1x2x6_222rn.BqPercc: [ 0.000005584  ] # DUNE FD requirement of 1 mBq/kg (-JS) times 4 (to emulate the 4 subsequent alpha decays in secular equilibrium)  -JReichenbacher (01/11/2017)
+
 
 dune10kt_1x2x6_210po:  @local::dune10kt_1x2x6_PDs
 
