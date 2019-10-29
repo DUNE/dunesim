@@ -17,7 +17,6 @@ art_make(
           ${MF_MESSAGELOGGER}
           cetlib cetlib_except
           ${ROOT_BASIC_LIB_LIST}
-          ProtoDUNEAnaUtils
         )
 
 install_headers()
