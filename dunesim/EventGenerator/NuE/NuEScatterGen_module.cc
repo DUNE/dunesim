@@ -1,5 +1,6 @@
 #include <string>
 #include <iostream>
+#include <sstream>
 #include <fstream>
 
 #include "art/Framework/Core/EDProducer.h"
@@ -7,10 +8,12 @@
 #include "art/Framework/Principal/Event.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "cetlib_except/exception.h"
+#include "cetlib/search_path.h"
 
 #include "TLorentzVector.h"
 #include "TRandom3.h"
 #include "TDatabasePDG.h"
+#include "TFile.h"
 #include "TF1.h"
 
 #include "larcore/Geometry/Geometry.h"
@@ -32,7 +35,7 @@ public:
   void beginRun(art::Run & run) 		  override;
   void reconfigure(fhicl::ParameterSet const & p) ;
 
-  std::vector<simb::MCParticle> GenerateEventKinematics();
+  std::vector<simb::MCParticle> GenerateEventKinematics(bool isNewNu);
 
 private:
 
@@ -40,7 +43,7 @@ private:
   double fMinEnu;
   double fMaxEnu;
 
-  double fGF; // Fermi constant in GeV^-2
+  //dla double fGF; // Fermi constant in GeV^-2
   double fWMA; // sin^2 (Weak mixing angle)
 
   // Detector coordinates, in cm
@@ -53,7 +56,21 @@ private:
   double fMinT;
   double fMaxT;
 
-  double fNueFluxFrac;
+  std::string fEventRateFileName;
+
+  bool fIsSupernova;
+  int fNNu; // number of neutrinos to generate per supernova
+
+  // Event rate distributions in energy for each flavor
+  TF1 *fNueE;
+  TF1 *fNumuE;
+  TF1 *fNutauE;
+  TF1 *fNuebarE;
+  TF1 *fNumubarE;
+  TF1 *fNutaubarE;
+
+  // The neutrino direction, which may be the same for multiple neutrinos
+  TVector3 fNuDir;
 
   // Handels the cross section calculation, as a function of outgoing e mom.
   // Depends on ga, gv, the electron mass, and neutrino energy
@@ -85,6 +102,15 @@ evgen::NuEScatterGen::~NuEScatterGen()
 //------------------------------------------------------------------------------
 void evgen::NuEScatterGen::beginJob()
 {
+  TFile* eventrates = TFile::Open(fEventRateFileName.c_str());
+  eventrates->cd();
+
+  fNueE   = (TF1*)eventrates->Get("NueE");
+  fNumuE  = (TF1*)eventrates->Get("NumuE");
+  fNutauE = (TF1*)eventrates->Get("NutauE");
+  fNuebarE   = (TF1*)eventrates->Get("NuebarE");
+  fNumubarE  = (TF1*)eventrates->Get("NumubarE");
+  fNutaubarE = (TF1*)eventrates->Get("NutaubarE");
 }
 
 //------------------------------------------------------------------------------
@@ -107,14 +133,12 @@ void evgen::NuEScatterGen::produce(art::Event & e)
   // And we'll fill one
   simb::MCTruth truth;
 
-  std::vector<simb::MCParticle> parts = GenerateEventKinematics();
+  bool isNewNu = (e.event()%fNNu == 0);
+  std::vector<simb::MCParticle> parts = GenerateEventKinematics(isNewNu);
 
   assert(parts.size()==2);
   truth.Add(parts[0]);
   truth.Add(parts[1]);
-
-  TVector3 vec0(parts[0].Px(),parts[0].Py(),parts[0].Pz());
-  TVector3 vec1(parts[1].Px(),parts[1].Py(),parts[1].Pz());
 
   truthcol->push_back(truth);
 
@@ -129,6 +153,8 @@ void evgen::NuEScatterGen::reconfigure(fhicl::ParameterSet const & p)
   fMinEnu = p.get<double>("MinEnu");
   fMaxEnu = p.get<double>("MaxEnu");
 
+  fWMA  = p.get<double>("WMA");
+
   fMinX = p.get<double>("MinX");
   fMaxX = p.get<double>("MaxX");
   fMinY = p.get<double>("MinY");
@@ -138,33 +164,75 @@ void evgen::NuEScatterGen::reconfigure(fhicl::ParameterSet const & p)
   fMinT = p.get<double>("MinT");
   fMaxT = p.get<double>("MaxT");
 
-  fNueFluxFrac = p.get<double>("NueFluxFrac");
+  fIsSupernova = p.get<bool>("IsSupernova");
+  fNNu = p.get<int>("NNu");
+
+  fEventRateFileName = p.get<std::string>("EventRateFileName");
 
   return;
 }
 
-std::vector<simb::MCParticle> evgen::NuEScatterGen::GenerateEventKinematics()
+std::vector<simb::MCParticle> evgen::NuEScatterGen::GenerateEventKinematics(bool isNewNu)
 {
-  double Enu = fRand->Uniform(fMinEnu,fMaxEnu);
+  // First, need to choose a flavor and energy for our interacting neutrino
+  int flav = 0;
+  double Enu = 0;
 
+  double totNueE   = fNueE  ->Integral(fMinEnu,fMaxEnu,1e-2);
+  double totNumuE  = fNumuE ->Integral(fMinEnu,fMaxEnu,1e-2);
+  double totNutauE = fNutauE->Integral(fMinEnu,fMaxEnu,1e-2);
+  double totNuebarE   = fNuebarE  ->Integral(fMinEnu,fMaxEnu,1e-2);
+  double totNumubarE  = fNumubarE ->Integral(fMinEnu,fMaxEnu,1e-2);
+  double totNutaubarE = fNutaubarE->Integral(fMinEnu,fMaxEnu,1e-2);
+  double tot = totNueE + totNumuE + totNutauE +
+               totNuebarE + totNumubarE + totNutaubarE;
+
+  double randflav = fRand->Uniform(0,1);
+  if (randflav < totNueE/tot){
+    flav = 12;
+    Enu = fNueE->GetRandom(fMinEnu,fMaxEnu);
+  }
+  else if (randflav < (totNueE+totNumuE)/tot){
+    flav = 14;
+    Enu = fNumuE->GetRandom(fMinEnu,fMaxEnu);
+  }
+  else if (randflav < (totNueE+totNumuE+totNutauE)/tot){
+    flav = 16;
+    Enu = fNutauE->GetRandom(fMinEnu,fMaxEnu);
+  }
+  else if (randflav < (totNueE+totNumuE+totNutauE+totNuebarE)/tot){
+    flav = -12;
+    Enu = fNuebarE->GetRandom(fMinEnu,fMaxEnu);
+  }
+  else if (randflav < (totNueE+totNumuE+totNutauE+totNuebarE+totNumubarE)/tot){
+    flav = -14;
+    Enu = fNumubarE->GetRandom(fMinEnu,fMaxEnu);
+  }
+  else{
+    flav = -16;
+    Enu = fNutaubarE->GetRandom(fMinEnu,fMaxEnu);
+  }
+
+  // Throw a random neutrino direction if we're not generating events for
+  // a supernova.  Then, generate a neutrino direction only once / supernova
+  if (fNuDir.Mag() == 0 || !fIsSupernova || isNewNu){
+    double nuCos = fRand->Uniform(-1,1);
+    double nuPhi = fRand->Uniform(0,2*TMath::Pi());
+    fNuDir.SetX(sqrt(1-nuCos*nuCos)*sin(nuPhi));
+    fNuDir.SetY(sqrt(1-nuCos*nuCos)*cos(nuPhi));
+    fNuDir.SetZ(nuCos);
+  }
+
+  // Pull out the electron mass - needed for dif xsec formulat
   int ePDG = 11;
   static TDatabasePDG  pdg;
   TParticlePDG* pdgp = pdg.GetParticle(ePDG);
   double eMass = 0;
   if (pdgp) eMass = pdgp->Mass();
 
-  // The total cross section for nue-e  is A(1-2*ssWMA+4/3*ssWMA*ssWMA)
-  // The total cross section for nue-mu is A(0.25-ssWMA+4/3*ssWMA*ssWMA)
-  // The average nue flux is ~1/3 that of the total flux
-  // Wrap these into a random number pull that decides the type of neutrino
-  assert(fNueFluxFrac >= 0 && fNueFluxFrac <=1);
-  double fracE = fNueFluxFrac * (1-2*fWMA+4./3*fWMA*fWMA) / (fNueFluxFrac * (1-2*fWMA+4./3*fWMA*fWMA) + (1-fNueFluxFrac) * (0.5-fWMA+4./3*fWMA*fWMA));
-  // xsec is same for nutau and numu, for convenience make all neutrinos numu
-  int nuPDG = gRandom->Uniform(0,1) < fracE ? 12 : 14;
-
   // ga, gv depend on whether we're scattering nue-e or numu/nutau-e
-  double ga = nuPDG==12 ? 0.5 : -0.5;
-  double gv = nuPDG==12 ? 2*fWMA+0.5 : 2*fWMA-0.5;
+  double ga = abs(flav)==12 ? 0.5 : -0.5;
+  double gv = abs(flav)==12 ? 2*fWMA+0.5 : 2*fWMA-0.5;
   fdsigdT->SetParameter(0,gv);
   fdsigdT->SetParameter(1,ga);
   fdsigdT->SetParameter(2,Enu);
@@ -176,40 +244,22 @@ std::vector<simb::MCParticle> evgen::NuEScatterGen::GenerateEventKinematics()
   double eMom = sqrt(eKE*eKE+2*eMass*eKE);
   std::cout << "Throwing a neutrino of energy " << Enu << " with a maximum electron energy " << tmax << " from cross section " << fdsigdT->GetExpFormula() << ", and got " << eKE <<  std::endl;
 
-  // Throw a random neutrino direction
-  double nuCos = fRand->Uniform(-1,1);
-  double nuPhi = gRandom->Uniform(0,2*TMath::Pi());
-  TVector3 nu(sqrt(1-nuCos*nuCos)*sin(nuPhi),
-              sqrt(1-nuCos*nuCos)*cos(nuPhi),
-              nuCos);
-
-  // It's a bit tricky translating between the electron momentum in the nu
-  // and detector frame.  Do it by making a Gram-schmidt basis around the nu
-  // direction, and applying projecting onto it
-  TVector3 zprime = nu.Unit();
-  TVector3 xprime(0,0,0);
-  xprime.SetX(1-nu[0]*nu[0]);
-  xprime.SetY( -nu[0]*nu[1]);
-  xprime.SetZ( -nu[0]*nu[2]);
-  xprime = xprime.Unit();
-  TVector3 yprime(0,0,0);
-  yprime.SetX( -nu[1]*nu[0]-xprime[1]*xprime[0]);
-  yprime.SetY(1-nu[1]*nu[1]-xprime[1]*xprime[1]);
-  yprime.SetZ( -nu[1]*nu[2]-xprime[1]*xprime[2]);
-  yprime = yprime.Unit();
-
-  double eCos =
+  // Now, pull a direction for your electron
+  TVector3 eDir;
+  double ECos =
     TMath::Sqrt( (eKE*TMath::Power(1+(eMass/Enu),2) ) / ( 2*eMass + eKE));
-  double ePhi = fRand->Uniform(0,2*TMath::Pi());
+  double EPhi = fRand->Uniform(0,2*TMath::Pi());
+  eDir.SetX(sqrt(1-ECos*ECos)*sin(EPhi));
+  eDir.SetY(sqrt(1-ECos*ECos)*cos(EPhi));
+  eDir.SetZ(ECos);
+  // But, that's relative to the z-axis move to relative the nu direction
+  TVector3 zaxis(0,0,1);
+  TVector3 rotationAxis = zaxis.Cross(fNuDir);
+  double rotationAngle = zaxis.Angle(fNuDir);
+  eDir.Rotate(rotationAngle,rotationAxis);
 
-  double eSin = sqrt(1-eCos*eCos);
-  TVector3 e(0,0,0);
-  e.SetX(eCos*zprime[0]+eSin*sin(ePhi)*xprime[0]+eSin*cos(ePhi)*yprime[0]);
-  e.SetY(eCos*zprime[1]+eSin*sin(ePhi)*xprime[1]+eSin*cos(ePhi)*yprime[1]);
-  e.SetZ(eCos*zprime[2]+eSin*sin(ePhi)*xprime[2]+eSin*cos(ePhi)*yprime[2]);
-
-  e *= eMom;
-  nu *= Enu;
+  TVector3 e = eMom * eDir;;
+  TVector3 nu = Enu * fNuDir;;
 
   TLorentzVector e4d(e,eMass+eKE);
   TLorentzVector nu4d(nu,Enu);
@@ -222,10 +272,10 @@ std::vector<simb::MCParticle> evgen::NuEScatterGen::GenerateEventKinematics()
 
   // arguments are particle#, pdg code, process, mother, mass, status
   // status must be 1 to tel GEANT to propogate
-  simb::MCParticle mcNu(0, nuPDG, "primary", 0, 0, 1);
-  mcNu.AddTrajectoryPoint(vtx, e4d);
+  simb::MCParticle mcNu(0, flav, "primary", 0, 0, 1);
+  mcNu.AddTrajectoryPoint(vtx, nu4d);
   simb::MCParticle mcE(1, 11, "primary", 0, eMass, 1);
-  mcE.AddTrajectoryPoint(vtx, nu4d);
+  mcE.AddTrajectoryPoint(vtx, e4d);
 
   std::vector<simb::MCParticle> ret;
   ret.push_back(mcNu);
