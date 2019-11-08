@@ -12,15 +12,20 @@
 #define _DPhaseSimChannelExtractService_H_
 
 #include <vector>
+#include <string>
 #include "dune/DuneInterface/SimChannelExtractService.h"
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "lardata/Utilities/LArFFT.h"
 #include "dune/Utilities/SignalShapingServiceDUNEDPhase.h"
+#include "dune/Utilities/CrpGainService.h"
+//#include "dune/DetSim/Tool/CrpGainSimTool.h"
 
 namespace sim {
-class SimChannel;
+  class SimChannel;
 }
+
+//class CrpGainSimulator;
 
 class DPhaseSimChannelExtractService : public SimChannelExtractService {
 
@@ -32,7 +37,7 @@ public:
 
   std::ostream& print(std::ostream& out =std::cout, std::string prefix ="") const;
 
-  float GainPerView(){ return fDPGainPerView; };
+  //float GainPerView(){ return fDPGainPerView; };
 
 private:
 
@@ -42,10 +47,14 @@ private:
   // dual-phase signal response service
   art::ServiceHandle<util::SignalShapingServiceDUNEDPhase> m_psss;
 
-  unsigned int m_ntick;
+  //
+  art::ServiceHandle<util::CrpGainService> m_crpgain;
+  // tool to simulate charge gain in CRPs
+  //std::string m_CrpGainToolName;
+  //std::unique_ptr<CrpGainSimTool> m_CrpGainTool;
 
-  float fDPGainPerView; // gain in dual-phase
-  //float fRedENC;       // ENC noise, set to 0 to disable // unused
+  unsigned int m_ntick;
+  //float fDPGainPerView; // gain in dual-phase
 };
 
 DECLARE_ART_SERVICE_INTERFACE_IMPL(DPhaseSimChannelExtractService, SimChannelExtractService, LEGACY)
