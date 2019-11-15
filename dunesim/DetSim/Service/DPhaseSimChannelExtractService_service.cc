@@ -1,19 +1,14 @@
 // DPhaseSimChannelExtractService.cxx
 
-#include "messagefacility/MessageLogger/MessageLogger.h"
-
-#include "DPhaseSimChannelExtractService.h"
-#include <string>
 #include <iostream>
+#include "dune/ArtSupport/DuneToolManager.h"
 #include "larcore/Geometry/Geometry.h"
 #include "lardataobj/Simulation/SimChannel.h"
+#include "messagefacility/MessageLogger/MessageLogger.h"
+#include "DPhaseSimChannelExtractService.h"
 
-//#include "art/Framework/Services/Optional/RandomNumberGenerator.h"
-//#include "nutools/RandomUtils/NuRandomService.h"
-//#include "CLHEP/Random/RandGaussQ.h"
-
-//#undef UseSeedService
-
+using std::cout;
+using std::endl;
 using std::string;
 
 //**********************************************************************
@@ -22,29 +17,32 @@ DPhaseSimChannelExtractService::
 DPhaseSimChannelExtractService(const fhicl::ParameterSet& pset, art::ActivityRegistry&)
 : m_ntick(m_pfft->FFTSize())
 {
-
+  const string myname = "DPhaseSimChannelExtractService::ctor: ";
   if( !(m_ntick > 0 && !(m_ntick & (m_ntick-1))) )
     {
       throw cet::exception("DPhaseSimChannelExtractService")
 	<< "FFT size is not a power of 2. ";
     }
-
-  // get LEM gain per view
-  fDPGainPerView  = pset.get<float> ("DPGainPerView");
-  //fRedENC         = pset.get<float> ("RedENC");
-  mf::LogInfo("DPhaseSimChannelExtractService")<<" Gain per view "<<fDPGainPerView;
-
+  
   /*
-  // for adding noise fluctuations
-#ifdef UseSeedService
-  art::ServiceHandle<rndm::NuRandomService> seedSvc;
-  int seed = seedSvc->getSeed("DPhaseSimChannelExtractService");
-#else
-  int seed = 26012016;
-#endif
-  art::EngineCreator ecr;
-  m_pran = &ecr.createEngine(seed, "HepJamesRandom", "DPhaseSimChannelExtractService");
+  m_CrpGainToolName = pset.get<string>("CrpGainToolName");  
+  DuneToolManager* ptm = DuneToolManager::instance("");
+  if ( ptm == nullptr ) 
+    {
+      throw cet::exception("DPhaseSimChannelExtractService")
+	<< "Unable to retrieve tool manaager.";
+    } 
+  
+  m_CrpGainTool = ptm->getPrivate<CrpGainSimTool>(m_CrpGainToolName);
+  
+  if( !m_CrpGainTool )
+    {
+      throw cet::exception("DPhaseSimChannelExtractService")
+	<< "Unable to retrieve "<<m_CrpGainToolName<<".";
+    }
   */
+  //fDPGainPerView  = pset.get<float> ("DPGainPerView");
+  //mf::LogInfo("DPhaseSimChannelExtractService")<<" Gain per view "<<fDPGainPerView;
 }
 
 //**********************************************************************
@@ -56,24 +54,23 @@ extract(const sim::SimChannel* psc, AdcSignalVector& sigs) const {
   sigs.clear();
   sigs.resize(m_ntick, 0.0);
 
-
-  std::vector<double> sigs_original;
-  sigs_original.resize(m_ntick, 0.0);
+  //std::vector<double> sigs_original;
+  //sigs_original.resize(m_ntick, 0.0);
 
   if ( psc == nullptr ) return 0;
 
   // get the channel number
   unsigned int chan = psc->Channel();
 
-  //CLHEP::RandGaussQ rGauss(*m_pran, 0.0, fRedENC);
-
   for ( size_t itck=0; itck<sigs.size(); ++itck )
     {
-      sigs[itck] = fDPGainPerView * psc->Charge(itck);
+      //sigs[itck] = fDPGainPerView * psc->Charge(itck);
+      //sigs[itck] = m_CrpGainTool->getCharge( psc, itck );
+      sigs[itck] = m_crpgain->viewCharge( psc, itck );
     }
 
   // perform convolution
-
+  
   m_psss->Convolute(chan, sigs);
   
   return 0;
