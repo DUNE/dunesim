@@ -50,27 +50,20 @@ DPhaseSimChannelExtractService(const fhicl::ParameterSet& pset, art::ActivityReg
 int DPhaseSimChannelExtractService::
 extract(const sim::SimChannel* psc, AdcSignalVector& sigs) const {
 
-  // clear and resize temporary ADC buffer
-  sigs.clear();
-  sigs.resize(m_ntick, 0.0);
-
-  //std::vector<double> sigs_original;
-  //sigs_original.resize(m_ntick, 0.0);
-
   if ( psc == nullptr ) return 0;
 
   // get the channel number
   unsigned int chan = psc->Channel();
-
-  for ( size_t itck=0; itck<sigs.size(); ++itck )
-    {
-      //sigs[itck] = fDPGainPerView * psc->Charge(itck);
-      //sigs[itck] = m_CrpGainTool->getCharge( psc, itck );
-      sigs[itck] = m_crpgain->viewCharge( psc, itck );
-    }
-
-  // perform convolution
   
+  // clear and resize temporary ADC buffer
+  sigs.clear();
+  sigs.resize(m_ntick, 0.0);
+
+  for ( size_t itck=0; itck<sigs.size(); ++itck ){
+    sigs[itck] = m_crpgain->viewCharge( psc, itck );
+  }
+  
+  // perform convolution
   m_psss->Convolute(chan, sigs);
   
   return 0;
