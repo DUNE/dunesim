@@ -7,6 +7,7 @@ art_make( BASENAME_ONLY
                         larcore_Geometry_Geometry_service
                         nurandom_RandomUtils_NuRandomService_service
                         larsim_Simulation lardataobj_Simulation
+                        lardataobj_RecoBase
                         nusimdata_SimulationBase
                         ${ART_FRAMEWORK_CORE}
                         ${ART_FRAMEWORK_PRINCIPAL}
