@@ -302,6 +302,10 @@ namespace evgen{
         float   fXBPF701_f;
         float   fXBPF702_f;
         float   fReco_p;
+
+        float   fReco_tof;
+
+        int     fNP04_PDG;
         float   fNP04front_p;
 
         float   fXBPF716_x;
@@ -691,7 +695,10 @@ void evgen::ProtoDUNEBeam::beginJob(){
       fRecoTree->Branch( "XBPF702_rx", &fXBPF702_rx );
 
       fRecoTree->Branch( "Reco_p",  &fReco_p );
+      fRecoTree->Branch( "Reco_tof",  &fReco_tof );
       fRecoTree->Branch( "NP04front_p",  &fNP04front_p );
+
+      fRecoTree->Branch( "NP04_PDG", &fNP04_PDG );
 
       fRecoTree->Branch( "XBPF707_x", &fXBPF707_x );
       fRecoTree->Branch( "XBPF707_f", &fXBPF707_f );
@@ -1273,6 +1280,9 @@ void evgen::ProtoDUNEBeam::SetBeamEvent(beam::ProtoDUNEBeamEvent & beamevt){
 
   if( fSaveRecoTree ){ 
     fReco_p = beamevt.GetRecoBeamMomentum(0);
+    fReco_tof = beamevt.GetTOF();
+    std::cout << "TOF: " << beamevt.GetTOFs()[0] << " " << beamevt.GetTOF() << std::endl;
+    fNP04_PDG = fGoodNP04front_PDGid;
 
     fNP04front_p = sqrt( fGoodNP04front_Px * fGoodNP04front_Px 
                        + fGoodNP04front_Py * fGoodNP04front_Py 
