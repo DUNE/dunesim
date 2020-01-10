@@ -14,9 +14,35 @@ protodune_beam:
  BeamZ: -196.11
  RotateXZ: 0.0 #-11.844 # In degrees
  RotateYZ: 0.0 #11.107 
+
  # Rotations for the final beam monitors and background particles
- RotateMonitorXZ: -10.3 # [Degrees]
- RotateMonitorYZ: 11.7  # [Degrees]
+ #RotateMonitorXZ: -10.3 # [Degrees]
+ #RotateMonitorYZ: 11.7  # [Degrees]
+
+ ## Jake Calcutt: Replacing these with angles for opposite order rotations
+ ##       RotateX --> RotateY
+ RotateMonitorXZ: -10.51372
+ RotateMonitorYZ:  11.50886
+
+ ## Parameters for momentum spectrometer
+ MagP1: 5.82044830e-3
+ MagP3: -4.68880000e-6
+ MagP4: 324.573967
+
+ L1: 1.98
+ L2: 1.69472
+ L3: 2.11666
+ BeamBend: .12003
+
+
+ ## This will have to change for different momentum settings
+ ## Need to confirm with Nikos on this
+ Current: 68.8 # 1 GeV
+ #2 GeV: 137.5
+ #3 GeV: 206.2
+ #6 GeV: 419.7
+
+
  # Position of the beam monitor positions in z in [mm]
  BPROFEXTPosZ: 707479
  BPROF4PosZ : 716048
@@ -30,6 +56,7 @@ protodune_beam:
  Pos_Resolution: 1.0  # sigmas
  Ch_Efficiency: 1.0  # percentage
 
+ SaveRecoTree: false
 
 }
 
