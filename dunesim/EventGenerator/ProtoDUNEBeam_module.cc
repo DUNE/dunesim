@@ -1252,6 +1252,7 @@ void evgen::ProtoDUNEBeam::SetBeamEvent(beam::ProtoDUNEBeamEvent & beamevt){
   beamevt.DecodeTOF();
 
   beamevt.SetMagnetCurrent( 0. );
+  beamevt.SetTimingTrigger( 12 );
 
   beam::CKov dummy;
   dummy.trigger = 0;
