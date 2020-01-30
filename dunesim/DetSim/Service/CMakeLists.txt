@@ -30,9 +30,10 @@ simple_plugin(GenericSimChannelExtractService   "service"
 
 simple_plugin(DPhaseSimChannelExtractService   "service"
                 dune_DetSim
-                larsim_Simulation nug4_ParticleNavigation lardataobj_Simulation
+	        larsim_Simulation nug4_ParticleNavigation lardataobj_Simulation
                 lardata_Utilities
                 SignalShapingServiceDUNEDPhase_service
+                CrpGainService_service
                 art_Utilities canvas
 		${ART_FRAMEWORK_CORE}
                 cetlib cetlib_except

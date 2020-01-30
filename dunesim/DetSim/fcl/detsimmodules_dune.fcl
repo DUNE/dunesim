@@ -42,7 +42,6 @@ scxgeneric: {
 # Signal extractor service for dune dual-phase detector
 scxdp: {
   service_provider: DPhaseSimChannelExtractService
-  DPGainPerView: 10.0
 }
 
 # Single-phase extractor with special handling of signal near and beyond
