@@ -855,6 +855,8 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
         << " but tree only has entries 0 to "
         << fGoodEventList.size() - 1 << std::endl;
     } //end of if statement
+
+    size_t nBeamEvents = 0;
     
     // Get the list of entries for the current event
 //    int beamEvent = fGoodEventList[fCurrentGoodEvent];
@@ -867,10 +869,10 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
 //    std::cout << "This spill has " << spill.fAllSpillTracks.size() << " contributing events" << std::endl;
 
     // Find the entries that we are interested in.
-    //	std::cout << "Finding all particles associated with good particle event " << beamEvent << std::endl;
+    	//std::cout << "Finding all particles associated with good particle event " << std::endl;
     for(auto const & event : spill.fAllSpillTracks){
 
-//        std::cout << " - This event has " << event.second.size() << " contributing tracks" << std::endl;
+        //std::cout << " - This event has " << event.second.size() << " contributing tracks" << std::endl;
 
         // Is this the event we would have triggered on?
         bool trigEvent = (event.first == spill.fGoodEvent);
@@ -888,7 +890,7 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
             // Get the entry from the tree for this event and track.
             fAllParticlesTree->GetEntry(t);
             
-//            std::cout << fAllEventID << ", " << fAllTrackID << ", " << spill.fGoodEvent << ", " << spill.fGoodTrack << std::endl;
+            //std::cout << fAllEventID << ", " << fAllTrackID << ", " << spill.fGoodEvent << ", " << spill.fGoodTrack << std::endl;
 
             // Convert the pdgCode to an int
             int intPDG = (int)fPDG;
@@ -909,6 +911,7 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
               mom = MakeMomentumVector(fGoodNP04front_Px/1000.,fGoodNP04front_Py/1000.,fGoodNP04front_Pz/1000.,(int)fGoodNP04front_PDGid);           
               
               SetBeamEvent(beamEvent);
+              ++nBeamEvents;
             }
             else{
               // We just need to shift our background particles upstream to BPROFEXT so they will hit the CRTs
@@ -1013,7 +1016,8 @@ sim::ProtoDUNEBeamInstrument cherenkov2("CHERENKOV2",fGoodBPROFEXT_x,fGoodBPROFE
             
         } // End loop over interesting tracks for each event
     } // End loop over the vector of interesting events
-    
+
+    mf::LogInfo("ProtoDUNEBeam") << "Got " << nBeamEvents << " beam events";
     mf::LogInfo("ProtoDUNEBeam") << "Created event with " << mcTruth.NParticles() << " particles.";
     
     // Move on the good event iterator
