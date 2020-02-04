@@ -336,15 +336,6 @@ namespace evgen{
         float fPx, fPy, fPz;
         float fPDG; // Input tree has all floats
 
-        TTree * fAllTree;
-        std::vector< int > fXBPF697_fibers;
-        std::vector< int > fXBPF701_fibers;
-        std::vector< int > fXBPF702_fibers;
-        std::vector< int > fXBPF707_fibers;
-        std::vector< int > fXBPF708_fibers;
-        std::vector< int > fXBPF716_fibers;
-        std::vector< int > fXBPF717_fibers;
-
         // Event and TrackID for good particle tree
 //        float fBeamEvent;
 //        float fTrackID;
@@ -731,15 +722,6 @@ void evgen::ProtoDUNEBeam::beginJob(){
       fRecoTree->Branch( "RecoFront_y", &fRecoFront_y );
       fRecoTree->Branch( "RecoFront_z", &fRecoFront_z );
 
-      fAllTree = tfs->make<TTree>("all_tree", ""); 
-      fAllTree->Branch( "XBPF697_fibers", &fXBPF697_fibers );
-      fAllTree->Branch( "XBPF701_fibers", &fXBPF701_fibers );
-      fAllTree->Branch( "XBPF702_fibers", &fXBPF702_fibers );
-      fAllTree->Branch( "XBPF707_fibers", &fXBPF707_fibers );
-      fAllTree->Branch( "XBPF708_fibers", &fXBPF708_fibers );
-      fAllTree->Branch( "XBPF716_fibers", &fXBPF716_fibers );
-      fAllTree->Branch( "XBPF717_fibers", &fXBPF717_fibers );
-
     }
 }
 
@@ -763,16 +745,6 @@ void evgen::ProtoDUNEBeam::endJob(){
 //--------------------------------------------------------------------------------------------
 void evgen::ProtoDUNEBeam::produce(art::Event & e)
 {
-    
-    if( fSaveRecoTree ){
-      fXBPF697_fibers.clear();
-      fXBPF701_fibers.clear();
-      fXBPF702_fibers.clear();
-      fXBPF707_fibers.clear();
-      fXBPF708_fibers.clear();
-      fXBPF716_fibers.clear();
-      fXBPF717_fibers.clear();
-    }
     
     // Define the truth collection for this event.
     auto truthcol = std::make_unique< std::vector<simb::MCTruth> >();
@@ -943,36 +915,6 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
               
               SetBeamEvent(beamEvent);
               ++nBeamEvents;
-              if( fSaveRecoTree ){               
-                //std::cout << "Adding" << std::endl;
-                short f = 96 -  short( floor(fGoodBPROF1_x) ) - 1;
-                if( std::find( fXBPF697_fibers.begin(), fXBPF697_fibers.end(), f ) == fXBPF697_fibers.end() )
-                  fXBPF697_fibers.push_back( f );
-
-                f = 96 - short( floor(fGoodBPROF2_x) ) - 1;
-                if( std::find( fXBPF701_fibers.begin(), fXBPF701_fibers.end(), f ) == fXBPF701_fibers.end() )
-                  fXBPF701_fibers.push_back( f );
-
-                f = 96 - short( floor(fGoodBPROF3_x) ) - 1;
-                if( std::find( fXBPF702_fibers.begin(), fXBPF702_fibers.end(), f ) == fXBPF702_fibers.end() )
-                  fXBPF702_fibers.push_back( f );
-
-                f = 96 - short( floor(fGoodBPROFEXT_x) ) - 1;
-                if( std::find( fXBPF707_fibers.begin(), fXBPF707_fibers.end(), f ) == fXBPF707_fibers.end() )
-                  fXBPF707_fibers.push_back( f );
-
-                f = 96 - short( floor(fGoodBPROFEXT_y) ) - 1;
-                if( std::find( fXBPF708_fibers.begin(), fXBPF708_fibers.end(), f ) == fXBPF708_fibers.end() )
-                  fXBPF708_fibers.push_back( f );
-
-                f = 96 - short( floor(fGoodBPROF4_x) ) - 1;
-                if( std::find( fXBPF716_fibers.begin(), fXBPF716_fibers.end(), f ) == fXBPF716_fibers.end() )
-                  fXBPF716_fibers.push_back( f );
-
-                f = 96 - short( floor(fGoodBPROF4_y) ) - 1;
-                if( std::find( fXBPF717_fibers.begin(), fXBPF717_fibers.end(), f ) == fXBPF717_fibers.end() )
-                  fXBPF717_fibers.push_back( f );
-              }
             }
             else{
               // We just need to shift our background particles upstream to BPROFEXT so they will hit the CRTs
@@ -986,37 +928,6 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
 //                pos.Print();
 //                mom.Vect().Unit().Print();
 //              } 
-            
-              if( fSaveRecoTree ){               
-                //std::cout << "Adding" << std::endl;
-                short f = 96 -  short( floor(fGoodBPROF1_x) ) - 1;
-                if( std::find( fXBPF697_fibers.begin(), fXBPF697_fibers.end(), f ) == fXBPF697_fibers.end() )
-                  fXBPF697_fibers.push_back( f );
-
-                f = 96 - short( floor(fGoodBPROF2_x) ) - 1;
-                if( std::find( fXBPF701_fibers.begin(), fXBPF701_fibers.end(), f ) == fXBPF701_fibers.end() )
-                  fXBPF701_fibers.push_back( f );
-
-                f = 96 - short( floor(fGoodBPROF3_x) ) - 1;
-                if( std::find( fXBPF702_fibers.begin(), fXBPF702_fibers.end(), f ) == fXBPF702_fibers.end() )
-                  fXBPF702_fibers.push_back( f );
-
-                f = 96 - short( floor(fGoodBPROFEXT_x) ) - 1;
-                if( std::find( fXBPF707_fibers.begin(), fXBPF707_fibers.end(), f ) == fXBPF707_fibers.end() )
-                  fXBPF707_fibers.push_back( f );
-
-                f = 96 - short( floor(fGoodBPROFEXT_y) ) - 1;
-                if( std::find( fXBPF708_fibers.begin(), fXBPF708_fibers.end(), f ) == fXBPF708_fibers.end() )
-                  fXBPF708_fibers.push_back( f );
-
-                f = 96 - short( floor(fGoodBPROF4_x) ) - 1;
-                if( std::find( fXBPF716_fibers.begin(), fXBPF716_fibers.end(), f ) == fXBPF716_fibers.end() )
-                  fXBPF716_fibers.push_back( f );
-
-                f = 96 - short( floor(fGoodBPROF4_y) ) - 1;
-                if( std::find( fXBPF717_fibers.begin(), fXBPF717_fibers.end(), f ) == fXBPF717_fibers.end() )
-                  fXBPF717_fibers.push_back( f );
-              }
             }
 
 //            std::cout << "Information for particle " << intPDG << " with process " << process << std::endl;
@@ -1108,9 +1019,6 @@ sim::ProtoDUNEBeamInstrument cherenkov2("CHERENKOV2",fGoodBPROFEXT_x,fGoodBPROFE
             
         } // End loop over interesting tracks for each event
     } // End loop over the vector of interesting events
-
-    if( fSaveRecoTree )
-      fAllTree->Fill();
 
     mf::LogInfo("ProtoDUNEBeam") << "Got " << nBeamEvents << " beam events";
     mf::LogInfo("ProtoDUNEBeam") << "Created event with " << mcTruth.NParticles() << " particles.";
