@@ -377,14 +377,20 @@ namespace evgen{
         float fCh_Efficiency;
 
         float fLB;
+/*        
         float fMagP1;
         float fMagP3;
         float fMagP4;
+        float fCurrent;
+*/        
         float fL1;
         float fL2;
         float fL3;
         float fBeamBend;
-        float fCurrent;
+
+        float fLMag;
+        float fNominalP;
+        float fB;
 
         bool fSaveRecoTree;
 
@@ -482,19 +488,33 @@ evgen::ProtoDUNEBeam::ProtoDUNEBeam(fhicl::ParameterSet const & pset)
     fCurrentGoodEvent = 0;
 
     // For momentum spectrometer
+/*
     fCurrent = pset.get<float>("Current");
     fMagP1 = pset.get<float>("MagP1");
     fMagP3 = pset.get<float>("MagP3");
     fMagP4 = pset.get<float>("MagP4");
+*/    
     fL1 = pset.get<float>("L1");
     fL2 = pset.get<float>("L2");
     fL3 = pset.get<float>("L3");
     fBeamBend = pset.get<float>("BeamBend");
 
+    //New values for momentum spectrometer
+    fLMag = pset.get<float>("LMag");
+    fB    = pset.get<float>("B");
+    fNominalP = pset.get<float>("NominalP");
+
+
+/*
     fLB = fMagP1*fabs(fCurrent);
     float deltaI = fabs(fCurrent) - fMagP4;
     if(deltaI>0) fLB += fMagP3*deltaI*deltaI;
 
+    std::cout << "Old LB: " << fLB << std::endl;
+*/
+    fLB = fB * fLMag * fNominalP / 7.;
+//    std::cout << "New LB: " << fLB << std::endl;
+    
     fSaveRecoTree = pset.get<bool>("SaveRecoTree");
 
     
