@@ -432,7 +432,7 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetPosOffsets(geo::Point_t cons
   if (fRepresentationType=="Voxelized_TH3"){
     if (point.X() > 0.) {
     	thePosOffsets = GetOffsetsVoxel(point, SCEhistograms.at(0), SCEhistograms.at(1), SCEhistograms.at(2));
-    	thePosOffsets[0] = thePosOffsets[0];
+    	thePosOffsets[0] = -1.0*thePosOffsets[0];
     } else {
     	thePosOffsets = GetOffsetsVoxel(point, SCEhistograms.at(6), SCEhistograms.at(7), SCEhistograms.at(8));
     	thePosOffsets[0] = -1.0*thePosOffsets[0];

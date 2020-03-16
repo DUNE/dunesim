@@ -62,7 +62,7 @@ dune10kt_1x2x6_APA:{
 dune10kt_1x2x6_neutron: #Center region is added to simulate neutrons comming in from the rock at the outermost APAs (on the edge of the cryostat) per J. Reichenbacher's request. This should more accurately represent the worst case scenario in the FD.
 {
  module_type:           "RadioGen"
- Nuclide:               ["Concrete_DUNE1", "Concrete_DUNE1", "Concrete_DUNE1", "Concrete_DUNE1", "Concrete_DUNE1" ]
+ Nuclide:               ["Concrete_DUNE10MeV", "Concrete_DUNE10MeV", "Concrete_DUNE10MeV", "Concrete_DUNE10MeV", "Concrete_DUNE10MeV" ]
  Material:              [".*",".*",".*",".*", ".*"]
  BqPercc:               [ 0.0000076, 0.0000076, 0.0000076, 0.0000076, 0.0000076 ]   # activity -- Becquerels per cc. 0.0000076 assumes 10 neutrons/y/g per 10 ppm U-238 in concrete and a density of 2.40 g/cc for 10 cm mean depth in concrete -JReichenbacher (03/21/2017)
  X0:                    [ 0.0,    0.0,    0.0,    0.0 ,  -0.5  ]     # in cm in world coordinates, bottom corner of box
@@ -115,7 +115,8 @@ dune10kt_1x2x6_85kr.BqPercc: [ 0.00016 ] #Rate tied to LAr using rates establish
 
 dune10kt_1x2x6_222rn: @local::dune10kt_1x2x6_39ar
 dune10kt_1x2x6_222rn.Nuclide: [ "222Rn" ]
-dune10kt_1x2x6_222rn.BqPercc: [ 0.00005584  ] # DUNE FD requirement of 10 mBq/kg times 4 (to emulate the 4 subsequent alpha decays in secular equilibrium)  -JReichenbacher (01/11/2017)
+dune10kt_1x2x6_222rn.BqPercc: [ 0.000005584  ] # DUNE FD requirement of 1 mBq/kg (-JS) times 4 (to emulate the 4 subsequent alpha decays in secular equilibrium)  -JReichenbacher (01/11/2017)
+
 
 dune10kt_1x2x6_210po:  @local::dune10kt_1x2x6_PDs
 
@@ -145,6 +146,6 @@ protodunesp_85kr.BqPercc: [ 0.00016 ] #Rate tied to LAr using rates established 
 
 protodunesp_222rn: @local::protodunesp_39ar
 protodunesp_222rn.Nuclide: [ "222Rn" ]
-protodunesp_222rn.BqPercc: [ 0.00005584  ] # DUNE FD requirement of 10 mBq/kg times 4 (to emulate the 4 subsequent alpha decays in secular equilibrium)  -JReichenbacher (01/11/    2017)
+protodunesp_222rn.BqPercc: [ 0.000005584  ] # DUNE FD requirement of 10 mBq/kg times 4 (to emulate the 4 subsequent alpha decays in secular equilibrium)  -JReichenbacher (01/11/    2017)
 
 END_PROLOG
