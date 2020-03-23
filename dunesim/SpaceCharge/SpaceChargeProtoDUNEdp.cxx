@@ -43,29 +43,32 @@ bool spacecharge::SpaceChargeProtoDUNEdp::Configure(fhicl::ParameterSet const& p
   
   //auto const *detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
   fEfield = detprop->Efield();
-  
+  std::cout<<"Efield : "<<fEfield<<std::endl;
+
   if((fEnableSimSpatialSCE == true) || (fEnableSimEfieldSCE == true))
   {
     //only one representation type implemented for now
     //    fRepresentationType = pset.get<std::string>("RepresentationType");
-    fRepresentationType="Voxelized_TH3";
+    //    fRepresentationType="Voxelized_TH3";
 
     //x,y, z (in file z is drift... -> convert to x?)
-    
+
+       
     fInputFilename = pset.get<std::string>("InputFilename");
     
     std::string fname;
     cet::search_path sp("FW_SEARCH_PATH");
     sp.find_file(fInputFilename,fname);
-    
+    std::cout<<"spacecharge dualphase protodune: Find file: "<<fInputFilename<<" "<<fname<<std::endl;
+ 
     std::unique_ptr<TFile> infile(new TFile(fname.c_str(), "READ"));
     if(!infile->IsOpen()) throw cet::exception("SpaceChargeProtoDUNEdp") << "Could not find the space charge effect file '" << fname << "'!\n";
     
-   if (fRepresentationType == "Voxelized_TH3") { 
+    //   if (fRepresentationType == "Voxelized_TH3") { 
 
      //x position is in mm!! not cm...
       //Load in files //hEndPoint ou HEndPointDX (deltax??)
-      TH3F* hDx_sim_orig = (TH3F*)infile->Get("hEndPointDZ");
+    TH3F* hDx_sim_orig = (TH3F*)infile->Get("hEndPointDZ");//D
       TH3F* hDy_sim_orig = (TH3F*)infile->Get("hEndPointDY");
       TH3F* hDz_sim_orig = (TH3F*)infile->Get("hEndPointDX");
       TH3F* hEx_sim_orig = (TH3F*)infile->Get("hEz"); //swap z->x
@@ -73,14 +76,14 @@ bool spacecharge::SpaceChargeProtoDUNEdp::Configure(fhicl::ParameterSet const& p
       TH3F* hEz_sim_orig = (TH3F*)infile->Get("hEx");
       
         
-      TH3F* hDx_sim = (TH3F*)hDx_sim_orig->Clone("hDx");
-      TH3F* hDy_sim = (TH3F*)hDy_sim_orig->Clone("hDy");
-      TH3F* hDz_sim = (TH3F*)hDz_sim_orig->Clone("hDz");
-      TH3F* hEx_sim = (TH3F*)hEx_sim_orig->Clone("hEx");
-      TH3F* hEy_sim = (TH3F*)hEy_sim_orig->Clone("hEy");
-      TH3F* hEz_sim = (TH3F*)hEz_sim_orig->Clone("hEz");
+      TH3F* hDx_sim = (TH3F*)hDx_sim_orig->Clone("hDx_sim");
+      TH3F* hDy_sim = (TH3F*)hDy_sim_orig->Clone("hDy_sim");
+      TH3F* hDz_sim = (TH3F*)hDz_sim_orig->Clone("hDz_sim");
+      TH3F* hEx_sim = (TH3F*)hEx_sim_orig->Clone("hEx_sim");
+      TH3F* hEy_sim = (TH3F*)hEy_sim_orig->Clone("hEy_sim");
+      TH3F* hEz_sim = (TH3F*)hEz_sim_orig->Clone("hEz_sim");
       
-      
+      std::cout<<hDx_sim<<" "<<hEx_sim<<std::endl;
         
       hDx_sim->SetDirectory(0);
       hDy_sim->SetDirectory(0);
@@ -93,7 +96,7 @@ bool spacecharge::SpaceChargeProtoDUNEdp::Configure(fhicl::ParameterSet const& p
         
       SCEhistograms = {hDx_sim, hDy_sim, hDz_sim, hEx_sim, hEy_sim, hEz_sim};
                   
-   } //other representations not included yet..
+      //   } //other representations not included yet..
 
   }  
   fEnableCalEfieldSCE = false;
@@ -154,21 +157,19 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNEdp::GetPosOffsets(geo::Point_t co
 
   std::vector<double> thePosOffsets;
   geo::Point_t point = tmp_point;
-  if(IsTooFarFromBoundaries(point)) {
-    thePosOffsets.resize(3,0.0);
-    return { -thePosOffsets[0], -thePosOffsets[1], -thePosOffsets[2] };
-  }
-  if(!IsInsideBoundaries(point)&&!IsTooFarFromBoundaries(point)) point = PretendAtBoundary(point); //do pretend
+  //  if(IsTooFarFromBoundaries(point)) {
+  // thePosOffsets.resize(3,0.0);
+  // return { -thePosOffsets[0], -thePosOffsets[1], -thePosOffsets[2] };
+  // }
+  //  if(!IsInsideBoundaries(point)&&!IsTooFarFromBoundaries(point)) point = PretendAtBoundary(point); //do pretend
   
-  if (fRepresentationType=="Voxelized_TH3"){
-    
-    	thePosOffsets = GetOffsetsVoxel(point, SCEhistograms.at(0), SCEhistograms.at(1), SCEhistograms.at(2));
-	//    	thePosOffsets[0] = -1.0*thePosOffsets[0]; //why the flip x??
+  //  if (fRepresentationType=="Voxelized_TH3"){
 
+    	thePosOffsets = GetOffsetsVoxel(point, SCEhistograms.at(0), SCEhistograms.at(1), SCEhistograms.at(2));
       
-  }  else thePosOffsets.resize(3,0.0); 
+	//}  else thePosOffsets.resize(3,0.0); 
  
-  return { thePosOffsets[0], thePosOffsets[1], thePosOffsets[2] };
+	return {0, thePosOffsets[1]/10.0, thePosOffsets[2]/10.0 };
 }
 
 //----------------------------------------------------------------------------
@@ -181,19 +182,19 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNEdp::GetCalPosOffsets(geo::Point_t
    geo::Point_t point = tmp_point;
 
   
-  if(IsTooFarFromBoundaries(point)) {
+   /*  if(IsTooFarFromBoundaries(point)) {
     thePosOffsets.resize(3,0.0);
     return { -thePosOffsets[0], -thePosOffsets[1], -thePosOffsets[2] };
   }
   if(!IsInsideBoundaries(point)&&!IsTooFarFromBoundaries(point)){ 
   	point = PretendAtBoundary(point); 
   }
-  
-  if (fRepresentationType == "Voxelized_TH3"){
+   */
+  //  if (fRepresentationType == "Voxelized_TH3"){
 
       thePosOffsets = GetOffsetsVoxel(point, CalSCEhistograms.at(0), CalSCEhistograms.at(1), CalSCEhistograms.at(2));
       //      thePosOffsets[0] = -1.0*thePosOffsets[0]; why flip?
-     } else thePosOffsets.resize(3,0.0);
+      // } else thePosOffsets.resize(3,0.0);
   
   return { thePosOffsets[0], thePosOffsets[1], thePosOffsets[2] };
 }
@@ -204,11 +205,11 @@ std::vector<double> spacecharge::SpaceChargeProtoDUNEdp::GetOffsetsVoxel
   (geo::Point_t const& point, TH3F* hX, TH3F* hY, TH3F* hZ) const
 {
   //  if (fRepresentationType == "Voxelized_TH3"){
-  
+  //point is in cm.. histograms in mm
     return {
-      hX->Interpolate(point.X(),point.Y(),point.Z()),
-      hY->Interpolate(point.X(),point.Y(),point.Z()),
-      hZ->Interpolate(point.X(),point.Y(),point.Z())
+      hX->Interpolate(point.Z()*10.0,point.Y()*10.0,point.X()*10.0),
+	hY->Interpolate(point.Z()*10.0,point.Y()*10.0,point.X()*10.0),
+      hZ->Interpolate(point.Z()*10.0,point.Y()*10.0,point.X()*10.0)
     };
     
     //  } 
@@ -225,22 +226,29 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNEdp::GetEfieldOffsets(geo::Point_t
 {
 
   std::vector<double> theEfieldOffsets;
-  geo::Point_t point = tmp_point;
-  if(IsTooFarFromBoundaries(point)) {
-    theEfieldOffsets.resize(3,0.0);
-    return { -theEfieldOffsets[0], -theEfieldOffsets[1], -theEfieldOffsets[2] };
-  }
-  if(!IsInsideBoundaries(point)&&!IsTooFarFromBoundaries(point)) point = PretendAtBoundary(point);
+    geo::Point_t point = tmp_point;
+  //  if(IsTooFarFromBoundaries(point)) {
+  //  theEfieldOffsets.resize(3,0.0);
+  // return { -theEfieldOffsets[0], -theEfieldOffsets[1], -theEfieldOffsets[2] };
+    //}
+  // if(!IsInsideBoundaries(point)&&!IsTooFarFromBoundaries(point)) point = PretendAtBoundary(point);
   //  SCEhistograms = {hDx_sim, hDy_sim, hDz_sim, hEx_sim, hEy_sim, hEz_sim};
      
-  if (fRepresentationType=="Voxelized_TH3"){
-     theEfieldOffsets = GetOffsetsVoxel(point, SCEhistograms.at(3), SCEhistograms.at(4), SCEhistograms.at(5));
-     /*    theEfieldOffsets[0] = -1.0*theEfieldOffsets[0];
+  //  if (fRepresentationType=="Voxelized_TH3"){
+       theEfieldOffsets = GetOffsetsVoxel(point, SCEhistograms.at(3), SCEhistograms.at(4), SCEhistograms.at(5));
+       //     fEfield = detprop->Efield(); kV/cm..
+      
+       theEfieldOffsets[0] = theEfieldOffsets[0]/(-1000.0*fEfield);       
+       theEfieldOffsets[1] =theEfieldOffsets[1]/(-1000.0*fEfield);               
+       theEfieldOffsets[2] =theEfieldOffsets[2]/(-1000.0*fEfield); 
+
+       //       std::cout<<theEfieldOffsets[0]<<" "<<theEfieldOffsets[1]<<" "<<theEfieldOffsets[2]<<std::endl;
+	            /*    theEfieldOffsets[0] = -1.0*theEfieldOffsets[0];
     theEfieldOffsets[1] = -1.0*theEfieldOffsets[1];
     theEfieldOffsets[2] = -1.0*theEfieldOffsets[2]; */
-  }  else theEfieldOffsets.resize(3,0.0);
-    
-   return { -theEfieldOffsets[0], -theEfieldOffsets[1], -theEfieldOffsets[2] };
+     //  }  else theEfieldOffsets.resize(3,0.0);
+  //  theEfieldOffsets.resize(3,0.0);  
+   return { theEfieldOffsets[0], theEfieldOffsets[1], theEfieldOffsets[2] };
 }
 //----------------------------------------------------------------------------
 /// Primary working method of service that provides E field offsets to be
@@ -255,11 +263,11 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNEdp::GetCalEfieldOffsets(geo::Poin
   }
   if(!IsInsideBoundaries(point)&&!IsTooFarFromBoundaries(point)) point = PretendAtBoundary(point);
   
-  if (fRepresentationType == "Voxelized_TH3"){
+  //if (fRepresentationType == "Voxelized_TH3"){
  
       theEfieldOffsets = GetOffsetsVoxel(point, CalSCEhistograms.at(3), CalSCEhistograms.at(4), CalSCEhistograms.at(5));
-   }else
-    theEfieldOffsets.resize(3,0.0);
+      //   }else
+      //theEfieldOffsets.resize(3,0.0);
   
   return { -theEfieldOffsets[0], -theEfieldOffsets[1], -theEfieldOffsets[2] };
 }
