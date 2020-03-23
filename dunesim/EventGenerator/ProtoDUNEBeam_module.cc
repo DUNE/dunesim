@@ -1129,10 +1129,10 @@ TLorentzVector evgen::ProtoDUNEBeam::MakeMomentumVector(float px, float py, floa
     if(shifts){
       // Shift theta and phi first, and only rotate if we should
       if(fabs(fBeamThetaShift) > 1.e-10 && fabs(fBeamPhiShift) > 1.e-10){
-        std::cout << "Shifted momentum vector from " << momVec.Theta() << ", " << momVec.Phi() << " ";
+        //std::cout << "Shifted momentum vector from " << momVec.Theta() << ", " << momVec.Phi() << " ";
         momVec.SetTheta(momVec.Theta() + fBeamThetaShift);
         momVec.SetPhi(momVec.Phi() + fBeamPhiShift);
-        std::cout << "to " << momVec.Theta() << ", " << momVec.Phi() << std::endl;
+        //std::cout << "to " << momVec.Theta() << ", " << momVec.Phi() << std::endl;
       }
       else{
         momVec.RotateY(fRotateXZ/*rotationXZ*/ * TMath::Pi() / 180.);
