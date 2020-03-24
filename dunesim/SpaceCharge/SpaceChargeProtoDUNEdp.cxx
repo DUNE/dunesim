@@ -157,8 +157,9 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNEdp::GetPosOffsets(geo::Point_t co
 {
 
   std::vector<double> thePosOffsets;
-  geo::Point_t point = tmp_point;
-  
+  geo::Point_t point = {tmp_point.X(), tmp_point.Y(), tmp_point.Z() + 300.0};
+
+    
   //  if (fRepresentationType=="Voxelized_TH3"){
 
     	thePosOffsets = GetOffsetsVoxel(point, SCEhistograms.at(0), SCEhistograms.at(1), SCEhistograms.at(2));
@@ -206,8 +207,9 @@ std::vector<double> spacecharge::SpaceChargeProtoDUNEdp::GetOffsetsVoxel
   (geo::Point_t const& point, TH3F* hX, TH3F* hY, TH3F* hZ) const
 {
   //  if (fRepresentationType == "Voxelized_TH3"){
-  //point is in cm.. histograms in mm
-
+  //point is in cm.. histograms in mm [origin is in the middle for qscan, not for larsoft
+  //z -> 0- 600, y=-300,300; x=-300,300
+  
   if (isWithinHist(point, hX) && isWithinHist(point, hY) && isWithinHist(point, hZ)) {
    
     //need to check, X Y and Z on all three histograms..
@@ -234,8 +236,9 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNEdp::GetEfieldOffsets(geo::Point_t
 {
 
   std::vector<double> theEfieldOffsets;
-    geo::Point_t point = tmp_point;
-
+  geo::Point_t point = {tmp_point.X(), tmp_point.Y(), tmp_point.Z() + 300.0};
+    
+    
      
   //  if (fRepresentationType=="Voxelized_TH3"){
     if (isWithinHist(point,  SCEhistograms.at(3)) && isWithinHist(point, SCEhistograms.at(4)) && isWithinHist(point,  SCEhistograms.at(5))) {
