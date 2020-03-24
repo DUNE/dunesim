@@ -166,10 +166,10 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNEdp::GetPosOffsets(geo::Point_t co
       
 	//}  else thePosOffsets.resize(3,0.0); 
 	//thePosOffsets[0] is the distance in mm (along the field line to the anode), hardcode in order to get an offset (for now).positive indicates a shorter trajectory
-	thePosOffsets[0] = (310.52632 - point.X()) - thePosOffsets[0]/10.0;//in cm..
+	//	thePosOffsets[0] = (310.52632 - point.X()) - thePosOffsets[0]/10.0;//in cm..
 
  
-	return {thePosOffsets[0], thePosOffsets[1]/10.0, thePosOffsets[2]/10.0 };
+	return {0.0, thePosOffsets[1]/10.0, thePosOffsets[2]/10.0 };
 }
 
 //----------------------------------------------------------------------------
