@@ -136,8 +136,8 @@ namespace evgen{
         TLorentzVector ConvertCoordinates(float x, float y, float z, float t);
         
         // Make the momentum vector, rotating as required.
-        TLorentzVector MakeMomentumVector(float px, float py, float pz, int pdg);
-        TLorentzVector MakeMomentumVector(const TVector3 &mom, int pdg);
+        TLorentzVector MakeMomentumVector(float px, float py, float pz, int pdg, bool shifts);
+        TLorentzVector MakeMomentumVector(const TVector3 &mom, int pdg, bool shifts);
 
         // We need to rotate the beam monitor coordinates into the detector frame
         TLorentzVector ConvertBeamMonitorCoordinates(float x, float y, float z, float t, float offset);
@@ -352,6 +352,8 @@ namespace evgen{
         float fBeamX;
         float fBeamY;
         float fBeamZ;
+        float fBeamThetaShift;
+        float fBeamPhiShift;
         float fRotateXZ;
         float fRotateYZ;
         // Rotate the beam monitor coordinate system (those after the last bending magnet)
@@ -468,7 +470,9 @@ evgen::ProtoDUNEBeam::ProtoDUNEBeam(fhicl::ParameterSet const & pset)
     fBeamX = pset.get<float>("BeamX");
     fBeamY = pset.get<float>("BeamY");
     fBeamZ = pset.get<float>("BeamZ");
-    fRotateXZ = pset.get<float>("RotateXZ");
+    fBeamThetaShift = pset.get<float>("BeamThetaShift",0.0);
+    fBeamPhiShift   = pset.get<float>("BeamPhiShift",0.0);
+    fRotateXZ = pset.get<float>("RotateXZ"); // Only use rotation if the above aren't defined
     fRotateYZ = pset.get<float>("RotateYZ");
     
     fRotateMonitorXZ = pset.get<float>("RotateMonitorXZ");
@@ -931,7 +935,7 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
               // We also need to build the momentum vector using the correct good particle information
               fGoodParticleTree->GetEntry(spill.fGoodIndex);
               pos = ConvertCoordinates(fGoodNP04front_x/10.,fGoodNP04front_y/10.,fGoodNP04front_z/10.,baseTime + fGoodNP04front_t);
-              mom = MakeMomentumVector(fGoodNP04front_Px/1000.,fGoodNP04front_Py/1000.,fGoodNP04front_Pz/1000.,(int)fGoodNP04front_PDGid);           
+              mom = MakeMomentumVector(fGoodNP04front_Px/1000.,fGoodNP04front_Py/1000.,fGoodNP04front_Pz/1000.,(int)fGoodNP04front_PDGid,true);
               
               SetBeamEvent(beamEvent);
               ++nBeamEvents;
@@ -941,7 +945,7 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
               TVector3 tempPos = GetBackgroundPosition(fX,fY,fZ,fPx,fPy,fPz); 
               // At this step the position and momentum matches the GoodPartcle coordinates so apply the same functions
               pos = ConvertCoordinates(tempPos.X()/10.,tempPos.Y()/10.,tempPos.Z()/10.,baseTime+fEntryT);
-              mom = MakeMomentumVector(fPx/1000.,fPy/1000.,fPz/1000.,intPDG);
+              mom = MakeMomentumVector(fPx/1000.,fPy/1000.,fPz/1000.,intPDG,false);
 //              if(fabs(intPDG) == 13){
 //                std::cout << "Found a " << process << " muon at time = " << baseTime+fEntryT << ":" << std::endl;
 //                std::cout << fX/10. << ", " << fY/10. << ", " << fZ/10. << std::endl;
@@ -1114,16 +1118,27 @@ TLorentzVector evgen::ProtoDUNEBeam::ConvertCoordinates(float x, float y, float 
 
 //--------------------------------------------------------------------------------
 
-TLorentzVector evgen::ProtoDUNEBeam::MakeMomentumVector(float px, float py, float pz, int pdg){
+TLorentzVector evgen::ProtoDUNEBeam::MakeMomentumVector(float px, float py, float pz, int pdg, bool shifts){
     
     //float rotationXZ = fRotateXZ;
     //float rotationYZ = fRotateYZ;
     
     // Make the momentum vector and rotate it
     TVector3 momVec(px,py,pz);
-    
-    momVec.RotateY(fRotateXZ/*rotationXZ*/ * TMath::Pi() / 180.);
-    momVec.RotateX(fRotateYZ/*rotationYZ*/ * TMath::Pi() / 180.);
+
+    if(shifts){
+      // Shift theta and phi first, and only rotate if we should
+      if(fabs(fBeamThetaShift) > 1.e-10 && fabs(fBeamPhiShift) > 1.e-10){
+        //std::cout << "Shifted momentum vector from " << momVec.Theta() << ", " << momVec.Phi() << " ";
+        momVec.SetTheta(momVec.Theta() + fBeamThetaShift);
+        momVec.SetPhi(momVec.Phi() + fBeamPhiShift);
+        //std::cout << "to " << momVec.Theta() << ", " << momVec.Phi() << std::endl;
+      }
+      else{
+        momVec.RotateY(fRotateXZ/*rotationXZ*/ * TMath::Pi() / 180.);
+        momVec.RotateX(fRotateYZ/*rotationYZ*/ * TMath::Pi() / 180.);
+      }
+    }
 
     // Find the particle mass so we can form the energy
     const TDatabasePDG* databasePDG = TDatabasePDG::Instance();
@@ -1136,9 +1151,9 @@ TLorentzVector evgen::ProtoDUNEBeam::MakeMomentumVector(float px, float py, floa
     return newMom;
 }
 
-TLorentzVector evgen::ProtoDUNEBeam::MakeMomentumVector(const TVector3 &mom, int pdg){
+TLorentzVector evgen::ProtoDUNEBeam::MakeMomentumVector(const TVector3 &mom, int pdg, bool shifts){
 
-  return MakeMomentumVector(mom.X(),mom.Y(),mom.Z(),pdg);
+  return MakeMomentumVector(mom.X(),mom.Y(),mom.Z(),pdg,shifts);
 
 }
 
