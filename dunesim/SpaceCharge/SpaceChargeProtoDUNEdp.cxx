@@ -5,6 +5,7 @@
 //
 // based on\author mrmooney@colostate.edu
 // \author jdawson@in2p3.fr
+//  \author zambelli@lapp.in2p3.fr
 ////////////////////////////////////////////////////////////////////////
 // C++ language includes
 #include <iostream>
@@ -18,6 +19,7 @@
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 // Framework includes
 #include "cetlib_except/exception.h"
+
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 // ROOT includes
 #include "TFile.h"
@@ -25,7 +27,13 @@
 #include "TTree.h"
 #include "TLeaf.h"
 //-----------------------------------------------
-bool isWithinHist(geo::Point_t const& point, TH3F* hist);   
+bool isWithinHist(geo::Point_t const& point, TH3F* hist);
+bool isWithinHistOuter(geo::Point_t const& point, TH3F* hist);
+
+double ExtrapolateAtEdge(TH3F *hist, double x, double y, double z);
+bool IsBorder(TAxis *ax, double v);
+double GetSymmetric(double x, double xc);   
+//-----------------------------------------------
 spacecharge::SpaceChargeProtoDUNEdp::SpaceChargeProtoDUNEdp(
   fhicl::ParameterSet const& pset
 )
@@ -48,14 +56,11 @@ bool spacecharge::SpaceChargeProtoDUNEdp::Configure(fhicl::ParameterSet const& p
 
   if((fEnableSimSpatialSCE == true) || (fEnableSimEfieldSCE == true))
   {
-    //only one representation type implemented for now
-    //    fRepresentationType = pset.get<std::string>("RepresentationType");
-    //    fRepresentationType="Voxelized_TH3";
 
-    //x,y, z (in file z is drift... -> convert to x?)
+    //x,y, z (drift is x)
 
-       
     fInputFilename = pset.get<std::string>("InputFilename");
+   
     
     std::string fname;
     cet::search_path sp("FW_SEARCH_PATH");
@@ -64,17 +69,15 @@ bool spacecharge::SpaceChargeProtoDUNEdp::Configure(fhicl::ParameterSet const& p
  
     std::unique_ptr<TFile> infile(new TFile(fname.c_str(), "READ"));
     if(!infile->IsOpen()) throw cet::exception("SpaceChargeProtoDUNEdp") << "Could not find the space charge effect file '" << fname << "'!\n";
-    
+    // units are cm and V/cm
     //   if (fRepresentationType == "Voxelized_TH3") { 
-
-     //x position is in mm!! not cm...
-      //Load in files //hEndPoint ou HEndPointDX (deltax??)
-    TH3F* hDx_sim_orig = (TH3F*)infile->Get("hEndPointDZ");//D
-      TH3F* hDy_sim_orig = (TH3F*)infile->Get("hEndPointDY");
-      TH3F* hDz_sim_orig = (TH3F*)infile->Get("hEndPointDX");
-      TH3F* hEx_sim_orig = (TH3F*)infile->Get("hEz"); //swap z->x
-      TH3F* hEy_sim_orig = (TH3F*)infile->Get("hEy");
-      TH3F* hEz_sim_orig = (TH3F*)infile->Get("hEx");
+    // drift coordinate uses -> hDeltaLength
+    TH3F* hDx_sim_orig = (TH3F*)infile->Get("hDeltaLength");//D
+    TH3F* hDy_sim_orig = (TH3F*)infile->Get("hEndPointDY");
+    TH3F* hDz_sim_orig = (TH3F*)infile->Get("hEndPointDZ");
+    TH3F* hEx_sim_orig = (TH3F*)infile->Get("hEx"); //swap z->x
+    TH3F* hEy_sim_orig = (TH3F*)infile->Get("hEy");
+    TH3F* hEz_sim_orig = (TH3F*)infile->Get("hEz");
       
         
       TH3F* hDx_sim = (TH3F*)hDx_sim_orig->Clone("hDx_sim");
@@ -84,7 +87,7 @@ bool spacecharge::SpaceChargeProtoDUNEdp::Configure(fhicl::ParameterSet const& p
       TH3F* hEy_sim = (TH3F*)hEy_sim_orig->Clone("hEy_sim");
       TH3F* hEz_sim = (TH3F*)hEz_sim_orig->Clone("hEz_sim");
       
-      std::cout<<hDx_sim<<" "<<hEx_sim<<std::endl;
+
         
       hDx_sim->SetDirectory(0);
       hDy_sim->SetDirectory(0);
@@ -103,11 +106,52 @@ bool spacecharge::SpaceChargeProtoDUNEdp::Configure(fhicl::ParameterSet const& p
   fEnableCalEfieldSCE = false;
   fEnableCalSpatialSCE = false;
   
-  /* if((fEnableCalSpatialSCE == true) || (fEnableCalEfieldSCE == true))
+   if((fEnableCalSpatialSCE == true) || (fEnableCalEfieldSCE == true))
   {
-   throw cet::exception("SpaceChargeProtoDUNEdp") << "Calibration files not include yet...'" << fname << "'!\n";
+
+
+    fCalInputFilename = pset.get<std::string>("CalibrationInputFilename");
+
+    std::string fname;
+    cet::search_path sp("FW_SEARCH_PATH");
+    sp.find_file(fCalInputFilename,fname);
+    std::cout<<"spacecharge dualphase protodune: Find file: "<<fCalInputFilename<<" "<<fname<<std::endl;
+
+    std::unique_ptr<TFile> calinfile(new TFile(fname.c_str(), "READ"));
+    if(!calinfile->IsOpen()) throw cet::exception("SpaceChargeProtoDUNEdp") << "Could not find the space charge effect calibration file '" << fname << "'!\n";
+     
+    TH3F* hDx_cal_orig = (TH3F*)calinfile->Get("hoffsetX");                                               
+    TH3F* hDy_cal_orig = (TH3F*)calinfile->Get("hoffsetY");
+    TH3F* hDz_cal_orig = (TH3F*)calinfile->Get("hoffsetZ");
+
+    TH3F* hEx_cal_orig = (TH3F*)calinfile->Get("hEx"); 
+    TH3F* hEy_cal_orig = (TH3F*)calinfile->Get("hEy");
+    TH3F* hEz_cal_orig = (TH3F*)calinfile->Get("hEz");
+
+
+    TH3F* hDx_cal = (TH3F*)hDx_cal_orig->Clone("hDx_cal");
+    TH3F* hDy_cal = (TH3F*)hDy_cal_orig->Clone("hDy_cal");
+    TH3F* hDz_cal = (TH3F*)hDz_cal_orig->Clone("hDz_cal");
+    TH3F* hEx_cal = (TH3F*)hEx_cal_orig->Clone("hEx_cal");
+    TH3F* hEy_cal = (TH3F*)hEy_cal_orig->Clone("hEy_cal");
+    TH3F* hEz_cal = (TH3F*)hEz_cal_orig->Clone("hEz_cal");
+
+    hDx_cal->SetDirectory(0);
+    hDy_cal->SetDirectory(0);
+    hDz_cal->SetDirectory(0);
+    hEx_cal->SetDirectory(0);
+    hEy_cal->SetDirectory(0);
+    hEz_cal->SetDirectory(0);
+
+
+    
+    CalSCEhistograms = {hDx_cal, hDy_cal, hDz_cal, hEx_cal, hEy_cal, hEz_cal};
+
+
+
+
    
-   }*/
+   }
   
    
   return true;
@@ -155,9 +199,9 @@ bool spacecharge::SpaceChargeProtoDUNEdp::EnableCalEfieldSCE() const
 /// used in ionization electron drift
 geo::Vector_t spacecharge::SpaceChargeProtoDUNEdp::GetPosOffsets(geo::Point_t const& tmp_point) const
 {
-
+  //x [-300,300], y [-300,300], z[0,600]
   std::vector<double> thePosOffsets;
-  geo::Point_t point = {tmp_point.X(), tmp_point.Y(), tmp_point.Z() + 300.0};
+  geo::Point_t point = {tmp_point.X(), tmp_point.Y(), tmp_point.Z()};
 
     
   //  if (fRepresentationType=="Voxelized_TH3"){
@@ -165,11 +209,10 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNEdp::GetPosOffsets(geo::Point_t co
     	thePosOffsets = GetOffsetsVoxel(point, SCEhistograms.at(0), SCEhistograms.at(1), SCEhistograms.at(2));
       
 	//}  else thePosOffsets.resize(3,0.0); 
-	//thePosOffsets[0] is the distance in mm (along the field line to the anode), hardcode in order to get an offset (for now).positive indicates a shorter trajectory
-	//	thePosOffsets[0] = (310.52632 - point.X()) - thePosOffsets[0]/10.0;//in cm..
 
+	std::cout<< tmp_point.X()<<" "<< tmp_point.Y()<<" "<< tmp_point.Z()<<" "<<thePosOffsets[0]<<" "<< thePosOffsets[1]<<" "<< thePosOffsets[2]<<std::endl;
  
-	return {0.0, thePosOffsets[1]/10.0, thePosOffsets[2]/10.0 };
+	return {thePosOffsets[0], thePosOffsets[1], thePosOffsets[2] };
 }
 
 //----------------------------------------------------------------------------
@@ -185,21 +228,132 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNEdp::GetCalPosOffsets(geo::Point_t
   //  if (fRepresentationType == "Voxelized_TH3"){
    
       thePosOffsets = GetOffsetsVoxel(point, CalSCEhistograms.at(0), CalSCEhistograms.at(1), CalSCEhistograms.at(2));
-      //      thePosOffsets[0] = -1.0*thePosOffsets[0]; why flip?
+
       // } else thePosOffsets.resize(3,0.0);
   
   return { thePosOffsets[0], thePosOffsets[1], thePosOffsets[2] };
 }
+//Laura Zambelli's code from 3x1x1 sim
+bool IsBorder(TAxis *ax, double v) {
+   
+       /*
+	      In the external half of the first/last bin or outside the range
+	       */
+    if( ax->GetNbins()==1) return true;
+    if( v<= ax->GetBinCenter(1) ) return true;
+    //a->GetNbins() or GetNbins()-1..?   
+    if( v>= ax->GetBinCenter(ax->GetNbins()) ) return true;
+ 
+    return false;
+  }
+double GetSymmetric(double x, double xc){
+     return xc + (xc-x); 
+   }
 
+double ExtrapolateAtEdge(TH3F *hist, double x, double y, double z){
+  /*
+     Want to get the value at x, close to the wall
+    |----+----+--+--+---->
+         x    c  a  b
+     c is the center of the voxel (interpolation limit)
+     b is the symetric of x wrt to c
+     a is between c and b
+     ->make linear interpolation from B, A to X
+     
+    */
+     
+     int binx = hist->GetXaxis()->FindBin(x);
+     int biny = hist->GetYaxis()->FindBin(y);
+     int binz = hist->GetZaxis()->FindBin(z);
+  
+   
+     //get coordinate of the center of the voxel
+     double xcenter = IsBorder(hist->GetXaxis(),x) ? hist->GetXaxis()->GetBinCenter(binx) : x;
+     double ycenter = IsBorder(hist->GetYaxis(),y) ? hist->GetYaxis()->GetBinCenter(biny) : y;
+     double zcenter = IsBorder(hist->GetZaxis(),z) ? hist->GetZaxis()->GetBinCenter(binz) : z;
+  
+     int Nx = hist->GetXaxis()->GetNbins();
+     int Ny = hist->GetYaxis()->GetNbins();
+     int Nz = hist->GetZaxis()->GetNbins();
+
+     /*     if (Nz==1){ // when the GAr map is used (only one Z bin at the moment)
+        return InterpolateAtEdge(x,y,z);// LZ 
+	}*/
+  
+      //special case when the starting point is at the center of the voxel
+     if(x==xcenter && IsBorder(hist->GetXaxis(),x)){
+         int binx2 = (binx==Nx) ? binx-1 : 2;
+         xcenter =  0.5*(hist->GetXaxis()->GetBinCenter(binx2)+x);
+        }
+     if(y==ycenter&& IsBorder(hist->GetYaxis(),y)){
+       int biny2 = (biny==Ny) ? biny-1 : 2;
+       ycenter =  0.5*(hist->GetYaxis()->GetBinCenter(biny2)+y);
+     }
+     if(z==zcenter&& IsBorder(hist->GetZaxis(), z)){
+            int binz2 = (binz==Nz) ? binz-1 : 2;
+         zcenter =  0.5*(hist->GetZaxis()->GetBinCenter(binz2)+z);
+       }
+   
+    
+      //Get the symmetric of edgy point wrt to center
+     double xb = IsBorder(hist->GetXaxis(),x) ? GetSymmetric(x,xcenter) : x;
+     double yb = IsBorder(hist->GetYaxis(),y) ? GetSymmetric(y,ycenter) : y;
+     double zb = IsBorder(hist->GetZaxis(),z) ? GetSymmetric(z,zcenter) : z;
+   
+       //Get middle point of [symmetric, center]
+     double xa = IsBorder(hist->GetXaxis(),x) ?  0.5*(xcenter+xb) : x;
+     double ya = IsBorder(hist->GetYaxis(),y) ?  0.5*(ycenter+yb) : y;
+     double za = IsBorder(hist->GetZaxis(),z) ?  0.5*(zcenter+zb) : z;
+    
+     double valb = hist->Interpolate(xb, yb, zb); //symmetric point value
+     double vala =  hist->Interpolate(xa, ya, za);
+     double val = 0.;
+   
+     double Nedges = 0.;
+     if(IsBorder(hist->GetXaxis(),x)) Nedges = Nedges+1.;
+     if(IsBorder(hist->GetYaxis(),y)) Nedges = Nedges+1.;
+     if(IsBorder(hist->GetZaxis(),z)) Nedges = Nedges+1.;
+       
+   
+   
+     double delta = vala - valb;//
+   
+     double dx = IsBorder(hist->GetXaxis(),x) ? xa-xb : 1;
+     double dy = IsBorder(hist->GetYaxis(),y) ? ya-yb : 1;
+     double dz = IsBorder(hist->GetZaxis(),z) ? za-zb : 1;
+   
+     val = x*delta/dx + (xa*valb - xb*vala)/dx
+         +  y*delta/dy + (ya*valb - yb*vala)/dy
+         +  z*delta/dz + (za*valb - zb*vala)/dz;
+   
+   
+     val = val/Nedges;
+     return val;
+     
+  }
 //----------------------------------------------------------------------------
+bool isWithinHistOuter(geo::Point_t const& point, TH3F* hist)
+{                                   
+  if(point.X()> hist->GetXaxis()->GetBinLowEdge(0) &&
+     point.X()< hist->GetXaxis()->GetBinLowEdge(hist->GetXaxis()->GetNbins()+1) &&
+     point.Y()> hist->GetYaxis()->GetBinLowEdge(0) &&
+     point.Y()< hist->GetYaxis()->GetBinLowEdge(hist->GetYaxis()->GetNbins()+1) &&
+     point.Z()> hist->GetZaxis()->GetBinLowEdge(0) &&
+     point.Z()< hist->GetZaxis()->GetBinLowEdge(hist->GetZaxis()->GetNbins()+1)  ){
+
+    return true;}
+  return false;
+
+}
+
 bool isWithinHist(geo::Point_t const& point, TH3F* hist)
-{//point X is drift (test against Z!)
-  if(point.X()> hist->GetZaxis()->GetBinCenter(1)/10.0  &&
-     point.X()< hist->GetZaxis()->GetBinCenter(hist->GetZaxis()->GetNbins()-1)/10.0 &&
-     point.Y()> hist->GetYaxis()->GetBinCenter(1)/10.0 &&
-     point.Y()< hist->GetYaxis()->GetBinCenter(hist->GetYaxis()->GetNbins()-1)/10.0 &&
-     point.Z()> hist->GetXaxis()->GetBinCenter(1)/10.0 &&
-     point.Z()< hist->GetXaxis()->GetBinCenter(hist->GetXaxis()->GetNbins()-1)/10.0 ){
+{
+  if(point.X()> hist->GetXaxis()->GetBinCenter(1)  &&
+     point.X()< hist->GetXaxis()->GetBinCenter(hist->GetXaxis()->GetNbins()) &&
+     point.Y()> hist->GetYaxis()->GetBinCenter(1) &&
+     point.Y()< hist->GetYaxis()->GetBinCenter(hist->GetYaxis()->GetNbins()) &&
+     point.Z()> hist->GetZaxis()->GetBinCenter(1) &&
+     point.Z()< hist->GetZaxis()->GetBinCenter(hist->GetZaxis()->GetNbins()) ){
 
     return true;}
   return false;
@@ -209,22 +363,27 @@ bool isWithinHist(geo::Point_t const& point, TH3F* hist)
 std::vector<double> spacecharge::SpaceChargeProtoDUNEdp::GetOffsetsVoxel
   (geo::Point_t const& point, TH3F* hX, TH3F* hY, TH3F* hZ) const
 {
-  //  if (fRepresentationType == "Voxelized_TH3"){
-  //point is in cm.. histograms in mm [origin is in the middle for qscan, not for larsoft
-  //z -> 0- 600, y=-300,300; x=-300,300
-  
+    
   if (isWithinHist(point, hX) && isWithinHist(point, hY) && isWithinHist(point, hZ)) {
    
     //need to check, X Y and Z on all three histograms..
       
     return {
-      hX->Interpolate(point.Z()*10.0,point.Y()*10.0,point.X()*10.0),
-	hY->Interpolate(point.Z()*10.0,point.Y()*10.0,point.X()*10.0),
-      hZ->Interpolate(point.Z()*10.0,point.Y()*10.0,point.X()*10.0)
+        hX->Interpolate(point.X(),point.Y(),point.Z()),
+	hY->Interpolate(point.X(),point.Y(),point.Z()),
+        hZ->Interpolate(point.X(),point.Y(),point.Z())
     };
   }
+  if (isWithinHistOuter(point, hX) && isWithinHistOuter(point, hY) && isWithinHistOuter(point, hZ)) {
+  //use Laura's extrapolation method
+    std::cout<<"extrap: ";
 
-    return {0.0,0.0,0.0}; //no offset
+  return {ExtrapolateAtEdge(hX, point.X(),point.Y(),point.Z()),
+          ExtrapolateAtEdge(hY,point.X(),point.Y(),point.Z()),
+         ExtrapolateAtEdge(hZ,point.X(),point.Y(),point.Z())};
+  }
+  std::cout<<"outside: ";
+      return {0.0,0.0,0.0}; //no offset and no efield!
        
   
 
@@ -239,12 +398,11 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNEdp::GetEfieldOffsets(geo::Point_t
 {
 
   std::vector<double> theEfieldOffsets;
-  geo::Point_t point = {tmp_point.X(), tmp_point.Y(), tmp_point.Z() + 300.0};
+  geo::Point_t point = {tmp_point.X(), tmp_point.Y(), tmp_point.Z()};
     
     
      
   //  if (fRepresentationType=="Voxelized_TH3"){
-    if (isWithinHist(point,  SCEhistograms.at(3)) && isWithinHist(point, SCEhistograms.at(4)) && isWithinHist(point,  SCEhistograms.at(5))) {
   
 
        theEfieldOffsets = GetOffsetsVoxel(point, SCEhistograms.at(3), SCEhistograms.at(4), SCEhistograms.at(5));
@@ -254,33 +412,28 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNEdp::GetEfieldOffsets(geo::Point_t
        theEfieldOffsets[1] =theEfieldOffsets[1]/(-1000.0*fEfield);               
        theEfieldOffsets[2] =theEfieldOffsets[2]/(-1000.0*fEfield); 
 
-       //       std::cout<<theEfieldOffsets[0]<<" "<<theEfieldOffsets[1]<<" "<<theEfieldOffsets[2]<<std::endl;
-	            /*    theEfieldOffsets[0] = -1.0*theEfieldOffsets[0];
-    theEfieldOffsets[1] = -1.0*theEfieldOffsets[1];
-    theEfieldOffsets[2] = -1.0*theEfieldOffsets[2]; */
-     //  }  else theEfieldOffsets.resize(3,0.0);
-  //  theEfieldOffsets.resize(3,0.0);  
-   return { theEfieldOffsets[0], theEfieldOffsets[1], theEfieldOffsets[2] };
-    }
 
-return {0.0,0.0,0.0}; 
+     //  }  else theEfieldOffsets.resize(3,0.0);
+
+   return { theEfieldOffsets[0], theEfieldOffsets[1], theEfieldOffsets[2] };
+   // }
+
+
 }
 //----------------------------------------------------------------------------
 /// Primary working method of service that provides E field offsets to be
 /// used in charge/light yield calculation (e.g.) for calibration
 geo::Vector_t spacecharge::SpaceChargeProtoDUNEdp::GetCalEfieldOffsets(geo::Point_t const& tmp_point, int const& TPCid) const
-{ 
+{ //not implemented yet..
   std::vector<double> theEfieldOffsets;
   geo::Point_t point = tmp_point;
-  if(IsTooFarFromBoundaries(point)) {
-    theEfieldOffsets.resize(3,0.0);
-    return { -theEfieldOffsets[0], -theEfieldOffsets[1], -theEfieldOffsets[2] };
-  }
-  if(!IsInsideBoundaries(point)&&!IsTooFarFromBoundaries(point)) point = PretendAtBoundary(point);
-  
+
+
+  // Efieldoffset or ratio of Efield?
+
   //if (fRepresentationType == "Voxelized_TH3"){
  
-      theEfieldOffsets = GetOffsetsVoxel(point, CalSCEhistograms.at(3), CalSCEhistograms.at(4), CalSCEhistograms.at(5));
+    theEfieldOffsets = GetOffsetsVoxel(point, CalSCEhistograms.at(3), CalSCEhistograms.at(4), CalSCEhistograms.at(5));
       //   }else
       //theEfieldOffsets.resize(3,0.0);
   
@@ -288,116 +441,4 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNEdp::GetCalEfieldOffsets(geo::Poin
 }
 
 //----------------------------------------------------------------------------
-//???
 
-/// Transform X to SCE X coordinate:  [0.0,3.6] --> [0.0,3.6]
-/*double spacecharge::SpaceChargeProtoDUNEdp::TransformX(double xVal) const
-{
-  double xValNew;
-  xValNew = (fabs(xVal)/100.0);
-  //xValNew -= 1.8;
-  return xValNew;
-}
-//----------------------------------------------------------------------------
-/// Transform Y to SCE Y coordinate:  [0.0,6.08] --> [0.0,6.0]
-double spacecharge::SpaceChargeProtoDUNEdp::TransformY(double yVal) const
-{
-  double yValNew;
-  yValNew = (6.00/6.08)*((yVal+0.2)/100.0);
-  //yValNew -= 3.0;
-  return yValNew;
-}
-//----------------------------------------------------------------------------
-/// Transform Z to SCE Z coordinate:  [0.0,6.97] --> [0.0,7.2]
-double spacecharge::SpaceChargeProtoDUNEdp::TransformZ(double zVal) const
-{
-  double zValNew;
-  zValNew = (7.20/6.97)*((zVal+0.8)/100.0);
-  return zValNew;
-}
-*/
-//----------------------------------------------------------------------------
-/// Check to see if point is inside boundaries of map (allow to go slightly out of range)
-bool spacecharge::SpaceChargeProtoDUNEdp::IsInsideBoundaries(geo::Point_t const& point) const
-{
-  //not used!
-  //  if( isWithinHist( point, TH3F* hist)
-
-
-  //point is in cm..  PROBLEMS HERE.. are all histograms the same?
-
-  double driftmin = -300;//SCEhistograms.at(3)->GetZaxis()->GetBinLowEdge(0)/10.0;
-  double zmin =  -300;// SCEhistograms.at(3)->GetXaxis()->GetBinLowEdge(0)/10.0;
-  double ymin =  -300; //SCEhistograms.at(3)->GetYaxis()->GetBinLowEdge(0)/10.0; //mm->cm
- 
-  double driftmax = 300;// SCEhistograms.at(3)->GetZaxis()->GetBinUpEdge(SCEhistograms.at(3)->GetZaxis()->GetNbins())/10.0;
-  double zmax =  300; //SCEhistograms.at(3)->GetXaxis()->GetBinUpEdge(SCEhistograms.at(3)->GetXaxis()->GetNbins())/10.0;
-  double ymax =  300; //SCEhistograms.at(3)->GetYaxis()->GetBinUpEdge(SCEhistograms.at(3)->GetYaxis()->GetNbins())/10.0;
-
-  std::cout<<point.X()<<" : "<<driftmin<<" "<<driftmax<<std::endl;
-  std::cout<<point.Y()<<" : "<<ymin<<" "<<ymax<<std::endl;
-  std::cout<<point.Z()<<" : "<<zmin<<" "<<zmax<<std::endl;
-
-  
-  //  if(fRepresentationType=="Voxelized_TH3"){
-  	return (
-		(point.X() <= driftmax || point.X() >= driftmin)
-		|| (point.Y() <= ymax || point.Y() >= ymin)
-		|| (point.Z() <= zmax || point.Z() >= zmin)
-		 );
-	//} 
-} 
-  
-bool spacecharge::SpaceChargeProtoDUNEdp::IsTooFarFromBoundaries(geo::Point_t const& point) const
-{
-  double driftmin = SCEhistograms.at(3)->GetZaxis()->GetBinLowEdge(0)/10.0;
-  double zmin =  SCEhistograms.at(3)->GetXaxis()->GetBinLowEdge(0)/10.0;
-  double ymin =  SCEhistograms.at(3)->GetYaxis()->GetBinLowEdge(0)/10.0; //mm->cm
- 
-  double driftmax = SCEhistograms.at(3)->GetZaxis()->GetBinUpEdge(SCEhistograms.at(3)->GetZaxis()->GetNbins())/10.0;
-  double zmax =  SCEhistograms.at(3)->GetXaxis()->GetBinUpEdge(SCEhistograms.at(3)->GetXaxis()->GetNbins())/10.0;
-  double ymax =  SCEhistograms.at(3)->GetYaxis()->GetBinUpEdge(SCEhistograms.at(3)->GetYaxis()->GetNbins())/10.0;
-
-  
-  // if(fRepresentationType=="Voxelized_TH3"){
-  	return (
-		(point.X() >= driftmax || point.X() < driftmin)
-		|| (point.Y() >= ymax || point.Y() < ymin)
-		|| (point.Z() >= zmax || point.Z() < zmin)
-		 );
-	// }
-}
-
-
-geo::Point_t spacecharge::SpaceChargeProtoDUNEdp::PretendAtBoundary(geo::Point_t const& point) const
-{
-  
-  double x = point.X(), y = point.Y(), z = point.Z();
-  //  
-  /*  if(fRepresentationType=="Voxelized_TH3"){ 
-  
-    if      (TMath::Abs(point.X()) ==    0.0    ) x =                           -0.00001;
-    else if (TMath::Abs(point.X()) <	 0.00001) x =   TMath::Sign(point.X(),1)*0.00001; 
-    else if (TMath::Abs(point.X()) >=    360.0  ) x = TMath::Sign(point.X(),1)*359.99999;
-  
-    if      (point.Y() <=   5.2) y =   5.20001;
-    else if (point.Y() >= 604.0) y = 603.99999;
-  
-    if      (point.Z() <=   -0.5) z =   -0.49999;
-    else if (point.Z() >= 695.3) z = 695.29999;
-    
-  } else { 
-  
-    if      (TMath::Abs(point.X()) ==    0.0) x =                           -0.00001;
-    else if (TMath::Abs(point.X()) <	 0.0) x =   TMath::Sign(point.X(),1)*0.00001; 
-    else if (TMath::Abs(point.X()) >=  360.0) x = TMath::Sign(point.X(),1)*359.99999;
-  
-    if      (point.Y() <=  -0.2) y =  -0.19999;
-    else if (point.Y() >= 607.8) y = 607.79999;
-  
-    if      (point.Z() <=  -0.8) z =  -0.79999;
-    else if (point.Z() >= 696.2) z = 696.19999;
-    
-    }*/
-  return {x, y, z};
-}

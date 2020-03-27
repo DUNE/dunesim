@@ -55,11 +55,10 @@ namespace spacecharge {
       std::vector<TH3F*> SCEhistograms = std::vector<TH3F*>(6); //Histograms are Dx, Dy, Dz, dEx/E0, dEy/E0, dEz/E0 (positive; repeat for negative)
       std::vector<TH3F*> CalSCEhistograms = std::vector<TH3F*>(6); 
       
-      //      bool isWithinHist(geo::Point_t const& point, TH3F* hist);
+
       
-      bool IsInsideBoundaries(geo::Point_t const& point) const;
-      bool IsTooFarFromBoundaries(geo::Point_t const& point) const;
-    geo::Point_t PretendAtBoundary(geo::Point_t const& point) const; //?
+
+      //    geo::Point_t PretendAtBoundary(geo::Point_t const& point) const; //?
       
       bool fEnableSimSpatialSCE;
       bool fEnableSimEfieldSCE;
