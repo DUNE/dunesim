@@ -78,8 +78,11 @@ bool spacecharge::SpaceChargeProtoDUNEdp::Configure(fhicl::ParameterSet const& p
     TH3F* hEx_sim_orig = (TH3F*)infile->Get("hEx"); //swap z->x
     TH3F* hEy_sim_orig = (TH3F*)infile->Get("hEy");
     TH3F* hEz_sim_orig = (TH3F*)infile->Get("hEz");
-      
-        
+
+    //X = DRIFT COORDINATE..
+    TH3F* hEndPointX_sim_orig = (TH3F*)infile->Get("hEndPointX");
+    TH3F* hEndPointX_sim = (TH3F*) hEndPointX_sim_orig->Clone("hEndPointX");
+
       TH3F* hDx_sim = (TH3F*)hDx_sim_orig->Clone("hDx_sim");
       TH3F* hDy_sim = (TH3F*)hDy_sim_orig->Clone("hDy_sim");
       TH3F* hDz_sim = (TH3F*)hDz_sim_orig->Clone("hDz_sim");
@@ -87,7 +90,7 @@ bool spacecharge::SpaceChargeProtoDUNEdp::Configure(fhicl::ParameterSet const& p
       TH3F* hEy_sim = (TH3F*)hEy_sim_orig->Clone("hEy_sim");
       TH3F* hEz_sim = (TH3F*)hEz_sim_orig->Clone("hEz_sim");
       
-
+      hEndPointX_sim->SetDirectory(0);
         
       hDx_sim->SetDirectory(0);
       hDy_sim->SetDirectory(0);
@@ -98,7 +101,7 @@ bool spacecharge::SpaceChargeProtoDUNEdp::Configure(fhicl::ParameterSet const& p
       
       
         
-      SCEhistograms = {hDx_sim, hDy_sim, hDz_sim, hEx_sim, hEy_sim, hEz_sim};
+      SCEhistograms = {hDx_sim, hDy_sim, hDz_sim, hEx_sim, hEy_sim, hEz_sim, hEndPointX_sim};
                   
       //   } //other representations not included yet..
 
@@ -128,6 +131,7 @@ bool spacecharge::SpaceChargeProtoDUNEdp::Configure(fhicl::ParameterSet const& p
     TH3F* hEy_cal_orig = (TH3F*)calinfile->Get("hEy");
     TH3F* hEz_cal_orig = (TH3F*)calinfile->Get("hEz");
 
+   
 
     TH3F* hDx_cal = (TH3F*)hDx_cal_orig->Clone("hDx_cal");
     TH3F* hDy_cal = (TH3F*)hDy_cal_orig->Clone("hDy_cal");
@@ -207,13 +211,29 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNEdp::GetPosOffsets(geo::Point_t co
   //  if (fRepresentationType=="Voxelized_TH3"){
 
     	thePosOffsets = GetOffsetsVoxel(point, SCEhistograms.at(0), SCEhistograms.at(1), SCEhistograms.at(2));
+	//drift offset = bended trajectory  - straight, LArVoxelReadout requires (straight-bended), so flip
       
-	//}  else thePosOffsets.resize(3,0.0); 
 
-	std::cout<< tmp_point.X()<<" "<< tmp_point.Y()<<" "<< tmp_point.Z()<<" "<<thePosOffsets[0]<<" "<< thePosOffsets[1]<<" "<< thePosOffsets[2]<<std::endl;
+	//}  else thePosOffsets.resize(3,0.0);
+	
+	//CHECK EndPointX (does this point get to the anode?), if not make offsets so large point goes outside volume...
+	//	std::cout<<"pos: "<< tmp_point.X()<<" "<< tmp_point.Y()<<std::endl;
+
+	if(isWithinHist(point, SCEhistograms.at(6)))
+	  {
+	    // std::cout<<"within..?"<<SCEhistograms.at(6)->Interpolate(point.X(), point.Y(), point.Z())<<" "<<SCEhistograms.at(6)->GetXaxis()->GetXmax()<<std::endl;
+	    if (SCEhistograms.at(6)->Interpolate(point.X(), point.Y(), point.Z()) >= SCEhistograms.at(6)->GetXaxis()->GetXmax() )
+	      {
+	 
+		//	      	      std::cout<<"hits anode: "<< tmp_point.X()<<" "<< tmp_point.Y()<<" "<< tmp_point.Z()<<" "<<thePosOffsets[0]<<" "<< thePosOffsets[1]<<" "<< thePosOffsets[2]<<std::endl;
  
-	return {thePosOffsets[0], thePosOffsets[1], thePosOffsets[2] };
-}
+	      return {-thePosOffsets[0], thePosOffsets[1], thePosOffsets[2] };
+	    }
+	  }
+
+	  return {9999999,9999999,9999999 };
+	
+	  }
 
 //----------------------------------------------------------------------------
 /// Primary working method of service that provides position offsets to be
@@ -376,13 +396,13 @@ std::vector<double> spacecharge::SpaceChargeProtoDUNEdp::GetOffsetsVoxel
   }
   if (isWithinHistOuter(point, hX) && isWithinHistOuter(point, hY) && isWithinHistOuter(point, hZ)) {
   //use Laura's extrapolation method
-    std::cout<<"extrap: ";
+    //    std::cout<<"extrap: ";
 
   return {ExtrapolateAtEdge(hX, point.X(),point.Y(),point.Z()),
           ExtrapolateAtEdge(hY,point.X(),point.Y(),point.Z()),
          ExtrapolateAtEdge(hZ,point.X(),point.Y(),point.Z())};
   }
-  std::cout<<"outside: ";
+  //  std::cout<<"outside: ";
       return {0.0,0.0,0.0}; //no offset and no efield!
        
   

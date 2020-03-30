@@ -52,7 +52,7 @@ namespace spacecharge {
      
       std::vector<double> GetOffsetsVoxel(geo::Point_t const& point, TH3F* hX, TH3F* hY, TH3F* hZ) const;
      
-      std::vector<TH3F*> SCEhistograms = std::vector<TH3F*>(6); //Histograms are Dx, Dy, Dz, dEx/E0, dEy/E0, dEz/E0 (positive; repeat for negative)
+      std::vector<TH3F*> SCEhistograms = std::vector<TH3F*>(7); //Histograms are Dx, Dy, Dz, dEx/E0, dEy/E0, dEz/E0 (positive; repeat for negative)
       std::vector<TH3F*> CalSCEhistograms = std::vector<TH3F*>(6); 
       
 
