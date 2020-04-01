@@ -327,6 +327,10 @@ namespace evgen{
         float   fTrueFront_y;
         float   fTrueFront_z;
 
+        float   fTrueFront_Px;
+        float   fTrueFront_Py;
+        float   fTrueFront_Pz;
+
         float   fRecoFront_x;
         float   fRecoFront_y;
         float   fRecoFront_z;
@@ -742,6 +746,10 @@ void evgen::ProtoDUNEBeam::beginJob(){
       fRecoTree->Branch( "TrueFront_y", &fTrueFront_y );
       fRecoTree->Branch( "TrueFront_z", &fTrueFront_z );
 
+      fRecoTree->Branch( "TrueFront_Px", &fTrueFront_Px );
+      fRecoTree->Branch( "TrueFront_Py", &fTrueFront_Py );
+      fRecoTree->Branch( "TrueFront_Pz", &fTrueFront_Pz );
+
       fRecoTree->Branch( "RecoFront_x", &fRecoFront_x );
       fRecoTree->Branch( "RecoFront_y", &fRecoFront_y );
       fRecoTree->Branch( "RecoFront_z", &fRecoFront_z );
@@ -936,6 +944,15 @@ void evgen::ProtoDUNEBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, std::vector
               fGoodParticleTree->GetEntry(spill.fGoodIndex);
               pos = ConvertCoordinates(fGoodNP04front_x/10.,fGoodNP04front_y/10.,fGoodNP04front_z/10.,baseTime + fGoodNP04front_t);
               mom = MakeMomentumVector(fGoodNP04front_Px/1000.,fGoodNP04front_Py/1000.,fGoodNP04front_Pz/1000.,(int)fGoodNP04front_PDGid,true);
+              if (fSaveRecoTree) {
+                fTrueFront_x = pos.X();
+                fTrueFront_y = pos.Y();
+                fTrueFront_z = pos.Z();
+
+                fTrueFront_Px = mom.X();
+                fTrueFront_Py = mom.Y();
+                fTrueFront_Pz = mom.Z();
+              }
               
               SetBeamEvent(beamEvent);
               ++nBeamEvents;
@@ -1370,9 +1387,9 @@ void evgen::ProtoDUNEBeam::SetBeamEvent(beam::ProtoDUNEBeamEvent & beamevt){
     fXBPF707_rx = GetPosition( fXBPF707_f ); 
     fXBPF708_ry = GetPosition( fXBPF708_f ); 
 
-    fTrueFront_x = fGoodNP04front_x + fBeamX;
-    fTrueFront_y = fGoodNP04front_y + fBeamY;
-    fTrueFront_z = fGoodNP04front_z + fBeamZ;
+    //fTrueFront_x = fGoodNP04front_x + fBeamX;
+    //fTrueFront_y = fGoodNP04front_y + fBeamY;
+    //fTrueFront_z = fGoodNP04front_z + fBeamZ;
 
     fRecoFront_x = beamevt.GetBeamTrack(0).End().X();
     fRecoFront_y = beamevt.GetBeamTrack(0).End().Y();
@@ -1438,10 +1455,10 @@ void evgen::ProtoDUNEBeam::MakeTracks( beam::ProtoDUNEBeamEvent & beamEvent ){
 
   beamEvent.AddBeamTrack(
     recob::Track(
-      recob::TrackTrajectory(   recob::tracking::convertCollToPoint( thePoints ),
-                                recob::tracking::convertCollToVector( theMomenta ),
-                                recob::Track::Flags_t( thePoints.size() ),
-                                false ),
+      recob::TrackTrajectory(recob::tracking::convertCollToPoint( thePoints ),
+                             recob::tracking::convertCollToVector( theMomenta ),
+                             recob::Track::Flags_t( thePoints.size() ),
+                             false ),
       0, -1., 0, recob::tracking::SMatrixSym55(), recob::tracking::SMatrixSym55(), 1 
     )
   );
