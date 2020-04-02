@@ -17,6 +17,9 @@
 // LArSoft includes
 #include "dune/SpaceCharge/SpaceChargeProtoDUNEdp.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
+#include "larcore/CoreUtils/ServiceUtil.h"
+#include "larcore/Geometry/Geometry.h"
+#
 // Framework includes
 #include "cetlib_except/exception.h"
 
@@ -38,6 +41,7 @@ spacecharge::SpaceChargeProtoDUNEdp::SpaceChargeProtoDUNEdp(
   fhicl::ParameterSet const& pset
 )
 {
+  driftcoordinate=0;
   //Configure(pset);
 }
 //------------------------------------------------
@@ -53,6 +57,25 @@ bool spacecharge::SpaceChargeProtoDUNEdp::Configure(fhicl::ParameterSet const& p
   //auto const *detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
   fEfield = detprop->Efield();
   std::cout<<"Efield : "<<fEfield<<std::endl;
+
+  art::ServiceHandle<geo::Geometry> geom;
+  //  auto const* geom = lar::providerFrom<geo::GeometryCore>();
+  driftcoordinate = geom->TPC(0).DetectDriftDirection();
+  if( driftcoordinate==1 || driftcoordinate==2 )
+   {
+        std::cout<<" drift coordinate: "<<driftcoordinate<<std::endl;
+   }else{ throw cet::exception("CRTGen") << "unknown drift coordinate "<< driftcoordinate << " \n"; }
+
+ 
+     /*    +1: positive x
+       +2: positive y
+       +3: positive z
+       -1: negative x
+       -2: negative y
+       -3: negative z
+       0: other (or algorithm failed)
+     */
+
 
   if((fEnableSimSpatialSCE == true) || (fEnableSimEfieldSCE == true))
   {
@@ -71,37 +94,54 @@ bool spacecharge::SpaceChargeProtoDUNEdp::Configure(fhicl::ParameterSet const& p
     if(!infile->IsOpen()) throw cet::exception("SpaceChargeProtoDUNEdp") << "Could not find the space charge effect file '" << fname << "'!\n";
     // units are cm and V/cm
     //   if (fRepresentationType == "Voxelized_TH3") { 
+    //set up for driftcoordinate=1, driftcoordinate=2 is y-axis drift
     // drift coordinate uses -> hDeltaLength
-    TH3F* hDx_sim_orig = (TH3F*)infile->Get("hDeltaLength");//D
-    TH3F* hDy_sim_orig = (TH3F*)infile->Get("hEndPointDY");
+    TH3F* hDx_sim_orig;
+    TH3F* hDy_sim_orig;
+    TH3F* hEndPoint_sim_orig; //was X
+    if (driftcoordinate==1){
+      hDx_sim_orig= (TH3F*)infile->Get("hDeltaLength");
+      hDy_sim_orig = (TH3F*)infile->Get("hEndPointDY");
+      hEndPoint_sim_orig = (TH3F*)infile->Get("hEndPointX");
+      Anodebin = hEndPoint_sim_orig->GetXaxis()->GetXmax();
+
+    }else if (driftcoordinate==2){
+      hDx_sim_orig= (TH3F*)infile->Get("hEndPointDX");
+      hDy_sim_orig = (TH3F*)infile->Get("hDeltaLength");
+      hEndPoint_sim_orig = (TH3F*)infile->Get("hEndPointY");
+      Anodebin = hEndPoint_sim_orig->GetYaxis()->GetXmax();//?
+    }else{
+      throw cet::exception("SpaceChargeProtoDUNEdp") << "Driftcoordinate "<<driftcoordinate<<" unknown\n";
+    }
+
     TH3F* hDz_sim_orig = (TH3F*)infile->Get("hEndPointDZ");
-    TH3F* hEx_sim_orig = (TH3F*)infile->Get("hEx"); //swap z->x
+    TH3F* hEx_sim_orig = (TH3F*)infile->Get("hEx"); 
     TH3F* hEy_sim_orig = (TH3F*)infile->Get("hEy");
     TH3F* hEz_sim_orig = (TH3F*)infile->Get("hEz");
 
-    //X = DRIFT COORDINATE..
-    TH3F* hEndPointX_sim_orig = (TH3F*)infile->Get("hEndPointX");
-    TH3F* hEndPointX_sim = (TH3F*) hEndPointX_sim_orig->Clone("hEndPointX");
+    
 
-      TH3F* hDx_sim = (TH3F*)hDx_sim_orig->Clone("hDx_sim");
-      TH3F* hDy_sim = (TH3F*)hDy_sim_orig->Clone("hDy_sim");
-      TH3F* hDz_sim = (TH3F*)hDz_sim_orig->Clone("hDz_sim");
-      TH3F* hEx_sim = (TH3F*)hEx_sim_orig->Clone("hEx_sim");
-      TH3F* hEy_sim = (TH3F*)hEy_sim_orig->Clone("hEy_sim");
-      TH3F* hEz_sim = (TH3F*)hEz_sim_orig->Clone("hEz_sim");
-      
-      hEndPointX_sim->SetDirectory(0);
+    TH3F* hEndPointDrift_sim = (TH3F*) hEndPoint_sim_orig->Clone("hEndPointDrift");
+
+    TH3F* hDx_sim = (TH3F*)hDx_sim_orig->Clone("hDx_sim");
+    TH3F* hDy_sim = (TH3F*)hDy_sim_orig->Clone("hDy_sim");
+    TH3F* hDz_sim = (TH3F*)hDz_sim_orig->Clone("hDz_sim");
+    TH3F* hEx_sim = (TH3F*)hEx_sim_orig->Clone("hEx_sim");
+    TH3F* hEy_sim = (TH3F*)hEy_sim_orig->Clone("hEy_sim");
+    TH3F* hEz_sim = (TH3F*)hEz_sim_orig->Clone("hEz_sim");
+    
+    hEndPointDrift_sim->SetDirectory(0);
         
-      hDx_sim->SetDirectory(0);
-      hDy_sim->SetDirectory(0);
-      hDz_sim->SetDirectory(0);
-      hEx_sim->SetDirectory(0);
-      hEy_sim->SetDirectory(0);
-      hEz_sim->SetDirectory(0);
-      
+    hDx_sim->SetDirectory(0);
+    hDy_sim->SetDirectory(0);
+    hDz_sim->SetDirectory(0);
+    hEx_sim->SetDirectory(0);
+    hEy_sim->SetDirectory(0);
+    hEz_sim->SetDirectory(0);
+    
       
         
-      SCEhistograms = {hDx_sim, hDy_sim, hDz_sim, hEx_sim, hEy_sim, hEz_sim, hEndPointX_sim};
+    SCEhistograms = {hDx_sim, hDy_sim, hDz_sim, hEx_sim, hEy_sim, hEz_sim, hEndPointDrift_sim};
                   
       //   } //other representations not included yet..
 
@@ -222,12 +262,18 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNEdp::GetPosOffsets(geo::Point_t co
 	if(isWithinHist(point, SCEhistograms.at(6)))
 	  {
 	    // std::cout<<"within..?"<<SCEhistograms.at(6)->Interpolate(point.X(), point.Y(), point.Z())<<" "<<SCEhistograms.at(6)->GetXaxis()->GetXmax()<<std::endl;
-	    if (SCEhistograms.at(6)->Interpolate(point.X(), point.Y(), point.Z()) >= SCEhistograms.at(6)->GetXaxis()->GetXmax() )
+	    if (SCEhistograms.at(6)->Interpolate(point.X(), point.Y(), point.Z()) >= Anodebin )
 	      {
 	 
 		//	      	      std::cout<<"hits anode: "<< tmp_point.X()<<" "<< tmp_point.Y()<<" "<< tmp_point.Z()<<" "<<thePosOffsets[0]<<" "<< thePosOffsets[1]<<" "<< thePosOffsets[2]<<std::endl;
- 
-	      return {-thePosOffsets[0], thePosOffsets[1], thePosOffsets[2] };
+		if(driftcoordinate==1){
+		  return {-thePosOffsets[0], thePosOffsets[1], thePosOffsets[2] };
+		}else if (driftcoordinate==2)
+		   { //is Voxel ready for y-shift?
+		     return {thePosOffsets[0], -thePosOffsets[1], thePosOffsets[2] };
+		   }else{
+		  throw cet::exception("SpaceChargeProtoDUNEdp") << "Driftcoordinate "<<driftcoordinate<<" unknown\n";
+		}
 	    }
 	  }
 

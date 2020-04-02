@@ -11,8 +11,10 @@
 #include <iostream>
 
 // LArSoft includes
+#include "larcore/CoreUtils/ServiceUtil.h"
 #include "dune/SpaceChargeServices/SpaceChargeServiceProtoDUNEdp.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
+
 
 // ROOT includes
 #include "TMath.h"

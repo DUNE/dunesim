@@ -27,7 +27,7 @@ namespace spacecharge{
       
       SpaceChargeServiceProtoDUNEdp(fhicl::ParameterSet const& pset, art::ActivityRegistry& reg);
 
-      virtual void   reconfigure(fhicl::ParameterSet const& pset)  override;
+      virtual void   reconfigure(fhicl::ParameterSet const& pset);
       void   preBeginRun(const art::Run& run);
 
 
