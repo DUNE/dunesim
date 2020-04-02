@@ -21,6 +21,7 @@
 #include "messagefacility/MessageLogger/MessageLogger.h"
 #include "nurandom/RandomUtils/NuRandomService.h"
 
+#include "larcore/CoreUtils/ServiceUtil.h"
 #include "lardataobj/RawData/raw.h"
 #include "lardataobj/RawData/ExternalTrigger.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"

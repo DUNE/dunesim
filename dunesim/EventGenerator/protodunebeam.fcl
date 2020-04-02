@@ -9,20 +9,20 @@ protodune_beam:
  StartEvent: 0
  # From protoDUNE_gensingle.fcl
  # Updated geometry values:
- BeamX: 8.0757 # In cm
- BeamY: 461.06 
+ BeamX: 8.905247 # In cm
+ BeamY: 461.749224 
  BeamZ: -196.11
+ BeamThetaShift: 0.0114276
+ BeamPhiShift: -0.0761654
  RotateXZ: 0.0 #-11.844 # In degrees
  RotateYZ: 0.0 #11.107 
 
- # Rotations for the final beam monitors and background particles
- #RotateMonitorXZ: -10.3 # [Degrees]
- #RotateMonitorYZ: 11.7  # [Degrees]
-
- ## Jake Calcutt: Replacing these with angles for opposite order rotations
+ ## Jake Calcutt: Replacing angles for opposite order rotations
  ##       RotateX --> RotateY
- RotateMonitorXZ: -10.51372
- RotateMonitorYZ:  11.50886
+ ##       Also: tuned the direction with Leig's shift from above.
+ ##             old ones are commented
+ RotateMonitorXZ: -11.8373 #-10.51372
+ RotateMonitorYZ:  11.0929 # 11.50886
 
  ## Parameters for momentum spectrometer
  #MagP1: 5.82044830e-3
