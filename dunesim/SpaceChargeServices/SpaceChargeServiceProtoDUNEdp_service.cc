@@ -12,8 +12,9 @@
 
 // LArSoft includes
 #include "larcore/CoreUtils/ServiceUtil.h"
-#include "dune/SpaceChargeServices/SpaceChargeServiceProtoDUNE.h"
+#include "dune/SpaceChargeServices/SpaceChargeServiceProtoDUNEdp.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
+
 
 // ROOT includes
 #include "TMath.h"
@@ -23,24 +24,24 @@
 #include "cetlib_except/exception.h"
 
 //-----------------------------------------------
-spacecharge::SpaceChargeServiceProtoDUNE::SpaceChargeServiceProtoDUNE(fhicl::ParameterSet const& pset, art::ActivityRegistry &reg)
+spacecharge::SpaceChargeServiceProtoDUNEdp::SpaceChargeServiceProtoDUNEdp(fhicl::ParameterSet const& pset, art::ActivityRegistry &reg)
 {
-  fProp.reset(new spacecharge::SpaceChargeProtoDUNE(pset));
+  fProp.reset(new spacecharge::SpaceChargeProtoDUNEdp(pset));
   
   auto const *detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
   fProp->Configure(pset,detprop);
 
-  reg.sPreBeginRun.watch(this, &SpaceChargeServiceProtoDUNE::preBeginRun);
+  reg.sPreBeginRun.watch(this, &SpaceChargeServiceProtoDUNEdp::preBeginRun);
 }
 
 //----------------------------------------------
-void spacecharge::SpaceChargeServiceProtoDUNE::preBeginRun(const art::Run& run)
+void spacecharge::SpaceChargeServiceProtoDUNEdp::preBeginRun(const art::Run& run)
 {
   fProp->Update(run.id().run());
 }
 
 //------------------------------------------------
-void spacecharge::SpaceChargeServiceProtoDUNE::reconfigure(fhicl::ParameterSet const& pset)
+void spacecharge::SpaceChargeServiceProtoDUNEdp::reconfigure(fhicl::ParameterSet const& pset)
 {
   auto const *detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();  
   fProp->Configure(pset,detprop);  
@@ -48,4 +49,4 @@ void spacecharge::SpaceChargeServiceProtoDUNE::reconfigure(fhicl::ParameterSet c
 }
 
 //------------------------------------------------
-DEFINE_ART_SERVICE_INTERFACE_IMPL(spacecharge::SpaceChargeServiceProtoDUNE, spacecharge::SpaceChargeService)
+DEFINE_ART_SERVICE_INTERFACE_IMPL(spacecharge::SpaceChargeServiceProtoDUNEdp, spacecharge::SpaceChargeService)
