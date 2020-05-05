@@ -44,7 +44,9 @@ public:
   ~DPhaseCoherentNoiseService();
 
   // Add noise to a signal array.
-  int addNoise(Channel chan, AdcSignalVector& sigs) const;
+  int addNoise(detinfo::DetectorClocksData const& clockData,
+               detinfo::DetectorPropertiesData const& detProp,
+               Channel chan, AdcSignalVector& sigs) const;
 
   // Print the configuration.
   std::ostream& print(std::ostream& out =std::cout, std::string prefix ="") const;
@@ -64,7 +66,8 @@ private:
   int getNumber( Channel chan ) const;
 
   //fill noise
-  void getNoiseArray( std::vector< float > & noiseArray,
+  void getNoiseArray(detinfo::DetectorClocksData const& clockData,
+                     std::vector< float > & noiseArray,
      std::vector< float > ampArray,  std::vector< float > freqArray, std::vector< float > phaseArray, float randAmp ) const;
 
   void getPhases();

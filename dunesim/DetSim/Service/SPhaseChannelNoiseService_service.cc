@@ -99,7 +99,8 @@ SPhaseChannelNoiseService(fhicl::ParameterSet const& pset)
     seedSvc->registerEngine(NuRandomService::CLHEPengineSeeder(m_pran), rname);
   }
   if ( fLogLevel > 0 ) cout << myname << "  Registered seed: " << m_pran->getSeed() << endl;
-  generateNoise();
+  auto const clockData = art::ServiceHandle<detinfo::DetectorClocksService const>()->DataForJob();
+  generateNoise(clockData);
   if ( fLogLevel > 1 ) print() << endl;
 }
 
@@ -121,7 +122,9 @@ SPhaseChannelNoiseService::~SPhaseChannelNoiseService() {
 
 //**********************************************************************
 
-int SPhaseChannelNoiseService::addNoise(Channel chan, AdcSignalVector& sigs) const {
+int SPhaseChannelNoiseService::addNoise(detinfo::DetectorClocksData const&,
+                                        detinfo::DetectorPropertiesData const&,
+                                        Channel chan, AdcSignalVector& sigs) const {
   CLHEP::RandFlat flat(*m_pran);
   CLHEP::RandGauss gaus(*m_pran);
   	
@@ -242,7 +245,8 @@ ostream& SPhaseChannelNoiseService::print(ostream& out, string prefix) const {
 //**********************************************************************
 
 void SPhaseChannelNoiseService::
-generateMicroBooNoise(float wirelength, float ENOB, 
+generateMicroBooNoise(detinfo::DetectorClocksData const& clockData,
+                      float wirelength, float ENOB,
               AdcSignalVector& noise, TH1* aNoiseHist) const {
   const string myname = "SPhaseChannelNoiseService::generateCoherentNoise: ";
   if ( fLogLevel > 1 ) {
@@ -252,8 +256,7 @@ generateMicroBooNoise(float wirelength, float ENOB,
     }
   }
   // Fetch sampling rate.
-  auto const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
-  float sampleRate = detprop->SamplingRate();
+  float sampleRate = sampling_rate(clockData);
   // Fetch FFT service and # ticks.
   art::ServiceHandle<util::LArFFT> pfft;
   unsigned int ntick = pfft->FFTSize();
@@ -331,7 +334,8 @@ generateMicroBooNoise(float wirelength, float ENOB,
 //**********************************************************************
 
 void SPhaseChannelNoiseService::
-generateGaussianNoise(AdcSignalVector& noise, std::vector<float> gausNorm, 
+generateGaussianNoise(detinfo::DetectorClocksData const& clockData,
+                      AdcSignalVector& noise, std::vector<float> gausNorm,
 	                    std::vector<float> gausMean, std::vector<float> gausSigma,
 	                    TH1* aNoiseHist) const {
   const string myname = "SPhaseChannelNoiseService::generateGaussianNoise: ";
@@ -360,8 +364,7 @@ generateGaussianNoise(AdcSignalVector& noise, std::vector<float> gausNorm,
   }
   
   // Fetch sampling rate.
-  auto const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
-  float sampleRate = detprop->SamplingRate();
+  float sampleRate = sampling_rate(clockData);
   // Fetch FFT service and # ticks.
   art::ServiceHandle<util::LArFFT> pfft;
   unsigned int ntick = pfft->FFTSize();
@@ -405,7 +408,8 @@ generateGaussianNoise(AdcSignalVector& noise, std::vector<float> gausNorm,
 ////**********************************************************************
 
 void SPhaseChannelNoiseService::
-generateCoherentNoise(AdcSignalVector& noise, std::vector<float> gausNorm, 
+generateCoherentNoise(detinfo::DetectorClocksData const& clockData,
+                      AdcSignalVector& noise, std::vector<float> gausNorm,
 	                    std::vector<float> gausMean, std::vector<float> gausSigma,
 	                    float cohExpNorm, float cohExpWidth, float cohExpOffset, 
 	                    TH1* aNoiseHist) const {
@@ -444,8 +448,7 @@ generateCoherentNoise(AdcSignalVector& noise, std::vector<float> gausNorm,
   params[0] = 4; // hard-coded for now. To be updated with data
   _poisson->SetParameters(params);
   // Fetch sampling rate.
-  auto const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
-  float sampleRate = detprop->SamplingRate();
+  float sampleRate = sampling_rate(clockData);
   // Fetch FFT service and # ticks.
   art::ServiceHandle<util::LArFFT> pfft;
   unsigned int ntick = pfft->FFTSize();
@@ -535,16 +538,16 @@ unsigned int SPhaseChannelNoiseService::getCohNoiseChanFromGroup(unsigned int co
 
 //**********************************************************************
 
-void SPhaseChannelNoiseService::generateNoise() { 
+void SPhaseChannelNoiseService::generateNoise(detinfo::DetectorClocksData const& clockData) {
   
   if(fEnableMicroBooNoise) {
     fMicroBooNoiseZ.resize(fNoiseArrayPoints);
     fMicroBooNoiseU.resize(fNoiseArrayPoints);
     fMicroBooNoiseV.resize(fNoiseArrayPoints);
     for ( unsigned int i=0; i<fNoiseArrayPoints; ++i ) {
-      generateMicroBooNoise(fWirelengthZ, fENOB, fMicroBooNoiseZ[i], fMicroBooNoiseHistZ);
-      generateMicroBooNoise(fWirelengthU, fENOB, fMicroBooNoiseU[i], fMicroBooNoiseHistU);
-      generateMicroBooNoise(fWirelengthV, fENOB, fMicroBooNoiseV[i], fMicroBooNoiseHistV);
+      generateMicroBooNoise(clockData, fWirelengthZ, fENOB, fMicroBooNoiseZ[i], fMicroBooNoiseHistZ);
+      generateMicroBooNoise(clockData, fWirelengthU, fENOB, fMicroBooNoiseU[i], fMicroBooNoiseHistU);
+      generateMicroBooNoise(clockData, fWirelengthV, fENOB, fMicroBooNoiseV[i], fMicroBooNoiseHistV);
     } 
   }
   
@@ -553,9 +556,9 @@ void SPhaseChannelNoiseService::generateNoise() {
     fGausNoiseV.resize(fNoiseArrayPoints);
     fGausNoiseZ.resize(fNoiseArrayPoints);
     for ( unsigned int i=0; i<fNoiseArrayPoints; ++i ) {
-      generateGaussianNoise(fGausNoiseU[i], fGausNormU, fGausMeanU, fGausSigmaU, fGausNoiseHistU);
-      generateGaussianNoise(fGausNoiseV[i], fGausNormV, fGausMeanV, fGausSigmaV, fGausNoiseHistV);
-      generateGaussianNoise(fGausNoiseZ[i], fGausNormZ, fGausMeanZ, fGausSigmaZ, fGausNoiseHistZ);
+      generateGaussianNoise(clockData, fGausNoiseU[i], fGausNormU, fGausMeanU, fGausSigmaU, fGausNoiseHistU);
+      generateGaussianNoise(clockData, fGausNoiseV[i], fGausNormV, fGausMeanV, fGausSigmaV, fGausNoiseHistV);
+      generateGaussianNoise(clockData, fGausNoiseZ[i], fGausNormZ, fGausMeanZ, fGausSigmaZ, fGausNoiseHistZ);
     }
   }
   
@@ -563,7 +566,8 @@ void SPhaseChannelNoiseService::generateNoise() {
   	makeCoherentGroupsByOfflineChannel(fNChannelsPerCoherentGroup);
     fCohNoise.resize(fCohNoiseArrayPoints);
     for ( unsigned int i=0; i<fCohNoiseArrayPoints; ++i ) {
-      generateCoherentNoise(fCohNoise[i], fCohGausNorm, fCohGausMean, fCohGausSigma, 
+      generateCoherentNoise(clockData,
+                            fCohNoise[i], fCohGausNorm, fCohGausMean, fCohGausSigma,
                             fCohExpNorm, fCohExpWidth, fCohExpOffset, 
                             fCohNoiseHist);
     }

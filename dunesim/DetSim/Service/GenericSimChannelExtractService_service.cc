@@ -20,7 +20,8 @@ GenericSimChannelExtractService(const fhicl::ParameterSet&, art::ActivityRegistr
 //**********************************************************************
 
 int GenericSimChannelExtractService::
-extract(const sim::SimChannel* psc, AdcSignalVector& sigs) const {
+extract(detinfo::DetectorClocksData const& clockData,
+        const sim::SimChannel* psc, AdcSignalVector& sigs) const {
   sigs.clear();
   sigs.resize(m_ntick, 0.0);
   if ( psc == nullptr ) return 0;
@@ -28,7 +29,7 @@ extract(const sim::SimChannel* psc, AdcSignalVector& sigs) const {
     sigs[itck] = psc->Charge(itck);
   }
   unsigned int chan = psc->Channel();
-  m_psss->Convolute(chan, sigs);
+  m_psss->Convolute(clockData, chan, sigs);
   return 0;
 }
 

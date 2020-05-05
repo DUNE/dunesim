@@ -70,10 +70,11 @@ ProtoDUNEChannelNoiseService(fhicl::ParameterSet const& pset)
     seedSvc->registerEngine(NuRandomService::CLHEPengineSeeder(m_pran), rname);
   }
   if ( fLogLevel > 0 ) cout << myname << "  Registered seed: " << m_pran->getSeed() << endl;
+  auto const clockData = art::ServiceHandle<detinfo::DetectorClocksService const>()->DataForJob();
   for ( unsigned int isam=0; isam<fNoiseArrayPoints; ++isam ) {
-    generateNoise(fWirelengthZ, fENOB, fLowCutoffZ, fNoiseZ[isam], fNoiseHistZ);
-    generateNoise(fWirelengthU, fENOB, fLowCutoffU, fNoiseU[isam], fNoiseHistU);
-    generateNoise(fWirelengthV, fENOB, fLowCutoffV, fNoiseV[isam], fNoiseHistV);
+    generateNoise(clockData, fWirelengthZ, fENOB, fLowCutoffZ, fNoiseZ[isam], fNoiseHistZ);
+    generateNoise(clockData, fWirelengthU, fENOB, fLowCutoffU, fNoiseU[isam], fNoiseHistU);
+    generateNoise(clockData, fWirelengthV, fENOB, fLowCutoffV, fNoiseV[isam], fNoiseHistV);
   }
   if ( fLogLevel > 1 ) print() << endl;
 }
@@ -96,7 +97,9 @@ ProtoDUNEChannelNoiseService::~ProtoDUNEChannelNoiseService() {
 
 //**********************************************************************
 
-int ProtoDUNEChannelNoiseService::addNoise(Channel chan, AdcSignalVector& sigs) const {
+int ProtoDUNEChannelNoiseService::addNoise(detinfo::DetectorClocksData const&,
+                                           detinfo::DetectorPropertiesData const&,
+                                           Channel chan, AdcSignalVector& sigs) const {
   CLHEP::RandFlat flat(*m_pran);
   CLHEP::RandGauss gaus(*m_pran);
   unsigned int noisechan = 0;
@@ -155,7 +158,8 @@ ostream& ProtoDUNEChannelNoiseService::print(ostream& out, string prefix) const 
 //**********************************************************************
 
 void ProtoDUNEChannelNoiseService::
-generateNoise(float wirelength, float ENOB, float aLowCutoff,
+generateNoise(detinfo::DetectorClocksData const& clockData,
+              float wirelength, float ENOB, float aLowCutoff,
               AdcSignalVector& noise, TH1* aNoiseHist) const {
   const string myname = "ProtoDUNEChannelNoiseService::generateNoise: ";
   if ( fLogLevel > 1 ) {
@@ -166,8 +170,7 @@ generateNoise(float wirelength, float ENOB, float aLowCutoff,
     }
   }
   // Fetch sampling rate.
-  auto const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
-  float sampleRate = detprop->SamplingRate();
+  float sampleRate = sampling_rate(clockData);
   // Fetch FFT service and # ticks.
   art::ServiceHandle<util::LArFFT> pfft;
   unsigned int ntick = pfft->FFTSize();
@@ -249,14 +252,14 @@ generateNoise(float wirelength, float ENOB, float aLowCutoff,
 
 //**********************************************************************
 
-void ProtoDUNEChannelNoiseService::generateNoise() {
+void ProtoDUNEChannelNoiseService::generateNoise(detinfo::DetectorClocksData const& clockData) {
   fNoiseZ.resize(fNoiseArrayPoints);
   fNoiseU.resize(fNoiseArrayPoints);
   fNoiseV.resize(fNoiseArrayPoints);
   for ( unsigned int inch=0; inch<fNoiseArrayPoints; ++inch ) {
-    generateNoise(fWirelengthZ, fENOB, fLowCutoffZ, fNoiseZ[inch], fNoiseHistZ);
-    generateNoise(fWirelengthU, fENOB, fLowCutoffU, fNoiseZ[inch], fNoiseHistU);
-    generateNoise(fWirelengthV, fENOB, fLowCutoffV, fNoiseZ[inch], fNoiseHistV);
+    generateNoise(clockData, fWirelengthZ, fENOB, fLowCutoffZ, fNoiseZ[inch], fNoiseHistZ);
+    generateNoise(clockData, fWirelengthU, fENOB, fLowCutoffU, fNoiseZ[inch], fNoiseHistU);
+    generateNoise(clockData, fWirelengthV, fENOB, fLowCutoffV, fNoiseZ[inch], fNoiseHistV);
   }
 }
 

@@ -48,7 +48,8 @@ DPhaseSimChannelExtractService(const fhicl::ParameterSet& pset, art::ActivityReg
 //**********************************************************************
 
 int DPhaseSimChannelExtractService::
-extract(const sim::SimChannel* psc, AdcSignalVector& sigs) const {
+extract(detinfo::DetectorClocksData const& clockData,
+        const sim::SimChannel* psc, AdcSignalVector& sigs) const {
 
   if ( psc == nullptr ) return 0;
 
@@ -64,7 +65,7 @@ extract(const sim::SimChannel* psc, AdcSignalVector& sigs) const {
   }
   
   // perform convolution
-  m_psss->Convolute(chan, sigs);
+  m_psss->Convolute(clockData, chan, sigs);
   
   return 0;
 }

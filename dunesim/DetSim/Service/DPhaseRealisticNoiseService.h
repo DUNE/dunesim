@@ -15,6 +15,11 @@
 #include <vector>
 #include <iostream>
 
+namespace detinfo {
+  class DetectorClocksData;
+  class DetectorPropertiesData;
+}
+
 class TH1;
 namespace CLHEP {
 class HepRandomEngine;
@@ -34,7 +39,9 @@ public:
   ~DPhaseRealisticNoiseService();
 
   // Add noise to a signal array.
-  int addNoise(Channel chan, AdcSignalVector& sigs) const;
+  int addNoise(detinfo::DetectorClocksData const& clockData,
+               detinfo::DetectorPropertiesData const& detProp,
+               Channel chan, AdcSignalVector& sigs) const;
 
   // Print the configuration.
   std::ostream& print(std::ostream& out =std::cout, std::string prefix ="") const;
@@ -42,7 +49,8 @@ public:
   // Fill a noise vector.
   // Input vector contents are lost.
   // The size of the vector is obtained from the FFT service.
-  void generateNoise(std::vector<double> frequencyVector, AdcSignalVector& noise,
+  void generateNoise(detinfo::DetectorPropertiesData const& detProp,
+                     std::vector<double> frequencyVector, AdcSignalVector& noise,
                                     TH1* aNoiseHist, double customRandom);
 
 private:
@@ -60,7 +68,7 @@ private:
   void Chan2Phase(std::map<Channel, double> &PhaseChannelMap) const;
 
   // Fill the noise vectors.
-  void generateNoise();
+  void generateNoise(detinfo::DetectorPropertiesData const& detProp);
 
   //Mirror the output waveform to match geometries dofferent from 3x1x1 geo
   void mirrorWaveform(AdcSignalVector& noise, int TimeSamples) const;

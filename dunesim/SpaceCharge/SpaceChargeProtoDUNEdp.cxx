@@ -46,7 +46,7 @@ spacecharge::SpaceChargeProtoDUNEdp::SpaceChargeProtoDUNEdp(
 }
 //------------------------------------------------
 bool spacecharge::SpaceChargeProtoDUNEdp::Configure(fhicl::ParameterSet const& pset, 
-							detinfo::DetectorProperties const* detprop)
+                                                    detinfo::DetectorPropertiesData const& detProp)
 {  
 
   fEnableSimSpatialSCE = pset.get<bool>("EnableSimSpatialSCE");
@@ -54,8 +54,7 @@ bool spacecharge::SpaceChargeProtoDUNEdp::Configure(fhicl::ParameterSet const& p
   fEnableCalSpatialSCE = pset.get<bool>("EnableCalSpatialSCE");
   fEnableCalEfieldSCE = pset.get<bool>("EnableCalEfieldSCE");
   
-  //auto const *detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
-  fEfield = detprop->Efield();
+  fEfield = detProp.Efield();
   std::cout<<"Efield : "<<fEfield<<std::endl;
 
   art::ServiceHandle<geo::Geometry> geom;
@@ -472,7 +471,7 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNEdp::GetEfieldOffsets(geo::Point_t
   
 
        theEfieldOffsets = GetOffsetsVoxel(point, SCEhistograms.at(3), SCEhistograms.at(4), SCEhistograms.at(5));
-       //     fEfield = detprop->Efield(); kV/cm..
+       //     fEfield = detProp.Efield(); kV/cm..
       
        theEfieldOffsets[0] = theEfieldOffsets[0]/(-1000.0*fEfield);       
        theEfieldOffsets[1] =theEfieldOffsets[1]/(-1000.0*fEfield);               
@@ -507,4 +506,3 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNEdp::GetCalEfieldOffsets(geo::Poin
 }
 
 //----------------------------------------------------------------------------
-
