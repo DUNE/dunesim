@@ -465,18 +465,48 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNEdp::GetEfieldOffsets(geo::Point_t
 
   std::vector<double> theEfieldOffsets;
   geo::Point_t point = {tmp_point.X(), tmp_point.Y(), tmp_point.Z()};
-    
-    
-     
-  //  if (fRepresentationType=="Voxelized_TH3"){
+
   
 
        theEfieldOffsets = GetOffsetsVoxel(point, SCEhistograms.at(3), SCEhistograms.at(4), SCEhistograms.at(5));
+       //THESE are the absoluted values of the Efield 
+       //ISCalculation expects difference from expected field
+       /*
+ geo::Point_t midPoint
+      { ( step->GetPreStepPoint()->GetPosition() + step->GetPostStepPoint()->Ge\
+tPosition() ) * 0.5/CLHEP::cm };
+    auto EfieldDelta = fEfield * SCE->GetEfieldOffsets(midPoint);
+    geo::Vector_t EfieldVec
+      = { fEfield + EfieldDelta.X(), EfieldDelta.Y(), EfieldDelta.Z() };
+      std::cout<<"ISCalculation : "<<EfieldVec.R()<<std::endl;    return EfieldVe\
+c.R();
+	*/
        //     fEfield = detprop->Efield(); kV/cm..
-      
-       theEfieldOffsets[0] = theEfieldOffsets[0]/(-1000.0*fEfield);       
-       theEfieldOffsets[1] =theEfieldOffsets[1]/(-1000.0*fEfield);               
-       theEfieldOffsets[2] =theEfieldOffsets[2]/(-1000.0*fEfield); 
+       // Efield in larsoft is in kV/cm
+       //std::cout<<"SpaceCharge efield: "<<pow( pow(theEfieldOffsets[0],2) + pow(theEfieldOffsets[1],2) +pow(theEfieldOffsets[2],2) ,0.5)/1000.0<<std::endl;
+
+
+       //These maps are in: V/cm
+       theEfieldOffsets[0]= theEfieldOffsets[0]/(-1000.0);
+       theEfieldOffsets[1]= theEfieldOffsets[1]/(-1000.0);
+       theEfieldOffsets[2]= theEfieldOffsets[2]/(-1000.0);
+
+       if(driftcoordinate==1){
+       theEfieldOffsets[0]=theEfieldOffsets[0]-fEfield;
+
+       }else if(driftcoordinate==2){
+	 theEfieldOffsets[1]=theEfieldOffsets[1]-fEfield;
+       }else{
+	 std::cout<<" Problem with drift field coordiate system for Efield calculation "<<std::endl;
+       }
+       theEfieldOffsets[0]= theEfieldOffsets[0]/(fEfield);
+       theEfieldOffsets[1]= theEfieldOffsets[1]/(fEfield);
+       theEfieldOffsets[2]= theEfieldOffsets[2]/(fEfield);
+
+
+
+       //       std::cout<<theEfieldOffsets[0]<<" "<<theEfieldOffsets[1]<<" "<<
+       //theEfieldOffsets[2]<<std::endl;
 
 
      //  }  else theEfieldOffsets.resize(3,0.0);
