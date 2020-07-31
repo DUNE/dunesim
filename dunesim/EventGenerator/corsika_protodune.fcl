@@ -19,11 +19,11 @@ protodune_corsika_cmc.BufferBox:      [ -300.0,300.0,-300.0,300.0,-300.0,300.0 ]
 protodune_corsika_cmc.ShowerAreaExtension: 2000
 protodune_corsika_cmc.ProjectToHeight:  865  #height to which particles are projected in cm
 protodune_corsika_cmc.ShowerInputFiles: [
-    "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/p_showers_*db",
-    "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/He_showers_*db",
-    "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/N_showers_*db",
-    "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/Mg_showers_*db",
-    "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/Fe_showers_*db"
+    "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/Cosmics/CERN/CORSIKA/standard/p_showers_*db",
+    "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/Cosmics/CERN/CORSIKA/standard/He_showers_*db",
+    "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/Cosmics/CERN/CORSIKA/standard/N_showers_*db",
+    "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/Cosmics/CERN/CORSIKA/standard/Mg_showers_*db",
+    "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/Cosmics/CERN/CORSIKA/standard/Fe_showers_*db"
          ]
 
 END_PROLOG
