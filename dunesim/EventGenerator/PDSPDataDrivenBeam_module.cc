@@ -19,8 +19,27 @@
 
 #include <memory>
 
+#include "TFile.h"
+
 class PDSPDataDrivenBeam;
 
+/*
+struct MonitorRegion {
+  int upstream_low;
+  int upstream_high;
+  int downstream_low;
+  int downstream_high;
+
+  MonitorRegion(int up_low, int up_high, int down_low, int down_high)
+    : upstream_low(up_low), upstream_high(up_high),
+      downtream_low(down_low), downstream_high(down_high) {};
+
+  check(int up, int down) {
+    return ((upstream_low <= up && up <= upstream_high) &&
+            (downstream_low <= down && down <= downstream_high));
+  };
+};
+*/
 
 class PDSPDataDrivenBeam : public art::EDProducer {
 public:
@@ -31,7 +50,7 @@ public:
   // Plugins should not be copied or assigned.
   PDSPDataDrivenBeam(PDSPDataDrivenBeam const&) = delete;
   PDSPDataDrivenBeam(PDSPDataDrivenBeam&&) = delete;
-  PDSDataDrivenBeam&
+  PDSPDataDrivenBeam&
       operator=(PDSPDataDrivenBeam const&) = delete;
   PDSPDataDrivenBeam& operator=(PDSPDataDrivenBeam&&) = delete;
 
@@ -51,8 +70,9 @@ private:
 PDSPDataDrivenBeam::PDSPDataDrivenBeam(
     fhicl::ParameterSet const& p)
   : EDProducer{p},
-    fFileName(p.get<std::string>("FileName"),
-    fParticleTypes(p.get<std::vector<std::string>>("ParticleTypes") {
+    fFileName(p.get<std::string>("FileName")) {
+
+  fParticleTypes = p.get<std::vector<std::string>>("ParticleTypes");
 
 }
 
@@ -65,15 +85,19 @@ void PDSPDataDrivenBeam::beginJob() {
   fInputFile = new TFile(fFileName.c_str(), "READ");
 
   //Get all the PDFs  
-  //These will be 1D distributions in momentum for each
+  //These will be a 1D distributions in momentum for each
   //4D monitor bin (x,y for up/downstream)
   //Stored in directories according to their particle type
   for (size_t i = 0; i < fParticleTypes.size(); ++i) {
     std::cout << "Fetching directory for " << fParticleTypes[i] << std::endl;
-    TDirectory * current_dir = fInputFile->cd(fParticleTypes[i].c_str());
-    TList * hists = current_dir->GetListOfKeys();
-    for (size_t j = 0; j < hists->GetSize(); ++j) {
+    TDirectory * current_dir = (TDirectory*)fInputFile->Get(fParticleTypes[i].c_str());
+    TList * hists = (TList*)current_dir->GetListOfKeys();
+    for (int j = 0; j < hists->GetSize(); ++j) {
       std::cout << hists->At(j)->GetName() << std::endl;
+      std::string title = hists->At(j)->GetTitle();
+      std::string h_bins = title.substr(0, title.find("_"));
+      std::string v_bins = title.substr(title.find("_")+1, title.size()-1);
+      std::cout << title << " " << h_bins << " " << v_bins << std::endl;
     }
   }
 

@@ -5,3 +5,5 @@ datadriven_beam: {
   FileName: "dummy.root"
   ParticleTypes: ["pion", "proton"]
 }
+
+END_PROLOG
