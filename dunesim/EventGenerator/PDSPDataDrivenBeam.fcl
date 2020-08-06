@@ -1,0 +1,7 @@
+BEGIN_PROLOG
+
+datadriven_beam: {
+  module_type: "PDSPDataDrivenBeam"
+  FileName: "dummy.root"
+  ParticleTypes: ["pion", "proton"]
+}
