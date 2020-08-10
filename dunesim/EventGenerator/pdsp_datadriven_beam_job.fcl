@@ -10,6 +10,9 @@ services:
   RandomNumberGenerator: {} #ART native random number generator
   FileCatalogMetadata:  @local::art_file_catalog_mc
   @table::protodune_simulation_services
+  TFileService: { #closeFileFast: true
+                  fileName: "datadriven_hist.root" #can be overridden by '-T'
+                }
 }
 
 #Start each new event with an empty event.
@@ -45,3 +48,7 @@ outputs:
    compressionLevel: 1
  }
 }
+
+physics.producers.generator.FileName: "try.root"
+physics.producers.generator.NGenerate: 1
+source.maxEvents: @local::physics.producers.generator.NGenerate 

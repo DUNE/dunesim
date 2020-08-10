@@ -3,7 +3,19 @@ BEGIN_PROLOG
 datadriven_beam: {
   module_type: "PDSPDataDrivenBeam"
   FileName: "dummy.root"
-  ParticleTypes: ["pion", "proton"]
+  ParticleTypes: ["Pions", "Protons"]
+  Seed: 0
+  NGenerate: 10
+  Verbose: true
+  RotateMonitorYZ: 11.4328
+  RotateMonitorXZ: -10.7985
+  NP04FrontZ: 717243
+  UpstreamZ: 707555
+  DownstreamZ: 716124
+  BeamX: -4.994
+  BeamY: 448.449
+  BeamZ: -129.804
+  GeneratorZ: -196.11
 }
 
 END_PROLOG
