@@ -50,5 +50,5 @@ outputs:
 }
 
 physics.producers.generator.FileName: "try.root"
-physics.producers.generator.NGenerate: 1
+physics.producers.generator.NGenerate: 10
 source.maxEvents: @local::physics.producers.generator.NGenerate 

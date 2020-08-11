@@ -29,6 +29,8 @@
 #include "TRandom3.h"
 #include "TTree.h"
 #include "TH1D.h"
+#include "TDatabasePDG.h"
+#include "TParticlePDG.h"
 
 class PDSPDataDrivenBeam;
 
@@ -95,8 +97,8 @@ private:
                double maxima[5], double output_point[5]);
 
   void GenerateTrueEvent(simb::MCTruth &mcTruth);
-  //TLorentzVector MakeMomentumVector();
-  TLorentzVector MakePositionVector();
+  void SetPositionAndMomentum(TLorentzVector & position,
+                              TLorentzVector & momentum);
   TVector3 ConvertProfCoordinates(double x, double y, double z, double zOffset);
   void BeamMonitorBasisVectors();
   void RotateMonitorVector(TVector3 & vec);
@@ -128,10 +130,16 @@ void PDSPDataDrivenBeam::produce(art::Event& e) {
 
   // Define the truth collection for this event.
   auto mcTruths = std::make_unique<std::vector<simb::MCTruth>>();
+
+  //Create and produce the true event
   simb::MCTruth truth;
+  GenerateTrueEvent(truth);
+
+  //Set in the MCTruth vector and into the event
   mcTruths->push_back(truth);
   e.put(std::move(mcTruths));
   
+  if (fVerbose) {
   std::cout << fCurrentEvent << " " <<
                fRandPDG[fCurrentEvent] << " " <<
                fRandMomentum[fCurrentEvent] << " " <<
@@ -139,23 +147,22 @@ void PDSPDataDrivenBeam::produce(art::Event& e) {
                fRandVUpstream[fCurrentEvent] << " " <<
                fRandHDownstream[fCurrentEvent] << " " <<
                fRandVDownstream[fCurrentEvent] << std::endl; 
+  }
 
+  //Some output to the hist file
   fOutputPDG = fRandPDG[fCurrentEvent];
   fOutputMomentum = fRandMomentum[fCurrentEvent];
   fOutputHUpstream = fRandHUpstream[fCurrentEvent];
   fOutputVUpstream = fRandVUpstream[fCurrentEvent];
   fOutputHDownstream = fRandHDownstream[fCurrentEvent];
   fOutputVDownstream = fRandVDownstream[fCurrentEvent];
-  std::cout << fOutputPDG << std::endl;
   fOutputTree->Fill();
 
-  GenerateTrueEvent(truth);
+  //Increment position in sampled particle list
   ++fCurrentEvent;
 }
 
 void PDSPDataDrivenBeam::beginJob() {
-  art::ServiceHandle<art::TFileService> tfs;
-
   //Open input file
   fInputFile = new TFile(fFileName.c_str(), "READ");
 
@@ -174,6 +181,9 @@ void PDSPDataDrivenBeam::beginJob() {
   //the true energy (taken from nominal MC?) at the generation 
   //point (what is called the face in the beam sim files I think)
 
+  //Get all of the PDFs that we'll use to sample from
+  //One for each particle type we're interested in
+  //Also get the number of that type of particle
   for (size_t i = 0; i < fParticleTypes.size(); ++i) {
     std::string part_type = fParticleTypes[i];
     fPDFs[part_type] = (THnSparseD*)fInputFile->Get(part_type.c_str());
@@ -185,7 +195,16 @@ void PDSPDataDrivenBeam::beginJob() {
     fTotalParticles += (*n_parts)[0];
   }
 
+  //Compute fractions of particles to sample from 
+  double running_total = 0.;
+  for (auto it = fParticleNums.begin(); it != fParticleNums.end(); ++it) {
+    running_total += it->second / fTotalParticles;
+    fParticleFracs[it->first] = running_total;
+  }
+
+
   //Get the kinematic ranges from 1D projections of the first PDF (arbitrary)
+  //To use for setting the values later on
   THnSparseD * temp_pdf = fPDFs.begin()->second;
   double minima[5];
   double maxima[5];
@@ -198,17 +217,10 @@ void PDSPDataDrivenBeam::beginJob() {
     delete temp_hist;
   }
   
-  //Compute fractions
-  double running_total = 0.;
-  for (auto it = fParticleNums.begin(); it != fParticleNums.end(); ++it) {
-    running_total += it->second / fTotalParticles;
-    fParticleFracs[it->first] = running_total;
-  }
-
   //Will need to throw some random numbers
-  //Flat for pdg type
-  //Flat in reco momentum
-  //Flat in theta, phi, vert/horiz fibers
+  //pdg type
+  //reco momentum
+  //vert/horiz fibers for both monitors
   //     --- Establish valid ranges?
   //
   //Then throw flat(0,1) 
@@ -221,19 +233,19 @@ void PDSPDataDrivenBeam::beginJob() {
   //
   //
   //
-  //I think we can do this all in the beginJob step, 
+  //Do this all in the beginJob step, 
   //where we throw all of the numbers until we get 
   //N events, where N is a fcl parameter describing how
   //many events we would like to generate. Save the 
-  //kinematics + position for these N events and then use
+  //kinematics, position, and PDG for these N events and then use
   //in the produce function to create the events. 
   int nSampled = 0;
   double kin_samples[5]; //the point in phase space to check against pdf
   double pdf_check; //the number used for the checking
   double pdg_sample = 0.; //point to sample fractions of particle types
   while (nSampled < fNGenerate) {
-    pdg_sample = fRNG.Rndm();
     //Get the pdg from the random num   
+    pdg_sample = fRNG.Rndm();
     std::string part_type = "";
     for (auto it = fParticleFracs.begin(); it != fParticleFracs.end(); ++it) {
       if (pdg_sample <= it->second) {
@@ -247,6 +259,11 @@ void PDSPDataDrivenBeam::beginJob() {
       }
     }
     
+    //Now, find a random point in phase space, throw a number,
+    //and check against the PDF
+    //
+    //If successful, store the kinematics and store for later production
+    //If unsuccessful, select a new random point in phase, throw & check again
     bool sample_again = true;
     while (sample_again) {
       fRNG.RndmArray(5, &kin_samples[0]);
@@ -256,23 +273,31 @@ void PDSPDataDrivenBeam::beginJob() {
       //to within the sampling range
       double kin_point[5];
       Convert(kin_samples, minima, maxima, kin_point);
-                                                //false: do not allocate a bin
-                                                //to save on memory usage
+
+
+      //Find the bin in the THnSparseD. If the bin has a value of 0,
+      //then it would not have been allocated to save on memory.
+      //The false parameter prevents that bin from being allocated here,
+      //to save memory
       long long bin = fPDFs[part_type]->GetBin(&kin_point[0], false);
+
+      //The bin has no chance of being populated, move on
       if (bin == -1) continue;
+
+      //Find how likely we are to populate this bin
       double pdf_value = fPDFs[part_type]->GetBinContent(bin);
 
+      //If successful, save info and move on
       if (pdf_check <= pdf_value) {
         if (fVerbose) {
-          std::cout << "bin: " << bin << " PDF val: " << pdf_value << " Check: " << pdf_check << std::endl;
+          std::cout << "bin: " << bin << " PDF val: " << pdf_value <<
+                       " Check: " << pdf_check << std::endl;
           std::cout << kin_samples[0] << " " << kin_samples[1] << " " <<
                        kin_samples[2] << " " << kin_samples[3] << " " <<
                        kin_samples[4] << std::endl;
           std::cout << kin_point[0] << " " << kin_point[1] << " " <<
                        kin_point[2] << " " << kin_point[3] << " " <<
                        kin_point[4] << std::endl;
-
-
           std::cout << "Will keep" << std::endl;
         }
 
@@ -288,6 +313,8 @@ void PDSPDataDrivenBeam::beginJob() {
     }
   }
 
+  //For quick output info
+  art::ServiceHandle<art::TFileService> tfs;
   fOutputTree = tfs->make<TTree>("tree", ""); 
   fOutputTree->Branch("PDG", &fOutputPDG);
   fOutputTree->Branch("Event", &fCurrentEvent);
@@ -298,11 +325,13 @@ void PDSPDataDrivenBeam::beginJob() {
   fOutputTree->Branch("VDownstream", &fOutputVDownstream);
 
 
-  //Setting up for positioning stuff
+  //Setting up for positioning/momentum projection
   BeamMonitorBasisVectors();
 
 }
 
+//To turn the kinematic sample (range 0 --> 1)
+//into the variable we use in the pdf (momentum, fiber numbers)
 void PDSPDataDrivenBeam::Convert(
     double input_point[5], double minima[5],
     double maxima[5], double output_point[5]) {
@@ -315,83 +344,93 @@ void PDSPDataDrivenBeam::Convert(
 }
 
 void PDSPDataDrivenBeam::GenerateTrueEvent(simb::MCTruth &mcTruth) {
+  TLorentzVector position(0, 0, 0, 0);
+  TLorentzVector momentum(0., 0., 0., 0.);
+  SetPositionAndMomentum(position, momentum);
+  
+  if (fVerbose) {
+    std::cout << "Position: ";
+    position.Print();
+    std::cout << "Momentum: ";
+    momentum.Print();
+  }
 
-  MakePositionVector();
-/*
   mcTruth.SetOrigin(simb::kSingleParticle);
 
   std::string process = "primary";
   int trackID = 0; //Change?
 
-  TLorentzVector position(0, 0, 0, 0);
-  TLorentzVector momentum(0., 0., 1., 1.);
-
-  simb::MCParticle newParticle(trackID, fCurrentPDG[fCurrentEvent], process);
+  simb::MCParticle newParticle(trackID, fRandPDG[fCurrentEvent], process);
   newParticle.AddTrajectoryPoint(position, momentum);
   
   // Add the MCParticle to the MCTruth for the event.
   mcTruth.Add(newParticle);
-  */
 }
 
-/*
-TLorentzVector PDSPDataDrivenBeam::MakeMomentumVector() {
-
-}
-*/
-
-TLorentzVector PDSPDataDrivenBeam::MakePositionVector() {
+void PDSPDataDrivenBeam::SetPositionAndMomentum(TLorentzVector & position, TLorentzVector & momentum) {
   //First, get the vector between the two sets of tracking monitors
   //
   //Shift to center of fibers. Middle is 96
+  //Fiber 0 is most-positive: 95.5
+  //Fiber 191 is most-negative: -95.5
   double upstreamX = 96. - int(fRandHUpstream[fCurrentEvent]) - .5;
   double upstreamY = 96. - int(fRandVUpstream[fCurrentEvent]) - .5;
   TVector3 upstream_point = ConvertProfCoordinates(upstreamX, upstreamY, 0., 
                                                    fUpstreamZ);
-
-  std::cout << upstreamX << " " << upstreamY << std::endl;
 
   double downstreamX = 96. - int(fRandHDownstream[fCurrentEvent]) - .5;
   double downstreamY = 96. - int(fRandVDownstream[fCurrentEvent]) - .5;
   TVector3 downstream_point = ConvertProfCoordinates(downstreamX, downstreamY, 0., 
                                                      fDownstreamZ);
 
-  std::cout << downstreamX << " " << downstreamY << std::endl;
+  TVector3 dR = (downstream_point - upstream_point).Unit();
 
-  TVector3 diff = downstream_point - upstream_point;
-  TVector3 dR = diff.Unit();
+  if (fVerbose) {
+  std::cout << "Upstream: " << upstream_point.X() << " " << 
+               upstream_point.Y() << " " << upstream_point.Z() << std::endl;
+  std::cout << "Downstream: " << downstream_point.X() << " " <<
+               downstream_point.Y() << " " << downstream_point.Z() << std::endl;
+  std::cout << "dR: " << dR.X() << " " << dR.Y() << " " << dR.Z() << std::endl;
+  }
 
-  std::cout << upstream_point.X() << " " << upstream_point.Y() << " " <<
-               upstream_point.Z() << std::endl;
-  std::cout << downstream_point.X() << " " << downstream_point.Y() << " " <<
-               downstream_point.Z() << std::endl;
-  std::cout << dR.X() << " " << dR.Y() << " " << dR.Z() << std::endl;
-
+  //Project to generator point
   double deltaZ = (fGeneratorZ - downstream_point.Z());
   double deltaX = (dR.X() / dR.Z()) * deltaZ; 
   double deltaY = (dR.Y() / dR.Z()) * deltaZ; 
 
   TVector3 generator_point = downstream_point +
                              TVector3(deltaX, deltaY, deltaZ);
+  //Set the position 4-vector
+  //Time = 0 for now?
+  position = TLorentzVector(generator_point, 0.);
+
+  //Prints out the projected position at the face of the TPC
+  if (fVerbose) {
+    deltaZ = (-1.*fGeneratorZ);
+    deltaX = (dR.X() / dR.Z()) * deltaZ; 
+    deltaY = (dR.Y() / dR.Z()) * deltaZ; 
+
+    TVector3 last_point = generator_point +
+                          TVector3(deltaX, deltaY, deltaZ);
+
+    std::cout << last_point.X() << " " << last_point.Y() << " " <<
+                 last_point.Z() << std::endl;
+  }
   
-  std::cout << generator_point.X() << " " <<
-               generator_point.Y() << " " <<
-               generator_point.Z() << std::endl;
-
-  deltaZ = (-1.*fGeneratorZ);
-  deltaX = (dR.X() / dR.Z()) * deltaZ; 
-  deltaY = (dR.Y() / dR.Z()) * deltaZ; 
-
-  TVector3 last_point = generator_point +
-                        TVector3(deltaX, deltaY, deltaZ);
-
-  std::cout << last_point.X() << " " << last_point.Y() << " " <<
-               last_point.Z() << std::endl;
-
-  TVector3 momentum = fRandMomentum[fCurrentEvent]*dR;
-  std::cout << dR.X() << " " << dR.Y() << " " << dR.Z() << std::endl;
-
-  return TLorentzVector(0., 0., 0., 0.);
+  //Scales the trajectory between monitors by the momentum value
+  //Later: need to unfold from the sampled, reconstructed momentum
+  //into 'true' momentum
+  TVector3 mom_vec = fRandMomentum[fCurrentEvent]*dR;
+  
+  //Get the PDG and set the mass & energy accordingly
+  int pdg = fRandPDG[fCurrentEvent];
+  const TDatabasePDG * dbPDG = TDatabasePDG::Instance();
+  const TParticlePDG * def = dbPDG->GetParticle(pdg);
+  double mass = def->Mass();
+  double energy = sqrt(mass*mass + mom_vec.Mag2());
+  
+  //Set the momentum 4-vector
+  momentum = TLorentzVector(mom_vec, energy);
 }
 
 TVector3 PDSPDataDrivenBeam::ConvertProfCoordinates(
