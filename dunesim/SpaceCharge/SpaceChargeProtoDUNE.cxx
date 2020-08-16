@@ -89,32 +89,6 @@ bool spacecharge::SpaceChargeProtoDUNE::Configure(fhicl::ParameterSet const& pse
       TH3F* hEy_sim_neg = (TH3F*)hEy_sim_neg_orig->Clone("hEy_neg");
       TH3F* hEz_sim_neg = (TH3F*)hEz_sim_neg_orig->Clone("hEz_neg");
 
-      for(int y = 1; y <= 31; y++){
-	for(int z = 1; z <= 37; z++){
-	  spline_dx_fwd_neg[y-1][z-1] = MakeSpline(hDx_sim_neg,1,y,z,1,1);
-	  spline_dx_fwd_pos[y-1][z-1] = MakeSpline(hDx_sim_pos,1,y,z,1,2);
-	  spline_dEx_neg[y-1][z-1] = MakeSpline(hEx_sim_neg,1,y,z,3,1);
-	  spline_dEx_pos[y-1][z-1] = MakeSpline(hEx_sim_pos,1,y,z,3,2);
-	}
-      }
-      for(int x = 1; x <= 19; x++){
-	for(int z = 1; z <= 37; z++){
-	  spline_dy_fwd_neg[x-1][z-1] = MakeSpline(hDy_sim_neg,2,x,z,1,1);
-	  spline_dy_fwd_pos[x-1][z-1] = MakeSpline(hDy_sim_pos,2,x,z,1,2);
-	  spline_dEy_neg[x-1][z-1] = MakeSpline(hEy_sim_neg,2,x,z,3,1);
-	  spline_dEy_pos[x-1][z-1] = MakeSpline(hEy_sim_pos,2,x,z,3,2);
-	}
-      }
-      for(int x = 1; x <= 19; x++){
-	for(int y = 1; y <= 31; y++){
-	  spline_dz_fwd_neg[x-1][y-1] = MakeSpline(hDz_sim_neg,3,x,y,1,1);
-	  spline_dz_fwd_pos[x-1][y-1] = MakeSpline(hDz_sim_pos,3,x,y,1,2);
-	  spline_dEz_neg[x-1][y-1] = MakeSpline(hEz_sim_neg,3,x,y,3,1);
-	  spline_dEz_pos[x-1][y-1] = MakeSpline(hEz_sim_pos,3,x,y,3,2);
-	}
-      }
-      created_efield_splines = true;
-        
       hDx_sim_pos->SetDirectory(0);
       hDy_sim_pos->SetDirectory(0);
       hDz_sim_pos->SetDirectory(0);
@@ -128,7 +102,35 @@ bool spacecharge::SpaceChargeProtoDUNE::Configure(fhicl::ParameterSet const& pse
       hEx_sim_neg->SetDirectory(0);
       hEy_sim_neg->SetDirectory(0);
       hEz_sim_neg->SetDirectory(0);
-        
+
+      if (fRepresentationType == "Splines_TH3") { 
+        for(int y = 1; y <= 31; y++){
+          for(int z = 1; z <= 37; z++){
+            spline_dx_fwd_neg[y-1][z-1] = MakeSpline(hDx_sim_neg,1,y,z,1,1);
+            spline_dx_fwd_pos[y-1][z-1] = MakeSpline(hDx_sim_pos,1,y,z,1,2);
+            spline_dEx_neg[y-1][z-1] = MakeSpline(hEx_sim_neg,1,y,z,3,1);
+            spline_dEx_pos[y-1][z-1] = MakeSpline(hEx_sim_pos,1,y,z,3,2);
+          }
+        }
+        for(int x = 1; x <= 19; x++){
+          for(int z = 1; z <= 37; z++){
+            spline_dy_fwd_neg[x-1][z-1] = MakeSpline(hDy_sim_neg,2,x,z,1,1);
+            spline_dy_fwd_pos[x-1][z-1] = MakeSpline(hDy_sim_pos,2,x,z,1,2);
+            spline_dEy_neg[x-1][z-1] = MakeSpline(hEy_sim_neg,2,x,z,3,1);
+            spline_dEy_pos[x-1][z-1] = MakeSpline(hEy_sim_pos,2,x,z,3,2);
+          }
+        }
+        for(int x = 1; x <= 19; x++){
+          for(int y = 1; y <= 31; y++){
+            spline_dz_fwd_neg[x-1][y-1] = MakeSpline(hDz_sim_neg,3,x,y,1,1);
+            spline_dz_fwd_pos[x-1][y-1] = MakeSpline(hDz_sim_pos,3,x,y,1,2);
+            spline_dEz_neg[x-1][y-1] = MakeSpline(hEz_sim_neg,3,x,y,3,1);
+            spline_dEz_pos[x-1][y-1] = MakeSpline(hEz_sim_pos,3,x,y,3,2);
+          }
+        }
+        created_efield_splines = true;
+      }
+                
       SCEhistograms = {hDx_sim_pos, hDy_sim_pos, hDz_sim_pos, hEx_sim_pos, hEy_sim_pos, hEz_sim_pos, hDx_sim_neg, hDy_sim_neg, hDz_sim_neg, hEx_sim_neg, hEy_sim_neg, hEz_sim_neg};
                   
    } else if (fRepresentationType == "Voxelized") {
@@ -317,46 +319,6 @@ bool spacecharge::SpaceChargeProtoDUNE::Configure(fhicl::ParameterSet const& pse
       TH3F* hEy_cal_neg = (TH3F*)hEy_cal_neg_orig->Clone("hEy_neg");
       TH3F* hEz_cal_neg = (TH3F*)hEz_cal_neg_orig->Clone("hEz_neg");
 
-      for(int y = 1; y <= 31; y++){
-	for(int z = 1; z <= 37; z++){
-	  spline_dx_bkwd_neg[y-1][z-1] = MakeSpline(hDx_cal_neg,1,y,z,2,1);
-	  spline_dx_bkwd_pos[y-1][z-1] = MakeSpline(hDx_cal_pos,1,y,z,2,2);
-	}
-      }
-      for(int x = 1; x <= 19; x++){
-	for(int z = 1; z <= 37; z++){
-	  spline_dy_bkwd_neg[x-1][z-1] = MakeSpline(hDy_cal_neg,2,x,z,2,1);
-	  spline_dy_bkwd_pos[x-1][z-1] = MakeSpline(hDy_cal_pos,2,x,z,2,2);
-	}
-      }
-      for(int x = 1; x <= 19; x++){
-	for(int y = 1; y <= 31; y++){
-	  spline_dz_bkwd_neg[x-1][y-1] = MakeSpline(hDz_cal_neg,3,x,y,2,1);
-	  spline_dz_bkwd_pos[x-1][y-1] = MakeSpline(hDz_cal_pos,3,x,y,2,2);
-	}
-      }
-      if(created_efield_splines == false){
-        for(int y = 1; y <= 31; y++){
-          for(int z = 1; z <= 37; z++){
-            spline_dEx_neg[y-1][z-1] = MakeSpline(hEx_cal_neg,1,y,z,3,1);
-            spline_dEx_pos[y-1][z-1] = MakeSpline(hEx_cal_pos,1,y,z,3,2);
-          }
-        }
-        for(int x = 1; x <= 19; x++){
-          for(int z = 1; z <= 37; z++){
-            spline_dEy_neg[x-1][z-1] = MakeSpline(hEy_cal_neg,2,x,z,3,1);
-            spline_dEy_pos[x-1][z-1] = MakeSpline(hEy_cal_pos,2,x,z,3,2);
-          }
-        }
-        for(int x = 1; x <= 19; x++){
-          for(int y = 1; y <= 31; y++){
-            spline_dEz_neg[x-1][y-1] = MakeSpline(hEz_cal_neg,3,x,y,3,1);
-            spline_dEz_pos[x-1][y-1] = MakeSpline(hEz_cal_pos,3,x,y,3,2);
-          }
-        }
-        created_efield_splines = true;
-      }
-        
       hDx_cal_pos->SetDirectory(0);
       hDy_cal_pos->SetDirectory(0);
       hDz_cal_pos->SetDirectory(0);
@@ -370,7 +332,49 @@ bool spacecharge::SpaceChargeProtoDUNE::Configure(fhicl::ParameterSet const& pse
       hEx_cal_neg->SetDirectory(0);
       hEy_cal_neg->SetDirectory(0);
       hEz_cal_neg->SetDirectory(0);
-        
+
+      if (fRepresentationType == "Splines_TH3") { 
+        for(int y = 1; y <= 31; y++){
+          for(int z = 1; z <= 37; z++){
+            spline_dx_bkwd_neg[y-1][z-1] = MakeSpline(hDx_cal_neg,1,y,z,2,1);
+            spline_dx_bkwd_pos[y-1][z-1] = MakeSpline(hDx_cal_pos,1,y,z,2,2);
+          }
+        }
+        for(int x = 1; x <= 19; x++){
+          for(int z = 1; z <= 37; z++){
+            spline_dy_bkwd_neg[x-1][z-1] = MakeSpline(hDy_cal_neg,2,x,z,2,1);
+            spline_dy_bkwd_pos[x-1][z-1] = MakeSpline(hDy_cal_pos,2,x,z,2,2);
+          }
+        }
+        for(int x = 1; x <= 19; x++){
+          for(int y = 1; y <= 31; y++){
+            spline_dz_bkwd_neg[x-1][y-1] = MakeSpline(hDz_cal_neg,3,x,y,2,1);
+            spline_dz_bkwd_pos[x-1][y-1] = MakeSpline(hDz_cal_pos,3,x,y,2,2);
+          }
+        }
+        if(created_efield_splines == false){
+          for(int y = 1; y <= 31; y++){
+            for(int z = 1; z <= 37; z++){
+              spline_dEx_neg[y-1][z-1] = MakeSpline(hEx_cal_neg,1,y,z,3,1);
+              spline_dEx_pos[y-1][z-1] = MakeSpline(hEx_cal_pos,1,y,z,3,2);
+            }
+          }
+          for(int x = 1; x <= 19; x++){
+            for(int z = 1; z <= 37; z++){
+              spline_dEy_neg[x-1][z-1] = MakeSpline(hEy_cal_neg,2,x,z,3,1);
+              spline_dEy_pos[x-1][z-1] = MakeSpline(hEy_cal_pos,2,x,z,3,2);
+            }
+          }
+          for(int x = 1; x <= 19; x++){
+            for(int y = 1; y <= 31; y++){
+              spline_dEz_neg[x-1][y-1] = MakeSpline(hEz_cal_neg,3,x,y,3,1);
+              spline_dEz_pos[x-1][y-1] = MakeSpline(hEz_cal_pos,3,x,y,3,2);
+            }
+          }
+          created_efield_splines = true;
+        }
+      }
+                
       CalSCEhistograms = {hDx_cal_pos, hDy_cal_pos, hDz_cal_pos, hEx_cal_pos, hEy_cal_pos, hEz_cal_pos, hDx_cal_neg, hDy_cal_neg, hDz_cal_neg, hEx_cal_neg, hEy_cal_neg, hEz_cal_neg};
       
     } else if (fRepresentationType == "Voxelized") {
@@ -1211,8 +1215,6 @@ TSpline3* spacecharge::SpaceChargeProtoDUNE::MakeSpline(TH3F* spline_hist, int d
       spline->SetName(Form("spline_%d_%d_%d_%d_%d",dim1,dim2_bin,dim3_bin,maptype,driftvol));
     }
   }
-
-  spline->Write();
 
   return spline;
 }
