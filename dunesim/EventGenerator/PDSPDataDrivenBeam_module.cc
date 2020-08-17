@@ -19,6 +19,8 @@
 #include "art_root_io/TFileService.h"
 #include "nusimdata/SimulationBase/MCTruth.h"
 #include "nusimdata/SimulationBase/MCParticle.h"
+#include "dune/DuneObj/ProtoDUNEBeamEvent.h"
+#include "dune/DuneObj/ProtoDUNEBeamSpill.h"
 
 #include <memory>
 #include <map>
@@ -29,6 +31,7 @@
 #include "TRandom3.h"
 #include "TTree.h"
 #include "TH1D.h"
+#include "TF1.h"
 #include "TDatabasePDG.h"
 #include "TParticlePDG.h"
 
@@ -54,14 +57,22 @@ public:
 private:
   
   TFile* fInputFile = 0x0;
-  std::string fFileName;
+  std::string fInputFileName;
+  TFile* fResolutionFile = 0x0;
+  std::string fResolutionFileName;
   std::vector<std::string> fParticleTypes;
   int fNGenerate;
   int fSeed;
   TRandom3 fRNG;
   bool fVerbose;
+  double fRotateMonitorXZ, fRotateMonitorYZ;
+  double fNP04FrontZ, fBeamX, fBeamY, fBeamZ;
+  double fUpstreamZ, fDownstreamZ, fGeneratorZ;
+
 
   std::map<std::string, THnSparseD *> fPDFs;
+  std::map<std::string, TH1D *> fResolutionHists;
+  std::map<std::string, TF1 *> fResolutions;
   std::map<std::string, int> fParticleNums;
   double fTotalParticles = 0.;
   std::map<std::string, double> fParticleFracs;
@@ -75,42 +86,51 @@ private:
   TTree * fOutputTree;
   int fOutputPDG;
   double fOutputMomentum;
+  double fUnfoldedMomentum;
   double fOutputHUpstream, fOutputVUpstream;
   double fOutputHDownstream, fOutputVDownstream;
 
   std::map<std::string, int> fNameToPDG = {
     {"Protons", 2212},
     {"Pions", 211},
-    {"Electrons", -11},
+    {"Electrons", -11}
+  };
+
+  std::map<int, std::string> fPDGToName = {
+    {2212, "Protons"},
+    {211, "Pions"},
+    {-11, "Electrons"}
   };
 
   TVector3 fBMBasisX = TVector3(1.,0.,0.);
   TVector3 fBMBasisY = TVector3(0.,1.,0.);
   TVector3 fBMBasisZ = TVector3(0.,0.,1.);
 
-  double fRotateMonitorXZ, fRotateMonitorYZ;
-  double fNP04FrontZ, fBeamX, fBeamY, fBeamZ;
-  double fUpstreamZ, fDownstreamZ, fGeneratorZ;
-
 
   void Convert(double input_point[5], double minima[5],
                double maxima[5], double output_point[5]);
 
   void GenerateTrueEvent(simb::MCTruth &mcTruth);
+  void GenerateBeamEvent(beam::ProtoDUNEBeamEvent & beamEvent);
+  void MakeTracks(beam::ProtoDUNEBeamEvent & beamEvent);
+  beam::FBM MakeFiberMonitor(double pos);
   void SetPositionAndMomentum(TLorentzVector & position,
                               TLorentzVector & momentum);
   TVector3 ConvertProfCoordinates(double x, double y, double z, double zOffset);
   void BeamMonitorBasisVectors();
   void RotateMonitorVector(TVector3 & vec);
+  void FitResolutions();
 };
 
 
 PDSPDataDrivenBeam::PDSPDataDrivenBeam(fhicl::ParameterSet const& p)
   : EDProducer{p},
-    fFileName(p.get<std::string>("FileName")),
+    fInputFileName(p.get<std::string>("InputFileName")),
+    fResolutionFileName(p.get<std::string>("ResolutionFileName")),
     fNGenerate(p.get<int>("NGenerate")),
     fSeed(p.get<int>("Seed")),
     fRNG(fSeed),
+    fVerbose(p.get<bool>("Verbose")),
     fRotateMonitorXZ(p.get<double>("RotateMonitorXZ")),
     fRotateMonitorYZ(p.get<double>("RotateMonitorYZ")),
     fNP04FrontZ(p.get<double>("NP04FrontZ")),
@@ -123,6 +143,7 @@ PDSPDataDrivenBeam::PDSPDataDrivenBeam(fhicl::ParameterSet const& p)
 
   fParticleTypes = p.get<std::vector<std::string>>("ParticleTypes");
   produces<std::vector<simb::MCTruth>>();
+  produces<std::vector<beam::ProtoDUNEBeamEvent>>();
 
 }
 
@@ -138,15 +159,24 @@ void PDSPDataDrivenBeam::produce(art::Event& e) {
   //Set in the MCTruth vector and into the event
   mcTruths->push_back(truth);
   e.put(std::move(mcTruths));
+
+  //Define beam event for the event
+  std::unique_ptr<std::vector<beam::ProtoDUNEBeamEvent>>
+      beamData(new std::vector<beam::ProtoDUNEBeamEvent>);
+  beam::ProtoDUNEBeamEvent beamEvent;
+
+  GenerateBeamEvent(beamEvent);
+  beamData->push_back(beamEvent);
+  e.put(std::move(beamData));
   
   if (fVerbose) {
-  std::cout << fCurrentEvent << " " <<
-               fRandPDG[fCurrentEvent] << " " <<
-               fRandMomentum[fCurrentEvent] << " " <<
-               fRandHUpstream[fCurrentEvent] << " " <<
-               fRandVUpstream[fCurrentEvent] << " " <<
-               fRandHDownstream[fCurrentEvent] << " " <<
-               fRandVDownstream[fCurrentEvent] << std::endl; 
+    std::cout << fCurrentEvent << " " <<
+                 fRandPDG[fCurrentEvent] << " " <<
+                 fRandMomentum[fCurrentEvent] << " " <<
+                 fRandHUpstream[fCurrentEvent] << " " <<
+                 fRandVUpstream[fCurrentEvent] << " " <<
+                 fRandHDownstream[fCurrentEvent] << " " <<
+                 fRandVDownstream[fCurrentEvent] << std::endl; 
   }
 
   //Some output to the hist file
@@ -164,7 +194,8 @@ void PDSPDataDrivenBeam::produce(art::Event& e) {
 
 void PDSPDataDrivenBeam::beginJob() {
   //Open input file
-  fInputFile = new TFile(fFileName.c_str(), "READ");
+  fInputFile = new TFile(fInputFileName.c_str(), "READ");
+  fResolutionFile = new TFile(fResolutionFileName.c_str(), "READ");
 
   //Get all the PDFs  
   //
@@ -193,6 +224,11 @@ void PDSPDataDrivenBeam::beginJob() {
     fParticleNums[part_type] = (*n_parts)[0];
 
     fTotalParticles += (*n_parts)[0];
+
+
+    //Also get the resolutions
+    std::string res_name = "h" + part_type + "Res";
+    fResolutionHists[part_type] = (TH1D*)fResolutionFile->Get(res_name.c_str());
   }
 
   //Compute fractions of particles to sample from 
@@ -302,10 +338,10 @@ void PDSPDataDrivenBeam::beginJob() {
         }
 
         fRandMomentum.push_back(kin_point[0]);
-        fRandVUpstream.push_back(int(kin_point[1]));
-        fRandHUpstream.push_back(int(kin_point[2]));
-        fRandVDownstream.push_back(int(kin_point[3]));
-        fRandHDownstream.push_back(int(kin_point[4]));
+        fRandVUpstream.push_back(kin_point[1]);
+        fRandHUpstream.push_back(kin_point[2]);
+        fRandVDownstream.push_back(kin_point[3]);
+        fRandHDownstream.push_back(kin_point[4]);
 
         ++nSampled;
         sample_again = false;
@@ -319,6 +355,7 @@ void PDSPDataDrivenBeam::beginJob() {
   fOutputTree->Branch("PDG", &fOutputPDG);
   fOutputTree->Branch("Event", &fCurrentEvent);
   fOutputTree->Branch("Momentum", &fOutputMomentum);
+  fOutputTree->Branch("UnfoldedMomentum", &fUnfoldedMomentum);
   fOutputTree->Branch("HUpstream", &fOutputHUpstream);
   fOutputTree->Branch("VUpstream", &fOutputVUpstream);
   fOutputTree->Branch("HDownstream", &fOutputHDownstream);
@@ -328,6 +365,8 @@ void PDSPDataDrivenBeam::beginJob() {
   //Setting up for positioning/momentum projection
   BeamMonitorBasisVectors();
 
+  //Fit the resolution hists
+  FitResolutions();
 }
 
 //To turn the kinematic sample (range 0 --> 1)
@@ -373,24 +412,32 @@ void PDSPDataDrivenBeam::SetPositionAndMomentum(TLorentzVector & position, TLore
   //Shift to center of fibers. Middle is 96
   //Fiber 0 is most-positive: 95.5
   //Fiber 191 is most-negative: -95.5
+  /*
   double upstreamX = 96. - int(fRandHUpstream[fCurrentEvent]) - .5;
   double upstreamY = 96. - int(fRandVUpstream[fCurrentEvent]) - .5;
-  TVector3 upstream_point = ConvertProfCoordinates(upstreamX, upstreamY, 0., 
-                                                   fUpstreamZ);
 
   double downstreamX = 96. - int(fRandHDownstream[fCurrentEvent]) - .5;
   double downstreamY = 96. - int(fRandVDownstream[fCurrentEvent]) - .5;
+  */
+
+  double upstreamX = 96. - fRandHUpstream[fCurrentEvent];
+  double upstreamY = 96. - fRandVUpstream[fCurrentEvent];
+  double downstreamX = 96. - fRandHDownstream[fCurrentEvent];
+  double downstreamY = 96. - fRandVDownstream[fCurrentEvent];
+
+  TVector3 upstream_point = ConvertProfCoordinates(upstreamX, upstreamY, 0., 
+                                                   fUpstreamZ);
   TVector3 downstream_point = ConvertProfCoordinates(downstreamX, downstreamY, 0., 
                                                      fDownstreamZ);
 
   TVector3 dR = (downstream_point - upstream_point).Unit();
 
   if (fVerbose) {
-  std::cout << "Upstream: " << upstream_point.X() << " " << 
-               upstream_point.Y() << " " << upstream_point.Z() << std::endl;
-  std::cout << "Downstream: " << downstream_point.X() << " " <<
-               downstream_point.Y() << " " << downstream_point.Z() << std::endl;
-  std::cout << "dR: " << dR.X() << " " << dR.Y() << " " << dR.Z() << std::endl;
+    std::cout << "Upstream: " << upstream_point.X() << " " << 
+                 upstream_point.Y() << " " << upstream_point.Z() << std::endl;
+    std::cout << "Downstream: " << downstream_point.X() << " " <<
+                 downstream_point.Y() << " " << downstream_point.Z() << std::endl;
+    std::cout << "dR: " << dR.X() << " " << dR.Y() << " " << dR.Z() << std::endl;
   }
 
   //Project to generator point
@@ -418,12 +465,19 @@ void PDSPDataDrivenBeam::SetPositionAndMomentum(TLorentzVector & position, TLore
   }
   
   //Scales the trajectory between monitors by the momentum value
-  //Later: need to unfold from the sampled, reconstructed momentum
-  //into 'true' momentum
-  TVector3 mom_vec = fRandMomentum[fCurrentEvent]*dR;
+  //Attempting to go from reco to true 
+  int pdg = fRandPDG[fCurrentEvent];
+  TF1 * res = fResolutions[fPDGToName[pdg]];
+  double mean = res->GetParameter(1);
+  double sigma = res->GetParameter(2);
+  double t = fRNG.Gaus(mean, sigma); //random number from momentum resolution
+  double unfolded_momentum = fRandMomentum[fCurrentEvent]/(t + 1.); 
+  fUnfoldedMomentum = unfolded_momentum; //Set output
+
+  //TVector3 mom_vec = fRandMomentum[fCurrentEvent]*dR;
+  TVector3 mom_vec = unfolded_momentum*dR;
   
   //Get the PDG and set the mass & energy accordingly
-  int pdg = fRandPDG[fCurrentEvent];
   const TDatabasePDG * dbPDG = TDatabasePDG::Instance();
   const TParticlePDG * def = dbPDG->GetParticle(pdg);
   double mass = def->Mass();
@@ -452,15 +506,149 @@ TVector3 PDSPDataDrivenBeam::ConvertProfCoordinates(
   return result;
 }
 
-void PDSPDataDrivenBeam::BeamMonitorBasisVectors(){
+void PDSPDataDrivenBeam::BeamMonitorBasisVectors() {
   RotateMonitorVector(fBMBasisX);
   RotateMonitorVector(fBMBasisY);
   RotateMonitorVector(fBMBasisZ);
 }
 
-void PDSPDataDrivenBeam::RotateMonitorVector(TVector3 &vec){
-  vec.RotateX( fRotateMonitorYZ * TMath::Pi()/180. );
-  vec.RotateY( fRotateMonitorXZ * TMath::Pi()/180. );
+void PDSPDataDrivenBeam::RotateMonitorVector(TVector3 &vec) {
+  vec.RotateX(fRotateMonitorYZ * TMath::Pi()/180.);
+  vec.RotateY(fRotateMonitorXZ * TMath::Pi()/180.);
+}
+
+void PDSPDataDrivenBeam::FitResolutions() {
+  for (auto it = fResolutionHists.begin(); it != fResolutionHists.end(); ++it) {
+    TH1D * hist = it->second;
+    hist->Fit("gaus", "Q");
+    fResolutions[it->first] = (TF1 *)hist->GetFunction("gaus");
+  }
+}
+
+void PDSPDataDrivenBeam::GenerateBeamEvent(
+    beam::ProtoDUNEBeamEvent & beamEvent) {
+  beamEvent.SetTOFs(std::vector<double>{0.});
+  beamEvent.SetTOFChans(std::vector<int>{0});
+  beamEvent.SetUpstreamTriggers(std::vector<size_t>{0});
+  beamEvent.SetDownstreamTriggers(std::vector<size_t>{0});
+  beamEvent.SetCalibrations(0., 0., 0., 0.);
+  beamEvent.DecodeTOF();
+
+  beamEvent.SetMagnetCurrent(0.);
+  beamEvent.SetTimingTrigger(12);
+
+  beam::CKov dummy;
+  dummy.trigger = 0;
+  dummy.pressure = 0.;
+  dummy.timeStamp = 0.;
+  beamEvent.SetCKov0(dummy);
+  beamEvent.SetCKov1(dummy);
+
+  beamEvent.SetActiveTrigger(0);
+  beamEvent.SetT0(std::make_pair(0.,0.));
+
+  //Dummy positions for these
+  beamEvent.SetFBMTrigger("XBPF022697", MakeFiberMonitor(.5));
+  beamEvent.SetFBMTrigger("XBPF022698", MakeFiberMonitor(.5));
+  beamEvent.SetFBMTrigger("XBPF022701", MakeFiberMonitor(.5));
+  beamEvent.SetFBMTrigger("XBPF022702", MakeFiberMonitor(.5));
+
+  double upstream_x = fRandHUpstream[fCurrentEvent];
+  double upstream_y = fRandVUpstream[fCurrentEvent];
+  double downstream_x = fRandHDownstream[fCurrentEvent];
+  double downstream_y = fRandVDownstream[fCurrentEvent];
+
+  beamEvent.SetFBMTrigger("XBPF022707", MakeFiberMonitor(96. - upstream_x));//X
+  beamEvent.SetFBMTrigger("XBPF022708", MakeFiberMonitor(96. - upstream_y));//Y
+
+  beamEvent.SetFBMTrigger("XBPF022716", MakeFiberMonitor(96. - downstream_x));//X
+  beamEvent.SetFBMTrigger("XBPF022717", MakeFiberMonitor(96. - downstream_y));//Y
+  
+  MakeTracks(beamEvent);
+
+  beamEvent.AddRecoBeamMomentum(fRandMomentum[fCurrentEvent]);
+}
+
+beam::FBM PDSPDataDrivenBeam::MakeFiberMonitor(double pos) {
+  beam::FBM theFBM;
+
+  //I should probably just make this into
+  //a constructor for the FBM...
+  theFBM.ID = -1;
+  theFBM.glitch_mask = {};
+  std::uninitialized_fill(std::begin(theFBM.fiberData),
+                          std::end(theFBM.fiberData), 0.);
+  std::uninitialized_fill(std::begin(theFBM.timeData),
+                          std::end(theFBM.timeData), 0.);
+  theFBM.timeStamp = 0.;
+
+  short f = 96 -  short(floor(pos)) - 1;
+  theFBM.fibers[f] = 1;
+  theFBM.active.push_back(f);
+  theFBM.decoded = true;
+
+  return theFBM; 
+}
+
+void PDSPDataDrivenBeam::MakeTracks(beam::ProtoDUNEBeamEvent & beamEvent) {
+  
+  //We should only have one active fiber at a time
+  short fx1 = beamEvent.GetFBM("XBPF022707").active[0];
+  short fy1 = beamEvent.GetFBM("XBPF022708").active[0];
+
+  //Convert fiber number to position
+  //p = 96. - f - .5
+  double x1 = 96. - fx1 - .5;
+  double y1 = 96. - fy1 - .5;
+
+  TVector3 pos1 = ConvertProfCoordinates(x1, y1, 0., fUpstreamZ);
+
+  short fx2 = beamEvent.GetFBM("XBPF022716").active[0];
+  short fy2 = beamEvent.GetFBM("XBPF022717").active[0];
+
+  double x2 = 96. - fx2 - .5;
+  double y2 = 96. - fy2 - .5;
+
+  TVector3 pos2 = ConvertProfCoordinates(x2, y2, 0., fDownstreamZ);
+
+  TVector3 dR = (pos2 - pos1).Unit();
+
+  double deltaZ = (-1.*pos2.Z());
+  double deltaX = (dR.X() / dR.Z()) * deltaZ; 
+  double deltaY = (dR.Y() / dR.Z()) * deltaZ; 
+
+  TVector3 tpc_point = pos2 + TVector3(deltaX, deltaY, deltaZ);
+  if (fVerbose) {
+    std::cout << "TPC point: " << tpc_point.X() << " " << tpc_point.Y() <<
+                 " " << tpc_point.Z() << std::endl; 
+  }
+ 
+  std::vector< TVector3 > thePoints = {pos1, pos2, tpc_point};
+  std::vector< TVector3 > theMomenta = {
+    (pos2 - pos1).Unit(),
+    (pos2 - pos1).Unit(),
+    (pos2 - pos1).Unit()
+  };
+
+  recob::Track track(
+      recob::TrackTrajectory(recob::tracking::convertCollToPoint(thePoints),
+                             recob::tracking::convertCollToVector(theMomenta),
+                             recob::Track::Flags_t(thePoints.size()),
+                             false),
+      0, -1., 0, recob::tracking::SMatrixSym55(),
+      recob::tracking::SMatrixSym55(), 1);
+
+  beamEvent.AddBeamTrack(track);
+  
+//    recob::Track(
+//      recob::TrackTrajectory(recob::tracking::convertCollToPoint(thePoints),
+//                             recob::tracking::convertCollToVector(theMomenta),
+//                             recob::Track::Flags_t(thePoints.size()),
+//                             false),
+//      0, -1., 0, recob::tracking::SMatrixSym55(),
+//      recob::tracking::SMatrixSym55(), 1)
+// );
+    
 }
 
 DEFINE_ART_MODULE(PDSPDataDrivenBeam)

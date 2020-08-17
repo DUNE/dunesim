@@ -49,6 +49,8 @@ outputs:
  }
 }
 
-physics.producers.generator.FileName: "try.root"
+physics.producers.generator.InputFileName: "try.root"
+physics.producers.generator.ResolutionFileName: "beam_res.root"
 physics.producers.generator.NGenerate: 10
 source.maxEvents: @local::physics.producers.generator.NGenerate 
+physics.producers.generator.Verbose: false

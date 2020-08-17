@@ -2,7 +2,8 @@ BEGIN_PROLOG
 
 datadriven_beam: {
   module_type: "PDSPDataDrivenBeam"
-  FileName: "dummy.root"
+  InputFileName: "dummy.root"
+  ResolutionFileName: "dummy2.root"
   ParticleTypes: ["Pions", "Protons"]
   Seed: 0
   NGenerate: 10
