@@ -22,11 +22,11 @@ standard_CORSIKAGendp_CMC:
  TimeOffset:          -4.0e-3              #time in seconds before a spill to begin the interactions, -1.6e-3 (TPC Trig. offset) - 0.2e-3 (g4 rise time)
  ProjectToHeight:      856                 #height to which particles are projected [cm]
  ShowerInputFiles:     [
-                          "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/p_showers_*db",
-                          "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/He_showers_*db",
-                          "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/N_showers_*db",
-                          "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/Mg_showers_*db",
-                          "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/Fe_showers_*db"
+                          "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/Cosmics/CERN/CORSIKA/standard/p_showers_*db",
+                          "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/Cosmics/CERN/CORSIKA/standard/He_showers_*db",
+                          "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/Cosmics/CERN/CORSIKA/standard/N_showers_*db",
+                          "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/Cosmics/CERN/CORSIKA/standard/Mg_showers_*db",
+                          "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/Cosmics/CERN/CORSIKA/standard/Fe_showers_*db"
                         ] #list of sqlite dbs with corsika showers
  ShowerFluxConstants:  [ 1.72e4, 9.2e3, 6.2e3, 9.2e3, 6.2e3] #list of flux constants per shower file
  BufferBox:            [ -300.0, 300.0, -300.0, 300.0, -300.0, 300.0 ] #list of buffer box extensions to cryo volume in each dimension/dir (-x,+x,-y,+y,-z,+z)
@@ -44,11 +44,11 @@ standard_311_trigger:
   TimeOffset:             -4.0e-3                                               #time in seconds before a spill to begin the interactions, -1.6e-3 (TPC Trig. offset) - 0.2e-3 (g4 rise time)
   ProjectToHeight:         856                                                  #height to which particles are projected [cm]
   ShowerInputFiles:       [
-                           "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/p_showers_*db",
-                           "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/He_showers_*db",
-                           "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/N_showers_*db",
-                           "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/Mg_showers_*db",
-                           "/pnfs/larsoft/persistent/physics/cosmics/CERN/CORSIKA/standard/Fe_showers_*db"
+                           "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/Cosmics/CERN/CORSIKA/standard/p_showers_*db",
+                           "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/Cosmics/CERN/CORSIKA/standard/He_showers_*db",
+                           "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/Cosmics/CERN/CORSIKA/standard/N_showers_*db",
+                           "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/Cosmics/CERN/CORSIKA/standard/Mg_showers_*db",
+                           "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/Cosmics/CERN/CORSIKA/standard/Fe_showers_*db"
                           ]
   ShowerFluxConstants:    [ 1.72e4, 9.2e3, 6.2e3, 9.2e3, 6.2e3]                 #list of flux constants per shower file
   BufferBox:              [ -300.0, 300.0, -300.0, 300.0, -300.0, 300.0 ]       #list of buffer box extensions to cryo volume in each dimension/dir (-x,+x,-y,+y,-z,+z)
