@@ -11,7 +11,7 @@
 // LArSoft libraries
 #include "larevt/SpaceCharge/SpaceCharge.h"
 #include "larcoreobj/SimpleTypesAndConstants/geo_vectors.h"
-#include "lardataalg/DetectorInfo/DetectorProperties.h"
+#include "lardataalg/DetectorInfo/DetectorPropertiesData.h"
 // FHiCL libraries
 #include "fhiclcpp/ParameterSet.h"
 // ROOT includes
@@ -33,7 +33,7 @@ namespace spacecharge {
       SpaceChargeProtoDUNE(SpaceChargeProtoDUNE const&) = delete;
       virtual ~SpaceChargeProtoDUNE() = default;
       
-      bool Configure(fhicl::ParameterSet const& pset, detinfo::DetectorProperties const*);
+      bool Configure(fhicl::ParameterSet const& pset, detinfo::DetectorPropertiesData const&);
       bool Update(uint64_t ts=0);
       
       bool EnableSimSpatialSCE() const override;

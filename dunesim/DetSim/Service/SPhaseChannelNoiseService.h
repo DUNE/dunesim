@@ -42,7 +42,9 @@ public:
   ~SPhaseChannelNoiseService();
 
   // Add noise to a signal array.
-  int addNoise(Channel chan, AdcSignalVector& sigs) const;
+  int addNoise(detinfo::DetectorClocksData const&,
+               detinfo::DetectorPropertiesData const&,
+               Channel chan, AdcSignalVector& sigs) const;
 
   // Print the configuration.
   std::ostream& print(std::ostream& out =std::cout, std::string prefix ="") const;
@@ -50,17 +52,20 @@ public:
 private:
  
   // Fill the noise vectors.
-  void generateNoise();
+  void generateNoise(detinfo::DetectorClocksData const& clockData);
   
   // Fill a noise vector.
   // Input vector contents are lost.
   // The size of the vector is obtained from the FFT service.
-  void generateMicroBooNoise(float wirelength, float ENOB, 
+  void generateMicroBooNoise(detinfo::DetectorClocksData const& clockData,
+                             float wirelength, float ENOB,
                      AdcSignalVector& noise, TH1* aNoiseHist) const;
-  void generateGaussianNoise(AdcSignalVector& noise, std::vector<float> gausNorm, 
+  void generateGaussianNoise(detinfo::DetectorClocksData const& clockData,
+                             AdcSignalVector& noise, std::vector<float> gausNorm,
 	                    std::vector<float> gausMean, std::vector<float> gausSigma,
 	                    TH1* aNoiseHist) const;
-  void generateCoherentNoise(AdcSignalVector& noise, std::vector<float> gausNorm, 
+  void generateCoherentNoise(detinfo::DetectorClocksData const& clockData,
+                             AdcSignalVector& noise, std::vector<float> gausNorm,
 	                    std::vector<float> gausMean, std::vector<float> gausSigma,
 	                    float cohExpNorm, float cohExpWidth, float cohExpOffset, 
 	                    TH1* aNoiseHist) const;

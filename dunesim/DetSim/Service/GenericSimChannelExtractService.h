@@ -31,7 +31,8 @@ public:
 
   GenericSimChannelExtractService(fhicl::ParameterSet const& pset, art::ActivityRegistry&);
 
-  int extract(const sim::SimChannel* psc, AdcSignalVector& sig) const;
+  int extract(detinfo::DetectorClocksData const& clockData,
+              const sim::SimChannel* psc, AdcSignalVector& sig) const;
 
   std::ostream& print(std::ostream& out =std::cout, std::string prefix ="") const;
 
@@ -46,4 +47,3 @@ private:
 DECLARE_ART_SERVICE_INTERFACE_IMPL(GenericSimChannelExtractService, SimChannelExtractService, LEGACY)
 
 #endif
-

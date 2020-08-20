@@ -33,7 +33,10 @@ spacecharge::SpaceChargeProtoDUNE::SpaceChargeProtoDUNE(
   //Configure(pset);
 }
 //------------------------------------------------
-bool spacecharge::SpaceChargeProtoDUNE::Configure(fhicl::ParameterSet const& pset, detinfo::DetectorProperties const* detprop)
+
+//bool spacecharge::SpaceChargeProtoDUNE::Configure(fhicl::ParameterSet const& pset, detinfo::DetectorProperties const* detprop)
+bool spacecharge::SpaceChargeProtoDUNE::Configure(fhicl::ParameterSet const& pset, 
+                                                  detinfo::DetectorPropertiesData const& detProp)
 {  
 
   fEnableSimSpatialSCE = pset.get<bool>("EnableSimSpatialSCE");
@@ -42,9 +45,11 @@ bool spacecharge::SpaceChargeProtoDUNE::Configure(fhicl::ParameterSet const& pse
   fEnableCalEfieldSCE = pset.get<bool>("EnableCalEfieldSCE");
   
   //auto const *detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
-  fEfield = detprop->Efield();
+  //fEfield = detprop->Efield();
 
   bool created_efield_splines = false;
+
+  fEfield = detProp.Efield();
   
   if((fEnableSimSpatialSCE == true) || (fEnableSimEfieldSCE == true))
   {

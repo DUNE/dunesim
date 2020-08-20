@@ -57,7 +57,9 @@ WhiteChannelNoiseService::~WhiteChannelNoiseService() {
 
 //**********************************************************************
 
-int WhiteChannelNoiseService::addNoise(Channel chan, AdcSignalVector& sigs) const {
+int WhiteChannelNoiseService::addNoise(detinfo::DetectorClocksData const&,
+                                       detinfo::DetectorPropertiesData const&,
+                                       Channel chan, AdcSignalVector& sigs) const {
   art::ServiceHandle<util::SignalShapingServiceDUNE> sss;
   float fASICGain      = sss->GetASICGain(chan);
   double fShapingTime   = sss->GetShapingTime(chan);
