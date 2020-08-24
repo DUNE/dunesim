@@ -23,7 +23,7 @@ tree = inputFile.Get("beamreco/tree")
 
 outputFile = RT.TFile(args.o, "RECREATE")
                    #p,  fvu, fhu, fvd, fhd
-nBins = array("i", [25, 32, 32, 32, 32])
+nBins = array("i", [100, 32, 32, 32, 32])
 mins = array("d", [0., 0., 0., 0., 0.]) 
 maxes = array("d", [2., 192., 192., 192., 192.]) 
 

@@ -18,6 +18,11 @@ datadriven_beam: {
   BeamY: 448.449
   BeamZ: -129.804
   GeneratorZ: -196.11
+
+  UnsmearType: 1
+
+  Minima: [.8, 0, 0, 0, 0]
+  Maxima: [1.2, 192, 192, 192, 192]
 }
 
 END_PROLOG
