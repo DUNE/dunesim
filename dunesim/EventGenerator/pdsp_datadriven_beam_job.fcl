@@ -51,7 +51,7 @@ outputs:
 
 physics.producers.generator.InputFileName: "p100.root"
 physics.producers.generator.ResolutionFileName: "2D_res.root" #"beam_res.root"
-physics.producers.generator.NGenerate: 1 #0
+physics.producers.generator.NGenerate: 5 
 physics.producers.generator.UnsmearType: 2
 source.maxEvents: @local::physics.producers.generator.NGenerate 
-physics.producers.generator.Verbose: true 
+physics.producers.generator.Verbose: false 

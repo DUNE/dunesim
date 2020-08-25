@@ -4,7 +4,11 @@ datadriven_beam: {
   module_type: "PDSPDataDrivenBeam"
   InputFileName: "dummy.root"
   ResolutionFileName: "dummy2.root"
-  ParticleTypes: ["Pions", "Protons"]
+  #ParticleTypes: ["Pions", "Protons"]
+  ParticleTypes: [ ["Pions", .50],
+                   ["Muons", .25],
+                   ["Protons", .25] ]
+
   Seed: 0
   NGenerate: 10
   Verbose: true
@@ -23,6 +27,8 @@ datadriven_beam: {
 
   Minima: [.8, 0, 0, 0, 0]
   Maxima: [1.2, 192, 192, 192, 192]
+
+  NominalMomentum: 1
 }
 
 END_PROLOG

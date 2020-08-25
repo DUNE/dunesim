@@ -23,6 +23,7 @@
 #include "dune/DuneObj/ProtoDUNEBeamSpill.h"
 
 #include <memory>
+#include <utility>
 #include <map>
 
 #include "TFile.h"
@@ -71,13 +72,14 @@ private:
   double fUpstreamZ, fDownstreamZ, fGeneratorZ;
   int fUnsmearType;
   std::vector<double> fMinima, fMaxima;
+  int fNominalMomentum;
 
 
   std::map<std::string, THnSparseD *> fPDFs;
   std::map<std::string, TH1D *> fResolutionHists;
   std::map<std::string, TH2D *> fResolutionHists2D;
   std::map<std::string, TF1 *> fResolutions;
-  std::map<std::string, int> fParticleNums;
+  std::map<std::string, double> fParticleNums;
   double fTotalParticles = 0.;
   std::map<std::string, double> fParticleFracs;
   int fCurrentEvent = 0;
@@ -97,13 +99,15 @@ private:
   std::map<std::string, int> fNameToPDG = {
     {"Protons", 2212},
     {"Pions", 211},
-    {"Electrons", -11}
+    {"Electrons", -11},
+    {"Muons", -13}
   };
 
   std::map<int, std::string> fPDGToName = {
     {2212, "Protons"},
     {211, "Pions"},
-    {-11, "Electrons"}
+    {-11, "Electrons"},
+    {-13, "Muons"}
   };
 
   TVector3 fBMBasisX = TVector3(1.,0.,0.);
@@ -128,6 +132,12 @@ private:
   void FitResolutions();
   double UnsmearMomentum1D();
   double UnsmearMomentum2D();
+
+  void Setup1GeV(); //Shared by 2GeV
+  void Setup3GeV();
+  void Setup6GeV(); //Shared by 7GeV
+  
+  void Scale2DRes();
 };
 
 
@@ -148,9 +158,20 @@ PDSPDataDrivenBeam::PDSPDataDrivenBeam(fhicl::ParameterSet const& p)
     fUpstreamZ(p.get<double>("UpstreamZ")),
     fDownstreamZ(p.get<double>("DownstreamZ")),
     fGeneratorZ(p.get<double>("GeneratorZ")),
-    fUnsmearType(p.get<int>("UnsmearType")) {
+    fUnsmearType(p.get<int>("UnsmearType")),
+    fNominalMomentum(p.get<int>("NominalMomentum")) {
 
-  fParticleTypes = p.get<std::vector<std::string>>("ParticleTypes");
+  std::vector<std::pair<std::string, double>> temp_vec =
+      p.get<std::vector<std::pair<std::string, double>>>("ParticleTypes");
+
+  for (auto it = temp_vec.begin(); it != temp_vec.end(); ++it) {
+    fParticleTypes.push_back(it->first);
+    fParticleNums[it->first] = it->second;
+    fTotalParticles += it->second;
+    if (fVerbose)
+      std::cout << it->second << " " << fTotalParticles << std::endl;
+  }
+
   fMinima = p.get<std::vector<double>>("Minima");
   fMaxima = p.get<std::vector<double>>("Maxima");
 
@@ -227,6 +248,7 @@ void PDSPDataDrivenBeam::beginJob() {
   //Get all of the PDFs that we'll use to sample from
   //One for each particle type we're interested in
   //Also get the number of that type of particle
+  /*
   for (size_t i = 0; i < fParticleTypes.size(); ++i) {
     std::string part_type = fParticleTypes[i];
     fPDFs[part_type] = (THnSparseD*)fInputFile->Get(part_type.c_str());
@@ -260,29 +282,42 @@ void PDSPDataDrivenBeam::beginJob() {
       std::cout << "Bin " << i << " total " << total << std::endl;
     }
   }
+  */
+
+  switch (fNominalMomentum) {
+    case 1:
+      Setup1GeV();
+      break;
+    case 2:
+      Setup1GeV();
+      break;
+    case 3:
+      Setup3GeV();
+      break;
+    case 6:
+      Setup6GeV();
+      break;
+    case 7:
+      Setup6GeV();
+      break;
+    default:
+      Setup1GeV();
+      break;
+  }
+
+  Scale2DRes();
 
   //Compute fractions of particles to sample from
   double running_total = 0.;
   for (auto it = fParticleNums.begin(); it != fParticleNums.end(); ++it) {
     running_total += it->second / fTotalParticles;
     fParticleFracs[it->first] = running_total;
+    if (fVerbose) {
+      std::cout << it->second << " " << running_total << std::endl;
+      std::cout << fParticleFracs[it->first] << std::endl;
+    }
   }
 
-
-  //Get the kinematic ranges from 1D projections of the first PDF (arbitrary)
-  //To use for setting the values later on
-  /*
-  THnSparseD * temp_pdf = fPDFs.begin()->second;
-  double minima[5];
-  double maxima[5];
-  for (size_t i = 0; i < 5; ++i) {
-    TH1D * temp_hist = (TH1D*)temp_pdf->Projection(i);
-    minima[i] = temp_hist->GetXaxis()->GetXmin();
-    maxima[i] = temp_hist->GetXaxis()->GetXmax();
-
-    //Free the memory used for the projection
-    delete temp_hist;
-  }*/
 
   //Will need to throw some random numbers
   //pdg type
@@ -406,14 +441,10 @@ void PDSPDataDrivenBeam::beginJob() {
 void PDSPDataDrivenBeam::Convert(
     double input_point[5], std::vector<double> minima,
     std::vector<double> maxima, double output_point[5]) {
-    //double input_point[5], double minima[5],
-    //double maxima[5], double output_point[5]) {
-
   for (int i = 0; i < 5; ++i) {
     double delta = maxima[i] - minima[i];
     output_point[i] = minima[i] + delta * input_point[i];
   }
-
 }
 
 void PDSPDataDrivenBeam::GenerateTrueEvent(simb::MCTruth &mcTruth) {
@@ -501,14 +532,6 @@ void PDSPDataDrivenBeam::SetPositionAndMomentum(TLorentzVector & position, TLore
   //Scales the trajectory between monitors by the momentum value
   //Attempting to go from reco to true
   int pdg = fRandPDG[fCurrentEvent];
-  /*
-  TF1 * res = fResolutions[fPDGToName[pdg]];
-  double mean = res->GetParameter(1);
-  double sigma = res->GetParameter(2);
-  double t = fRNG.Gaus(mean, sigma); //random number from momentum resolution
-  double unfolded_momentum = fRandMomentum[fCurrentEvent]/(t + 1.);
-  fUnfoldedMomentum = unfolded_momentum; //Set output
-  */
   switch (fUnsmearType) {
     case 1:
       fUnfoldedMomentum = UnsmearMomentum1D();
@@ -712,8 +735,10 @@ double PDSPDataDrivenBeam::UnsmearMomentum2D() {
   TH2D * res = fResolutionHists2D[fPDGToName[pdg]];
 
   int xBin = res->GetXaxis()->FindBin(fRandMomentum[fCurrentEvent]);
-  std::cout << "Momentum & bin: " << fRandMomentum[fCurrentEvent] << " " <<
-               xBin << std::endl;
+  if (fVerbose) {
+    std::cout << "Momentum & bin: " << fRandMomentum[fCurrentEvent] << " " <<
+                 xBin << std::endl;
+  }
 
   double true_min = res->GetYaxis()->GetXmin();
   double true_max = res->GetYaxis()->GetXmax();
@@ -730,7 +755,8 @@ double PDSPDataDrivenBeam::UnsmearMomentum2D() {
     }
   }
 
-  std::cout << "True min and max: " << true_min << " " << true_max << std::endl;
+  if (fVerbose)
+    std::cout << "True min and max: " << true_min << " " << true_max << std::endl;
   
   double unsmeared_momentum = 0.;
   while (true) {
@@ -738,17 +764,120 @@ double PDSPDataDrivenBeam::UnsmearMomentum2D() {
     double pdf_check = fRNG.Rndm(); //random number to check against PDF 
     
     int yBin = res->GetYaxis()->FindBin(t);
-    std::cout << "True mom & bin: " << t << " " << yBin << std::endl;
     double pdf_value = res->GetBinContent(xBin, yBin);
-    std::cout << "Check & val: " << pdf_check << " " << pdf_value << std::endl;
+    if (fVerbose) {
+      std::cout << "True mom & bin: " << t << " " << yBin << std::endl;
+      std::cout << "Check & val: " << pdf_check << " " << pdf_value <<
+                   std::endl;
+    }
     if (pdf_check < pdf_value) {
       unsmeared_momentum = t;
-      std::cout << "Setting momentum to " << t << std::endl;
+      if (fVerbose) std::cout << "Setting momentum to " << t << std::endl;
       break;
     }
   }
 
   return unsmeared_momentum;
+}
+
+void PDSPDataDrivenBeam::Scale2DRes() {
+  for (auto it = fResolutionHists2D.begin();
+       it != fResolutionHists2D.end(); ++it) {
+    TH2D * this_hist = it->second;
+    for (int i = 1; i <= this_hist->GetNbinsX(); ++i) {
+      double integral = this_hist->Integral(i, i);
+      double total = 0.;
+      for (int j = 1; j <= this_hist->GetNbinsY(); ++j) {
+        this_hist->SetBinContent(i, j,
+            this_hist->GetBinContent(i, j) / integral);
+        total += this_hist->GetBinContent(i, j);
+      }
+    }
+  }
+}
+
+void PDSPDataDrivenBeam::Setup1GeV() {
+  for (size_t i = 0; i < fParticleTypes.size(); ++i) {
+    std::string part_type = fParticleTypes[i];
+    if (part_type == "Muons") {
+      fPDFs[part_type] = (THnSparseD*)fInputFile->Get("Pions"); 
+    }
+    else {
+      fPDFs[part_type] = (THnSparseD*)fInputFile->Get(part_type.c_str());
+    }
+
+    //Also get the resolutions
+    std::string res_name = "";
+    if (part_type == "Muons") {
+      res_name = "hPionsRes";
+    }
+    else {
+      res_name = "h" + part_type + "Res";
+    }
+
+    fResolutionHists[part_type] = (TH1D*)fResolutionFile->Get(res_name.c_str());
+
+    res_name += "2D";
+    fResolutionHists2D[part_type] = (TH2D*)fResolutionFile->Get(res_name.c_str());
+  }
+}
+
+void PDSPDataDrivenBeam::Setup3GeV() {
+  for (size_t i = 0; i < fParticleTypes.size(); ++i) {
+    std::string part_type = fParticleTypes[i];
+    if (part_type == "Muons") {
+      fPDFs[part_type] = (THnSparseD*)fInputFile->Get("Pions"); 
+    }
+    else if (part_type == "Kaons") {
+      fPDFs[part_type] = (THnSparseD*)fInputFile->Get("Protons"); 
+    }
+    else {
+      fPDFs[part_type] = (THnSparseD*)fInputFile->Get(part_type.c_str());
+    }
+
+    //Also get the resolutions
+    std::string res_name = "";
+    if (part_type == "Muons") {
+      res_name = "hPionsRes";
+    }
+    if (part_type == "Kaons") {
+      res_name = "hProtonsRes";
+    }
+    else {
+      res_name = "h" + part_type + "Res";
+    }
+
+    fResolutionHists[part_type] = (TH1D*)fResolutionFile->Get(res_name.c_str());
+
+    res_name += "2D";
+    fResolutionHists2D[part_type] = (TH2D*)fResolutionFile->Get(res_name.c_str());
+  }
+}
+
+void PDSPDataDrivenBeam::Setup6GeV() {
+  for (size_t i = 0; i < fParticleTypes.size(); ++i) {
+    std::string part_type = fParticleTypes[i];
+    if (part_type == "Muons" || part_type == "Electrons") {
+      fPDFs[part_type] = (THnSparseD*)fInputFile->Get("Pions"); 
+    }
+    else {
+      fPDFs[part_type] = (THnSparseD*)fInputFile->Get(part_type.c_str());
+    }
+
+    //Also get the resolutions
+    std::string res_name = "";
+    if (part_type == "Muons") {
+      res_name = "hPionsRes";
+    }
+    else {
+      res_name = "h" + part_type + "Res";
+    }
+
+    fResolutionHists[part_type] = (TH1D*)fResolutionFile->Get(res_name.c_str());
+
+    res_name += "2D";
+    fResolutionHists2D[part_type] = (TH2D*)fResolutionFile->Get(res_name.c_str());
+  }
 }
 
 DEFINE_ART_MODULE(PDSPDataDrivenBeam)
