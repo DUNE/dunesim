@@ -3,9 +3,10 @@ from array import array
 from argparse import ArgumentParser as ap
 parser = ap()
 
-parser.add_argument( "-i", type=str, help='Input file', default="")
-parser.add_argument( "-o", type=str, help='Output file', default="beam_pdf.root")
-parser.add_argument( "-n", type=int, help='Max number of entries', default=-1)
+parser.add_argument("-i", type=str, help='Input file', default="")
+parser.add_argument("-o", type=str, help='Output file', default="beam_pdf.root")
+parser.add_argument("-n", type=int, help='Max number of entries', default=-1)
+parser.add_argument("-p", type=int, help='Which momentum', default=1)
 args = parser.parse_args()
 
 
@@ -14,29 +15,40 @@ if not args.i:
 
 inputFile = RT.TFile(args.i, "OPEN")
 tree = inputFile.Get("beamreco/tree")
-
-''' fibers_h_upstream = NULL
- fibers_v_upstream = NULL
-  fibers_h_downstream = NULL
-   fibers_v_downstream = NULL
-'''
-
 outputFile = RT.TFile(args.o, "RECREATE")
                    #p,  fvu, fhu, fvd, fhd
 nBins = array("i", [100, 32, 32, 32, 32])
-mins = array("d", [0., 0., 0., 0., 0.]) 
-maxes = array("d", [2., 192., 192., 192., 192.]) 
+
+if args.p == 1:
+  min_p = 0.
+  max_p = 2.
+elif args.p == 2:
+  min_p = 1.
+  max_p = 3.
+elif args.p == 3:
+  min_p = 2.
+  max_p = 4.
+elif args.p == 6:
+  min_p = 4.
+  max_p = 8.
+elif args.p == 7:
+  min_p = 6.
+  max_p = 8.
+
+mins = array("d", [min_p, 0., 0., 0., 0.]) 
+maxes = array("d", [max_p, 192., 192., 192., 192.]) 
 
 Pions = RT.THnSparseD("Pions", "", 5, nBins, mins, maxes)
 Protons = RT.THnSparseD("Protons", "", 5, nBins, mins, maxes)
 Electrons = RT.THnSparseD("Electrons", "", 5, nBins, mins, maxes)
-#kaon?
+Kaons = RT.THnSparseD("Kaons", "", 5, nBins, mins, maxes)
+
+if args.p in [1, 2, 3]:
+  pdfs = [Pions, Protons, Electrons]
+elif args.p in [6, 7]:
+  pdfs = [Pions, Protons, Kaons]
 
 counter = 0
-nProtons = 0
-nPions = 0
-nElectrons = 0
-#kaon?
 
 if args.n < 0:
   max_entries = tree.GetEntries()
@@ -58,46 +70,41 @@ for e in tree:
           len(f_v_down) == 1 and len(f_h_down) == 1 and len(pdgs) > 0):
     continue
   
-  if Momentum < 0. or Momentum > 2.: continue 
+  if Momentum < min_p or Momentum > max_p: continue 
   
   data = array("d", [Momentum, f_v_up[0], f_h_up[0], f_v_down[0], f_h_down[0]])
 
-  if pdgs[0] == 2212:
-    Protons.Fill(data)
-    nProtons += 1
-  elif pdgs[0] == 13:
-    Pions.Fill(data)   
-    nPions += 1
-  elif pdgs[0] == 11:
-    Electrons.Fill(data)
-    nElectrons += 1
-  #else kaon?
+  if args.p in [1, 2]:
+    if pdgs[0] == 2212:
+      Protons.Fill(data)
+    elif pdgs[0] == 13:
+      Pions.Fill(data)   
+    elif pdgs[0] == 11:
+      Electrons.Fill(data)
+
+  elif args.p == 3:
+    if 13 in pdgs:
+      Pions.Fill(data)
+    elif 2212 in pdgs:
+      Protons.Fill(data)
+    elif 11 in pdgs:
+      Electrons.Fill(data)
+
+  elif args.p in [6, 7]:
+    if 13 in pdgs:
+      Pions.Fill(data)
+    elif 2212 in pdgs:
+      Protons.Fill(data)
+    elif 321 in pdgs:
+      Kaons.Fill(data)
 
   counter += 1 
 
 outputFile.cd()
 
-Pions.Scale(1. / nPions)
-Pions.Write()
-
-Protons.Scale(1. / nProtons)
-Protons.Write()
-
-if nElectrons > 0: Electrons.Scale(1. / nElectrons)
-Electrons.Write()
-
-##Saving the number of particles
-nElec = RT.TVectorD(1)
-nElec[0] += nElectrons
-nElec.Write("nElectrons")
-
-nProt = RT.TVectorD(1)
-nProt[0] += nProtons
-nProt.Write("nProtons")
-
-nPi = RT.TVectorD(1)
-nPi[0] += nPions
-nPi.Write("nPions")
-###############################
+for pdf in pdfs:
+  if pdf.Projection(0).Integral() > 0:
+    pdf.Scale(1./pdf.Projection(0).Integral())
+  pdf.Write()
 
 outputFile.Close()
