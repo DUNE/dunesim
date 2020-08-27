@@ -100,14 +100,16 @@ private:
     {"Protons", 2212},
     {"Pions", 211},
     {"Electrons", -11},
-    {"Muons", -13}
+    {"Muons", -13},
+    {"Kaons", 321}
   };
 
   std::map<int, std::string> fPDGToName = {
     {2212, "Protons"},
     {211, "Pions"},
     {-11, "Electrons"},
-    {-13, "Muons"}
+    {-13, "Muons"},
+    {321, "Kaons"}
   };
 
   TVector3 fBMBasisX = TVector3(1.,0.,0.);
@@ -169,7 +171,8 @@ PDSPDataDrivenBeam::PDSPDataDrivenBeam(fhicl::ParameterSet const& p)
     fParticleNums[it->first] = it->second;
     fTotalParticles += it->second;
     if (fVerbose)
-      std::cout << it->second << " " << fTotalParticles << std::endl;
+      std::cout << it->first << " " << it->second << " " << fTotalParticles <<
+                   std::endl;
   }
 
   fMinima = p.get<std::vector<double>>("Minima");
@@ -823,6 +826,8 @@ void PDSPDataDrivenBeam::Setup1GeV() {
 }
 
 void PDSPDataDrivenBeam::Setup3GeV() {
+
+
   for (size_t i = 0; i < fParticleTypes.size(); ++i) {
     std::string part_type = fParticleTypes[i];
     if (part_type == "Muons") {
@@ -840,17 +845,19 @@ void PDSPDataDrivenBeam::Setup3GeV() {
     if (part_type == "Muons") {
       res_name = "hPionsRes";
     }
-    if (part_type == "Kaons") {
+    /*
+    else if (part_type == "Kaons") {
       res_name = "hProtonsRes";
-    }
+    }*/
     else {
       res_name = "h" + part_type + "Res";
     }
-
+    
     fResolutionHists[part_type] = (TH1D*)fResolutionFile->Get(res_name.c_str());
 
     res_name += "2D";
     fResolutionHists2D[part_type] = (TH2D*)fResolutionFile->Get(res_name.c_str());
+
   }
 }
 

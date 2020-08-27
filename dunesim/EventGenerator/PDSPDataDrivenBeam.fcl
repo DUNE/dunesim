@@ -4,10 +4,10 @@ datadriven_beam: {
   module_type: "PDSPDataDrivenBeam"
   InputFileName: "dummy.root"
   ResolutionFileName: "dummy2.root"
-  #ParticleTypes: ["Pions", "Protons"]
-  ParticleTypes: [ ["Pions", .50],
+  ParticleTypes: [ ["Pions", .25],
                    ["Muons", .25],
-                   ["Protons", .25] ]
+                   ["Protons", .25],
+                   ["Electrons", .25] ]
 
   Seed: 0
   NGenerate: 10
