@@ -82,9 +82,10 @@ DPhaseRealisticNoiseService::DPhaseRealisticNoiseService(fhicl::ParameterSet con
   importNoiseModel(fNoiseModel, fNoiseModelFrequenciesX, fNoiseModelFrequenciesY);
 
   //pregenerated noise model waveforms based on the realistic noise frequency pattern
+  auto const detProp = art::ServiceHandle<detinfo::DetectorPropertiesService const>()->DataForJob();
   for ( unsigned int isam=0; isam<fNoiseArrayPoints; ++isam ) {
-    generateNoise(fNoiseModelFrequenciesX,  fNoiseX[isam], fNoiseHistX, fRandomizeX);
-    generateNoise(fNoiseModelFrequenciesY,  fNoiseY[isam], fNoiseHistY, fRandomizeY);
+    generateNoise(detProp, fNoiseModelFrequenciesX,  fNoiseX[isam], fNoiseHistX, fRandomizeX);
+    generateNoise(detProp, fNoiseModelFrequenciesY,  fNoiseY[isam], fNoiseHistY, fRandomizeY);
   }
 
   if ( fLogLevel > 1 ) print() << endl;
@@ -108,15 +109,16 @@ DPhaseRealisticNoiseService::~DPhaseRealisticNoiseService() {
 
 //**********************************************************************
 
-int DPhaseRealisticNoiseService::addNoise(Channel chan, AdcSignalVector& sigs) const{
+int DPhaseRealisticNoiseService::addNoise(detinfo::DetectorClocksData const& clockData,
+                                          detinfo::DetectorPropertiesData const& detProp,
+                                          Channel chan, AdcSignalVector& sigs) const{
 
   CLHEP::RandFlat flat(*m_pran);
 
   //define the baseline fluctuations
   //done here because chan is needed to tune the phase
-  auto const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
-  unsigned int ntick = detprop->NumberTimeSamples();
-  double dt = 1./detprop->SamplingRate();
+  unsigned int ntick = detProp.NumberTimeSamples();
+  double dt = 1./sampling_rate(clockData);
   unsigned int model_tick = GetModelSize();
   std::map<Channel, double>  fPhaseChannelMap;
   Chan2Phase(fPhaseChannelMap);
@@ -145,7 +147,7 @@ int DPhaseRealisticNoiseService::addNoise(Channel chan, AdcSignalVector& sigs) c
   art::ServiceHandle<geo::Geometry> geo;
   const geo::View_t view = geo->View(chan);
 
-  //sigs.resize( detprop->NumberTimeSamples() );
+  //sigs.resize( detProp.NumberTimeSamples() );
 
   for ( unsigned int itck=0; itck<ntick; ++itck ) {
     double tnoise = 0.0;
@@ -369,7 +371,8 @@ void DPhaseRealisticNoiseService::mirrorWaveform(AdcSignalVector& noise,
 
 //**********************************************************************
 
-void DPhaseRealisticNoiseService::generateNoise(std::vector<double> frequencyVector,
+void DPhaseRealisticNoiseService::generateNoise(detinfo::DetectorPropertiesData const& detProp,
+                                                std::vector<double> frequencyVector,
                 AdcSignalVector& noise, TH1* aNoiseHist, double customRandom){
 
   const string myname = "DPRealisticNoiseService::generateNoise: ";
@@ -425,8 +428,7 @@ void DPhaseRealisticNoiseService::generateNoise(std::vector<double> frequencyVec
 
   //here the signal is mirrored until it match the number of time samples for
   //a given detector geometry
-  auto const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
-  int ntick = detprop->NumberTimeSamples();
+  int ntick = detProp.NumberTimeSamples();
 
   if(noise.size()<(size_t)ntick){
     mirrorWaveform(noise, ntick);
@@ -444,12 +446,12 @@ void DPhaseRealisticNoiseService::generateNoise(std::vector<double> frequencyVec
 
 //**********************************************************************
 
-void DPhaseRealisticNoiseService::generateNoise() {
+void DPhaseRealisticNoiseService::generateNoise(detinfo::DetectorPropertiesData const& detProp) {
   fNoiseX.resize(fNoiseArrayPoints);
   fNoiseY.resize(fNoiseArrayPoints);
   for ( unsigned int inch=0; inch<fNoiseArrayPoints; ++inch ) {
-    generateNoise(fNoiseModelFrequenciesX, fNoiseX[inch], fNoiseHistX, fRandomizeX);
-    generateNoise(fNoiseModelFrequenciesY, fNoiseY[inch], fNoiseHistY, fRandomizeY);
+    generateNoise(detProp, fNoiseModelFrequenciesX, fNoiseX[inch], fNoiseHistX, fRandomizeX);
+    generateNoise(detProp, fNoiseModelFrequenciesY, fNoiseY[inch], fNoiseHistY, fRandomizeY);
   }
 }
 

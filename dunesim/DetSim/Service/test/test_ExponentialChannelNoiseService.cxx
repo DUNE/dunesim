@@ -18,6 +18,8 @@
 #include "art_root_io/TFileService.h"
 #include "art/Framework/Services/Optional/RandomNumberGenerator.h"
 #include "fhiclcpp/ParameterSet.h"
+#include "lardata/DetectorInfoServices/DetectorClocksService.h"
+#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "lardata/Utilities/LArFFT.h"
 #include "larcore/Geometry/Geometry.h"
 #include "lardataobj/RawData/raw.h"
@@ -162,7 +164,9 @@ int test_ExponentialChannelNoiseService(unsigned int ntick, unsigned int maxchan
       ++nchanind;
     } else abort();
     AdcSignalVector sigs = sigsin;
-    assert( noisvc.addNoise(icha, sigs) == 0 );
+    auto const clockData = art::ServiceHandle<detinfo::DetectorClocksService const>()->DataForJob();
+    auto const detProp = art::ServiceHandle<detinfo::DetectorPropertiesService const>()->DataForJob(clockData);
+    assert( noisvc.addNoise(clockData, detProp, icha, sigs) == 0 );
     if ( firstcol || firstind ) {
       cout << myname << "First " << labtyp << " channel: " << icha << endl;
     }

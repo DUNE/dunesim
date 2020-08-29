@@ -6,10 +6,10 @@ dunefd_spacecharge:   @local::standard_spacecharge
 
 dunefddphase_spacecharge:   @local::standard_spacecharge
 
-protodune_spacecharge:   						@local::standard_spacecharge
-protodune_spacecharge.InputFilename:  			"SpaceChargeProtoDUNE/dispOutput_ProtoDUNE_E500.root"
-protodune_spacecharge.CalibrationInputFilename:	"SpaceChargeProtoDUNE/dispOutput_ProtoDUNE_E500.root"
-protodune_spacecharge.RepresentationType:       "Voxelized"
+protodune_spacecharge:   				@local::standard_spacecharge
+protodune_spacecharge.InputFilename:  			"SpaceChargeProtoDUNE/SCE_DataDriven_180kV_v4.root"
+protodune_spacecharge.CalibrationInputFilename:	        "SpaceChargeProtoDUNE/SCE_DataDriven_180kV_v4.root"
+protodune_spacecharge.RepresentationType:               "Splines_TH3"
 protodune_spacecharge.service_provider:  		SpaceChargeServiceProtoDUNE
 
 protodunedp_spacecharge:                                                  @local::standard_spacecharge

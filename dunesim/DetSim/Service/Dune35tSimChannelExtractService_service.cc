@@ -57,7 +57,8 @@ Dune35tSimChannelExtractService(fhicl::ParameterSet const& pset, art::ActivityRe
 //**********************************************************************
 
 int Dune35tSimChannelExtractService::
-extract(const sim::SimChannel* psc, AdcSignalVector& fChargeWork) const {
+extract(detinfo::DetectorClocksData const& clockData,
+        const sim::SimChannel* psc, AdcSignalVector& fChargeWork) const {
   int dflag = 0;
   fChargeWork.clear();
   fChargeWork.resize(m_ntick, 0.0);
@@ -163,8 +164,8 @@ extract(const sim::SimChannel* psc, AdcSignalVector& fChargeWork) const {
     }  // end loop over ides
   }  // end loop over ticks
   // Convolute and combine charges.
-  m_psss->Convolute(chan, fChargeWork);
-  m_psss->Convolute(fFirstCollectionChannel, fChargeWorkCollInd);
+  m_psss->Convolute(clockData, chan, fChargeWork);
+  m_psss->Convolute(clockData, fFirstCollectionChannel, fChargeWorkCollInd);
   for ( unsigned int itck=0; itck<m_ntick; ++itck ) {
     fChargeWork[itck] += fChargeWorkCollInd[itck];
   }

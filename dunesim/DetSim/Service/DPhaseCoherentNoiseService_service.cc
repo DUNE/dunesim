@@ -138,15 +138,16 @@ DPhaseCoherentNoiseService::~DPhaseCoherentNoiseService() {
 
 //**********************************************************************
 
-int DPhaseCoherentNoiseService::addNoise(Channel chan, AdcSignalVector& sigs) const {
+int DPhaseCoherentNoiseService::addNoise(detinfo::DetectorClocksData const& clockData,
+                                         detinfo::DetectorPropertiesData const& detProp,
+                                         Channel chan, AdcSignalVector& sigs) const {
 
   const string myname = "DPhaseCoherentNoiseService::addNoise: ";
   if ( fLogLevel > 0 ) {
     cout << myname << " Processing channel: " << chan  << endl;
   }
 
-  auto const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
-  unsigned int ntick = detprop->NumberTimeSamples();
+  unsigned int ntick = detProp.NumberTimeSamples();
 
   art::ServiceHandle<geo::Geometry> geo;
   const geo::View_t view = geo->View(chan);
@@ -202,7 +203,7 @@ int DPhaseCoherentNoiseService::addNoise(Channel chan, AdcSignalVector& sigs) co
   }
 
   //build the noise signal
-  getNoiseArray( sigs, amplitudeArray, frequencyArray, phaseArray, randAmp);
+  getNoiseArray(clockData, sigs, amplitudeArray, frequencyArray, phaseArray, randAmp);
 
   //add incoherent noise if set
   if( fInchoerentNoise.size() > 0 ){
@@ -404,7 +405,8 @@ void DPhaseCoherentNoiseService::makePhaseMap( Map & phaseMap ,int size,
 
 //******************************************************************************
 
-void DPhaseCoherentNoiseService::getNoiseArray(  vector< float > & noiseArray,
+void DPhaseCoherentNoiseService::getNoiseArray(detinfo::DetectorClocksData const& clockData,
+                                               vector< float > & noiseArray,
    vector< float > ampArray, vector< float > freqArray, vector< float > phaseArray, float randAmp ) const {
 
   //Sum up all the frequencies and amplitude. Make noise waveform
@@ -414,7 +416,6 @@ void DPhaseCoherentNoiseService::getNoiseArray(  vector< float > & noiseArray,
   CLHEP::RandGauss gaus(*m_pran);
 
   //detector properties service
-  auto const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
 
   //check if frequency vector, and amplitude vector have the same size.
   if( (ampArray.size() != freqArray.size()) || (ampArray.size() < freqArray.size()) ){
@@ -436,7 +437,7 @@ void DPhaseCoherentNoiseService::getNoiseArray(  vector< float > & noiseArray,
       double amp = ampArray.at(f) + gaus.fire( 0, randAmp  ); //<< Randomization with the expected rms fluctuation calculated from the model
 
       //make signal for that frequency
-      double argument = 2*TMath::Pi()*detprop->SamplingRate()*(1.e-3)*freqArray.at(f)*t + phaseArray.at(f);
+      double argument = 2*TMath::Pi()*sampling_rate(clockData)*(1.e-3)*freqArray.at(f)*t + phaseArray.at(f);
 
       noiseArray.at(t) += ( ((float)1/(float)fNormalization)*amp*sin( argument ) );
     }

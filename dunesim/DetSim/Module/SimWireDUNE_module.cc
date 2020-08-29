@@ -216,8 +216,9 @@ void SimWireDUNE::produce(art::Event& evt) {
   std::unique_ptr<std::vector<raw::RawDigit>>  digcol(new std::vector<raw::RawDigit>);
 
   // Fetch the number of ticks to write out for each channel.
-  auto const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
-  unsigned int nTickReadout  = detprop->ReadOutWindowSize();
+  auto const clockData = art::ServiceHandle<detinfo::DetectorClocksService const>()->DataFor(evt);
+  auto const detProp = art::ServiceHandle<detinfo::DetectorPropertiesService const>()->DataFor(evt, clockData);
+  unsigned int nTickReadout  = detProp.ReadOutWindowSize();
 
   // Loop over channels.
   std::map<int,double>::iterator mapIter;
@@ -235,12 +236,12 @@ void SimWireDUNE::produce(art::Event& evt) {
     }
     else{
       // Extract the floating ADC count from the SimChannel for each tick in the channel.
-      m_pscx->extract(psc, fChargeWork);
+      m_pscx->extract(clockData, psc, fChargeWork);
     }
 
     // Add noise to each tick in the channel.
     if ( fNoiseOn ) {
-      m_pcns->addNoise(chan, fChargeWork);
+      m_pcns->addNoise(clockData, detProp, chan, fChargeWork);
     }
 
     // Option to display signals before adding pedestals.

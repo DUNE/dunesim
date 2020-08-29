@@ -142,8 +142,8 @@ void detsim::SimCounter35t::produce(art::Event & e)
   int skippedHitsIneff = 0;
   int skippedHitsOutRange = 0;
 
-  auto const *ts = lar::providerFrom<detinfo::DetectorClocksService>();
-  auto const *detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
+  auto const clockData = art::ServiceHandle<detinfo::DetectorClocksService const>()->DataFor(e);
+  auto const detProp = art::ServiceHandle<detinfo::DetectorPropertiesService const>()->DataFor(e, clockData);
 
   // make unique_ptr that allows ownership of the produced triggers to be transferred to the art::Event after the put statement below
   std::unique_ptr<std::vector<raw::ExternalTrigger>> trigcol(new std::vector<raw::ExternalTrigger>);
@@ -196,9 +196,9 @@ void detsim::SimCounter35t::produce(art::Event & e)
       }
 
       // calculate the time length of one window
-      double triggerOffsetTPC = ts->TriggerOffsetTPC()*1.e3; // ns
-      double readoutWindowSizeTPC = detprop->ReadOutWindowSize(); // tpc ticks
-      double clockSpeedTPC = ts->TPCClock().Frequency(); // MHz
+      double triggerOffsetTPC = clockData.TriggerOffsetTPC()*1.e3; // ns
+      double readoutWindowSizeTPC = detProp.ReadOutWindowSize(); // tpc ticks
+      double clockSpeedTPC = clockData.TPCClock().Frequency(); // MHz
       double windowLength = readoutWindowSizeTPC/clockSpeedTPC; // us
 
       // get information from AuxDetIDE
