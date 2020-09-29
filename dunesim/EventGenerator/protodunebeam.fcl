@@ -54,7 +54,7 @@ protodune_beam:
  NP04frontPosZ: 717243
  # Intensity variables
  Intensity: 1.e6 # Number of interactions on the secondary target in one spill
- ReadoutWindow: 4.0 # In milliseconds
+ ReadoutWindow: 3.0 # In milliseconds
  BeamSpillLength: 4.8 # In seconds
 
  T_Resolution: 1.0  # sigmas 
@@ -64,5 +64,8 @@ protodune_beam:
  SaveRecoTree: false
 
 }
+
+protodune_triggeredbeam: @local::protodune_beam
+protodune_triggeredbeam.module_type: "ProtoDUNETriggeredBeam"
 
 END_PROLOG
