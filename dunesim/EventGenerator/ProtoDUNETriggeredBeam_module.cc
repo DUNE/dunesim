@@ -41,6 +41,9 @@
 #include <TFile.h>
 #include <TTree.h>
 #include <TVector3.h>
+#include "THnSparse.h"
+#include "TH2D.h"
+#include "TRandom3.h"
 #include <TLorentzVector.h>
 #include <TDatabasePDG.h>
 #include <TParticlePDG.h>
@@ -173,7 +176,29 @@ namespace evgen{
 
         // Convert our BeamParticle struct into a MCParticle object
         simb::MCParticle BeamParticleToMCParticle(const BeamParticle &beamParticle, const int outputTrackID, const float triggerParticleTime);
-        
+
+        // Use DDMC to create a primary beam particle
+        simb::MCParticle DataDrivenMCParticle(
+            const BeamParticle &beamParticle, const int outputTrackID,
+            const float triggerParticleTime,
+            beam::ProtoDUNEBeamEvent & beamEvent);
+
+        void SetDataDrivenPosMom(TLorentzVector & position,
+                                 TLorentzVector & momentum, double sampledHUp,
+                                 double sampledVUp, double sampledHDown,
+                                 double sampledVDown, double sampledMomentum,
+                                 int beamPDG);
+
+        double UnsmearMomentum2D(double momentum, int pdg);
+
+        void SetDataDrivenBeamEvent(
+            beam::ProtoDUNEBeamEvent & beamEvent,
+            double sampledHUp, double sampledVUp, double sampledHDown,
+            double sampledVDown, double sampledMomentum);
+        void ConvertSamplingPoint(double input_point[5],
+                                  std::vector<double> minima,
+                                  std::vector<double> maxima,
+                                  double output_point[5]);
         // Handle root files from beam instrumentation group
         void OpenInputFile();
         
@@ -241,6 +266,7 @@ namespace evgen{
         float fBeamZ;
         float fBeamThetaShift;
         float fBeamPhiShift;
+        float fGeneratorZ;
         // Rotate the beam monitor coordinate system (those after the last bending magnet)
         float fRotateMonitorXZ;
         float fRotateMonitorYZ;
@@ -265,8 +291,31 @@ namespace evgen{
         float fBeamBend;
 
         float fLMag;
-        float fNominalP;
+        int fNominalP;
         float fB;
+
+        TRandom3 fRNG;
+        bool fVerbose;
+        std::vector<double> fMinima, fMaxima;
+        std::map<int, std::string> fPDGToName = {
+          {2212, "Protons"},
+          {211, "Pions"},
+          {-11, "Electrons"},
+          {-13, "Muons"},
+          {321, "Kaons"}
+        };
+
+        std::string fSamplingFileName;
+        std::string fResolutionFileName;
+        TFile * fSamplingFile;
+        TFile * fResolutionFile;
+        std::map<std::string, THnSparseD *> fPDFs;
+        std::map<std::string, TH2D *> fResolutionHists2D;
+        void Setup1GeV(); //Shared by 2GeV
+        void Setup3GeV();
+        void Setup6GeV(); //Shared by 7GeV
+        
+        void Scale2DRes();
 
         bool fSaveRecoTree;
 
@@ -352,6 +401,8 @@ evgen::ProtoDUNETriggeredBeam::ProtoDUNETriggeredBeam(fhicl::ParameterSet const 
     fBeamZ = pset.get<float>("BeamZ");
     fBeamThetaShift = pset.get<float>("BeamThetaShift",0.0);
     fBeamPhiShift   = pset.get<float>("BeamPhiShift",0.0);
+
+    fGeneratorZ = pset.get<float>("GeneratorZ");
     
     fRotateMonitorXZ = pset.get<float>("RotateMonitorXZ");
     fRotateMonitorYZ = pset.get<float>("RotateMonitorYZ");
@@ -371,9 +422,16 @@ evgen::ProtoDUNETriggeredBeam::ProtoDUNETriggeredBeam(fhicl::ParameterSet const 
     //New values for momentum spectrometer
     fLMag = pset.get<float>("LMag");
     fB    = pset.get<float>("B");
-    fNominalP = pset.get<float>("NominalP");
+    fNominalP = pset.get<int>("NominalP");
 
     fLB = fB * fLMag * fNominalP / 7.;
+
+    fRNG = TRandom3(pset.get<int>("Seed", 0));
+    fVerbose = pset.get<bool>("Verbose", false);
+    fMinima = pset.get<std::vector<double>>("Minima");
+    fMaxima = pset.get<std::vector<double>>("Maxima");
+    fResolutionFileName = pset.get<std::string>("ResolutionFileName");
+    fSamplingFileName = pset.get<std::string>("SamplingFileName");
     
     fSaveRecoTree = pset.get<bool>("SaveRecoTree");
 
@@ -444,6 +502,30 @@ void evgen::ProtoDUNETriggeredBeam::beginJob(){
     delete inputFile;
     inputFile = 0x0;
 
+
+    fSamplingFile = new TFile(fSamplingFileName.c_str());
+    fResolutionFile = new TFile(fResolutionFileName.c_str());
+    switch (fNominalP) {
+      case 1:
+        Setup1GeV();
+        break;
+      case 2:
+        Setup1GeV();
+        break;
+      case 3:
+        Setup3GeV();
+        break;
+      case 6:
+        Setup6GeV();
+        break;
+      case 7:
+        Setup6GeV();
+        break;
+      default:
+        Setup1GeV();
+        break;
+    }
+    Scale2DRes();
 }
 
 //----------------------------------------------------------------------------------------
@@ -826,6 +908,9 @@ void evgen::ProtoDUNETriggeredBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, co
   else{
     // Add some data driven code here
     std::cout << "Using data driven approach for triggered particle" << std::endl;
+    simb::MCParticle triggerParticle = DataDrivenMCParticle(trigParticle, trigOutputTrackID, triggerParticleTime, beamEvent);
+
+    mcTruth.Add(triggerParticle);
   }
 
   // Now let's deal with all of the background events
@@ -878,6 +963,448 @@ simb::MCParticle evgen::ProtoDUNETriggeredBeam::BeamParticleToMCParticle(const B
 }
 
 //---------------------------------------------------------------------------------------
+
+simb::MCParticle evgen::ProtoDUNETriggeredBeam::DataDrivenMCParticle(
+    const BeamParticle &beamParticle, const int outputTrackID,
+    const float timeOffset, beam::ProtoDUNEBeamEvent & beamEvent) {
+  std::string process = "primary";
+  simb::MCParticle newParticle(outputTrackID, beamParticle.fPDG, process);
+
+  double kin_samples[5]; //the point in phase space to check against pdf
+  double pdf_check; //the number used for the checking
+  bool sample_again = true;
+
+  double sampled_momentum = 0.;
+  double sampled_h_upstream = 0.;
+  double sampled_v_upstream = 0.;
+  double sampled_h_downstream = 0.;
+  double sampled_v_downstream = 0.;
+  while (sample_again) {
+    fRNG.RndmArray(5, &kin_samples[0]);
+    pdf_check = fRNG.Rndm();
+
+    //Need to convert the numbers sampled for the kinematics (0, 1)
+    //to within the sampling range
+    double kin_point[5];
+    //Convert(kin_samples, minima, maxima, kin_point);
+    ConvertSamplingPoint(kin_samples, fMinima, fMaxima, kin_point);
+
+
+    //Find the bin in the THnSparseD. If the bin has a value of 0,
+    //then it would not have been allocated to save on memory.
+    //The false parameter prevents that bin from being allocated here,
+    //to save memory
+    long long bin = fPDFs[fPDGToName[beamParticle.fPDG]]->GetBin(&kin_point[0],
+                                                                 false);
+
+    //The bin has no chance of being populated, move on
+    if (bin == -1) continue;
+
+    //Find how likely we are to populate this bin
+    double pdf_value = fPDFs[fPDGToName[beamParticle.fPDG]]->GetBinContent(bin);
+
+    //If successful, save info and move on
+    if (pdf_check <= pdf_value) {
+      if (fVerbose) {
+        std::cout << "bin: " << bin << " PDF val: " << pdf_value <<
+                     " Check: " << pdf_check << std::endl;
+        std::cout << kin_samples[0] << " " << kin_samples[1] << " " <<
+                     kin_samples[2] << " " << kin_samples[3] << " " <<
+                     kin_samples[4] << std::endl;
+        std::cout << kin_point[0] << " " << kin_point[1] << " " <<
+                     kin_point[2] << " " << kin_point[3] << " " <<
+                     kin_point[4] << std::endl;
+        std::cout << "Will keep" << std::endl;
+      }
+
+      //diff
+      sampled_momentum = kin_point[0];
+      sampled_v_upstream = kin_point[1];
+      sampled_h_upstream = kin_point[2];
+      sampled_v_downstream = kin_point[3];
+      sampled_h_downstream = kin_point[4];
+
+      sample_again = false;
+    }
+  }
+
+  TLorentzVector position(0, 0, 0, 0);
+  TLorentzVector momentum(0., 0., 0., 0.);
+  SetDataDrivenPosMom(position, momentum, sampled_h_upstream,
+                      sampled_v_upstream, sampled_h_downstream,
+                      sampled_v_downstream, sampled_momentum,
+                      beamParticle.fPDG);
+  newParticle.AddTrajectoryPoint(position, momentum);
+
+  SetDataDrivenBeamEvent(beamEvent, sampled_h_upstream,
+                      sampled_v_upstream, sampled_h_downstream,
+                      sampled_v_downstream, sampled_momentum);
+  return newParticle;
+}
+
+//------------------------------------------------------------------------------------
+
+
+void evgen::ProtoDUNETriggeredBeam::ConvertSamplingPoint(
+    double input_point[5], std::vector<double> minima,
+    std::vector<double> maxima, double output_point[5]) {
+  for (int i = 0; i < 5; ++i) {
+    double delta = maxima[i] - minima[i];
+    output_point[i] = minima[i] + delta * input_point[i];
+  }
+}
+
+void evgen::ProtoDUNETriggeredBeam::SetDataDrivenPosMom(
+    TLorentzVector & position, TLorentzVector & momentum, double sampledHUp,
+    double sampledVUp, double sampledHDown, double sampledVDown,
+    double sampledMomentum, int beamPDG) {
+
+  double upstreamX = 96. - sampledHUp; 
+  double upstreamY = 96. - sampledVUp;
+  double downstreamX = 96. - sampledHDown;
+  double downstreamY = 96. - sampledVDown;
+
+
+//rename these
+  TVector3 upstream_point = ConvertProfCoordinates(upstreamX, upstreamY, 0.,
+                                                   fBPROFEXTPos);
+  TVector3 downstream_point = ConvertProfCoordinates(downstreamX, downstreamY, 0.,
+                                                     fBPROF4Pos);
+  TVector3 dR = (downstream_point - upstream_point).Unit();
+
+  //Project to generator point
+  double deltaZ = (fGeneratorZ - downstream_point.Z());
+  double deltaX = (dR.X() / dR.Z()) * deltaZ;
+  double deltaY = (dR.Y() / dR.Z()) * deltaZ;
+
+  TVector3 generator_point = downstream_point +
+                             TVector3(deltaX, deltaY, deltaZ);
+  //Set the position 4-vector
+  //Time = 0 for now?
+  position = TLorentzVector(generator_point, 0.);
+
+  //Prints out the projected position at the face of the TPC
+  if (fVerbose) {
+    deltaZ = (-1.*fGeneratorZ);
+    deltaX = (dR.X() / dR.Z()) * deltaZ;
+    deltaY = (dR.Y() / dR.Z()) * deltaZ;
+
+    TVector3 last_point = generator_point +
+                          TVector3(deltaX, deltaY, deltaZ);
+
+    std::cout << last_point.X() << " " << last_point.Y() << " " <<
+                 last_point.Z() << std::endl;
+  }
+
+  double unsmeared_momentum = 0.;
+  /*switch (fUnsmearType) {
+    case 1:
+      unsmeared_momentum = UnsmearMomentum1D(sampledMomentum, beamPDG);
+      break;
+    case 2:*/
+      unsmeared_momentum = UnsmearMomentum2D(sampledMomentum, beamPDG);
+      //GetSystWeights();
+      /*break;
+    default:
+      //Just do 1D
+      unsmeared_momentum = UnsmearMomentum1D(sampledMomentum, beamPDG);
+      break;
+  }*/
+
+  //TVector3 mom_vec = fRandMomentum[fCurrentEvent]*dR;
+  //TVector3 mom_vec = unsmeared_momentum*dR;
+  TVector3 mom_vec = unsmeared_momentum*dR;
+
+  //Get the PDG and set the mass & energy accordingly
+  const TDatabasePDG * dbPDG = TDatabasePDG::Instance();
+  const TParticlePDG * def = dbPDG->GetParticle(beamPDG);
+  double mass = def->Mass();
+  double energy = sqrt(mass*mass + mom_vec.Mag2());
+
+  //Set the momentum 4-vector
+  momentum = TLorentzVector(mom_vec, energy);
+}
+
+/*
+double evgen::ProtoDUNETriggeredBeam::(double momentum, int pdg) {
+  TF1 * res = fResolutions[fPDGToName[pdg]];
+  double mean = res->GetParameter(1);
+  double sigma = res->GetParameter(2);
+  double t = fRNG.Gaus(mean, sigma); //random number from momentum resolution
+  return (momentum/(t + 1.));
+}*/
+
+double evgen::ProtoDUNETriggeredBeam::UnsmearMomentum2D(double momentum, int pdg) {
+
+  if (fVerbose) {
+    std::cout << "Using 2D Unsmear method" << std::endl;
+  }
+
+  TH2D * res = fResolutionHists2D[fPDGToName[pdg]];
+
+  int xBin = res->GetXaxis()->FindBin(momentum);
+  if (fVerbose) {
+    std::cout << "Momentum & bin: " << momentum << " " <<
+                 xBin << std::endl;
+  }
+
+  double true_min = res->GetYaxis()->GetXmin();
+  double true_max = res->GetYaxis()->GetXmax();
+  for (int i = 1; i <= res->GetNbinsY(); ++i) {
+    if (res->GetBinContent(xBin, i) > 0.) {
+      true_min = res->GetYaxis()->GetBinLowEdge(i);
+      break;
+    }
+  }
+  for (int i = res->GetNbinsY(); i >= 1; --i) {
+    if (res->GetBinContent(xBin, i) > 0.) {
+      true_max = res->GetYaxis()->GetBinUpEdge(i);
+      break;
+    }
+  }
+
+  if (fVerbose)
+    std::cout << "True min and max: " << true_min << " " << true_max << std::endl;
+  
+  double unsmeared_momentum = 0.;
+  while (true) {
+    double t = fRNG.Uniform(true_min, true_max);
+    double pdf_check = fRNG.Rndm(); //random number to check against PDF 
+    
+    int yBin = res->GetYaxis()->FindBin(t);
+    double pdf_value = res->GetBinContent(xBin, yBin);
+    if (fVerbose) {
+      std::cout << "True mom & bin: " << t << " " << yBin << std::endl;
+      std::cout << "Check & val: " << pdf_check << " " << pdf_value <<
+                   std::endl;
+    }
+    if (pdf_check < pdf_value) {
+      unsmeared_momentum = t;
+      if (fVerbose) std::cout << "Setting momentum to " << t << std::endl;
+      break;
+    }
+  }
+
+  return unsmeared_momentum;
+}
+
+void evgen::ProtoDUNETriggeredBeam::Scale2DRes() {
+  for (auto it = fResolutionHists2D.begin();
+       it != fResolutionHists2D.end(); ++it) {
+    TH2D * this_hist = it->second;
+    for (int i = 1; i <= this_hist->GetNbinsX(); ++i) {
+      double integral = this_hist->Integral(i, i);
+      double total = 0.;
+      for (int j = 1; j <= this_hist->GetNbinsY(); ++j) {
+        this_hist->SetBinContent(i, j,
+            this_hist->GetBinContent(i, j) / integral);
+        total += this_hist->GetBinContent(i, j);
+      }
+    }
+  }
+
+/*
+  for (auto it = fResolutionHists2DPlus.begin();
+       it != fResolutionHists2DPlus.end(); ++it) {
+    TH2D * this_hist = it->second;
+    for (int i = 1; i <= this_hist->GetNbinsX(); ++i) {
+      double integral = this_hist->Integral(i, i);
+      double total = 0.;
+      for (int j = 1; j <= this_hist->GetNbinsY(); ++j) {
+        this_hist->SetBinContent(i, j,
+            this_hist->GetBinContent(i, j) / integral);
+        total += this_hist->GetBinContent(i, j);
+      }
+    }
+
+    this_hist->Divide(fResolutionHists2D[it->first]);
+  }
+
+  for (auto it = fResolutionHists2DMinus.begin();
+       it != fResolutionHists2DMinus.end(); ++it) {
+    TH2D * this_hist = it->second;
+    for (int i = 1; i <= this_hist->GetNbinsX(); ++i) {
+      double integral = this_hist->Integral(i, i);
+      double total = 0.;
+      for (int j = 1; j <= this_hist->GetNbinsY(); ++j) {
+        this_hist->SetBinContent(i, j,
+            this_hist->GetBinContent(i, j) / integral);
+        total += this_hist->GetBinContent(i, j);
+      }
+    }
+
+    this_hist->Divide(fResolutionHists2D[it->first]);
+  }
+  */
+}
+
+void evgen::ProtoDUNETriggeredBeam::Setup1GeV() {
+  std::vector<std::string> particle_types = {
+    "Muons", "Pions", "Protons", "Electrons"
+  };
+  for (size_t i = 0; i < particle_types.size(); ++i) {
+    std::string part_type = particle_types[i];
+    if (part_type == "Muons") {
+      fPDFs[part_type] = (THnSparseD*)fSamplingFile->Get("Pions"); 
+    }
+    else {
+      fPDFs[part_type] = (THnSparseD*)fSamplingFile->Get(part_type.c_str());
+    }
+
+    //Also get the resolutions
+    std::string res_name = "";
+    if (part_type == "Muons") {
+      res_name = "hPionsRes";
+    }
+    else {
+      res_name = "h" + part_type + "Res";
+    }
+
+    //fResolutionHists[part_type] = (TH1D*)fResolutionFile->Get(res_name.c_str());
+
+    res_name += "2D";
+    fResolutionHists2D[part_type] = (TH2D*)fResolutionFile->Get(res_name.c_str());
+
+    /*
+    std::string plus_name = res_name + "Plus";
+    fResolutionHists2DPlus[part_type] = (TH2D*)fResolutionFile->Get(plus_name.c_str());
+
+    std::string minus_name = res_name + "Minus";
+    fResolutionHists2DMinus[part_type] = (TH2D*)fResolutionFile->Get(minus_name.c_str());
+    */
+
+  }
+}
+
+void evgen::ProtoDUNETriggeredBeam::Setup3GeV() {
+  std::vector<std::string> particle_types = {
+    "Muons", "Pions", "Protons", "Electrons", "Kaons"
+  };
+
+  for (size_t i = 0; i < particle_types.size(); ++i) {
+    std::string part_type = particle_types[i];
+    if (part_type == "Muons") {
+      fPDFs[part_type] = (THnSparseD*)fSamplingFile->Get("Pions"); 
+    }
+    else if (part_type == "Kaons") {
+      fPDFs[part_type] = (THnSparseD*)fSamplingFile->Get("Protons"); 
+    }
+    else {
+      fPDFs[part_type] = (THnSparseD*)fSamplingFile->Get(part_type.c_str());
+    }
+
+    //Also get the resolutions
+    std::string res_name = "";
+    if (part_type == "Muons") {
+      res_name = "hPionsRes";
+    }
+    /*
+    else if (part_type == "Kaons") {
+      res_name = "hProtonsRes";
+    }*/
+    else {
+      res_name = "h" + part_type + "Res";
+    }
+    
+    //fResolutionHists[part_type] = (TH1D*)fResolutionFile->Get(res_name.c_str());
+
+    res_name += "2D";
+    fResolutionHists2D[part_type] = (TH2D*)fResolutionFile->Get(res_name.c_str());
+
+    /*
+    std::string plus_name = res_name + "Plus";
+    fResolutionHists2DPlus[part_type] = (TH2D*)fResolutionFile->Get(plus_name.c_str());
+
+    std::string minus_name = res_name + "Minus";
+    fResolutionHists2DMinus[part_type] = (TH2D*)fResolutionFile->Get(minus_name.c_str());
+    */
+  }
+}
+
+void evgen::ProtoDUNETriggeredBeam::Setup6GeV() {
+  std::vector<std::string> particle_types = {
+    "Muons", "Pions", "Protons", "Electrons", "Kaons"
+  };
+
+  for (size_t i = 0; i < particle_types.size(); ++i) {
+    std::string part_type = particle_types[i];
+    if (part_type == "Muons" || part_type == "Electrons") {
+      fPDFs[part_type] = (THnSparseD*)fSamplingFile->Get("Pions"); 
+    }
+    else {
+      fPDFs[part_type] = (THnSparseD*)fSamplingFile->Get(part_type.c_str());
+    }
+
+    //Also get the resolutions
+    std::string res_name = "";
+    if (part_type == "Muons") {
+      res_name = "hPionsRes";
+    }
+    else {
+      res_name = "h" + part_type + "Res";
+    }
+
+    //fResolutionHists[part_type] = (TH1D*)fResolutionFile->Get(res_name.c_str());
+
+    res_name += "2D";
+    fResolutionHists2D[part_type] = (TH2D*)fResolutionFile->Get(res_name.c_str());
+
+    /*
+    std::string plus_name = res_name + "Plus";
+    fResolutionHists2DPlus[part_type] = (TH2D*)fResolutionFile->Get(plus_name.c_str());
+
+    std::string minus_name = res_name + "Minus";
+    fResolutionHists2DMinus[part_type] = (TH2D*)fResolutionFile->Get(minus_name.c_str());
+    */
+  }
+}
+
+void evgen::ProtoDUNETriggeredBeam::SetDataDrivenBeamEvent(
+    beam::ProtoDUNEBeamEvent & beamEvent,
+    double sampledHUp, double sampledVUp, double sampledHDown,
+    double sampledVDown, double sampledMomentum) {
+
+  beamEvent.SetTOFs(std::vector<double>{0.});
+  beamEvent.SetTOFChans(std::vector<int>{0});
+  beamEvent.SetUpstreamTriggers(std::vector<size_t>{0});
+  beamEvent.SetDownstreamTriggers(std::vector<size_t>{0});
+  beamEvent.SetCalibrations(0., 0., 0., 0.);
+  beamEvent.DecodeTOF();
+
+  beamEvent.SetMagnetCurrent(0.);
+  beamEvent.SetTimingTrigger(12);
+
+  beam::CKov dummy;
+  dummy.trigger = 0;
+  dummy.pressure = 0.;
+  dummy.timeStamp = 0.;
+  beamEvent.SetCKov0(dummy);
+  beamEvent.SetCKov1(dummy);
+
+  beamEvent.SetActiveTrigger(0);
+  beamEvent.SetT0(std::make_pair(0.,0.));
+
+  //Dummy positions for these
+  beamEvent.SetFBMTrigger("XBPF022697", MakeFiberMonitor(.5));
+  beamEvent.SetFBMTrigger("XBPF022698", MakeFiberMonitor(.5));
+  beamEvent.SetFBMTrigger("XBPF022701", MakeFiberMonitor(.5));
+  beamEvent.SetFBMTrigger("XBPF022702", MakeFiberMonitor(.5));
+
+  double upstream_x = sampledHUp;
+  double upstream_y = sampledVUp;
+  double downstream_x = sampledHDown;
+  double downstream_y = sampledVDown;
+
+  beamEvent.SetFBMTrigger("XBPF022707", MakeFiberMonitor(96. - upstream_x));//X
+  beamEvent.SetFBMTrigger("XBPF022708", MakeFiberMonitor(96. - upstream_y));//Y
+
+  beamEvent.SetFBMTrigger("XBPF022716", MakeFiberMonitor(96. - downstream_x));//X
+  beamEvent.SetFBMTrigger("XBPF022717", MakeFiberMonitor(96. - downstream_y));//Y
+
+  MakeTracks(beamEvent);
+
+  beamEvent.AddRecoBeamMomentum(sampledMomentum);
+}
 
 // Function written in similar way as "openDBs()" in CORSIKAGen_module.cc
 void evgen::ProtoDUNETriggeredBeam::OpenInputFile()
