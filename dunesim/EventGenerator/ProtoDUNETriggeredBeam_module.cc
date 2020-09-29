@@ -33,9 +33,6 @@
 #include <utility>
 #include <vector>
 #include "dune/DuneObj/ProtoDUNEBeamEvent.h"
-//#include "lardataobj/RecoBase/TrackingTypes.h"
-//#include "lardataobj/RecoBase/TrackTrajectory.h"
-//#include "lardataobj/RecoBase/Track.h"
 #include "lardata/Utilities/AssociationUtil.h"
 // art extensions
 #include "nurandom/RandomUtils/NuRandomService.h"
@@ -244,8 +241,6 @@ namespace evgen{
         float fBeamZ;
         float fBeamThetaShift;
         float fBeamPhiShift;
-        float fRotateXZ;
-        float fRotateYZ;
         // Rotate the beam monitor coordinate system (those after the last bending magnet)
         float fRotateMonitorXZ;
         float fRotateMonitorYZ;
@@ -357,8 +352,6 @@ evgen::ProtoDUNETriggeredBeam::ProtoDUNETriggeredBeam(fhicl::ParameterSet const 
     fBeamZ = pset.get<float>("BeamZ");
     fBeamThetaShift = pset.get<float>("BeamThetaShift",0.0);
     fBeamPhiShift   = pset.get<float>("BeamPhiShift",0.0);
-    fRotateXZ = pset.get<float>("RotateXZ"); // Only use rotation if the above aren't defined
-    fRotateYZ = pset.get<float>("RotateYZ");
     
     fRotateMonitorXZ = pset.get<float>("RotateMonitorXZ");
     fRotateMonitorYZ = pset.get<float>("RotateMonitorYZ");
