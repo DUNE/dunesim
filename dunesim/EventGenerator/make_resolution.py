@@ -44,6 +44,14 @@ hElectronsRes2D = RT.gDirectory.Get("hElectronsRes2D")
 hKaonsRes2D = RT.gDirectory.Get("hKaonsRes2D")
 
 outputFile.cd()
+
+##New: trying to fill every bin
+hs = [hPionsRes2D, hProtonsRes2D, hElectronsRes2D, hKaonsRes2D]
+for h in hs:
+  for i in range(1, h.GetNbinsX()+1):
+    for j in range(1, h.GetNbinsY()+1):
+      if h.GetBinContent(i, j) < 1.: h.SetBinContent(i, j, 1)
+
 hPionsRes.Write()
 hProtonsRes.Write()
 hElectronsRes.Write()
@@ -52,4 +60,28 @@ hPionsRes2D.Write()
 hProtonsRes2D.Write()
 hElectronsRes2D.Write()
 hKaonsRes2D.Write()
+
+##New: trying to make a variation
+for h in hs:
+  nbinsx = h.GetNbinsX()
+  nbinsy = h.GetNbinsY()
+
+  hPlus = RT.TH2D(h.GetName() + "Plus", "",
+    nbinsx, h.GetXaxis().GetBinLowEdge(1), h.GetXaxis().GetBinUpEdge(nbinsx),
+    nbinsy, h.GetYaxis().GetBinLowEdge(1), h.GetYaxis().GetBinUpEdge(nbinsy))
+  hMinus = RT.TH2D(h.GetName() + "Minus", "",
+    nbinsx, h.GetXaxis().GetBinLowEdge(1), h.GetXaxis().GetBinUpEdge(nbinsx),
+    nbinsy, h.GetYaxis().GetBinLowEdge(1), h.GetYaxis().GetBinUpEdge(nbinsy))
+
+  for i in range(1, h.GetNbinsX()+1):
+    for j in range(38, 64):
+      hPlus.SetBinContent(i, j+2, h.GetBinContent(i, j))
+      hMinus.SetBinContent(i, j-2, h.GetBinContent(i, j))
+    for j in range(1, nbinsy+1):
+      if hPlus.GetBinContent(i, j) < 1.:
+        hPlus.SetBinContent(i, j, h.GetBinContent(i,j))
+      if hMinus.GetBinContent(i, j) < 1.:
+        hMinus.SetBinContent(i, j, h.GetBinContent(i,j))
+  hPlus.Write()
+  hMinus.Write()
 outputFile.Close()

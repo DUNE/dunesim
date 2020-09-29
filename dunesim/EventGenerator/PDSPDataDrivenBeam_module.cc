@@ -78,6 +78,8 @@ private:
   std::map<std::string, THnSparseD *> fPDFs;
   std::map<std::string, TH1D *> fResolutionHists;
   std::map<std::string, TH2D *> fResolutionHists2D;
+  std::map<std::string, TH2D *> fResolutionHists2DPlus;
+  std::map<std::string, TH2D *> fResolutionHists2DMinus;
   std::map<std::string, TF1 *> fResolutions;
   std::map<std::string, double> fParticleNums;
   double fTotalParticles = 0.;
@@ -95,6 +97,7 @@ private:
   double fUnfoldedMomentum;
   double fOutputHUpstream, fOutputVUpstream;
   double fOutputHDownstream, fOutputVDownstream;
+  double fPlusSigmaWeight, fMinusSigmaWeight;
 
   std::map<std::string, int> fNameToPDG = {
     {"Protons", 2212},
@@ -134,6 +137,7 @@ private:
   void FitResolutions();
   double UnsmearMomentum1D();
   double UnsmearMomentum2D();
+  void GetSystWeights();
 
   void Setup1GeV(); //Shared by 2GeV
   void Setup3GeV();
@@ -430,6 +434,8 @@ void PDSPDataDrivenBeam::beginJob() {
   fOutputTree->Branch("VUpstream", &fOutputVUpstream);
   fOutputTree->Branch("HDownstream", &fOutputHDownstream);
   fOutputTree->Branch("VDownstream", &fOutputVDownstream);
+  fOutputTree->Branch("PlusSigmaWeight", &fPlusSigmaWeight);
+  fOutputTree->Branch("MinusSigmaWeight", &fMinusSigmaWeight);
 
 
   //Setting up for positioning/momentum projection
@@ -541,6 +547,7 @@ void PDSPDataDrivenBeam::SetPositionAndMomentum(TLorentzVector & position, TLore
       break;
     case 2:
       fUnfoldedMomentum = UnsmearMomentum2D();
+      GetSystWeights();
       break;
     default:
       //Just do 1D
@@ -797,6 +804,38 @@ void PDSPDataDrivenBeam::Scale2DRes() {
       }
     }
   }
+
+  for (auto it = fResolutionHists2DPlus.begin();
+       it != fResolutionHists2DPlus.end(); ++it) {
+    TH2D * this_hist = it->second;
+    for (int i = 1; i <= this_hist->GetNbinsX(); ++i) {
+      double integral = this_hist->Integral(i, i);
+      double total = 0.;
+      for (int j = 1; j <= this_hist->GetNbinsY(); ++j) {
+        this_hist->SetBinContent(i, j,
+            this_hist->GetBinContent(i, j) / integral);
+        total += this_hist->GetBinContent(i, j);
+      }
+    }
+
+    this_hist->Divide(fResolutionHists2D[it->first]);
+  }
+
+  for (auto it = fResolutionHists2DMinus.begin();
+       it != fResolutionHists2DMinus.end(); ++it) {
+    TH2D * this_hist = it->second;
+    for (int i = 1; i <= this_hist->GetNbinsX(); ++i) {
+      double integral = this_hist->Integral(i, i);
+      double total = 0.;
+      for (int j = 1; j <= this_hist->GetNbinsY(); ++j) {
+        this_hist->SetBinContent(i, j,
+            this_hist->GetBinContent(i, j) / integral);
+        total += this_hist->GetBinContent(i, j);
+      }
+    }
+
+    this_hist->Divide(fResolutionHists2D[it->first]);
+  }
 }
 
 void PDSPDataDrivenBeam::Setup1GeV() {
@@ -822,6 +861,12 @@ void PDSPDataDrivenBeam::Setup1GeV() {
 
     res_name += "2D";
     fResolutionHists2D[part_type] = (TH2D*)fResolutionFile->Get(res_name.c_str());
+
+    std::string plus_name = res_name + "Plus";
+    fResolutionHists2DPlus[part_type] = (TH2D*)fResolutionFile->Get(plus_name.c_str());
+
+    std::string minus_name = res_name + "Minus";
+    fResolutionHists2DMinus[part_type] = (TH2D*)fResolutionFile->Get(minus_name.c_str());
   }
 }
 
@@ -858,6 +903,11 @@ void PDSPDataDrivenBeam::Setup3GeV() {
     res_name += "2D";
     fResolutionHists2D[part_type] = (TH2D*)fResolutionFile->Get(res_name.c_str());
 
+    std::string plus_name = res_name + "Plus";
+    fResolutionHists2DPlus[part_type] = (TH2D*)fResolutionFile->Get(plus_name.c_str());
+
+    std::string minus_name = res_name + "Minus";
+    fResolutionHists2DMinus[part_type] = (TH2D*)fResolutionFile->Get(minus_name.c_str());
   }
 }
 
@@ -884,7 +934,24 @@ void PDSPDataDrivenBeam::Setup6GeV() {
 
     res_name += "2D";
     fResolutionHists2D[part_type] = (TH2D*)fResolutionFile->Get(res_name.c_str());
+
+    std::string plus_name = res_name + "Plus";
+    fResolutionHists2DPlus[part_type] = (TH2D*)fResolutionFile->Get(plus_name.c_str());
+
+    std::string minus_name = res_name + "Minus";
+    fResolutionHists2DMinus[part_type] = (TH2D*)fResolutionFile->Get(minus_name.c_str());
   }
+}
+
+void PDSPDataDrivenBeam::GetSystWeights() {
+  int pdg = fRandPDG[fCurrentEvent];
+
+  TH2D * plus_map = fResolutionHists2DPlus[fPDGToName[pdg]];
+  TH2D * minus_map = fResolutionHists2DMinus[fPDGToName[pdg]];
+  int xBin = plus_map->GetXaxis()->FindBin(fRandMomentum[fCurrentEvent]);
+  int yBin = plus_map->GetYaxis()->FindBin(fUnfoldedMomentum);
+  fPlusSigmaWeight = plus_map->GetBinContent(xBin, yBin); 
+  fMinusSigmaWeight = minus_map->GetBinContent(xBin, yBin); 
 }
 
 DEFINE_ART_MODULE(PDSPDataDrivenBeam)
