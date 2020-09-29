@@ -236,10 +236,11 @@ namespace detsim {
     fInductionCalibPed     = p.get< float                >("InductionCalibPed");
     fInductionCalibPedRMS  = p.get< float                >("InductionCalibPedRMS");
     fPedestalOn       = p.get< bool                 >("PedestalOn");  
-    auto const *detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
-    fSampleRate       = detprop->SamplingRate();
-    fNSamplesReadout  = detprop->ReadOutWindowSize();
-    fNTimeSamples  = detprop->NumberTimeSamples();
+    auto const clockData = art::ServiceHandle<detinfo::DetectorClocksService const>()->DataForJob();
+    auto const detProp = art::ServiceHandle<detinfo::DetectorPropertiesService const>()->DataForJob(clockData);
+    fSampleRate       = sampling_rate(clockData);
+    fNSamplesReadout  = detProp.ReadOutWindowSize();
+    fNTimeSamples  = detProp.NumberTimeSamples();
     
     fSimCombs            = p.get< bool >("SimCombs");  
     fSimStuckBits        = p.get< bool >("SimStuckBits"); 
@@ -629,6 +630,8 @@ namespace detsim {
 
     int dflag = 0;
 
+    auto const clockData = art::ServiceHandle<detinfo::DetectorClocksService const>()->DataFor(evt);
+
     for(chan = 0; chan < geo->Nchannels(); chan++) {    
       
  
@@ -796,7 +799,7 @@ namespace detsim {
         // Convolve charge with appropriate response function 
 
 	fChargeWork.resize(fNTicks,0);
-	sss->Convolute(chan,fChargeWork);
+        sss->Convolute(clockData, chan,fChargeWork);
 	// if (chan == 180 ) {
 	//   for(size_t t = 0; t < fChargeWork.size(); ++t) {
 	//     std::cout << "Xin2: " << t << " " << fChargeWork[t] << std::endl;
@@ -804,7 +807,7 @@ namespace detsim {
 	// }
 
 	fChargeWorkCollInd.resize(fNTicks,0);
-        sss->Convolute(fFirstCollectionChannel,fChargeWorkCollInd); 
+        sss->Convolute(clockData, fFirstCollectionChannel,fChargeWorkCollInd);
 
       }
 

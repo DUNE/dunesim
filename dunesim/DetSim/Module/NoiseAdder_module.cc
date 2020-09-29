@@ -22,6 +22,8 @@
 
 #include "lardataobj/Simulation/SimChannel.h"
 #include "lardataobj/RawData/RawDigit.h"
+#include "lardata/DetectorInfoServices/DetectorClocksService.h"
+#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 
 #include "dune/DuneInterface/ChannelNoiseService.h"
 
@@ -106,6 +108,9 @@ void NoiseAdder::produce(art::Event & e)
         *e.getValidHandle<std::vector<raw::RawDigit>>("daq");
     std::unique_ptr<std::vector<raw::RawDigit>> digits_out(new std::vector<raw::RawDigit>);
 
+    auto const clockData = art::ServiceHandle<detinfo::DetectorClocksService const>()->DataFor(e);
+    auto const detProp = art::ServiceHandle<detinfo::DetectorPropertiesService const>()->DataFor(e, clockData);
+
     for(auto&& digit: digits_in){
         if(digit.Compression()!=0){
             // TODO: throw or just uncompress the stream and carry on
@@ -114,7 +119,7 @@ void NoiseAdder::produce(art::Event & e)
         std::vector<short> samples_out(digit.NADC(), 0);
         std::vector<float> samples_work(digit.NADC(), 0);
         for(size_t i=0; i<digit.NADC(); ++i){
-            samples_out[i]=m_noiseService->addNoise(digit.Channel(), samples_work);
+            samples_out[i]=m_noiseService->addNoise(clockData, detProp, digit.Channel(), samples_work);
         }
         digits_out->push_back(raw::RawDigit(digit.Channel(),
                                            digit.Samples(),

@@ -22,6 +22,10 @@
 #include <vector>
 #include <iostream>
 
+namespace detinfo {
+  class DetectorClocksData;
+}
+
 class TH1;
 namespace CLHEP {
 class HepRandomEngine;
@@ -41,7 +45,9 @@ public:
   ~ExponentialChannelNoiseService();
 
   // Add noise to a signal array.
-  int addNoise(Channel chan, AdcSignalVector& sigs) const;
+  int addNoise(detinfo::DetectorClocksData const& clockData,
+               detinfo::DetectorPropertiesData const& detProp,
+               Channel chan, AdcSignalVector& sigs) const;
 
   // Print the configuration.
   std::ostream& print(std::ostream& out =std::cout, std::string prefix ="") const;
@@ -49,13 +55,14 @@ public:
   // Fill a noise vector.
   // Input vector contents are lost.
   // The size of the vector is obtained from the FFT service.
-  void generateNoise(float aNoiseNorm, float aNoiseWidth, float aLowCutoff,
+  void generateNoise(detinfo::DetectorClocksData const& clockData,
+                     float aNoiseNorm, float aNoiseWidth, float aLowCutoff,
                      AdcSignalVector& noise, TH1* aNoiseHist) const;
 
 private:
  
   // Fill the noise vectors.
-  void generateNoise();
+  void generateNoise(detinfo::DetectorClocksData const& clockData);
 
   // Parameters.
   float        fNoiseNormZ;        ///< noise scale factor for Z (collection) plane
