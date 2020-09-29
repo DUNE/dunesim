@@ -28,8 +28,8 @@ spacecharge::SpaceChargeServiceProtoDUNEdp::SpaceChargeServiceProtoDUNEdp(fhicl:
 {
   fProp.reset(new spacecharge::SpaceChargeProtoDUNEdp(pset));
   
-  auto const *detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
-  fProp->Configure(pset,detprop);
+  auto const detProp = art::ServiceHandle<detinfo::DetectorPropertiesService const>()->DataForJob();
+  fProp->Configure(pset,detProp);
 
   reg.sPreBeginRun.watch(this, &SpaceChargeServiceProtoDUNEdp::preBeginRun);
 }
@@ -43,8 +43,8 @@ void spacecharge::SpaceChargeServiceProtoDUNEdp::preBeginRun(const art::Run& run
 //------------------------------------------------
 void spacecharge::SpaceChargeServiceProtoDUNEdp::reconfigure(fhicl::ParameterSet const& pset)
 {
-  auto const *detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();  
-  fProp->Configure(pset,detprop);  
+  auto const detProp = art::ServiceHandle<detinfo::DetectorPropertiesService const>()->DataForJob();
+  fProp->Configure(pset,detProp);
   return;
 }
 

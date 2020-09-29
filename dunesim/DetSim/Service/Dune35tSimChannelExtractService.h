@@ -31,7 +31,8 @@ public:
 
   Dune35tSimChannelExtractService(fhicl::ParameterSet const& pset, art::ActivityRegistry&);
 
-  int extract(const sim::SimChannel* psc, AdcSignalVector& sig) const;
+  int extract(detinfo::DetectorClocksData const& clockData,
+              const sim::SimChannel* psc, AdcSignalVector& sig) const;
 
   std::ostream& print(std::ostream& out =std::cout, std::string prefix ="") const;
 
@@ -88,4 +89,3 @@ private:
 DECLARE_ART_SERVICE_INTERFACE_IMPL(Dune35tSimChannelExtractService, SimChannelExtractService, LEGACY)
 
 #endif
-

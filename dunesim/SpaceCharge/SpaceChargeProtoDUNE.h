@@ -11,7 +11,7 @@
 // LArSoft libraries
 #include "larevt/SpaceCharge/SpaceCharge.h"
 #include "larcoreobj/SimpleTypesAndConstants/geo_vectors.h"
-#include "lardataalg/DetectorInfo/DetectorProperties.h"
+#include "lardataalg/DetectorInfo/DetectorPropertiesData.h"
 // FHiCL libraries
 #include "fhiclcpp/ParameterSet.h"
 // ROOT includes
@@ -21,6 +21,7 @@
 #include "TH3.h"
 #include "TTree.h"
 #include "TLeaf.h"
+#include "TSpline.h"
 // C/C++ standard libraries
 #include <string>
 #include <vector>
@@ -32,7 +33,7 @@ namespace spacecharge {
       SpaceChargeProtoDUNE(SpaceChargeProtoDUNE const&) = delete;
       virtual ~SpaceChargeProtoDUNE() = default;
       
-      bool Configure(fhicl::ParameterSet const& pset, detinfo::DetectorProperties const*);
+      bool Configure(fhicl::ParameterSet const& pset, detinfo::DetectorPropertiesData const&);
       bool Update(uint64_t ts=0);
       
       bool EnableSimSpatialSCE() const override;
@@ -50,7 +51,7 @@ namespace spacecharge {
     private:
     protected:
      
-      std::vector<double> GetOffsetsVoxel(geo::Point_t const& point, TH3F* hX, TH3F* hY, TH3F* hZ) const;
+      std::vector<double> GetOffsetsVoxel(geo::Point_t const& point, TH3F* hX, TH3F* hY, TH3F* hZ, int maptype, int driftvol) const;
       std::vector<TH3F*> Build_TH3(TTree* tree_pos, TTree* eTree_pos, TTree* tree_neg, TTree* eTree_neg, std::string xvar, std::string yvar, std::string zvar, std::string posLeaf) const;
       std::vector<TH3F*> SCEhistograms = std::vector<TH3F*>(12); //Histograms are Dx, Dy, Dz, dEx/E0, dEy/E0, dEz/E0 (positive; repeat for negative)
       std::vector<TH3F*> CalSCEhistograms = std::vector<TH3F*>(12); 
@@ -66,6 +67,9 @@ namespace spacecharge {
       bool IsInsideBoundaries(geo::Point_t const& point) const;
       bool IsTooFarFromBoundaries(geo::Point_t const& point) const;
       geo::Point_t PretendAtBoundary(geo::Point_t const& point) const;
+
+      TSpline3* MakeSpline(TH3F* spline_hist, int dim1, int dim2_bin, int dim3_bin, int maptype, int driftvol) const;
+      double InterpolateSplines(TH3F* interp_hist, double xVal, double yVal, double zVal, int dim, int maptype, int driftvol) const;
       
       bool fEnableSimSpatialSCE;
       bool fEnableSimEfieldSCE;
@@ -155,6 +159,30 @@ namespace spacecharge {
       TF1 *f3_Ez = new TF1("f3_Ez","pol4");
       TF1 *f4_Ez = new TF1("f4_Ez","pol4");
       TF1 *fFinal_Ez = new TF1("fFinal_Ez","pol3");
+
+      TSpline3 *spline_dx_fwd_neg[31][37];
+      TSpline3 *spline_dy_fwd_neg[19][37];
+      TSpline3 *spline_dz_fwd_neg[19][31];
+
+      TSpline3 *spline_dx_bkwd_neg[31][37];
+      TSpline3 *spline_dy_bkwd_neg[19][37];
+      TSpline3 *spline_dz_bkwd_neg[19][31];
+
+      TSpline3 *spline_dEx_neg[31][37];
+      TSpline3 *spline_dEy_neg[19][37];
+      TSpline3 *spline_dEz_neg[19][31];
+
+      TSpline3 *spline_dx_fwd_pos[31][37];
+      TSpline3 *spline_dy_fwd_pos[19][37];
+      TSpline3 *spline_dz_fwd_pos[19][31];
+
+      TSpline3 *spline_dx_bkwd_pos[31][37];
+      TSpline3 *spline_dy_bkwd_pos[19][37];
+      TSpline3 *spline_dz_bkwd_pos[19][31];
+
+      TSpline3 *spline_dEx_pos[31][37];
+      TSpline3 *spline_dEy_pos[19][37];
+      TSpline3 *spline_dEz_pos[19][31];
     
   }; // class SpaceChargeProtoDUNE
 } //namespace spacecharge

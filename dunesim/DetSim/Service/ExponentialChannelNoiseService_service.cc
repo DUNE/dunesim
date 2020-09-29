@@ -2,8 +2,9 @@
 
 #include "dune/DetSim/Service/ExponentialChannelNoiseService.h"
 #include <sstream>
-#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "lardata/Utilities/LArFFT.h"
+#include "lardata/DetectorInfoServices/DetectorClocksService.h"
+#include "lardataalg/DetectorInfo/DetectorClocksData.h"
 #include "larcore/Geometry/Geometry.h"
 #include "nurandom/RandomUtils/NuRandomService.h"
 #include "art_root_io/TFileService.h"
@@ -70,10 +71,12 @@ ExponentialChannelNoiseService(fhicl::ParameterSet const& pset)
     seedSvc->registerEngine(NuRandomService::CLHEPengineSeeder(m_pran), rname);
   }
   if ( fLogLevel > 0 ) cout << myname << "  Registered seed: " << m_pran->getSeed() << endl;
+
+  auto const clockData = art::ServiceHandle<detinfo::DetectorClocksService const>()->DataForJob();
   for ( unsigned int isam=0; isam<fNoiseArrayPoints; ++isam ) {
-    generateNoise(fNoiseNormZ, fNoiseWidthZ, fLowCutoffZ, fNoiseZ[isam], fNoiseHistZ);
-    generateNoise(fNoiseNormU, fNoiseWidthU, fLowCutoffU, fNoiseU[isam], fNoiseHistU);
-    generateNoise(fNoiseNormV, fNoiseWidthV, fLowCutoffV, fNoiseV[isam], fNoiseHistV);
+    generateNoise(clockData, fNoiseNormZ, fNoiseWidthZ, fLowCutoffZ, fNoiseZ[isam], fNoiseHistZ);
+    generateNoise(clockData, fNoiseNormU, fNoiseWidthU, fLowCutoffU, fNoiseU[isam], fNoiseHistU);
+    generateNoise(clockData, fNoiseNormV, fNoiseWidthV, fLowCutoffV, fNoiseV[isam], fNoiseHistV);
   }
   if ( fLogLevel > 1 ) print() << endl;
 }
@@ -96,7 +99,9 @@ ExponentialChannelNoiseService::~ExponentialChannelNoiseService() {
 
 //**********************************************************************
 
-int ExponentialChannelNoiseService::addNoise(Channel chan, AdcSignalVector& sigs) const {
+int ExponentialChannelNoiseService::addNoise(detinfo::DetectorClocksData const&,
+                                             detinfo::DetectorPropertiesData const&,
+                                             Channel chan, AdcSignalVector& sigs) const {
   CLHEP::RandFlat flat(*m_pran);
   CLHEP::RandGauss gaus(*m_pran);
   unsigned int noisechan = 0;
@@ -157,7 +162,8 @@ ostream& ExponentialChannelNoiseService::print(ostream& out, string prefix) cons
 //**********************************************************************
 
 void ExponentialChannelNoiseService::
-generateNoise(float aNoiseNorm, float aNoiseWidth, float aLowCutoff,
+generateNoise(detinfo::DetectorClocksData const& clockData,
+              float aNoiseNorm, float aNoiseWidth, float aLowCutoff,
               AdcSignalVector& noise, TH1* aNoiseHist) const {
   const string myname = "ExponentialChannelNoiseService::generateNoise: ";
   if ( fLogLevel > 1 ) {
@@ -170,8 +176,7 @@ generateNoise(float aNoiseNorm, float aNoiseWidth, float aLowCutoff,
     }
   }
   // Fetch sampling rate.
-  auto const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
-  float sampleRate = detprop->SamplingRate();
+  float sampleRate = sampling_rate(clockData);
   // Fetch FFT service and # ticks.
   art::ServiceHandle<util::LArFFT> pfft;
   unsigned int ntick = pfft->FFTSize();
@@ -229,14 +234,14 @@ generateNoise(float aNoiseNorm, float aNoiseWidth, float aLowCutoff,
 
 //**********************************************************************
 
-void ExponentialChannelNoiseService::generateNoise() {
+void ExponentialChannelNoiseService::generateNoise(detinfo::DetectorClocksData const& clockData) {
   fNoiseZ.resize(fNoiseArrayPoints);
   fNoiseU.resize(fNoiseArrayPoints);
   fNoiseV.resize(fNoiseArrayPoints);
   for ( unsigned int inch=0; inch<fNoiseArrayPoints; ++inch ) {
-    generateNoise(fNoiseNormZ, fNoiseWidthZ, fLowCutoffZ, fNoiseZ[inch], fNoiseHistZ);
-    generateNoise(fNoiseNormU, fNoiseWidthU, fLowCutoffU, fNoiseZ[inch], fNoiseHistU);
-    generateNoise(fNoiseNormV, fNoiseWidthV, fLowCutoffV, fNoiseZ[inch], fNoiseHistV);
+    generateNoise(clockData, fNoiseNormZ, fNoiseWidthZ, fLowCutoffZ, fNoiseZ[inch], fNoiseHistZ);
+    generateNoise(clockData, fNoiseNormU, fNoiseWidthU, fLowCutoffU, fNoiseZ[inch], fNoiseHistU);
+    generateNoise(clockData, fNoiseNormV, fNoiseWidthV, fLowCutoffV, fNoiseZ[inch], fNoiseHistV);
   }
 }
 

@@ -162,10 +162,11 @@ namespace detsim {
     fNoiseModel           = p.get< unsigned int       >("NoiseModel");
     fCollectionPed    = p.get< float               >("CollectionPed");
     fInductionPed     = p.get< float               >("InductionPed");
-    auto const *detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
-    fSampleRate       = detprop->SamplingRate();
-    fNSamplesReadout  = detprop->ReadOutWindowSize();
-    fNTimeSamples  = detprop->NumberTimeSamples();
+    auto const clockData = art::ServiceHandle<detinfo::DetectorClocksService const>()->DataForJob();
+    auto const detProp = art::ServiceHandle<detinfo::DetectorPropertiesService const>()->DataForJob(clockData);
+    fSampleRate       = sampling_rate(clockData);
+    fNSamplesReadout  = detProp.ReadOutWindowSize();
+    fNTimeSamples  = detProp.NumberTimeSamples();
     fSaveEmptyChannel    = p.get< bool >("SaveEmptyChannel");  
     return;
   }
@@ -296,6 +297,7 @@ namespace detsim {
       digcolPostSpill->reserve(geo->Nchannels());
     }
     
+    auto const clockData = art::ServiceHandle<detinfo::DetectorClocksService const>()->DataFor(evt);
     for(chan = 0; chan < geo->Nchannels(); chan++) {
       
       fChargeWork.clear();
@@ -332,11 +334,11 @@ namespace detsim {
 
           fChargeWorkPreSpill.resize(fNTicks,0);
           fChargeWorkPostSpill.resize(fNTicks,0);
-          sss->Convolute(chan, fChargeWorkPreSpill);
-          sss->Convolute(chan, fChargeWorkPostSpill);
+          sss->Convolute(clockData, chan, fChargeWorkPreSpill);
+          sss->Convolute(clockData, chan, fChargeWorkPostSpill);
         }
         fChargeWork.resize(fNTicks,0);
-        sss->Convolute(chan,fChargeWork);
+        sss->Convolute(clockData, chan,fChargeWork);
 
 
       }
