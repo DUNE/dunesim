@@ -105,6 +105,8 @@ protodune_triggeredbeam:
  Minima: [.8, 0, 0, 0, 0]
  Maxima: [1.2, 192, 192, 192, 192]
 
+ MaxSamples: 10000
+
  BeamThetaShift: 0.0114276
  BeamPhiShift: -0.0761654
 
@@ -149,7 +151,7 @@ protodune_triggeredbeam:
  ReadoutWindow: 3.0 # In milliseconds
  BeamSpillLength: 4.8 # In seconds
 
- SaveRecoTree: false
+ SaveOutputTree: false
 
 }
 
