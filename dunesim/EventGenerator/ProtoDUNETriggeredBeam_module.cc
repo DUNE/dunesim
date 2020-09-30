@@ -502,30 +502,34 @@ void evgen::ProtoDUNETriggeredBeam::beginJob(){
     delete inputFile;
     inputFile = 0x0;
 
-
-    fSamplingFile = new TFile(fSamplingFileName.c_str());
-    fResolutionFile = new TFile(fResolutionFileName.c_str());
-    switch (fNominalP) {
-      case 1:
-        Setup1GeV();
-        break;
-      case 2:
-        Setup1GeV();
-        break;
-      case 3:
-        Setup3GeV();
-        break;
-      case 6:
-        Setup6GeV();
-        break;
-      case 7:
-        Setup6GeV();
-        break;
-      default:
-        Setup1GeV();
-        break;
+    // Data-driven file setup
+    if(fUseDataDriven){
+      fSamplingFile = new TFile(fSamplingFileName.c_str());
+      fResolutionFile = new TFile(fResolutionFileName.c_str());
+      switch (fNominalP) {
+        case 1:
+          Setup1GeV();
+          break;
+        case 2:
+          // This is the same function as for 1 GeV
+          Setup1GeV();
+          break;
+        case 3:
+          Setup3GeV();
+          break;
+        case 6:
+          Setup6GeV();
+          break;
+        case 7:
+          // This is the same function as for 7 GeV
+          Setup6GeV();
+          break;
+        default:
+          Setup1GeV();
+          break;
+      }
+      Scale2DRes();
     }
-    Scale2DRes();
 }
 
 //----------------------------------------------------------------------------------------
@@ -541,7 +545,7 @@ void evgen::ProtoDUNETriggeredBeam::beginRun(art::Run& run)
 //--------------------------------------------------------------------------------------------
 
 void evgen::ProtoDUNETriggeredBeam::endJob(){
-//    fInputFile->Close();
+
 }
 
 
@@ -907,7 +911,7 @@ void evgen::ProtoDUNETriggeredBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, co
   }
   else{
     // Add some data driven code here
-    std::cout << "Using data driven approach for triggered particle" << std::endl;
+    std::cout << "Using data driven approach for triggered particle with PDG = " << trigParticle.fPDG << std::endl;
     simb::MCParticle triggerParticle = DataDrivenMCParticle(trigParticle, trigOutputTrackID, triggerParticleTime, beamEvent);
 
     mcTruth.Add(triggerParticle);
@@ -994,14 +998,14 @@ simb::MCParticle evgen::ProtoDUNETriggeredBeam::DataDrivenMCParticle(
     //then it would not have been allocated to save on memory.
     //The false parameter prevents that bin from being allocated here,
     //to save memory
-    long long bin = fPDFs[fPDGToName[beamParticle.fPDG]]->GetBin(&kin_point[0],
+    long long bin = fPDFs.at(fPDGToName.at(beamParticle.fPDG))->GetBin(&kin_point[0],
                                                                  false);
 
     //The bin has no chance of being populated, move on
     if (bin == -1) continue;
 
     //Find how likely we are to populate this bin
-    double pdf_value = fPDFs[fPDGToName[beamParticle.fPDG]]->GetBinContent(bin);
+    double pdf_value = fPDFs.at(fPDGToName.at(beamParticle.fPDG))->GetBinContent(bin);
 
     //If successful, save info and move on
     if (pdf_check <= pdf_value) {

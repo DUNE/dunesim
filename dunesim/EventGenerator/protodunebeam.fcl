@@ -91,9 +91,12 @@ protodune_triggeredbeam:
  StartEvent: 0
  # From protoDUNE_gensingle.fcl
  # Updated geometry values:
- BeamX: 8.905247 # In cm
- BeamY: 461.749224 
- BeamZ: -196.11
+# BeamX: 8.905247 # In cm
+# BeamY: 461.749224 
+# BeamZ: -196.11
+ BeamX: -4.994 # In cm
+ BeamY: 448.449 
+ BeamZ: -129.804
  GeneratorZ: -196.11
  Verbose: true
 
