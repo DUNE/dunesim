@@ -97,7 +97,6 @@ protodune_triggeredbeam:
  BeamX: -4.994 # In cm
  BeamY: 448.449 
  BeamZ: -129.804
- GeneratorZ: -196.11
  Verbose: true
 
  SamplingFileName: "dummy.root"

@@ -266,7 +266,6 @@ namespace evgen{
         float fBeamZ;
         float fBeamThetaShift;
         float fBeamPhiShift;
-        float fGeneratorZ;
         // Rotate the beam monitor coordinate system (those after the last bending magnet)
         float fRotateMonitorXZ;
         float fRotateMonitorYZ;
@@ -402,7 +401,6 @@ evgen::ProtoDUNETriggeredBeam::ProtoDUNETriggeredBeam(fhicl::ParameterSet const 
     fBeamThetaShift = pset.get<float>("BeamThetaShift",0.0);
     fBeamPhiShift   = pset.get<float>("BeamPhiShift",0.0);
 
-    fGeneratorZ = pset.get<float>("GeneratorZ");
     
     fRotateMonitorXZ = pset.get<float>("RotateMonitorXZ");
     fRotateMonitorYZ = pset.get<float>("RotateMonitorYZ");
@@ -912,9 +910,9 @@ void evgen::ProtoDUNETriggeredBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, co
   else{
     // Add some data driven code here
     std::cout << "Using data driven approach for triggered particle with PDG = " << trigParticle.fPDG << std::endl;
-    simb::MCParticle triggerParticle = DataDrivenMCParticle(trigParticle, trigOutputTrackID, triggerParticleTime, beamEvent);
+    simb::MCParticle triggerParticle2 = DataDrivenMCParticle(trigParticle, trigOutputTrackID, triggerParticleTime, beamEvent);
 
-    mcTruth.Add(triggerParticle);
+    mcTruth.Add(triggerParticle2);
   }
 
   // Now let's deal with all of the background events
@@ -1077,7 +1075,7 @@ void evgen::ProtoDUNETriggeredBeam::SetDataDrivenPosMom(
   TVector3 dR = (downstream_point - upstream_point).Unit();
 
   //Project to generator point
-  double deltaZ = (fGeneratorZ - downstream_point.Z());
+  double deltaZ = (fBeamZ - downstream_point.Z());
   double deltaX = (dR.X() / dR.Z()) * deltaZ;
   double deltaY = (dR.Y() / dR.Z()) * deltaZ;
 
@@ -1089,7 +1087,7 @@ void evgen::ProtoDUNETriggeredBeam::SetDataDrivenPosMom(
 
   //Prints out the projected position at the face of the TPC
   if (fVerbose) {
-    deltaZ = (-1.*fGeneratorZ);
+    deltaZ = (-1.*fBeamZ);
     deltaX = (dR.X() / dR.Z()) * deltaZ;
     deltaY = (dR.Y() / dR.Z()) * deltaZ;
 
