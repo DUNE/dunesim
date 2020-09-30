@@ -933,9 +933,9 @@ void evgen::ProtoDUNETriggeredBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, co
   else{
     // Add some data driven code here
     std::cout << "Using data driven approach for triggered particle with PDG = " << trigParticle.fPDG << std::endl;
-    simb::MCParticle triggerParticle2 = DataDrivenMCParticle(trigParticle, trigOutputTrackID, triggerParticleTime, beamEvent);
+    simb::MCParticle triggerParticle1 = DataDrivenMCParticle(trigParticle, trigOutputTrackID, triggerParticleTime, beamEvent);
 
-    mcTruth.Add(triggerParticle2);
+    mcTruth.Add(triggerParticle);
   }
 
   // Now let's deal with all of the background events
