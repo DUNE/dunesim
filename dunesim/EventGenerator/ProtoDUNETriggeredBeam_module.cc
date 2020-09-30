@@ -294,6 +294,8 @@ namespace evgen{
         int fNominalP;
         float fB;
 
+        int fMaxSamples;
+
         TRandom3 fRNG;
         bool fVerbose;
         std::vector<double> fMinima, fMaxima;
@@ -317,7 +319,14 @@ namespace evgen{
         
         void Scale2DRes();
 
-        bool fSaveRecoTree;
+        bool fSaveOutputTree;
+        TTree * fOutputTree;
+        int fOutputPDG;
+        int fOutputEvent;
+        double fOutputMomentum;
+        double fOutputUnsmearedMomentum;
+        double fOutputHUpstream, fOutputVUpstream;
+        double fOutputHDownstream, fOutputVDownstream;
 
         bool fReduceNP04frontArea;
         
@@ -426,6 +435,8 @@ evgen::ProtoDUNETriggeredBeam::ProtoDUNETriggeredBeam(fhicl::ParameterSet const 
 
     fLB = fB * fLMag * fNominalP / 7.;
 
+    fMaxSamples = pset.get<int>("MaxSamples", 0);
+
     fRNG = TRandom3(pset.get<int>("Seed", 0));
     fVerbose = pset.get<bool>("Verbose", false);
     fMinima = pset.get<std::vector<double>>("Minima");
@@ -433,7 +444,7 @@ evgen::ProtoDUNETriggeredBeam::ProtoDUNETriggeredBeam(fhicl::ParameterSet const 
     fResolutionFileName = pset.get<std::string>("ResolutionFileName");
     fSamplingFileName = pset.get<std::string>("SamplingFileName");
     
-    fSaveRecoTree = pset.get<bool>("SaveRecoTree");
+    fSaveOutputTree = pset.get<bool>("SaveOutputTree");
 
     // Make sure we use ifdh to open the beam input file.
     OpenInputFile();
@@ -526,6 +537,19 @@ void evgen::ProtoDUNETriggeredBeam::beginJob(){
         break;
     }
     Scale2DRes();
+
+  if (fSaveOutputTree) {
+    fOutputTree = tfs->make<TTree>("tree", "");
+    fOutputTree->Branch("PDG", &fOutputPDG);
+    fOutputTree->Branch("Event", &fOutputEvent);
+    fOutputTree->Branch("Momentum", &fOutputMomentum);
+    fOutputTree->Branch("UnsmearedMomentum", &fOutputUnsmearedMomentum);
+    fOutputTree->Branch("HUpstream", &fOutputHUpstream);
+    fOutputTree->Branch("VUpstream", &fOutputVUpstream);
+    fOutputTree->Branch("HDownstream", &fOutputHDownstream);
+    fOutputTree->Branch("VDownstream", &fOutputVDownstream);
+  }
+
 }
 
 //----------------------------------------------------------------------------------------
@@ -566,6 +590,7 @@ void evgen::ProtoDUNETriggeredBeam::produce(art::Event & e)
     OverlaidTriggerEvent overlayEvent = GenerateOverlaidEvent(fFinalTriggerEventIDs.at(fEventNumber));
 
     // Fill the MCTruth object
+    fOutputEvent = e.id().event();
     GenerateTrueEvent(truth, overlayEvent, beamEvent);
     
     // Add the MCTruth to the vector
@@ -979,7 +1004,12 @@ simb::MCParticle evgen::ProtoDUNETriggeredBeam::DataDrivenMCParticle(
   double sampled_v_upstream = 0.;
   double sampled_h_downstream = 0.;
   double sampled_v_downstream = 0.;
+  int nSamples = 0;
   while (sample_again) {
+    if (nSamples > fMaxSamples) {
+      throw cet::exception("ProtoDUNETriggeredBeam") << 
+          "Reached max samples. Exiting" << std::endl;
+    }
     fRNG.RndmArray(5, &kin_samples[0]);
     pdf_check = fRNG.Rndm();
 
@@ -1039,6 +1069,17 @@ simb::MCParticle evgen::ProtoDUNETriggeredBeam::DataDrivenMCParticle(
   SetDataDrivenBeamEvent(beamEvent, sampled_h_upstream,
                       sampled_v_upstream, sampled_h_downstream,
                       sampled_v_downstream, sampled_momentum);
+
+  if (fSaveOutputTree) {
+    fOutputPDG = beamParticle.fPDG;
+    fOutputMomentum = sampled_momentum;
+    fOutputHUpstream = sampled_h_upstream;
+    fOutputVUpstream = sampled_v_upstream;
+    fOutputHDownstream = sampled_h_downstream;
+    fOutputVDownstream = sampled_v_downstream;
+    fOutputTree->Fill();
+  }
+
   return newParticle;
 }
 
@@ -1114,6 +1155,7 @@ void evgen::ProtoDUNETriggeredBeam::SetDataDrivenPosMom(
   //TVector3 mom_vec = fRandMomentum[fCurrentEvent]*dR;
   //TVector3 mom_vec = unsmeared_momentum*dR;
   TVector3 mom_vec = unsmeared_momentum*dR;
+  fOutputUnsmearedMomentum = unsmeared_momentum;
 
   //Get the PDG and set the mass & energy accordingly
   const TDatabasePDG * dbPDG = TDatabasePDG::Instance();
@@ -1694,7 +1736,7 @@ void evgen::ProtoDUNETriggeredBeam::SetBeamEvent(beam::ProtoDUNEBeamEvent & beam
   MomentumSpectrometer( beamevt );
 
 
-  if( fSaveRecoTree ){ 
+  if( fSaveOutputTree ){ 
     fReco_p = beamevt.GetRecoBeamMomentum(0);
     fReco_tof = beamevt.GetTOF();
     std::cout << "TOF: " << beamevt.GetTOFs()[0] << " " << beamevt.GetTOF() << std::endl;
