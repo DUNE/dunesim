@@ -200,7 +200,7 @@ namespace evgen{
                                   std::vector<double> maxima,
                                   double output_point[5]);
         // Handle root files from beam instrumentation group
-        void OpenInputFile();
+        void OpenInputFile(std::string & filename);
         
         // Convert to the detector coordinate frame
         void ConvertCoordinates(float &x, float &y, float &z);
@@ -445,7 +445,9 @@ evgen::ProtoDUNETriggeredBeam::ProtoDUNETriggeredBeam(fhicl::ParameterSet const 
     fSaveOutputTree = pset.get<bool>("SaveOutputTree");
 
     // Make sure we use ifdh to open the beam input file.
-    OpenInputFile();
+    OpenInputFile(fFileName);
+    OpenInputFile(fSamplingFileName);
+    OpenInputFile(fResolutionFileName);
 }
 
 
@@ -1471,7 +1473,7 @@ void evgen::ProtoDUNETriggeredBeam::SetDataDrivenBeamEvent(
 }
 
 // Function written in similar way as "openDBs()" in CORSIKAGen_module.cc
-void evgen::ProtoDUNETriggeredBeam::OpenInputFile()
+void evgen::ProtoDUNETriggeredBeam::OpenInputFile(std::string & filename)
 {
     // Setup ifdh object
     if (!fIFDH)
@@ -1486,27 +1488,27 @@ void evgen::ProtoDUNETriggeredBeam::OpenInputFile()
         fIFDH->set_debug(ifdh_debug_env);
     }
     
-    std::string path(gSystem->DirName(fFileName.c_str()));
-    std::string pattern(gSystem->BaseName(fFileName.c_str()));
+    std::string path(gSystem->DirName(filename.c_str()));
+    std::string pattern(gSystem->BaseName(filename.c_str()));
     
     auto flist = fIFDH->findMatchingFiles(path,pattern);
     if (flist.empty())
     {
         struct stat buffer;
-        if (stat(fFileName.c_str(), &buffer) != 0)
+        if (stat(filename.c_str(), &buffer) != 0)
         {
             throw cet::exception("ProtoDUNETriggeredBeam") << "No files returned for path:pattern: "<<path<<":"<<pattern<<std::endl;
         }
         else
         {
-            mf::LogInfo("ProtoDUNETriggeredBeam") << "For "<< fFileName <<"\n";
+            mf::LogInfo("ProtoDUNETriggeredBeam") << "For "<< filename <<"\n";
         }
     }
     else
     {
         std::pair<std::string, long> f = flist.front();
         
-        mf::LogInfo("ProtoDUNETriggeredBeam") << "For "<< fFileName <<"\n";
+        mf::LogInfo("ProtoDUNETriggeredBeam") << "For "<< filename <<"\n";
         
         // Do the fetching, store local filepaths in locallist
         
@@ -1515,7 +1517,7 @@ void evgen::ProtoDUNETriggeredBeam::OpenInputFile()
         std::string fetchedfile(fIFDH->fetchInput(f.first));
         MF_LOG_DEBUG("ProtoDUNETriggeredBeam") << " Fetched; local path: " << fetchedfile;
         
-        fFileName = fetchedfile;
+        filename = fetchedfile;
     }
 }
 
