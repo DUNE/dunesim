@@ -635,6 +635,10 @@ void evgen::ProtoDUNETriggeredBeam::FillParticleMaps(TTree *frontFaceTree){
 
       frontFaceTree->GetEntry(p);
 
+      // Don't consider nuclei here
+      int intPdgCode = static_cast<int>(pdgCode);
+      if(intPdgCode > 10000) continue;
+
       // If this particle is travelling backwards then it won't hit the detector
       if(momZ < 0) continue;
 
@@ -654,7 +658,6 @@ void evgen::ProtoDUNETriggeredBeam::FillParticleMaps(TTree *frontFaceTree){
 
       int intEventID = static_cast<int>(eventID);
       int intTrackID = static_cast<int>(trackID);
-      int intPdgCode = static_cast<int>(pdgCode);
       int intParentID= static_cast<int>(parentID);
       BeamParticle newParticle(intTrackID, intPdgCode, intParentID,
                                posX, posY, posZ, posT, momX, momY, momZ);
@@ -968,7 +971,7 @@ void evgen::ProtoDUNETriggeredBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, co
     double baseTime = (fFlatRnd.fire() - 0.5)*2.0*(fReadoutWindow*1000.*1000.);
     // Special case for triggered event
     if(overlayEvent.fTriggerEventID == eventID) baseTime = triggerParticleTime;
-
+  
     for (std::pair<int,BeamParticle> element : fAllBeamEvents.at(eventID).fParticlesFront){
       // Don't double count the trigger particle
       if(overlayEvent.fTriggerEventID == eventID && element.first == trigParticle.fTrackID) continue;
