@@ -772,7 +772,7 @@ std::vector<int> evgen::ProtoDUNETriggeredBeam::FindTriggeredEvents(TTree *trig1
     // There is a rare case where the TRIG2 particle can decay before NP04front
     if(event.fParticlesFront.find(event.fTriggerID) == event.fParticlesFront.end()){
       // Find the child particle in the map
-      std::cout << "- Triggered particle " << trigEventIDs.size() << " not at the front face... searching for children" << std::endl;
+      std::cout << "- Candidate event " << trigEventIDs.size() << " trigger particle of type " << trig2Particles.at(element.first).fPDG << " not at the front face... searching for children" << std::endl;
         for(const std::pair<int,BeamParticle> &partPair : event.fParticlesFront){
         if(partPair.second.fParentID == event.fTriggerID){
           std::cout << "  - Found child with PDG = " << partPair.second.fPDG << std::endl;
