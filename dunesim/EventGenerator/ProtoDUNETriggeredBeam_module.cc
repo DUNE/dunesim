@@ -767,7 +767,28 @@ std::vector<int> evgen::ProtoDUNETriggeredBeam::FindTriggeredEvents(TTree *trig1
     event.fTriggerID = trig2Particles.at(element.first).fTrackID;    
     event.fTriggeredParticleInfo.insert(std::make_pair(trig1TreeName,element.second));
     event.fTriggeredParticleInfo.insert(std::make_pair(trig2TreeName,trig2Particles.at(element.first)));
-    trigEventIDs.push_back(element.first);
+
+    bool isTriggerEvent = false;
+    // There is a rare case where the TRIG2 particle can decay before NP04front
+    if(event.fParticlesFront.find(event.fTriggerID) == event.fParticlesFront.end()){
+      // Find the child particle in the map
+      std::cout << "- Triggered particle " << trigEventIDs.size() << " not at the front face... searching for children" << std::endl;
+        for(const std::pair<int,BeamParticle> &partPair : event.fParticlesFront){
+        if(partPair.second.fParentID == event.fTriggerID){
+          std::cout << "  - Found child with PDG = " << partPair.second.fPDG << std::endl;
+          if(std::find(allowedPDGs.begin(),allowedPDGs.end(),partPair.second.fPDG)==allowedPDGs.end()) continue;
+          std::cout << "  - Child PDG code accepted" << std::endl;
+          event.fTriggerID = partPair.first;
+          isTriggerEvent = true;
+          break;
+        }
+      }
+    }
+    else{
+      isTriggerEvent = true;
+    }
+
+    if(isTriggerEvent) trigEventIDs.push_back(element.first);
   }
 
   trig1Tree->ResetBranchAddresses();
@@ -912,7 +933,8 @@ void evgen::ProtoDUNETriggeredBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, co
   mcTruth.SetOrigin(simb::kSingleParticle);
 
   // Get the actual triggered event first and the beam particle
-  const BeamEvent trigEvent = fAllBeamEvents.at(overlayEvent.fTriggerEventID); 
+  const BeamEvent trigEvent = fAllBeamEvents.at(overlayEvent.fTriggerEventID);
+  // We need to be slightly careful here... there are rare events where the pion decays between TRIG2 and NP04front
   BeamParticle trigParticle = trigEvent.fParticlesFront.at(trigEvent.fTriggerID);
 
   // Time of the triggered particle (will make all times relative to this)
