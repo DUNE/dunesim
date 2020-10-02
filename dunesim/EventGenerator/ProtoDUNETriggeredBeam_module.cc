@@ -330,6 +330,8 @@ namespace evgen{
         void Scale2DRes();
         void SetMinMax();
 
+        std::string GetSecondaryProcess(int primary_pdg, int secondary_pdg);
+
         bool fSaveOutputTree;
         TTree * fOutputTree;
         int fOutputPDG;
@@ -992,9 +994,15 @@ void evgen::ProtoDUNETriggeredBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, co
     for(const int &id : trigEvent.fSecondaryTrackIDs){
       trigOutputTrackID = -1*(mcTruth.NParticles() + 1);
       BeamParticle secondary = trigEvent.fParticlesFront.at(id);
-      simb::MCParticle secondaryParticle = BeamParticleToMCParticle(secondary,trigOutputTrackID,triggerParticleTime+secondary.fPosT,1,"primaryInteracted");
+      simb::MCParticle secondaryParticle = BeamParticleToMCParticle(
+          secondary, trigOutputTrackID, triggerParticleTime+secondary.fPosT, 1,
+          GetSecondaryProcess(trigParticle.fPDG, secondary.fPDG));
       mcTruth.Add(secondaryParticle);
-      std::cout << "  - Added secondary particle from interacting primary" << std::endl; 
+      std::cout << "  - Added secondary particle of type " << secondary.fPDG <<
+                   " with process " <<
+                   GetSecondaryProcess(trigParticle.fPDG, secondary.fPDG) <<
+                   " from interacting primary " << trigParticle.fPDG <<
+                   std::endl; 
     }
   }
 
@@ -1286,6 +1294,30 @@ double evgen::ProtoDUNETriggeredBeam::UnsmearMomentum2D(double momentum, int pdg
   }
 
   return unsmeared_momentum;
+}
+
+std::string evgen::ProtoDUNETriggeredBeam::GetSecondaryProcess(
+    int primary_pdg, int secondary_pdg) {
+  if (primary_pdg == 2212) {
+    return "protonInelastic";
+  }
+  else if (primary_pdg == 211) {
+    if (secondary_pdg == -13) {
+      return "Decay";
+    }
+    else if (secondary_pdg == 211 || secondary_pdg == -211 ||
+            secondary_pdg == 2212 || secondary_pdg == 2112 ||
+            secondary_pdg > 2212 || secondary_pdg == 22) {
+      return "pi+Inelastic";
+    }
+  }
+  else if (primary_pdg == 321) {
+    return "Decay";
+  }
+
+  std::cout << "Notice! Unknown secondary option " << primary_pdg << " " <<
+               secondary_pdg << std::endl;
+  return "default";
 }
 
 void evgen::ProtoDUNETriggeredBeam::SetMinMax() {
