@@ -181,7 +181,7 @@ namespace evgen{
         void GenerateTrueEvent(simb::MCTruth &mcTruth, const OverlaidTriggerEvent &overlayEvent, beam::ProtoDUNEBeamEvent & beamEvent);
 
         // Convert our BeamParticle struct into a MCParticle object
-        simb::MCParticle BeamParticleToMCParticle(const BeamParticle &beamParticle, const int outputTrackID, const float triggerParticleTime, const int primaryStatus, const std::string process);
+        simb::MCParticle BeamParticleToMCParticle(const BeamParticle &beamParticle, const int outputTrackID, const float triggerParticleTime, const int primaryStatus, const std::string process, const int motherID = -1);
 
         // Use DDMC to create a primary beam particle
         simb::MCParticle DataDrivenMCParticle(
@@ -283,6 +283,7 @@ namespace evgen{
         float fBPROFEXTPos;
         float fBPROF4Pos;
         float fNP04frontPos;
+        float fTRIG2Pos;
        
         // Parameters from the .fcl file to deal with overlaying events
         float fIntensity; // Number of interactions on the secondary target per SPS spill
@@ -429,6 +430,7 @@ evgen::ProtoDUNETriggeredBeam::ProtoDUNETriggeredBeam(fhicl::ParameterSet const 
     fRotateMonitorYZ = pset.get<float>("RotateMonitorYZ");
     fBPROFEXTPos     = pset.get<float>("BPROFEXTPosZ");
     fBPROF4Pos       = pset.get<float>("BPROF4PosZ");
+    fTRIG2Pos        = pset.get<float>("TRIG2PosZ");
     fNP04frontPos    = pset.get<float>("NP04frontPosZ");
     // Setup the beam monitor basis vectors
     BeamMonitorBasisVectors();   
@@ -739,8 +741,11 @@ std::vector<int> evgen::ProtoDUNETriggeredBeam::FindTriggeredEvents(TTree *trig1
 
     if(std::find(allowedPDGs.begin(),allowedPDGs.end(),static_cast<int>(pdgCode))==allowedPDGs.end()) continue;
      
+
+    TVector3 det_pos = ConvertProfCoordinates(posX, posY, posZ, fTRIG2Pos);
     BeamParticle particle(static_cast<int>(trackID), static_cast<int>(pdgCode), static_cast<int>(parentID),
-                          posX, posY, posZ, posT, momX, momY, momZ);
+                          det_pos.X(), det_pos.Y(), det_pos.Z(), posT, momX, momY, momZ);
+                          //posX, posY, posZ, posT, momX, momY, momZ);
     trig2Particles.insert(std::make_pair(intEventID,particle));
   }
 
@@ -975,35 +980,60 @@ void evgen::ProtoDUNETriggeredBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, co
   int trigOutputTrackID = -1*(mcTruth.NParticles() + 1);
 
   simb::MCParticle triggerParticle;
-  if(!fUseDataDriven){
+  if(!fUseDataDriven || trigEvent.fHasInteracted){
     // Create the MCParticle for the triggered beam particle - NB the time offset sets T = 0 for this particle
     triggerParticle = BeamParticleToMCParticle(trigParticle, trigOutputTrackID, triggerParticleTime, primaryStatus, "primary");
 
     // Fill the ProtoDUNEBeamEvent here to store beamline information
     SetBeamEvent(beamEvent,trigEvent);
     std::cout << "  - Created trigger particle using pure simulation" << std::endl;
+    std::cout << "  - Active? " << primaryStatus << std::endl;
+    std::cout << "  - Located at " << triggerParticle.EndX() << " " <<
+                 triggerParticle.EndY() << " " << triggerParticle.EndZ() <<
+                 std::endl;
   }
   else{
     triggerParticle = DataDrivenMCParticle(trigParticle, trigOutputTrackID, triggerParticleTime, beamEvent, primaryStatus, "primary");
     std::cout << "  - Created trigger particler using data driven method" << std::endl;
+    std::cout << "  - Located at " << triggerParticle.EndX() << " " <<
+                 triggerParticle.EndY() << " " << triggerParticle.EndZ() <<
+                 std::endl;
   }
-  mcTruth.Add(triggerParticle);
 
+  //mcTruth.Add(triggerParticle);
+
+  std::vector<simb::MCParticle> secondaries;
   // Now we can add any secondaries produced in the interaction before NP04front
   if(trigEvent.fHasInteracted){
     for(const int &id : trigEvent.fSecondaryTrackIDs){
-      trigOutputTrackID = -1*(mcTruth.NParticles() + 1);
+      trigOutputTrackID = -1*(mcTruth.NParticles() + 2/*1*/);
       BeamParticle secondary = trigEvent.fParticlesFront.at(id);
       simb::MCParticle secondaryParticle = BeamParticleToMCParticle(
           secondary, trigOutputTrackID, triggerParticleTime+secondary.fPosT, 1,
-          GetSecondaryProcess(trigParticle.fPDG, secondary.fPDG));
-      mcTruth.Add(secondaryParticle);
-      std::cout << "  - Added secondary particle of type " << secondary.fPDG <<
-                   " with process " <<
-                   GetSecondaryProcess(trigParticle.fPDG, secondary.fPDG) <<
-                   " from interacting primary " << trigParticle.fPDG <<
-                   std::endl; 
+          GetSecondaryProcess(trigParticle.fPDG, secondary.fPDG), triggerParticle.TrackId());
+      secondaries.push_back(secondaryParticle);
+      triggerParticle.AddDaughter(trigOutputTrackID);
+      //mcTruth.Add(secondaryParticle);
     }
+  }
+
+  std::cout << "  - Trigger particle has daughters:";
+  for (int i = 0; i < triggerParticle.NumberDaughters(); ++i) {
+    std::cout << " " << triggerParticle.Daughter(i);
+  }
+  std::cout << std::endl;
+
+  mcTruth.Add(triggerParticle);
+  for (const simb::MCParticle & sec : secondaries) {
+    mcTruth.Add(sec);
+    std::cout << "  - Added secondary " << sec.TrackId() <<
+                 " of type " << sec.PdgCode() << " with process " <<
+                 sec.Process() <<
+                 " from interacting primary " << triggerParticle.PdgCode() <<
+                 " " << triggerParticle.Mother() << std::endl; 
+    std::cout << "  - Located at " << sec.EndX() << " " << 
+                 sec.EndY() << " " <<
+                 sec.EndZ() << std::endl; 
   }
 
   // Now let's deal with all of the background events
@@ -1032,9 +1062,9 @@ void evgen::ProtoDUNETriggeredBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, co
 
 //---------------------------------------------------------------------------------------
 
-simb::MCParticle evgen::ProtoDUNETriggeredBeam::BeamParticleToMCParticle(const BeamParticle &beamParticle, const int outputTrackID, const float timeOffset, const int primaryStatus, const std::string process){
+simb::MCParticle evgen::ProtoDUNETriggeredBeam::BeamParticleToMCParticle(const BeamParticle &beamParticle, const int outputTrackID, const float timeOffset, const int primaryStatus, const std::string process, const int motherID){
 
-  simb::MCParticle newParticle(outputTrackID,beamParticle.fPDG,process, -1, -1.0, primaryStatus);
+  simb::MCParticle newParticle(outputTrackID,beamParticle.fPDG,process, motherID, -1.0, primaryStatus);
 
   // Get the position four-vector
   TLorentzVector pos(beamParticle.fPosX,beamParticle.fPosY,beamParticle.fPosZ,beamParticle.fPosT - timeOffset);

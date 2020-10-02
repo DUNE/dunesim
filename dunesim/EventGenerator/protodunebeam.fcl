@@ -98,12 +98,11 @@ protodune_triggeredbeam:
  BeamY: 448.449 
  BeamZ: -129.804
  Verbose: true
+ IncludeAnti: true
 
  SamplingFileName: "dummy.root"
  ResolutionFileName: "dummy2.root"
  Seed: 0
- Minima: [.8, 0, 0, 0, 0]
- Maxima: [1.2, 192, 192, 192, 192]
 
  MaxSamples: 10000
 
@@ -142,8 +141,9 @@ protodune_triggeredbeam:
 
 
  # Position of the beam monitor positions in z in [mm]
- BPROFEXTPosZ: 707479
- BPROF4PosZ : 716048
+ BPROFEXTPosZ:  707555 #707479 -- old values
+ BPROF4PosZ :   716124 #716048
+ TRIG2PosZ:     716296
  NP04frontPosZ: 717243
 
  # Intensity variables
