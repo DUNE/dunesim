@@ -296,14 +296,18 @@ namespace evgen{
         int fMaxSamples;
 
         TRandom3 fRNG;
-        bool fVerbose;
+        bool fVerbose, fIncludeAnti;
         std::vector<double> fMinima, fMaxima;
         std::map<int, std::string> fPDGToName = {
           {2212, "Protons"},
           {211, "Pions"},
           {-11, "Electrons"},
           {-13, "Muons"},
-          {321, "Kaons"}
+          {321, "Kaons"},
+          {-211, "Pions"},
+          {11, "Electrons"},
+          {13, "Muons"},
+          {-321, "Kaons"}
         };
 
         std::string fSamplingFileName;
@@ -437,6 +441,7 @@ evgen::ProtoDUNETriggeredBeam::ProtoDUNETriggeredBeam(fhicl::ParameterSet const 
 
     fRNG = TRandom3(pset.get<int>("Seed", 0));
     fVerbose = pset.get<bool>("Verbose", false);
+    fIncludeAnti = pset.get<bool>("IncludeAnti", false);
     fMinima = pset.get<std::vector<double>>("Minima");
     fMaxima = pset.get<std::vector<double>>("Maxima");
     fResolutionFileName = pset.get<std::string>("ResolutionFileName");
@@ -539,6 +544,7 @@ void evgen::ProtoDUNETriggeredBeam::beginJob(){
           Setup1GeV();
           break;
       }
+
       Scale2DRes();
     }
     if (fSaveOutputTree) {
@@ -1020,7 +1026,10 @@ simb::MCParticle evgen::ProtoDUNETriggeredBeam::DataDrivenMCParticle(
     const BeamParticle &beamParticle, const int outputTrackID,
     const float timeOffset, beam::ProtoDUNEBeamEvent & beamEvent) {
   std::string process = "primary";
-  simb::MCParticle newParticle(outputTrackID, beamParticle.fPDG, process);
+  
+  int pdg = (fIncludeAnti ? beamParticle.fPDG : abs(beamParticle.fPDG));
+
+  simb::MCParticle newParticle(outputTrackID, pdg, process);
 
   double kin_samples[5]; //the point in phase space to check against pdf
   double pdf_check; //the number used for the checking
@@ -1033,10 +1042,11 @@ simb::MCParticle evgen::ProtoDUNETriggeredBeam::DataDrivenMCParticle(
   double sampled_v_downstream = 0.;
   int nSamples = 0;
   while (sample_again) {
+    /*
     if (nSamples > fMaxSamples) {
       throw cet::exception("ProtoDUNETriggeredBeam") << 
           "Reached max samples. Exiting" << std::endl;
-    }
+    }*/
     fRNG.RndmArray(5, &kin_samples[0]);
     pdf_check = fRNG.Rndm();
 
@@ -1051,14 +1061,13 @@ simb::MCParticle evgen::ProtoDUNETriggeredBeam::DataDrivenMCParticle(
     //then it would not have been allocated to save on memory.
     //The false parameter prevents that bin from being allocated here,
     //to save memory
-    long long bin = fPDFs.at(fPDGToName.at(beamParticle.fPDG))->GetBin(&kin_point[0],
+    long long bin = fPDFs.at(fPDGToName.at(pdg))->GetBin(&kin_point[0],
                                                                  false);
-
     //The bin has no chance of being populated, move on
     if (bin == -1) continue;
 
     //Find how likely we are to populate this bin
-    double pdf_value = fPDFs.at(fPDGToName.at(beamParticle.fPDG))->GetBinContent(bin);
+    double pdf_value = fPDFs.at(fPDGToName.at(pdg))->GetBinContent(bin);
 
     //If successful, save info and move on
     if (pdf_check <= pdf_value) {
@@ -1083,6 +1092,7 @@ simb::MCParticle evgen::ProtoDUNETriggeredBeam::DataDrivenMCParticle(
 
       sample_again = false;
     }
+    ++nSamples;
   }
 
   TLorentzVector position(0, 0, 0, 0);
@@ -1090,7 +1100,7 @@ simb::MCParticle evgen::ProtoDUNETriggeredBeam::DataDrivenMCParticle(
   SetDataDrivenPosMom(position, momentum, sampled_h_upstream,
                       sampled_v_upstream, sampled_h_downstream,
                       sampled_v_downstream, sampled_momentum,
-                      beamParticle.fPDG);
+                      pdg);
   newParticle.AddTrajectoryPoint(position, momentum);
 
   SetDataDrivenBeamEvent(beamEvent, sampled_h_upstream,
@@ -1098,7 +1108,7 @@ simb::MCParticle evgen::ProtoDUNETriggeredBeam::DataDrivenMCParticle(
                       sampled_v_downstream, sampled_momentum);
 
   if (fSaveOutputTree) {
-    fOutputPDG = beamParticle.fPDG;
+    fOutputPDG = pdg;
     fOutputMomentum = sampled_momentum;
     fOutputHUpstream = sampled_h_upstream;
     fOutputVUpstream = sampled_v_upstream;
