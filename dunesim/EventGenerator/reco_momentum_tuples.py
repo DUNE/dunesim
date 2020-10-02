@@ -202,6 +202,7 @@ for e in t:
   elif( args.p == 2 ): current = 137.5 
   elif( args.p == 3 ): current = 206.2 
   elif( args.p == 6 ): current = 419.7
+  elif( args.p == 7 ): current = 508.3 
 
   LB = mag_P1 * current 
   deltaI = current  - mag_P4

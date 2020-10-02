@@ -32,8 +32,9 @@ elif args.p == 6:
   min_p = 4.
   max_p = 8.
 elif args.p == 7:
-  min_p = 6.
-  max_p = 8.
+  nBins = array("i", [50, 32, 32, 32, 32])
+  min_p = 5.
+  max_p = 9.
 
 mins = array("d", [min_p, 0., 0., 0., 0.]) 
 maxes = array("d", [max_p, 192., 192., 192., 192.]) 

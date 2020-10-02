@@ -302,14 +302,19 @@ namespace evgen{
         int fMaxSamples;
 
         TRandom3 fRNG;
-        bool fVerbose;
-        std::vector<double> fMinima, fMaxima;
+        bool fVerbose, fIncludeAnti;
+        std::vector<double> fMinima = {0.8, 0., 0., 0., 0.};
+        std::vector<double> fMaxima = {1.2, 192., 192., 192., 192.};
         std::map<int, std::string> fPDGToName = {
           {2212, "Protons"},
           {211, "Pions"},
           {-11, "Electrons"},
           {-13, "Muons"},
-          {321, "Kaons"}
+          {321, "Kaons"},
+          {-211, "Pions"},
+          {11, "Electrons"},
+          {13, "Muons"},
+          {-321, "Kaons"}
         };
 
         std::string fSamplingFileName;
@@ -323,6 +328,7 @@ namespace evgen{
         void Setup6GeV(); //Shared by 7GeV
         
         void Scale2DRes();
+        void SetMinMax();
 
         bool fSaveOutputTree;
         TTree * fOutputTree;
@@ -443,8 +449,7 @@ evgen::ProtoDUNETriggeredBeam::ProtoDUNETriggeredBeam(fhicl::ParameterSet const 
 
     fRNG = TRandom3(pset.get<int>("Seed", 0));
     fVerbose = pset.get<bool>("Verbose", false);
-    fMinima = pset.get<std::vector<double>>("Minima");
-    fMaxima = pset.get<std::vector<double>>("Maxima");
+    fIncludeAnti = pset.get<bool>("IncludeAnti", false);
     fResolutionFileName = pset.get<std::string>("ResolutionFileName");
     fSamplingFileName = pset.get<std::string>("SamplingFileName");
     
@@ -547,7 +552,9 @@ void evgen::ProtoDUNETriggeredBeam::beginJob(){
           Setup1GeV();
           break;
       }
+
       Scale2DRes();
+      SetMinMax();
     }
     if (fUseDataDriven && fSaveOutputTree) {
       fOutputTree = tfs->make<TTree>("tree", "");
@@ -1042,8 +1049,10 @@ simb::MCParticle evgen::ProtoDUNETriggeredBeam::BeamParticleToMCParticle(const B
 simb::MCParticle evgen::ProtoDUNETriggeredBeam::DataDrivenMCParticle(
     const BeamParticle &beamParticle, const int outputTrackID,
     const float timeOffset, beam::ProtoDUNEBeamEvent & beamEvent, const int primaryStatus, const std::string process) {
-  simb::MCParticle newParticle(outputTrackID, beamParticle.fPDG, process, -1, -1.0, primaryStatus);
-
+  
+  const int pdg = (fIncludeAnti ? beamParticle.fPDG : abs(beamParticle.fPDG));
+  simb::MCParticle newParticle(outputTrackID, pdg, process, -1, -1.0, primaryStatus);
+  
   double kin_samples[5]; //the point in phase space to check against pdf
   double pdf_check; //the number used for the checking
   bool sample_again = true;
@@ -1055,10 +1064,11 @@ simb::MCParticle evgen::ProtoDUNETriggeredBeam::DataDrivenMCParticle(
   double sampled_v_downstream = 0.;
   int nSamples = 0;
   while (sample_again) {
+    /*
     if (nSamples > fMaxSamples) {
       throw cet::exception("ProtoDUNETriggeredBeam") << 
           "Reached max samples. Exiting" << std::endl;
-    }
+    }*/
     fRNG.RndmArray(5, &kin_samples[0]);
     pdf_check = fRNG.Rndm();
 
@@ -1073,14 +1083,12 @@ simb::MCParticle evgen::ProtoDUNETriggeredBeam::DataDrivenMCParticle(
     //then it would not have been allocated to save on memory.
     //The false parameter prevents that bin from being allocated here,
     //to save memory
-    const long long bin = fPDFs.at(fPDGToName.at(beamParticle.fPDG))->GetBin(&kin_point[0],
-                                                                 false);
-
+    const long long bin = fPDFs.at(fPDGToName.at(pdg))->GetBin(&kin_point[0],false);
     //The bin has no chance of being populated, move on
     if (bin == -1) continue;
 
     //Find how likely we are to populate this bin
-    const double pdf_value = fPDFs.at(fPDGToName.at(beamParticle.fPDG))->GetBinContent(bin);
+    const double pdf_value = fPDFs.at(fPDGToName.at(pdg))->GetBinContent(bin);
 
     //If successful, save info and move on
     if (pdf_check <= pdf_value) {
@@ -1105,6 +1113,7 @@ simb::MCParticle evgen::ProtoDUNETriggeredBeam::DataDrivenMCParticle(
 
       sample_again = false;
     }
+    ++nSamples;
   }
 
   TLorentzVector position(0, 0, 0, 0);
@@ -1112,7 +1121,7 @@ simb::MCParticle evgen::ProtoDUNETriggeredBeam::DataDrivenMCParticle(
   SetDataDrivenPosMom(position, momentum, sampled_h_upstream,
                       sampled_v_upstream, sampled_h_downstream,
                       sampled_v_downstream, sampled_momentum,
-                      beamParticle.fPDG);
+                      pdg);
   newParticle.AddTrajectoryPoint(position, momentum);
 
   SetDataDrivenBeamEvent(beamEvent, sampled_h_upstream,
@@ -1120,7 +1129,7 @@ simb::MCParticle evgen::ProtoDUNETriggeredBeam::DataDrivenMCParticle(
                       sampled_v_downstream, sampled_momentum);
 
   if (fSaveOutputTree) {
-    fOutputPDG = beamParticle.fPDG;
+    fOutputPDG = pdg;
     fOutputMomentum = sampled_momentum;
     fOutputHUpstream = sampled_h_upstream;
     fOutputVUpstream = sampled_v_upstream;
@@ -1277,6 +1286,29 @@ double evgen::ProtoDUNETriggeredBeam::UnsmearMomentum2D(double momentum, int pdg
   }
 
   return unsmeared_momentum;
+}
+
+void evgen::ProtoDUNETriggeredBeam::SetMinMax() {
+  switch (fNominalP) {
+    case 2:
+      fMinima[0] = 1.6;
+      fMaxima[0] = 2.4;
+      break;
+    case 3:
+      fMinima[0] = 2.4;
+      fMaxima[0] = 3.6;
+      break;
+    case 6:
+      fMinima[0] = 5.0;
+      fMaxima[0] = 7.0;
+      break;
+    case 7:
+      fMinima[0] = 6.0;
+      fMaxima[0] = 8.0;
+      break;
+    default:
+      break;
+  }
 }
 
 void evgen::ProtoDUNETriggeredBeam::Scale2DRes() {
