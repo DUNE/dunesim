@@ -297,7 +297,8 @@ namespace evgen{
 
         TRandom3 fRNG;
         bool fVerbose, fIncludeAnti;
-        std::vector<double> fMinima, fMaxima;
+        std::vector<double> fMinima = {0.8, 0., 0., 0., 0.};
+        std::vector<double> fMaxima = {1.2, 192., 192., 192., 192.};
         std::map<int, std::string> fPDGToName = {
           {2212, "Protons"},
           {211, "Pions"},
@@ -321,6 +322,7 @@ namespace evgen{
         void Setup6GeV(); //Shared by 7GeV
         
         void Scale2DRes();
+        void SetMinMax();
 
         bool fSaveOutputTree;
         TTree * fOutputTree;
@@ -442,8 +444,6 @@ evgen::ProtoDUNETriggeredBeam::ProtoDUNETriggeredBeam(fhicl::ParameterSet const 
     fRNG = TRandom3(pset.get<int>("Seed", 0));
     fVerbose = pset.get<bool>("Verbose", false);
     fIncludeAnti = pset.get<bool>("IncludeAnti", false);
-    fMinima = pset.get<std::vector<double>>("Minima");
-    fMaxima = pset.get<std::vector<double>>("Maxima");
     fResolutionFileName = pset.get<std::string>("ResolutionFileName");
     fSamplingFileName = pset.get<std::string>("SamplingFileName");
     
@@ -546,6 +546,7 @@ void evgen::ProtoDUNETriggeredBeam::beginJob(){
       }
 
       Scale2DRes();
+      SetMinMax();
     }
     if (fSaveOutputTree) {
       fOutputTree = tfs->make<TTree>("tree", "");
@@ -1265,6 +1266,29 @@ double evgen::ProtoDUNETriggeredBeam::UnsmearMomentum2D(double momentum, int pdg
   }
 
   return unsmeared_momentum;
+}
+
+void evgen::ProtoDUNETriggeredBeam::SetMinMax() {
+  switch (fNominalP) {
+    case 2:
+      fMinima[0] = 1.6;
+      fMaxima[0] = 2.4;
+      break;
+    case 3:
+      fMinima[0] = 2.4;
+      fMaxima[0] = 3.6;
+      break;
+    case 6:
+      fMinima[0] = 5.0;
+      fMaxima[0] = 7.0;
+      break;
+    case 7:
+      fMinima[0] = 6.0;
+      fMaxima[0] = 8.0;
+      break;
+    default:
+      break;
+  }
 }
 
 void evgen::ProtoDUNETriggeredBeam::Scale2DRes() {
