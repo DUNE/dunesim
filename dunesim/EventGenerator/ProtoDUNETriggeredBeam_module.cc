@@ -116,10 +116,12 @@ namespace evgen{
           BeamEvent(){
             fEventID = -999;
             fTriggerID = -999;
+            fHasInteracted = false;
           }
           BeamEvent(int eventid){
             fEventID = eventid;
             fTriggerID = -999;
+            fHasInteracted = false;
           };
 
           void AddParticle(BeamParticle particle){
@@ -135,6 +137,10 @@ namespace evgen{
 
           // We need information for each point in the beamline
           std::map<std::string,BeamParticle> fTriggeredParticleInfo;
+
+          // Some events can interact before between TRIG2 and NP04front
+          bool fHasInteracted;
+          std::vector<int> fSecondaryTrackIDs;
         };
 
         // Convenience struct to encapsulate all particles that would
@@ -175,13 +181,13 @@ namespace evgen{
         void GenerateTrueEvent(simb::MCTruth &mcTruth, const OverlaidTriggerEvent &overlayEvent, beam::ProtoDUNEBeamEvent & beamEvent);
 
         // Convert our BeamParticle struct into a MCParticle object
-        simb::MCParticle BeamParticleToMCParticle(const BeamParticle &beamParticle, const int outputTrackID, const float triggerParticleTime);
+        simb::MCParticle BeamParticleToMCParticle(const BeamParticle &beamParticle, const int outputTrackID, const float triggerParticleTime, const int primaryStatus, const std::string process);
 
         // Use DDMC to create a primary beam particle
         simb::MCParticle DataDrivenMCParticle(
             const BeamParticle &beamParticle, const int outputTrackID,
             const float triggerParticleTime,
-            beam::ProtoDUNEBeamEvent & beamEvent);
+            beam::ProtoDUNEBeamEvent & beamEvent, const int primaryStatus, const std::string process);
 
         void SetDataDrivenPosMom(TLorentzVector & position,
                                  TLorentzVector & momentum, double sampledHUp,
@@ -446,8 +452,10 @@ evgen::ProtoDUNETriggeredBeam::ProtoDUNETriggeredBeam(fhicl::ParameterSet const 
 
     // Make sure we use ifdh to open the beam input file.
     OpenInputFile(fFileName);
-    OpenInputFile(fSamplingFileName);
-    OpenInputFile(fResolutionFileName);
+    if(fUseDataDriven){
+      OpenInputFile(fSamplingFileName);
+      OpenInputFile(fResolutionFileName);
+    }
 }
 
 
@@ -541,7 +549,7 @@ void evgen::ProtoDUNETriggeredBeam::beginJob(){
       }
       Scale2DRes();
     }
-    if (fSaveOutputTree) {
+    if (fUseDataDriven && fSaveOutputTree) {
       fOutputTree = tfs->make<TTree>("tree", "");
       fOutputTree->Branch("PDG", &fOutputPDG);
       fOutputTree->Branch("Event", &fOutputEvent);
@@ -776,16 +784,14 @@ std::vector<int> evgen::ProtoDUNETriggeredBeam::FindTriggeredEvents(TTree *trig1
     bool isTriggerEvent = false;
     // There is a rare case where the TRIG2 particle can decay before NP04front
     if(event.fParticlesFront.find(event.fTriggerID) == event.fParticlesFront.end()){
+      event.fHasInteracted = true;
       // Find the child particle in the map
       std::cout << "- Candidate event " << trigEventIDs.size() << " trigger particle of type " << trig2Particles.at(element.first).fPDG << " not at the front face... searching for children" << std::endl;
         for(const std::pair<int,BeamParticle> &partPair : event.fParticlesFront){
         if(partPair.second.fParentID == event.fTriggerID){
           std::cout << "  - Found child with PDG = " << partPair.second.fPDG << std::endl;
-          if(std::find(allowedPDGs.begin(),allowedPDGs.end(),partPair.second.fPDG)==allowedPDGs.end()) continue;
-          std::cout << "  - Child PDG code accepted" << std::endl;
-          event.fTriggerID = partPair.first;
+          event.fSecondaryTrackIDs.push_back(partPair.first);
           isTriggerEvent = true;
-          break;
         }
       }
     }
@@ -926,7 +932,6 @@ evgen::ProtoDUNETriggeredBeam::OverlaidTriggerEvent evgen::ProtoDUNETriggeredBea
     newTriggerEvent.AddOverlay(overlayID);
   }
 
-  std::cout << "Generated final overlay event with " << newTriggerEvent.fOverlayEventIDs.size() << " overlays" << std::endl;
   return newTriggerEvent;
 }
 
@@ -939,8 +944,20 @@ void evgen::ProtoDUNETriggeredBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, co
 
   // Get the actual triggered event first and the beam particle
   const BeamEvent trigEvent = fAllBeamEvents.at(overlayEvent.fTriggerEventID);
+
   // We need to be slightly careful here... there are rare events where the pion decays between TRIG2 and NP04front
-  BeamParticle trigParticle = trigEvent.fParticlesFront.at(trigEvent.fTriggerID);
+  BeamParticle trigParticle;
+  int primaryStatus = 1; // 1 means track in G4, 0 means don't track
+  if(!trigEvent.fHasInteracted){
+    trigParticle = trigEvent.fParticlesFront.at(trigEvent.fTriggerID);
+  }
+  else{
+    const std::string trig2Name = fTRIG2TreeName.substr(fTRIG2TreeName.find("/")+1);
+    trigParticle = trigEvent.fTriggeredParticleInfo.at(trig2Name);
+    primaryStatus = 0;
+  }
+
+  std::cout << "- Generating event with trigger particle type " << trigParticle.fPDG << std::endl;
 
   // Time of the triggered particle (will make all times relative to this)
   const float triggerParticleTime = trigParticle.fPosT;
@@ -948,21 +965,30 @@ void evgen::ProtoDUNETriggeredBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, co
   // The track ID for primary particles in LArSoft should be negative. This is -1 for our triggered particle
   int trigOutputTrackID = -1*(mcTruth.NParticles() + 1);
 
+  simb::MCParticle triggerParticle;
   if(!fUseDataDriven){
     // Create the MCParticle for the triggered beam particle - NB the time offset sets T = 0 for this particle
-    simb::MCParticle triggerParticle = BeamParticleToMCParticle(trigParticle, trigOutputTrackID, triggerParticleTime);
-    mcTruth.Add(triggerParticle);
+    triggerParticle = BeamParticleToMCParticle(trigParticle, trigOutputTrackID, triggerParticleTime, primaryStatus, "primary");
 
     // Fill the ProtoDUNEBeamEvent here to store beamline information
     SetBeamEvent(beamEvent,trigEvent);
-    std::cout << "Created trigger MCParticle and Beamline information" << std::endl;
+    std::cout << "  - Created trigger particle using pure simulation" << std::endl;
   }
   else{
-    // Add some data driven code here
-    std::cout << "Using data driven approach for triggered particle with PDG = " << trigParticle.fPDG << std::endl;
-    simb::MCParticle triggerParticle = DataDrivenMCParticle(trigParticle, trigOutputTrackID, triggerParticleTime, beamEvent);
+    triggerParticle = DataDrivenMCParticle(trigParticle, trigOutputTrackID, triggerParticleTime, beamEvent, primaryStatus, "primary");
+    std::cout << "  - Created trigger particler using data driven method" << std::endl;
+  }
+  mcTruth.Add(triggerParticle);
 
-    mcTruth.Add(triggerParticle);
+  // Now we can add any secondaries produced in the interaction before NP04front
+  if(trigEvent.fHasInteracted){
+    for(const int &id : trigEvent.fSecondaryTrackIDs){
+      trigOutputTrackID = -1*(mcTruth.NParticles() + 1);
+      BeamParticle secondary = trigEvent.fParticlesFront.at(id);
+      simb::MCParticle secondaryParticle = BeamParticleToMCParticle(secondary,trigOutputTrackID,triggerParticleTime+secondary.fPosT,1,"primaryInteracted");
+      mcTruth.Add(secondaryParticle);
+      std::cout << "  - Added secondary particle from interacting primary" << std::endl; 
+    }
   }
 
   // Now let's deal with all of the background events
@@ -980,7 +1006,7 @@ void evgen::ProtoDUNETriggeredBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, co
       const int outputTrackID =  -1*(mcTruth.NParticles() + 1);
       // For background particles we need to "back-strapolate" them to BPROFEXT so that they can hit the CRT
       SetBackgroundPosition(particle);
-      simb::MCParticle backgroundParticle = BeamParticleToMCParticle(particle,outputTrackID,baseTime);
+      simb::MCParticle backgroundParticle = BeamParticleToMCParticle(particle,outputTrackID,baseTime,1,"primaryBackground");
       mcTruth.Add(backgroundParticle);
     }  
 
@@ -991,12 +1017,9 @@ void evgen::ProtoDUNETriggeredBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, co
 
 //---------------------------------------------------------------------------------------
 
-simb::MCParticle evgen::ProtoDUNETriggeredBeam::BeamParticleToMCParticle(const BeamParticle &beamParticle, const int outputTrackID, const float timeOffset){
+simb::MCParticle evgen::ProtoDUNETriggeredBeam::BeamParticleToMCParticle(const BeamParticle &beamParticle, const int outputTrackID, const float timeOffset, const int primaryStatus, const std::string process){
 
-  std::string process = "primaryBackground";
-  if(outputTrackID == -1) process = "primary";
-
-  simb::MCParticle newParticle(outputTrackID,beamParticle.fPDG,process);
+  simb::MCParticle newParticle(outputTrackID,beamParticle.fPDG,process, -1, -1.0, primaryStatus);
 
   // Get the position four-vector
   TLorentzVector pos(beamParticle.fPosX,beamParticle.fPosY,beamParticle.fPosZ,beamParticle.fPosT - timeOffset);
@@ -1018,9 +1041,8 @@ simb::MCParticle evgen::ProtoDUNETriggeredBeam::BeamParticleToMCParticle(const B
 
 simb::MCParticle evgen::ProtoDUNETriggeredBeam::DataDrivenMCParticle(
     const BeamParticle &beamParticle, const int outputTrackID,
-    const float timeOffset, beam::ProtoDUNEBeamEvent & beamEvent) {
-  std::string process = "primary";
-  simb::MCParticle newParticle(outputTrackID, beamParticle.fPDG, process);
+    const float timeOffset, beam::ProtoDUNEBeamEvent & beamEvent, const int primaryStatus, const std::string process) {
+  simb::MCParticle newParticle(outputTrackID, beamParticle.fPDG, process, -1, -1.0, primaryStatus);
 
   double kin_samples[5]; //the point in phase space to check against pdf
   double pdf_check; //the number used for the checking
@@ -1051,14 +1073,14 @@ simb::MCParticle evgen::ProtoDUNETriggeredBeam::DataDrivenMCParticle(
     //then it would not have been allocated to save on memory.
     //The false parameter prevents that bin from being allocated here,
     //to save memory
-    long long bin = fPDFs.at(fPDGToName.at(beamParticle.fPDG))->GetBin(&kin_point[0],
+    const long long bin = fPDFs.at(fPDGToName.at(beamParticle.fPDG))->GetBin(&kin_point[0],
                                                                  false);
 
     //The bin has no chance of being populated, move on
     if (bin == -1) continue;
 
     //Find how likely we are to populate this bin
-    double pdf_value = fPDFs.at(fPDGToName.at(beamParticle.fPDG))->GetBinContent(bin);
+    const double pdf_value = fPDFs.at(fPDGToName.at(beamParticle.fPDG))->GetBinContent(bin);
 
     //If successful, save info and move on
     if (pdf_check <= pdf_value) {
@@ -1117,7 +1139,7 @@ void evgen::ProtoDUNETriggeredBeam::ConvertSamplingPoint(
     double input_point[5], std::vector<double> minima,
     std::vector<double> maxima, double output_point[5]) {
   for (int i = 0; i < 5; ++i) {
-    double delta = maxima[i] - minima[i];
+    const double delta = maxima[i] - minima[i];
     output_point[i] = minima[i] + delta * input_point[i];
   }
 }
@@ -1170,7 +1192,7 @@ void evgen::ProtoDUNETriggeredBeam::SetDataDrivenPosMom(
       unsmeared_momentum = UnsmearMomentum1D(sampledMomentum, beamPDG);
       break;
     case 2:*/
-      unsmeared_momentum = UnsmearMomentum2D(sampledMomentum, beamPDG);
+  unsmeared_momentum = UnsmearMomentum2D(sampledMomentum, beamPDG);
       //GetSystWeights();
       /*break;
     default:
@@ -1187,7 +1209,7 @@ void evgen::ProtoDUNETriggeredBeam::SetDataDrivenPosMom(
   //Get the PDG and set the mass & energy accordingly
   const TDatabasePDG * dbPDG = TDatabasePDG::Instance();
   const TParticlePDG * def = dbPDG->GetParticle(beamPDG);
-  double mass = def->Mass();
+  const double mass = def->Mass();
   double energy = sqrt(mass*mass + mom_vec.Mag2());
 
   //Set the momentum 4-vector
@@ -1209,7 +1231,7 @@ double evgen::ProtoDUNETriggeredBeam::UnsmearMomentum2D(double momentum, int pdg
     std::cout << "Using 2D Unsmear method" << std::endl;
   }
 
-  TH2D * res = fResolutionHists2D[fPDGToName[pdg]];
+  TH2D * res = fResolutionHists2D.at(fPDGToName.at(pdg));
 
   int xBin = res->GetXaxis()->FindBin(momentum);
   if (fVerbose) {
