@@ -993,7 +993,7 @@ void evgen::ProtoDUNETriggeredBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, co
   }
   else{
     triggerParticle = DataDrivenMCParticle(trigParticle, trigOutputTrackID, triggerParticleTime, beamEvent, primaryStatus, "primary");
-    std::cout << "  - Created trigger particler using data driven method" << std::endl;
+    std::cout << "  - Created trigger particle using data driven method" << std::endl;
     std::cout << "  - Located at " << triggerParticle.EndX() << " " <<
                  triggerParticle.EndY() << " " << triggerParticle.EndZ() <<
                  std::endl;
@@ -1016,11 +1016,13 @@ void evgen::ProtoDUNETriggeredBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, co
     }
   }
 
-  std::cout << "  - Trigger particle has daughters:";
-  for (int i = 0; i < triggerParticle.NumberDaughters(); ++i) {
-    std::cout << " " << triggerParticle.Daughter(i);
+  if(!secondaries.empty()){
+    std::cout << "  - Trigger particle has daughters:";
+    for (int i = 0; i < triggerParticle.NumberDaughters(); ++i) {
+      std::cout << " " << triggerParticle.Daughter(i);
+    }
+    std::cout << std::endl;
   }
-  std::cout << std::endl;
 
   // Add the trigger particle now that the hierarchy has been established
   mcTruth.Add(triggerParticle);
@@ -1034,7 +1036,7 @@ void evgen::ProtoDUNETriggeredBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, co
                  " " << triggerParticle.Mother() << std::endl; 
     std::cout << "  - Located at " << sec.EndX() << " " << 
                  sec.EndY() << " " <<
-                 sec.EndZ() << std::endl; 
+                 sec.EndZ() << std::endl;
   }
 
   // Now let's deal with all of the background events
