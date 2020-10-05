@@ -33,7 +33,6 @@
 #include <utility>
 #include <vector>
 #include "dune/DuneObj/ProtoDUNEBeamEvent.h"
-#include "lardata/Utilities/AssociationUtil.h"
 // art extensions
 #include "nurandom/RandomUtils/NuRandomService.h"
 #include "art_root_io/TFileService.h"
@@ -201,10 +200,12 @@ namespace evgen{
             beam::ProtoDUNEBeamEvent & beamEvent,
             double sampledHUp, double sampledVUp, double sampledHDown,
             double sampledVDown, double sampledMomentum);
+
         void ConvertSamplingPoint(double input_point[5],
                                   std::vector<double> minima,
                                   std::vector<double> maxima,
                                   double output_point[5]);
+
         // Handle root files from beam instrumentation group
         void OpenInputFile(std::string & filename);
         
@@ -217,7 +218,7 @@ namespace evgen{
         // We need to rotate the beam monitor coordinates into the detector frame
         TLorentzVector ConvertBeamMonitorCoordinates(float x, float y, float z, float t, float offset);
 
-        //New for making tracks
+        // Methods for making beam instrument tracks
         TVector3 ConvertProfCoordinates(double x, double y, double z, double zOffset);
         TVector3 ProjectToTPC(TVector3 firstPoint, TVector3 secondPoint);
         double GetPosition( short fiber );
@@ -331,7 +332,7 @@ namespace evgen{
         void Scale2DRes();
         void SetMinMax();
 
-        std::string GetSecondaryProcess(int primary_pdg, int secondary_pdg);
+        std::string GetSecondaryProcess(const int &primary_pdg, const int &secondary_pdg);
 
         bool fSaveOutputTree;
         TTree * fOutputTree;
@@ -473,8 +474,7 @@ evgen::ProtoDUNETriggeredBeam::ProtoDUNETriggeredBeam(fhicl::ParameterSet const 
 //------------------------------------------------------------------------------------
 evgen::ProtoDUNETriggeredBeam::~ProtoDUNETriggeredBeam()
 {
-    fIFDH->cleanup();
-    
+    fIFDH->cleanup();   
 }
 
 //-------------------------------------------------------------------------------------
@@ -655,7 +655,7 @@ void evgen::ProtoDUNETriggeredBeam::FillParticleMaps(TTree *frontFaceTree){
       frontFaceTree->GetEntry(p);
 
       // Don't consider nuclei here
-      int intPdgCode = static_cast<int>(pdgCode);
+      const int intPdgCode = static_cast<int>(pdgCode);
       if(intPdgCode > 10000) continue;
 
       // If this particle is travelling backwards then it won't hit the detector
@@ -671,13 +671,11 @@ void evgen::ProtoDUNETriggeredBeam::FillParticleMaps(TTree *frontFaceTree){
       }
 
       // Convert momentum
-//      std::cout << "Before convert = " << momZ;
       ConvertMomentum(momX,momY,momZ);
-//      std::cout << " and after = " << momZ << std::endl;
 
-      int intEventID = static_cast<int>(eventID);
-      int intTrackID = static_cast<int>(trackID);
-      int intParentID= static_cast<int>(parentID);
+      const int intEventID = static_cast<int>(eventID);
+      const int intTrackID = static_cast<int>(trackID);
+      const int intParentID= static_cast<int>(parentID);
       BeamParticle newParticle(intTrackID, intPdgCode, intParentID,
                                posX, posY, posZ, posT, momX, momY, momZ);
 
@@ -704,7 +702,7 @@ void evgen::ProtoDUNETriggeredBeam::FillParticleMaps(TTree *frontFaceTree){
 // Search for events that have particles in TRIG1 and TRIG2 planes
 std::vector<int> evgen::ProtoDUNETriggeredBeam::FindTriggeredEvents(TTree *trig1Tree, TTree *trig2Tree){
 
-  std::vector<int> allowedPDGs = {11,-11,13,-13,211,-211,321,-321,2212};
+  const std::vector<int> allowedPDGs = {11,-11,13,-13,211,-211,321,-321,2212};
   
   float eventID, trackID, pdgCode, parentID;
   float posX, posY, posZ, posT;
@@ -739,6 +737,7 @@ std::vector<int> evgen::ProtoDUNETriggeredBeam::FindTriggeredEvents(TTree *trig1
     // Carry on if we already found a particle for this event
     if(trig2Particles.find(intEventID) != trig2Particles.end()) continue;
 
+    // If the particle isn't of the type we want then move on
     if(std::find(allowedPDGs.begin(),allowedPDGs.end(),static_cast<int>(pdgCode))==allowedPDGs.end()) continue;
      
 
@@ -1023,7 +1022,9 @@ void evgen::ProtoDUNETriggeredBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, co
   }
   std::cout << std::endl;
 
+  // Add the trigger particle now that the hierarchy has been established
   mcTruth.Add(triggerParticle);
+  // Now add all of the secondaries (if any)
   for (const simb::MCParticle & sec : secondaries) {
     mcTruth.Add(sec);
     std::cout << "  - Added secondary " << sec.TrackId() <<
@@ -1067,7 +1068,7 @@ simb::MCParticle evgen::ProtoDUNETriggeredBeam::BeamParticleToMCParticle(const B
   simb::MCParticle newParticle(outputTrackID,beamParticle.fPDG,process, motherID, -1.0, primaryStatus);
 
   // Get the position four-vector
-  TLorentzVector pos(beamParticle.fPosX,beamParticle.fPosY,beamParticle.fPosZ,beamParticle.fPosT - timeOffset);
+  const TLorentzVector pos(beamParticle.fPosX,beamParticle.fPosY,beamParticle.fPosZ,beamParticle.fPosT - timeOffset);
 
   // Get the mass to calculate the momentum four-vector
   const TDatabasePDG* databasePDG = TDatabasePDG::Instance();
@@ -1075,7 +1076,7 @@ simb::MCParticle evgen::ProtoDUNETriggeredBeam::BeamParticleToMCParticle(const B
   const float mass = definition->Mass();
   const float energy = sqrt(mass*mass + TVector3(beamParticle.fMomX,beamParticle.fMomY,beamParticle.fMomZ).Mag2());
 
-  TLorentzVector mom(beamParticle.fMomX,beamParticle.fMomY,beamParticle.fMomZ,energy);
+  const TLorentzVector mom(beamParticle.fMomX,beamParticle.fMomY,beamParticle.fMomZ,energy);
 
   // Add the single trajectory point to the MCParticle
   newParticle.AddTrajectoryPoint(pos,mom);
@@ -1196,10 +1197,10 @@ void evgen::ProtoDUNETriggeredBeam::SetDataDrivenPosMom(
     double sampledVUp, double sampledHDown, double sampledVDown,
     double sampledMomentum, int beamPDG) {
 
-  double upstreamX = 96. - sampledHUp; 
-  double upstreamY = 96. - sampledVUp;
-  double downstreamX = 96. - sampledHDown;
-  double downstreamY = 96. - sampledVDown;
+  const double upstreamX = 96. - sampledHUp; 
+  const double upstreamY = 96. - sampledVUp;
+  const double downstreamX = 96. - sampledHDown;
+  const double downstreamY = 96. - sampledVDown;
 
 
 //rename these
@@ -1250,14 +1251,14 @@ void evgen::ProtoDUNETriggeredBeam::SetDataDrivenPosMom(
 
   //TVector3 mom_vec = fRandMomentum[fCurrentEvent]*dR;
   //TVector3 mom_vec = unsmeared_momentum*dR;
-  TVector3 mom_vec = unsmeared_momentum*dR;
+  const TVector3 mom_vec = unsmeared_momentum*dR;
   fOutputUnsmearedMomentum = unsmeared_momentum;
 
   //Get the PDG and set the mass & energy accordingly
   const TDatabasePDG * dbPDG = TDatabasePDG::Instance();
   const TParticlePDG * def = dbPDG->GetParticle(beamPDG);
   const double mass = def->Mass();
-  double energy = sqrt(mass*mass + mom_vec.Mag2());
+  const double energy = sqrt(mass*mass + mom_vec.Mag2());
 
   //Set the momentum 4-vector
   momentum = TLorentzVector(mom_vec, energy);
@@ -1280,7 +1281,7 @@ double evgen::ProtoDUNETriggeredBeam::UnsmearMomentum2D(double momentum, int pdg
 
   TH2D * res = fResolutionHists2D.at(fPDGToName.at(pdg));
 
-  int xBin = res->GetXaxis()->FindBin(momentum);
+  const int xBin = res->GetXaxis()->FindBin(momentum);
   if (fVerbose) {
     std::cout << "Momentum & bin: " << momentum << " " <<
                  xBin << std::endl;
@@ -1306,11 +1307,11 @@ double evgen::ProtoDUNETriggeredBeam::UnsmearMomentum2D(double momentum, int pdg
   
   double unsmeared_momentum = 0.;
   while (true) {
-    double t = fRNG.Uniform(true_min, true_max);
-    double pdf_check = fRNG.Rndm(); //random number to check against PDF 
+    const double t = fRNG.Uniform(true_min, true_max);
+    const double pdf_check = fRNG.Rndm(); //random number to check against PDF 
     
-    int yBin = res->GetYaxis()->FindBin(t);
-    double pdf_value = res->GetBinContent(xBin, yBin);
+    const int yBin = res->GetYaxis()->FindBin(t);
+    const double pdf_value = res->GetBinContent(xBin, yBin);
     if (fVerbose) {
       std::cout << "True mom & bin: " << t << " " << yBin << std::endl;
       std::cout << "Check & val: " << pdf_check << " " << pdf_value <<
@@ -1327,7 +1328,7 @@ double evgen::ProtoDUNETriggeredBeam::UnsmearMomentum2D(double momentum, int pdg
 }
 
 std::string evgen::ProtoDUNETriggeredBeam::GetSecondaryProcess(
-    int primary_pdg, int secondary_pdg) {
+    const int &primary_pdg, const int &secondary_pdg) {
   if (primary_pdg == 2212) {
     return "protonInelastic";
   }
@@ -1378,7 +1379,7 @@ void evgen::ProtoDUNETriggeredBeam::Scale2DRes() {
        it != fResolutionHists2D.end(); ++it) {
     TH2D * this_hist = it->second;
     for (int i = 1; i <= this_hist->GetNbinsX(); ++i) {
-      double integral = this_hist->Integral(i, i);
+      const double integral = this_hist->Integral(i, i);
       double total = 0.;
       for (int j = 1; j <= this_hist->GetNbinsY(); ++j) {
         this_hist->SetBinContent(i, j,
@@ -1428,7 +1429,7 @@ void evgen::ProtoDUNETriggeredBeam::Setup1GeV() {
     "Muons", "Pions", "Protons", "Electrons"
   };
   for (size_t i = 0; i < particle_types.size(); ++i) {
-    std::string part_type = particle_types[i];
+    const std::string part_type = particle_types[i];
     if (part_type == "Muons") {
       fPDFs[part_type] = (THnSparseD*)fSamplingFile->Get("Pions"); 
     }
@@ -1467,7 +1468,7 @@ void evgen::ProtoDUNETriggeredBeam::Setup3GeV() {
   };
 
   for (size_t i = 0; i < particle_types.size(); ++i) {
-    std::string part_type = particle_types[i];
+    const std::string part_type = particle_types[i];
     if (part_type == "Muons") {
       fPDFs[part_type] = (THnSparseD*)fSamplingFile->Get("Pions"); 
     }
@@ -1512,7 +1513,7 @@ void evgen::ProtoDUNETriggeredBeam::Setup6GeV() {
   };
 
   for (size_t i = 0; i < particle_types.size(); ++i) {
-    std::string part_type = particle_types[i];
+    const std::string part_type = particle_types[i];
     if (part_type == "Muons" || part_type == "Electrons") {
       fPDFs[part_type] = (THnSparseD*)fSamplingFile->Get("Pions"); 
     }
@@ -1575,10 +1576,10 @@ void evgen::ProtoDUNETriggeredBeam::SetDataDrivenBeamEvent(
   beamEvent.SetFBMTrigger("XBPF022701", MakeFiberMonitor(.5));
   beamEvent.SetFBMTrigger("XBPF022702", MakeFiberMonitor(.5));
 
-  double upstream_x = sampledHUp;
-  double upstream_y = sampledVUp;
-  double downstream_x = sampledHDown;
-  double downstream_y = sampledVDown;
+  const double upstream_x = sampledHUp;
+  const double upstream_y = sampledVUp;
+  const double downstream_x = sampledHDown;
+  const double downstream_y = sampledVDown;
 
   beamEvent.SetFBMTrigger("XBPF022707", MakeFiberMonitor(96. - upstream_x));//X
   beamEvent.SetFBMTrigger("XBPF022708", MakeFiberMonitor(96. - upstream_y));//Y
@@ -1607,10 +1608,10 @@ void evgen::ProtoDUNETriggeredBeam::OpenInputFile(std::string & filename)
         fIFDH->set_debug(ifdh_debug_env);
     }
     
-    std::string path(gSystem->DirName(filename.c_str()));
-    std::string pattern(gSystem->BaseName(filename.c_str()));
+    const std::string path(gSystem->DirName(filename.c_str()));
+    const std::string pattern(gSystem->BaseName(filename.c_str()));
     
-    auto flist = fIFDH->findMatchingFiles(path,pattern);
+    auto const flist = fIFDH->findMatchingFiles(path,pattern);
     if (flist.empty())
     {
         struct stat buffer;
@@ -1686,9 +1687,9 @@ void evgen::ProtoDUNETriggeredBeam::CalculateNOverlays(){
 // This means they can later be treated in the same way as the standard NP04front positions
 TLorentzVector evgen::ProtoDUNETriggeredBeam::ConvertBeamMonitorCoordinates(float x, float y, float z, float t, float zOffset){
 
-  float off = fNP04frontPos - zOffset;
+  const float off = fNP04frontPos - zOffset;
 
-  TLorentzVector old(x,y,z,t);
+//  TLorentzVector old(x,y,z,t);
 
   // Convert the coordinates using the rotated basis vectors
   float newX = x*fBMBasisX.X() + y*fBMBasisY.X() + (z-zOffset)*fBMBasisZ.X() + off*fabs(fBMBasisZ.X());
@@ -1713,9 +1714,9 @@ TLorentzVector evgen::ProtoDUNETriggeredBeam::ConvertBeamMonitorCoordinates(floa
 //----------------------------------------------------------------------------------
 
 TVector3 evgen::ProtoDUNETriggeredBeam::ConvertProfCoordinates(double x, double y, double z, double zOffset){
-  double off = fNP04frontPos - zOffset;
+  const double off = fNP04frontPos - zOffset;
 
-  TVector3 old(x,y,z);
+//  TVector3 old(x,y,z);
 
   double newX = x*fBMBasisX.X() + y*fBMBasisY.X() + /*(z-zOffset)*fBMBasisZ.X()*/ + off*fabs(fBMBasisZ.X());
   double newY = x*fBMBasisX.Y() + y*fBMBasisY.Y() + /*(z-zOffset)*fBMBasisZ.Y()*/ + off*fabs(fBMBasisZ.Y());
@@ -1954,7 +1955,7 @@ beam::FBM evgen::ProtoDUNETriggeredBeam::MakeFiberMonitor( float pos ){
   std::uninitialized_fill( std::begin(theFBM.timeData), std::end(theFBM.timeData), 0. );
   theFBM.timeStamp = 0.;
 
-  short f = 96 -  short( floor(pos) ) - 1;
+  const short f = 96 -  short( floor(pos) ) - 1;
   theFBM.fibers[f] = 1;
   theFBM.active.push_back(f);
   theFBM.decoded = true;
@@ -1978,19 +1979,19 @@ void evgen::ProtoDUNETriggeredBeam::MakeTracks( beam::ProtoDUNEBeamEvent & beamE
   //to have multiple particles going through at the
   //same time. In which case -- try to implement it
   
-  short fx1 = beamEvent.GetFBM( "XBPF022707" ).active[0];
-  short fy1 = beamEvent.GetFBM( "XBPF022708" ).active[0];
+  const short fx1 = beamEvent.GetFBM( "XBPF022707" ).active[0];
+  const short fy1 = beamEvent.GetFBM( "XBPF022708" ).active[0];
 
-  double x1 = GetPosition( fx1 );
-  double y1 = GetPosition( fy1 );
+  const double x1 = GetPosition( fx1 );
+  const double y1 = GetPosition( fy1 );
 
   TVector3 pos1 = ConvertProfCoordinates( x1, y1, 0., fBPROFEXTPos );
 
-  short fx2 = beamEvent.GetFBM( "XBPF022716" ).active[0];
-  short fy2 = beamEvent.GetFBM( "XBPF022717" ).active[0];
+  const short fx2 = beamEvent.GetFBM( "XBPF022716" ).active[0];
+  const short fy2 = beamEvent.GetFBM( "XBPF022717" ).active[0];
 
-  double x2 = GetPosition( fx2 );
-  double y2 = GetPosition( fy2 );
+  const double x2 = GetPosition( fx2 );
+  const double y2 = GetPosition( fy2 );
 
   TVector3 pos2 = ConvertProfCoordinates( x2, y2, 0., fBPROF4Pos );
  
@@ -2016,11 +2017,11 @@ void evgen::ProtoDUNETriggeredBeam::MakeTracks( beam::ProtoDUNEBeamEvent & beamE
 //----------------------------------------------------------------------------------
 
 TVector3 evgen::ProtoDUNETriggeredBeam::ProjectToTPC(TVector3 firstPoint, TVector3 secondPoint){
-  TVector3 dR = (secondPoint - firstPoint);
+  const TVector3 dR = (secondPoint - firstPoint);
   
-  double deltaZ = -1.*secondPoint.Z();
-  double deltaX = deltaZ * (dR.X() / dR.Z());
-  double deltaY = deltaZ * (dR.Y() / dR.Z());
+  const double deltaZ = -1.*secondPoint.Z();
+  const double deltaX = deltaZ * (dR.X() / dR.Z());
+  const double deltaY = deltaZ * (dR.Y() / dR.Z());
 
   TVector3 lastPoint = secondPoint + TVector3(deltaX, deltaY, deltaZ);
   return lastPoint;
@@ -2030,16 +2031,16 @@ TVector3 evgen::ProtoDUNETriggeredBeam::ProjectToTPC(TVector3 firstPoint, TVecto
 
 void evgen::ProtoDUNETriggeredBeam::MomentumSpectrometer( beam::ProtoDUNEBeamEvent & beamEvent ){
 
-  short f1 = beamEvent.GetFBM( "XBPF022697" ).active[0];
-  short f2 = beamEvent.GetFBM( "XBPF022701" ).active[0];
-  short f3 = beamEvent.GetFBM( "XBPF022702" ).active[0];
+  const short f1 = beamEvent.GetFBM( "XBPF022697" ).active[0];
+  const short f2 = beamEvent.GetFBM( "XBPF022701" ).active[0];
+  const short f3 = beamEvent.GetFBM( "XBPF022702" ).active[0];
 
-  double x1 = -1.e-3 * GetPosition( f1 );
-  double x2 = -1.e-3 * GetPosition( f2 );
-  double x3 = -1.e-3 * GetPosition( f3 );
+  const double x1 = -1.e-3 * GetPosition( f1 );
+  const double x2 = -1.e-3 * GetPosition( f2 );
+  const double x3 = -1.e-3 * GetPosition( f3 );
 
-  double cos_theta = MomentumCosTheta( x1, x2, x3 );
-  double momentum = 299792458*fLB/(1.E9 * acos(cos_theta));
+  const double cos_theta = MomentumCosTheta( x1, x2, x3 );
+  const double momentum = 299792458*fLB/(1.E9 * acos(cos_theta));
   beamEvent.AddRecoBeamMomentum( momentum );
 
 }
@@ -2047,18 +2048,16 @@ void evgen::ProtoDUNETriggeredBeam::MomentumSpectrometer( beam::ProtoDUNEBeamEve
 //----------------------------------------------------------------------------------
 
 double evgen::ProtoDUNETriggeredBeam::MomentumCosTheta(double x1, double x2, double x3){
-  double a =  (x2*fL3 - x3*fL2)*cos(fBeamBend)/(fL3-fL2);
-
+  const double a =  (x2*fL3 - x3*fL2)*cos(fBeamBend)/(fL3-fL2);
  
-  double numTerm = (a - x1)*( (fL3 - fL2)*tan(fBeamBend) + (x3 - x2)*cos(fBeamBend) ) + fL1*( fL3 - fL2 );
+  const double numTerm = (a - x1)*( (fL3 - fL2)*tan(fBeamBend) + (x3 - x2)*cos(fBeamBend) ) + fL1*( fL3 - fL2 );
 
-  double denomTerm1, denomTerm2, denom;
-  denomTerm1 = sqrt( fL1*fL1 + (a - x1)*(a - x1) );
-  denomTerm2 = sqrt( TMath::Power( ( (fL3 - fL2)*tan(fBeamBend) + (x3 - x2)*cos(fBeamBend) ),2)
+  const double denomTerm1 = sqrt( fL1*fL1 + (a - x1)*(a - x1) );
+  const double denomTerm2 = sqrt( TMath::Power( ( (fL3 - fL2)*tan(fBeamBend) + (x3 - x2)*cos(fBeamBend) ),2)
                    + TMath::Power( ( (fL3 - fL2) ),2) );
-  denom = denomTerm1 * denomTerm2;
+  const double denom = denomTerm1 * denomTerm2;
 
-  double cosTheta = numTerm/denom;  
+  const double cosTheta = numTerm/denom;  
   return cosTheta;
 }
 
