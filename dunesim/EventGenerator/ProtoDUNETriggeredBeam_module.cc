@@ -332,6 +332,7 @@ namespace evgen{
         void Scale2DRes();
         void SetMinMax();
 
+        std::string GetPrimaryEndProcess(const int &primary_pdg, const std::vector<int> & secondary_pdgs);
         std::string GetSecondaryProcess(const int &primary_pdg, const int &secondary_pdg);
 
         bool fSaveOutputTree;
@@ -1002,6 +1003,7 @@ void evgen::ProtoDUNETriggeredBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, co
   //mcTruth.Add(triggerParticle);
 
   std::vector<simb::MCParticle> secondaries;
+  std::vector<int> secondary_pdgs;
   // Now we can add any secondaries produced in the interaction before NP04front
   if(trigEvent.fHasInteracted){
     for(const int &id : trigEvent.fSecondaryTrackIDs){
@@ -1012,6 +1014,7 @@ void evgen::ProtoDUNETriggeredBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, co
           GetSecondaryProcess(trigParticle.fPDG, secondary.fPDG), triggerParticle.TrackId());
       secondaries.push_back(secondaryParticle);
       triggerParticle.AddDaughter(trigOutputTrackID);
+      secondary_pdgs.push_back(secondary.fPDG);
       //mcTruth.Add(secondaryParticle);
     }
   }
@@ -1025,6 +1028,10 @@ void evgen::ProtoDUNETriggeredBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, co
   }
 
   // Add the trigger particle now that the hierarchy has been established
+  if (trigEvent.fHasInteracted) {
+    triggerParticle.SetEndProcess(
+        GetPrimaryEndProcess(trigParticle.fPDG, secondary_pdgs));
+  }
   mcTruth.Add(triggerParticle);
   // Now add all of the secondaries (if any)
   for (const simb::MCParticle & sec : secondaries) {
@@ -1329,28 +1336,71 @@ double evgen::ProtoDUNETriggeredBeam::UnsmearMomentum2D(double momentum, int pdg
   return unsmeared_momentum;
 }
 
-std::string evgen::ProtoDUNETriggeredBeam::GetSecondaryProcess(
-    const int &primary_pdg, const int &secondary_pdg) {
+std::string evgen::ProtoDUNETriggeredBeam::GetPrimaryEndProcess(
+    const int &primary_pdg, const std::vector<int> &secondary_pdgs) {
+  
   if (primary_pdg == 2212) {
     return "protonInelastic";
   }
   else if (primary_pdg == 211) {
-    if (secondary_pdg == -13) {
+    if (std::find(secondary_pdgs.begin(), secondary_pdgs.end(), -13) !=
+        secondary_pdgs.end()) {
       return "Decay";
     }
-    else if (secondary_pdg == 211 || secondary_pdg == -211 ||
-            secondary_pdg == 2212 || secondary_pdg == 2112 ||
-            secondary_pdg > 2212 || secondary_pdg == 22) {
+    else {
       return "pi+Inelastic";
+    }
+  }
+  else if (primary_pdg == -211) {
+    if (std::find(secondary_pdgs.begin(), secondary_pdgs.end(), 13) !=
+        secondary_pdgs.end()) {
+      return "Decay";
+    }
+    else {
+      return "pi-Inelastic";
     }
   }
   else if (primary_pdg == 321) {
     return "Decay";
   }
 
+  return "default";
+}
+
+std::string evgen::ProtoDUNETriggeredBeam::GetSecondaryProcess(
+    const int &primary_pdg, const int &secondary_pdg) {
+  
+  std::string preamble = "primary:";
+  if (primary_pdg == 2212) {
+    return preamble + "protonInelastic";
+  }
+  else if (primary_pdg == 211) {
+    if (secondary_pdg == -13) {
+      return preamble + "Decay";
+    }
+    else if (secondary_pdg == 211 || secondary_pdg == -211 ||
+            secondary_pdg == 2212 || secondary_pdg == 2112 ||
+            secondary_pdg > 2212 || secondary_pdg == 22) {
+      return preamble + "pi+Inelastic";
+    }
+  }
+  else if (primary_pdg == -211) {
+    if (secondary_pdg == 13) {
+      return preamble + "Decay";
+    }
+    else if (secondary_pdg == 211 || secondary_pdg == -211 ||
+            secondary_pdg == 2212 || secondary_pdg == 2112 ||
+            secondary_pdg > 2212 || secondary_pdg == 22) {
+      return preamble + "pi-Inelastic";
+    }
+  }
+  else if (primary_pdg == 321) {
+    return preamble + "Decay";
+  }
+
   std::cout << "Notice! Unknown secondary option " << primary_pdg << " " <<
                secondary_pdg << std::endl;
-  return "default";
+  return preamble + "default";
 }
 
 void evgen::ProtoDUNETriggeredBeam::SetMinMax() {
