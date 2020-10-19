@@ -1,0 +1,215 @@
+#include "services_dune.fcl"
+
+BEGIN_PROLOG
+# parameters for a radiological generation generator.  Currently, it generates radiologicals within rectangular prisms
+# with sides parallel to the x, y, and z axes, and within a specified time window.  The parameters Nuclide through
+# T1 are arrays, so that many volumes can be specified to be radioactive with different nuclides.
+
+# remove excluded volume inside APA because we will have 39Ar there too!
+# -JReichenbacher (01/11/2017)
+#  v2.01/JS: use only generator and not also arGen
+#  v2.1-02142017/JR: moved photon paddles by (0.5+0.476+0.001) cm in x
+#  v2.2-02222017/JR: cut out LAr volume inside APA around PDs (-0.477,...,0.477) cm in x
+#  v2.3-03212017/JR: include neutrons emitted from concrete of membrane cryostat structure (temporarily placed at aluminum field cage positions in sim.)
+#  v2.4-05122017/JS: Removed the LAr cut out. Added in the 210po generation near the PDs. Disabled FC (Until Neutrons can be pushed to LArData.)
+#  v2.5-05252017/JS: Added in 85Kr as a background in LAr using the WARP collaboration rates. https://arxiv.org/pdf/astro-ph/0603131.pdf
+#  v2.6-05302017/JS: Added neutronGen back in, using the Concrete_DUNE1 spectrum (by JR). New spectrum will be in dune_pardata.
+#  v2.7-06062017/JS: Added material specific generation for LAr contaminants.
+#  v2.8-06092017/JS: Reconfigured this to be an include for a typical job. This file will now host generators for the various radiologicals, but will not run a simulation itself.
+
+#The Generator names provided that should be called from other files are:
+#dune10kt_1x2x6_39ar     #Ar39 in LAr
+#dune10kt_1x2x6_APA      #Co60 in APA frame
+#dune10kt_1x2x6_neutron  #Originally use for K40 in Field Cage. Now repurposed for Neutrons from concrete.
+#dune10kt_1x2x6_CPA      #K40 from CPA
+#dune10kt_1x2x6_85kr     #Kr in LAr
+#dune10kt_1x2x6_222rn    #Rn in LAr
+#dune10kt_1x2x6_210po    #po for 1 cm in front of PDs (approximates effect of Rn daughters on PDs
+#
+
+dune10kt_1x2x6_weird_beta_example_in_LAr:
+{
+   # module_type: "Decay0Gen"
+   module_type: "SpectrumVolumeGen"
+   isotope:     "11"
+   material:    "LAr"
+   spectrum_p_min: 0
+   spectrum_p_max: 0.01
+   spectrum: [0,0,1,1,1,1,4,4,1,1,0,0]
+   ## OR
+   # spectrum_p_min: 0
+   # spectrum_p_max: 0.01
+   # nbins:100
+   # function: "[0]*x+[1]*x*x+[2]"
+   # parameters: [100,0,0]
+   ## OR
+   # spectrum: [0,1,4,4,1.5]
+   # bins: [0.,0.02,0.04,0.08,0.15,0.3]
+   ## OR
+   # bins: [0.,0.02,0.04,0.08,0.15,0.3]
+   # function: "[0]*x+[1]*x*x+[2]"
+   # parameters: [100,0,0]
+   BqPercc: 0.00141 # activity -- Becquerels per cc. 0.00141 assumes 1.01 Bq/kg (typical for 39Ar) and a density of 1.396 g/cc for LAr
+   volume_rand: "volCryostat"
+}
+
+dune10kt_1x2x6_85Kr_in_LAr:{
+   module_type: "Decay0Gen"
+   isotope: "Kr85"
+   volume_rand: "volCryostat"
+   material:    "LAr"
+   BqPercc: 0.00016 #Rate tied to LAr using rates established by the WARP collaboration. https://arxiv.org/pdf/astro-ph/0603131.pdf
+}
+
+dune10kt_1x2x6_39Ar_in_LAr:{
+   module_type: "Decay0Gen"
+   isotope: "Ar39"
+   volume_rand: "volCryostat"
+   material:    "LAr"
+   BqPercc:     0.00141    # activity -- Becquerels per cc. 0.00141 assumes 1.01 Bq/kg (typical for 39Ar) and a density of 1.396 g/cc for LAr
+}
+
+
+dune10kt_1x2x6_42Ar_in_LAr:{
+   module_type: "Decay0Gen"
+   decay_chain:{
+      isotope_0: "Ar42"
+      isotope_1: "K42"
+   }
+   volume_rand: "volCryostat"
+   material:    "LAr"
+   BqPercc: 0.0000001283768
+}
+
+dune10kt_1x2x6_60Co_in_APA:{
+   module_type: "Decay0Gen"
+   material: "STEEL_STAINLESS_Fe7Cr2Ni"
+   volume_rand: "volCryostat"
+   volume_gen:".*APA.*"
+   isotope: "Co60"
+   BqPercc: 0.000082 # activity -- Becquerels per cc. 0.000082 assumes 45.5 mBq/kg (MPIK 2008 high measuremen)
+}
+
+dune10kt_1x2x6_40K_in_CPA:{
+   module_type: "Decay0Gen"
+   isotope: "K40"
+   volume_rand: "volCryostat"
+   volume_gen:".*Cathode.*"
+   material: "STEEL_STAINLESS_Fe7Cr2Ni"
+   BqPercc: 0.0027195 # activity -- Becquerels per cc. 0.0027195 assumes 4.9 Bq/kg (measured for 40K) and a density of 1.85 g/cc for 3 mm thick G10 -JReichenbacher (01/11/2017)
+}
+
+dune10kt_1x2x6_238U_fullchain_in_LAr:{
+   module_type:"Decay0Gen"
+   BqPercc: 0.000001395
+   material:   "LAr"
+   volume_rand: "volCryostat"
+   volume_gen: ".*"
+   decay_chain:{ # ALL THESE ARE ASSUMED TO BE @ EQUILIBRIUM!!
+      isotope_0:"U238"
+      isotope_1:"Th234"
+      isotope_2:"Pa234m"
+      isotope_3:"U234"
+      isotope_4:"Th230"
+      isotope_5:"Ra226"
+      isotope_6:"Rn222"
+      isotope_7:"Po218"
+      isotope_8:"Pb214"
+      isotope_9:"Bi214"
+      isotope_10:"Pb210"
+      isotope_11:"Bi210"
+      isotope_12:"Po210"
+   }
+}
+
+dune10kt_1x2x6_neutron_from_rock: #Center region is added to simulate neutrons comming in from the rock at the outermost APAs (on the edge of the cryostat) per J. Reichenbacher's request. This should more accurately represent the worst case scenario in the FD.
+{
+   module_type:           "RadioGen"
+   Nuclide:               ["Concrete_DUNE10MeV", "Concrete_DUNE10MeV", "Concrete_DUNE10MeV", "Concrete_DUNE10MeV", "Concrete_DUNE10MeV" ]
+   Material:              [".*",".*",".*",".*", ".*"]
+   BqPercc:               [ 0.0000076, 0.0000076, 0.0000076, 0.0000076, 0.0000076 ] # activity -- Becquerels per cc. 0.0000076 assumes 10 neutrons/y/g per 10 ppm U-238 in concrete and a density of 2.40 g/cc for 10 cm mean depth in concrete -JReichenbacher (03/21/2017)
+   T0:                    [ -2246000.,-2246000.,-2246000.,-2246000.,-2246000 ] # ending time in ns
+   T1:                    [  2246000., 2246000., 2246000., 2246000., 2246000 ] # ending time in ns
+   
+   X0:                    [    0. ,    0. ,    0.,    0.,   -0.5 ] # in cm in world coordinates, bottom corner of box
+   X1:                    [  350. ,  350. ,  350.,  350.,    0.5 ] # in cm in world coordinates, top corner of box
+   Y0:                    [ -600. , -600. , -601.,  600., -600.  ] # in cm in world coordinates, bottom corner of box
+   Y1:                    [  600. ,  600. , -600.,  601.,  600.  ] # in cm in world coordinates, top corner of box
+   Z0:                    [   -0.5, 1394.5,    0.,    0.,    0.  ] # in cm in world coordinates, bottom corner of box
+   Z1:                    [    0.5, 1395.5, 1395., 1395., 1395.  ] # in cm in world coordinates, top corner of box
+}
+
+# dune10kt_1x2x6_PDs:{
+   #    module_type:           "Decay0Gen"
+   #    Nuclide:               [ "222Rn" ]    # list of nuclides to simulate, supported so far: 39Ar, 60Co, 85Kr, 40K, 232Th, 238U, 222Rn
+   #    Material:              [".*"]
+   #    BqPercc:               [ 0.000005 ]   # activity -- Becquerels per cc. 0.000005 assumes 2x 12.5% PD coverage in APA frame and a surface alpha activity requirement of 0.2 Bq/m^2 -JReichenbacher (02/14/2017)
+   #    X0:                    [  0.477]     # in cm in world coordinates, bottom corner of box (moved it by 0.476 cm)
+   #    X1:                    [  1.477]     # in cm in world coordinates, top corner of box (moved it by 0.476 cm)
+   #    Y0:                    [ -600. ]     # in cm in world coordinates, bottom corner of box
+   #    Y1:                    [  600. ]     # in cm in world coordinates, top corner of box
+   #    Z0:                    [  0    ]     # in cm in world coordinates, bottom corner of box
+   #    Z1:                    [  1395 ]     # in cm in world coordinates, top corner of box
+   #    T0:                    [ -2246000 ]
+   #    T1:                    [  2246000. ] # ending time in ns
+   # }
+
+# dune10kt_1x2x6_CPA:{
+   #    module_type:           "Decay0Gen"
+   #    Nuclide:               [ "40K" ]    # list of nuclides to simulate, supported so far: 39Ar, 60Co, 85Kr, 40K, 232Th, 238U, 222Rn
+   #    Material:              [".*"]
+   #    BqPercc:               [ 0.0027195 ]   # activity -- Becquerels per cc. 0.0027195 assumes 4.9 Bq/kg (measured for 40K) and a density of 1.85 g/cc for 3 mm thick G10 -JReichenbacher (01/11/2017)
+   #    X0:                    [  349.5  ]     # in cm in world coordinates, bottom corner of box
+   #    X1:                    [  350.5  ]     # in cm in world coordinates, top corner of box
+   #    Y0:                    [ -600. ]     # in cm in world coordinates, bottom corner of box
+   #    Y1:                    [  600. ]     # in cm in world coordinates, top corner of box
+   #    Z0:                    [  0    ]     # in cm in world coordinates, bottom corner of box
+   #    Z1:                    [  1395 ]     # in cm in world coordinates, top corner of box
+   #    T0:                    [ -2246000 ]
+   #    T1:                    [  2246000. ] # ending time in ns
+   # }
+
+# dune10kt_1x2x6_42ar:     @local::dune10kt_1x2x6_39ar
+# dune10kt_1x2x6_42ar.Nuclide: [ "42Ar" ]
+# dune10kt_1x2x6_42ar.BqPercc: [] #Rate from paper by Barabash in conference proceding http://iopscience.iop.org/article/10.1088/1742-6596/718/6/062004/pdf
+
+# dune10kt_1x2x6_85kr:     @local::dune10kt_1x2x6_39ar
+# dune10kt_1x2x6_85kr.Nuclide: [ "85Kr" ]
+# dune10kt_1x2x6_85kr.BqPercc: [ 0.00016 ] #Rate tied to LAr using rates established by the WARP collaboration. https://arxiv.org/pdf/astro-ph/0603131.pdf
+
+# dune10kt_1x2x6_222rn: @local::dune10kt_1x2x6_39ar
+# dune10kt_1x2x6_222rn.Nuclide: [ "222Rn" ]
+# dune10kt_1x2x6_222rn.BqPercc: [ 0.000005584  ] # DUNE FD requirement of 1 mBq/kg (-JS) times 4 (to emulate the 4 subsequent alpha decays in secular equilibrium)  -JReichenbacher (01/11/2017)
+
+
+# dune10kt_1x2x6_210po:  @local::dune10kt_1x2x6_PDs
+
+protodunesp_39ar:
+{
+   module_type:           "Decay0Gen"
+   Nuclide:               [ "39Ar" ]    # list of nuclides to simulate, supported so far: 39Ar, 60Co, 85Kr, 40K, 232Th, 238U, 222Rn
+   Material:              ["LAr"]
+   BqPercc:               [ 0.00141 ]   # activity -- Becquerels per cc. 0.00141 assumes 1.01 Bq/kg (typical for 39Ar) and a density of 1.396 g/cc for LAr
+   X0:                    [ -360. ]     # in cm in world coordinates, bottom corner of box
+   X1:                    [  360. ]     # in cm in world coordinates, top corner of box
+   Y0:                    [  0. ]     # in cm in world coordinates, bottom corner of box
+   Y1:                    [  600. ]     # in cm in world coordinates, top corner of box
+   Z0:                    [  0. ]     # in cm in world coordinates, bottom corner of box
+   Z1:                    [  700. ]     # in cm in world coordinates, top corner of box
+   T0:                    [ -2500000. ] # max drift time (2.25 ms) + trigger offset (0.25 ms)
+   T1:                    [  3000000. ] # ending time in ns (readout window size)
+}
+
+protodunesp_42ar: @local::protodunesp_39ar
+protodunesp_42ar.Nuclide: [ "42Ar" ]
+protodunesp_42ar.BqPercc: [ 0.0000001283768 ] #Rate from paper by Barabash in conference proceding http://iopscience.iop.org/article/10.1088/1742-6596/718/6/062004/pdf
+
+protodunesp_85kr: @local::protodunesp_39ar
+protodunesp_85kr.Nuclide: [ "85Kr" ]
+protodunesp_85kr.BqPercc: [ 0.00016 ] #Rate tied to LAr using rates established by the WARP collaboration. https://arxiv.org/pdf/astro-ph/0603131.pdf
+
+protodunesp_222rn: @local::protodunesp_39ar
+protodunesp_222rn.Nuclide: [ "222Rn" ]
+protodunesp_222rn.BqPercc: [ 0.000005584  ] # DUNE FD requirement of 10 mBq/kg times 4 (to emulate the 4 subsequent alpha decays in secular equilibrium)  -JReichenbacher (01/11/    2017)
+
+END_PROLOG
