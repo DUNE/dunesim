@@ -54,7 +54,7 @@ protodune_beam:
  NP04frontPosZ: 717243
  # Intensity variables
  Intensity: 1.e6 # Number of interactions on the secondary target in one spill
- ReadoutWindow: 4.0 # In milliseconds
+ ReadoutWindow: 3.0 # In milliseconds
  BeamSpillLength: 4.8 # In seconds
 
  T_Resolution: 1.0  # sigmas 
@@ -62,6 +62,96 @@ protodune_beam:
  Ch_Efficiency: 1.0  # percentage
 
  SaveRecoTree: false
+
+}
+
+protodune_triggeredbeam:
+{
+ module_type:  "ProtoDUNETriggeredBeam"
+ FileName:  "dummy.root"
+
+ # The tree names from the beam simulation files
+ TOF1TreeName:      "VirtualDetector/TOF1"
+ BPROF1TreeName:    "VirtualDetector/BPROF1"
+ BPROF2TreeName:    "VirtualDetector/BPROF2"
+ BPROF3TreeName:    "VirtualDetector/BPROF3"
+ TRIG1TreeName:     "VirtualDetector/TRIG1"
+ BPROFEXTTreeName:  "VirtualDetector/BPROFEXT"
+ BPROF4TreeName:    "VirtualDetector/BPROF4"
+ TRIG2TreeName:     "VirtualDetector/TRIG2"
+ NP04frontTreeName: "Detector/NP04front"
+
+ # Set true to use the data driven method for the primary beam particle
+ UseDataDrivenPrimary: false
+
+ # In the beam simulation particles at the front face are saved in a 20m x 20m box
+ # To save time we can choose a 10m x 10m box instead
+ ReduceNP04frontArea: true
+
+ StartEvent: 0
+ # From protoDUNE_gensingle.fcl
+ # Updated geometry values:
+# BeamX: 8.905247 # In cm
+# BeamY: 461.749224 
+# BeamZ: -196.11
+ BeamX: -4.994 # In cm
+ BeamY: 448.449 
+ BeamZ: -129.804
+ Verbose: true
+ IncludeAnti: true
+
+ SamplingFileName: "dummy.root"
+ ResolutionFileName: "dummy2.root"
+ Seed: 0
+
+ MaxSamples: 10000
+
+ BeamThetaShift: 0.0114276
+ BeamPhiShift: -0.0761654
+
+ ## Jake Calcutt: Replacing angles for opposite order rotations
+ ##       RotateX --> RotateY
+ ##       Also: tuned the direction with Leigh's shift from above.
+ ##             old ones are commented
+ RotateMonitorXZ: -11.8373 #-10.51372
+ RotateMonitorYZ:  11.0929 # 11.50886
+
+ ## Parameters for momentum spectrometer
+ #MagP1: 5.82044830e-3
+ #MagP3: -4.68880000e-6
+ #MagP4: 324.573967
+
+ L1: 1.98
+ L2: 1.69472
+ L3: 2.11666
+ BeamBend: .12003
+
+
+ ## This will have to change for different momentum settings
+ ## Need to confirm with Nikos on this
+ #Current: 68.8 # 1 GeV
+ #2 GeV: 137.5
+ #3 GeV: 206.2
+ #6 GeV: 419.7
+
+ ## New parameters for momentum spectrometer
+ LMag: 2.1645
+ NominalP: 1
+ B: 1.294817
+
+
+ # Position of the beam monitor positions in z in [mm]
+ BPROFEXTPosZ:  707555 #707479 -- old values
+ BPROF4PosZ :   716124 #716048
+ TRIG2PosZ:     716296
+ NP04frontPosZ: 717243
+
+ # Intensity variables
+ Intensity: 1.e6 # Number of interactions on the secondary target in one spill
+ ReadoutWindow: 3.0 # In milliseconds
+ BeamSpillLength: 4.8 # In seconds
+
+ SaveOutputTree: false
 
 }
 

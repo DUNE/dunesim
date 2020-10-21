@@ -1,0 +1,57 @@
+#include "services_dune.fcl"
+#include "PDSPDataDrivenBeam.fcl"
+
+process_name: PDSPDataDrivenBeamGen
+
+services:
+{
+  # Load the service that manages root files for histograms.
+  TimeTracker:       {}
+  RandomNumberGenerator: {} #ART native random number generator
+  FileCatalogMetadata:  @local::art_file_catalog_mc
+  @table::protodune_simulation_services
+  TFileService: { #closeFileFast: true
+                  fileName: "datadriven_hist.root" #can be overridden by '-T'
+                }
+}
+
+#Start each new event with an empty event.
+source:
+{
+  module_type: EmptyEvent
+  timestampPlugin: { plugin_type: "GeneratedEventTimestamp" }
+  maxEvents:   100
+  firstRun:    1           # Run number to use for this file
+  firstEvent:  1           # number of first event in the file
+}
+
+physics:
+{
+ producers:
+ {
+   generator: @local::datadriven_beam
+   rns:       { module_type: "RandomNumberSaver" }
+ }
+ simulate: [ rns, generator ]
+ stream1:  [ out1 ]
+ trigger_paths: [simulate] 
+ end_paths:     [stream1]  
+}
+
+outputs:
+{
+ out1:
+ {
+   module_type: RootOutput
+   fileName:    "genBeam_dataDriven.root" #default file name, can override from command line with -o or --output
+   dataTier: "generated"
+   compressionLevel: 1
+ }
+}
+
+physics.producers.generator.InputFileName: "p100.root"
+physics.producers.generator.ResolutionFileName: "2D_res.root" #"beam_res.root"
+physics.producers.generator.NGenerate: 5 
+physics.producers.generator.UnsmearType: 2
+source.maxEvents: @local::physics.producers.generator.NGenerate 
+physics.producers.generator.Verbose: false 
