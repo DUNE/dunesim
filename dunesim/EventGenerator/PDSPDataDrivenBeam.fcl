@@ -29,6 +29,7 @@ datadriven_beam: {
   Maxima: [1.2, 192, 192, 192, 192]
 
   NominalMomentum: 1
+  DoWeights: false
 }
 
 END_PROLOG

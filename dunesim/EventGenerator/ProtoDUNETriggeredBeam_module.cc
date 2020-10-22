@@ -23,6 +23,8 @@
 #include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 #include "cetlib_except/exception.h"
+#include "cetlib/search_path.h"
+#include "cetlib/filesystem.h"
 #include "nusimdata/SimulationBase/MCTruth.h"
 #include "nusimdata/SimulationBase/MCParticle.h"
 #include "larcore/Geometry/Geometry.h"
@@ -39,6 +41,7 @@
 #include <TSystem.h>
 #include <TFile.h>
 #include <TTree.h>
+#include <TGraph.h>
 #include <TVector3.h>
 #include "THnSparse.h"
 #include "TH2D.h"
@@ -225,6 +228,7 @@ namespace evgen{
         void MakeTracks( beam::ProtoDUNEBeamEvent & beamEvent );
         void MomentumSpectrometer( beam::ProtoDUNEBeamEvent & beamEvent );
         double MomentumCosTheta( double, double, double );
+        std::string FindFile(const std::string filename);
 
         TVector3 ConvertBeamMonitorMomentumVec(float px, float py, float pz);
         // Setup the beam monitor basis vectors in detector coordinates
@@ -243,6 +247,7 @@ namespace evgen{
 
         // Beam input file name and tree names (in beam order)
         std::string fFileName;
+        std::string fBaseFileName;
         std::string fTOF1TreeName;
         std::string fBPROF1TreeName;
         std::string fBPROF2TreeName;
@@ -337,6 +342,7 @@ namespace evgen{
 
         bool fSaveOutputTree;
         TTree * fOutputTree;
+        TGraph * fTriggersGraph;
         int fOutputPDG;
         int fOutputEvent;
         double fOutputMomentum;
@@ -374,6 +380,7 @@ evgen::ProtoDUNETriggeredBeam::ProtoDUNETriggeredBeam(fhicl::ParameterSet const 
     produces< std::vector< beam::ProtoDUNEBeamEvent > >();
     // File reading variable initialisations
     fFileName = pset.get< std::string>("FileName");
+    fBaseFileName = fFileName.substr(fFileName.rfind("/")+1);
 
     // Tree names
     fTOF1TreeName      = pset.get<std::string>("TOF1TreeName");
@@ -464,7 +471,16 @@ evgen::ProtoDUNETriggeredBeam::ProtoDUNETriggeredBeam(fhicl::ParameterSet const 
     // Make sure we use ifdh to open the beam input file.
     OpenInputFile(fFileName);
     if(fUseDataDriven){
+      //std::string found_sampling_file = FindFile(fSamplingFileName);
+      //OpenInputFile(found_sampling_file);
+
+      //std::string found_res_file = FindFile(fResolutionFileName);
+      //OpenInputFile(found_res_file);
+
+      fSamplingFileName = FindFile(fSamplingFileName);
       OpenInputFile(fSamplingFileName);
+
+      fResolutionFileName = FindFile(fResolutionFileName);
       OpenInputFile(fResolutionFileName);
     }
 }
@@ -561,16 +577,20 @@ void evgen::ProtoDUNETriggeredBeam::beginJob(){
       Scale2DRes();
       SetMinMax();
     }
-    if (fUseDataDriven && fSaveOutputTree) {
-      fOutputTree = tfs->make<TTree>("tree", "");
-      fOutputTree->Branch("PDG", &fOutputPDG);
-      fOutputTree->Branch("Event", &fOutputEvent);
-      fOutputTree->Branch("Momentum", &fOutputMomentum);
-      fOutputTree->Branch("UnsmearedMomentum", &fOutputUnsmearedMomentum);
-      fOutputTree->Branch("HUpstream", &fOutputHUpstream);
-      fOutputTree->Branch("VUpstream", &fOutputVUpstream);
-      fOutputTree->Branch("HDownstream", &fOutputHDownstream);
-      fOutputTree->Branch("VDownstream", &fOutputVDownstream);
+    if (fSaveOutputTree) {
+      fTriggersGraph = tfs->makeAndRegister<TGraph>("Triggers", fBaseFileName.c_str(), 1);
+      fTriggersGraph->SetPoint(0, 0., triggeredEventIDs.size());
+      if (fUseDataDriven) {
+        fOutputTree = tfs->make<TTree>("tree", "");
+        fOutputTree->Branch("PDG", &fOutputPDG);
+        fOutputTree->Branch("Event", &fOutputEvent);
+        fOutputTree->Branch("Momentum", &fOutputMomentum);
+        fOutputTree->Branch("UnsmearedMomentum", &fOutputUnsmearedMomentum);
+        fOutputTree->Branch("HUpstream", &fOutputHUpstream);
+        fOutputTree->Branch("VUpstream", &fOutputVUpstream);
+        fOutputTree->Branch("HDownstream", &fOutputHDownstream);
+        fOutputTree->Branch("VDownstream", &fOutputVDownstream);
+      }
     }
 }
 
@@ -2111,6 +2131,40 @@ double evgen::ProtoDUNETriggeredBeam::MomentumCosTheta(double x1, double x2, dou
 
   const double cosTheta = numTerm/denom;  
   return cosTheta;
+}
+
+
+std::string evgen::ProtoDUNETriggeredBeam::FindFile(const std::string filename) {
+  mf::LogInfo("evgen::ProtoDUNETriggeredBeam::FindFile") << "Searching for " << filename;
+  if (cet::file_exists(filename)) {
+    mf::LogInfo("evgen::ProtoDUNETriggeredBeam::FindFile") << "File exists. Opening " << filename;
+    /*theFile = new TFile(filename.c_str());
+    if (!theFile ||theFile->IsZombie() || !theFile->IsOpen()) {
+      delete theFile;
+      theFile = 0x0;
+      throw cet::exception("ProtoDUNECalibration.cxx") << "Could not open " << filename;
+    }*/
+    return filename;
+  }
+  else {
+    mf::LogInfo("evgen::ProtoDUNETriggeredBeam::FindFile") << "File does not exist here. Searching FW_SEARCH_PATH";
+    cet::search_path sp{"FW_SEARCH_PATH"};
+    std::string found_filename;
+    auto found = sp.find_file(filename, found_filename);
+    if (!found) {
+      throw cet::exception("ProtoDUNECalibration.cxx") << "Could not find " << filename;
+    }
+
+    mf::LogInfo("evgen::ProtoDUNETriggeredBeam::FindFile") << "Found file " << found_filename;
+    /*
+    theFile = new TFile(found_filename.c_str());
+    if (!theFile ||theFile->IsZombie() || !theFile->IsOpen()) {
+      delete theFile;
+      theFile = 0x0;
+      throw cet::exception("ProtoDUNECalibration.cxx") << "Could not open " << found_filename;
+    }*/
+    return found_filename;
+  }
 }
 
 DEFINE_ART_MODULE(evgen::ProtoDUNETriggeredBeam)
