@@ -106,12 +106,10 @@ protodune_triggeredbeam:
  BeamThetaShift: 0.0114276
  BeamPhiShift: -0.0761654
 
- ## Jake Calcutt: Replacing angles for opposite order rotations
- ##       RotateX --> RotateY
- ##       Also: tuned the direction with Leigh's shift from above.
- ##             old ones are commented
- RotateMonitorXZ: -11.8373 #-10.51372
- RotateMonitorYZ:  11.0929 # 11.50886
+ ###New rotations - same final z axis as those 
+ ###from Paola, but the X axis is kept horizontal 
+ RotateMonitorYZ: 11.4328
+ RotateMonitorXZ: -10.7985
 
  L1: 1.98
  L2: 1.69472
