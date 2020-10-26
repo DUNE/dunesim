@@ -1,0 +1,35 @@
+BEGIN_PROLOG
+
+datadriven_beam: {
+  module_type: "PDSPDataDrivenBeam"
+  InputFileName: "dummy.root"
+  ResolutionFileName: "dummy2.root"
+  ParticleTypes: [ ["Pions", .25],
+                   ["Muons", .25],
+                   ["Protons", .25],
+                   ["Electrons", .25] ]
+
+  Seed: 0
+  NGenerate: 10
+  Verbose: true
+
+  RotateMonitorYZ: 11.4328
+  RotateMonitorXZ: -10.7985
+  NP04FrontZ: 717243
+  UpstreamZ: 707555
+  DownstreamZ: 716124
+  BeamX: -4.994
+  BeamY: 448.449
+  BeamZ: -129.804
+  GeneratorZ: -196.11
+
+  UnsmearType: 1
+
+  Minima: [.8, 0, 0, 0, 0]
+  Maxima: [1.2, 192, 192, 192, 192]
+
+  NominalMomentum: 1
+  DoWeights: false
+}
+
+END_PROLOG
