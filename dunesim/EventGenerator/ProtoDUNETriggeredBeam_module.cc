@@ -303,7 +303,7 @@ namespace evgen{
         float fBeamBend;
 
         float fLMag;
-        int fNominalP;
+        std::string fNominalP;
         float fB;
 
         int fMaxSamples;
@@ -454,9 +454,8 @@ evgen::ProtoDUNETriggeredBeam::ProtoDUNETriggeredBeam(fhicl::ParameterSet const 
     //New values for momentum spectrometer
     fLMag = pset.get<float>("LMag");
     fB    = pset.get<float>("B");
-    fNominalP = pset.get<int>("NominalP");
-
-    fLB = fB * fLMag * fNominalP / 7.;
+    fNominalP = pset.get<std::string>("NominalP");
+    fLB = fB * fLMag * std::stod(fNominalP) / 7.;
 
     fMaxSamples = pset.get<int>("MaxSamples", 0);
 
@@ -551,28 +550,27 @@ void evgen::ProtoDUNETriggeredBeam::beginJob(){
     if(fUseDataDriven){
       fSamplingFile = new TFile(fSamplingFileName.c_str());
       fResolutionFile = new TFile(fResolutionFileName.c_str());
-      switch (fNominalP) {
-        case 1:
-          Setup1GeV();
-          break;
-        case 2:
+        if (fNominalP =="0.5") {
           // This is the same function as for 1 GeV
           Setup1GeV();
-          break;
-        case 3:
+        }
+        else if (fNominalP =="1") {
+          Setup1GeV();
+        }
+        else if (fNominalP =="2") {
+          // This is the same function as for 1 GeV
+          Setup1GeV();
+        }
+        else if (fNominalP =="3") {
           Setup3GeV();
-          break;
-        case 6:
+        }
+        else if (fNominalP =="6") {
           Setup6GeV();
-          break;
-        case 7:
+        }
+        else if (fNominalP =="7") {
           // This is the same function as for 7 GeV
           Setup6GeV();
-          break;
-        default:
-          Setup1GeV();
-          break;
-      }
+        }
 
       Scale2DRes();
       SetMinMax();
@@ -581,7 +579,6 @@ void evgen::ProtoDUNETriggeredBeam::beginJob(){
       fTriggersGraph = tfs->makeAndRegister<TGraph>("Triggers", fBaseFileName.c_str(), 1);
       fTriggersGraph->SetPoint(0, 0., triggeredEventIDs.size());
       if (fUseDataDriven) {
-        fOutputTree = tfs->make<TTree>("tree", "");
         fOutputTree->Branch("PDG", &fOutputPDG);
         fOutputTree->Branch("Event", &fOutputEvent);
         fOutputTree->Branch("Momentum", &fOutputMomentum);
@@ -1424,25 +1421,25 @@ std::string evgen::ProtoDUNETriggeredBeam::GetSecondaryProcess(
 }
 
 void evgen::ProtoDUNETriggeredBeam::SetMinMax() {
-  switch (fNominalP) {
-    case 2:
-      fMinima[0] = 1.6;
-      fMaxima[0] = 2.4;
-      break;
-    case 3:
-      fMinima[0] = 2.4;
-      fMaxima[0] = 3.6;
-      break;
-    case 6:
-      fMinima[0] = 5.0;
-      fMaxima[0] = 7.0;
-      break;
-    case 7:
-      fMinima[0] = 6.0;
-      fMaxima[0] = 8.0;
-      break;
-    default:
-      break;
+  if (fNominalP =="0.5") {
+    fMinima[0] = 0.3;
+    fMaxima[0] = 0.7;
+  }
+  else if (fNominalP =="2") {
+    fMinima[0] = 1.6;
+    fMaxima[0] = 2.4;
+  }
+  else if (fNominalP =="3") {
+    fMinima[0] = 2.4;
+    fMaxima[0] = 3.6;
+  }
+  else if (fNominalP =="6") {
+    fMinima[0] = 5.0;
+    fMaxima[0] = 7.0;
+  }
+  else if (fNominalP =="7") {
+    fMinima[0] = 6.0;
+    fMaxima[0] = 8.0;
   }
 }
 
@@ -2166,5 +2163,6 @@ std::string evgen::ProtoDUNETriggeredBeam::FindFile(const std::string filename) 
     return found_filename;
   }
 }
+
 
 DEFINE_ART_MODULE(evgen::ProtoDUNETriggeredBeam)
