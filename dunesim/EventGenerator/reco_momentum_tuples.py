@@ -8,7 +8,7 @@ parser = ap()
 parser.add_argument("-i", type=str, help='Input cmd', default="")
 parser.add_argument("-o", type=str, help='Output file', default="beam_tuples.root")
 parser.add_argument("-m", type=int, help='Max number of files', default=1000)
-parser.add_argument("-p", type=int, help='Momentum setting', default=1)
+parser.add_argument("-p", type=str, help='Momentum setting', default="1")
 args = parser.parse_args()
 
 RT.gROOT.SetBatch(1)
@@ -198,11 +198,12 @@ for e in t:
   #2GeV: 137.5
   #3GeV: 206.2
 
-  if(   args.p == 1 ): current = 68.8
-  elif( args.p == 2 ): current = 137.5 
-  elif( args.p == 3 ): current = 206.2 
-  elif( args.p == 6 ): current = 419.7
-  elif( args.p == 7 ): current = 508.3 
+  if(   args.p == "1" ): current = 68.8
+  elif( args.p == "0.5" ): current = 34.4
+  elif( args.p == "2" ): current = 137.5 
+  elif( args.p == "3" ): current = 206.2 
+  elif( args.p == "6" ): current = 419.7
+  elif( args.p == "7" ): current = 508.3 
 
   LB = mag_P1 * current 
   deltaI = current  - mag_P4
