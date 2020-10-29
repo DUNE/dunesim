@@ -6,7 +6,7 @@ parser = ap()
 parser.add_argument("-i", type=str, help='Input file', default="")
 parser.add_argument("-o", type=str, help='Output file', default="beam_pdf.root")
 parser.add_argument("-n", type=int, help='Max number of entries', default=-1)
-parser.add_argument("-p", type=int, help='Which momentum', default=1)
+parser.add_argument("-p", type=str, help='Which momentum', default="1")
 args = parser.parse_args()
 
 
@@ -19,19 +19,23 @@ outputFile = RT.TFile(args.o, "RECREATE")
                    #p,  fvu, fhu, fvd, fhd
 nBins = array("i", [100, 32, 32, 32, 32])
 
-if args.p == 1:
+if args.p == "1":
   min_p = 0.
   max_p = 2.
-elif args.p == 2:
+elif args.p == "0.5":
+  nBins[0] = 40
+  min_p = 0.4
+  max_p = 0.6
+elif args.p == "2":
   min_p = 1.
   max_p = 3.
-elif args.p == 3:
+elif args.p == "3":
   min_p = 2.
   max_p = 4.
-elif args.p == 6:
+elif args.p == "6":
   min_p = 4.
   max_p = 8.
-elif args.p == 7:
+elif args.p == "7":
   nBins = array("i", [50, 32, 32, 32, 32])
   min_p = 5.
   max_p = 9.
@@ -44,9 +48,9 @@ Protons = RT.THnSparseD("Protons", "", 5, nBins, mins, maxes)
 Electrons = RT.THnSparseD("Electrons", "", 5, nBins, mins, maxes)
 Kaons = RT.THnSparseD("Kaons", "", 5, nBins, mins, maxes)
 
-if args.p in [1, 2, 3]:
+if args.p in ["0.5", "1", "2", "3"]:
   pdfs = [Pions, Protons, Electrons]
-elif args.p in [6, 7]:
+elif args.p in ["6", "7"]:
   pdfs = [Pions, Protons, Kaons]
 
 counter = 0
@@ -75,7 +79,7 @@ for e in tree:
   
   data = array("d", [Momentum, f_v_up[0], f_h_up[0], f_v_down[0], f_h_down[0]])
 
-  if args.p in [1, 2]:
+  if args.p in ["1", "2", "0.5"]:
     if pdgs[0] == 2212:
       Protons.Fill(data)
     elif pdgs[0] == 13:
@@ -83,7 +87,7 @@ for e in tree:
     elif pdgs[0] == 11:
       Electrons.Fill(data)
 
-  elif args.p == 3:
+  elif args.p == "3":
     if 13 in pdgs:
       Pions.Fill(data)
     elif 2212 in pdgs:
@@ -91,7 +95,7 @@ for e in tree:
     elif 11 in pdgs:
       Electrons.Fill(data)
 
-  elif args.p in [6, 7]:
+  elif args.p in ["6", "7"]:
     if 13 in pdgs:
       Pions.Fill(data)
     elif 2212 in pdgs:

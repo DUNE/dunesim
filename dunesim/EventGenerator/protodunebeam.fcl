@@ -94,7 +94,7 @@ protodune_triggeredbeam:
  BeamX: -4.994 # In cm
  BeamY: 448.449 
  BeamZ: -129.804
- Verbose: true
+ Verbose: false 
  IncludeAnti: true
 
  SamplingFileName: "dummy.root"
@@ -106,12 +106,10 @@ protodune_triggeredbeam:
  BeamThetaShift: 0.0114276
  BeamPhiShift: -0.0761654
 
- ## Jake Calcutt: Replacing angles for opposite order rotations
- ##       RotateX --> RotateY
- ##       Also: tuned the direction with Leigh's shift from above.
- ##             old ones are commented
- RotateMonitorXZ: -11.8373 #-10.51372
- RotateMonitorYZ:  11.0929 # 11.50886
+ ###New rotations - same final z axis as those 
+ ###from Paola, but the X axis is kept horizontal 
+ RotateMonitorYZ: 11.4328
+ RotateMonitorXZ: -10.7985
 
  L1: 1.98
  L2: 1.69472
@@ -121,7 +119,7 @@ protodune_triggeredbeam:
 
  ## New parameters for momentum spectrometer
  LMag: 2.1645
- NominalP: 1
+ NominalP: "1"
  B: 1.294817
 
 

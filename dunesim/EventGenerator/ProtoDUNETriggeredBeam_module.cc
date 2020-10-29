@@ -303,7 +303,7 @@ namespace evgen{
         float fBeamBend;
 
         float fLMag;
-        int fNominalP;
+        std::string fNominalP;
         float fB;
 
         int fMaxSamples;
@@ -454,9 +454,8 @@ evgen::ProtoDUNETriggeredBeam::ProtoDUNETriggeredBeam(fhicl::ParameterSet const 
     //New values for momentum spectrometer
     fLMag = pset.get<float>("LMag");
     fB    = pset.get<float>("B");
-    fNominalP = pset.get<int>("NominalP");
-
-    fLB = fB * fLMag * fNominalP / 7.;
+    fNominalP = pset.get<std::string>("NominalP");
+    fLB = fB * fLMag * std::stod(fNominalP) / 7.;
 
     fMaxSamples = pset.get<int>("MaxSamples", 0);
 
@@ -551,28 +550,27 @@ void evgen::ProtoDUNETriggeredBeam::beginJob(){
     if(fUseDataDriven){
       fSamplingFile = new TFile(fSamplingFileName.c_str());
       fResolutionFile = new TFile(fResolutionFileName.c_str());
-      switch (fNominalP) {
-        case 1:
-          Setup1GeV();
-          break;
-        case 2:
+        if (fNominalP =="0.5") {
           // This is the same function as for 1 GeV
           Setup1GeV();
-          break;
-        case 3:
+        }
+        else if (fNominalP =="1") {
+          Setup1GeV();
+        }
+        else if (fNominalP =="2") {
+          // This is the same function as for 1 GeV
+          Setup1GeV();
+        }
+        else if (fNominalP =="3") {
           Setup3GeV();
-          break;
-        case 6:
+        }
+        else if (fNominalP =="6") {
           Setup6GeV();
-          break;
-        case 7:
+        }
+        else if (fNominalP =="7") {
           // This is the same function as for 7 GeV
           Setup6GeV();
-          break;
-        default:
-          Setup1GeV();
-          break;
-      }
+        }
 
       Scale2DRes();
       SetMinMax();
@@ -904,8 +902,14 @@ void evgen::ProtoDUNETriggeredBeam::FillInstrumentInformation(std::vector<int> &
     }
   }
 
-  for(const int ev : eventIDs){
-    if(foundTrackInEvent.at(ev)) continue;
+
+  for (auto it = eventIDs.begin(); it != eventIDs.end();) {
+    const int ev = *it;
+    if(foundTrackInEvent.at(ev)) {
+      ++it;
+      continue;
+    }
+
     // If we didn't find TRIG2 particle, then look for the TRIG1 one
     for(const unsigned int index : triggerIndices.at(ev)){
       instrumentTree->GetEntry(index);
@@ -920,7 +924,11 @@ void evgen::ProtoDUNETriggeredBeam::FillInstrumentInformation(std::vector<int> &
       }
     }
   
-    if(foundTrackInEvent.at(ev)) continue;
+
+    if(foundTrackInEvent.at(ev)) {
+      ++it;
+      continue;
+    }
     // In the rare case that we still don't have the particle, try the TRIG1 parent
     const int parentTrack = fAllBeamEvents.at(ev).fTriggeredParticleInfo.at("TRIG1").fParentID;
     for(const unsigned int index : triggerIndices.at(ev)){
@@ -932,21 +940,27 @@ void evgen::ProtoDUNETriggeredBeam::FillInstrumentInformation(std::vector<int> &
                             posX, posY, posZ, posT, momX, momY, momZ);
         fAllBeamEvents.at(thisEvent).fTriggeredParticleInfo.insert(std::make_pair(treeName,particle));
         foundTrackInEvent.at(thisEvent) = true;
+
         break;
       }
 
     }
+
     if(foundTrackInEvent.at(ev) == false){
       fAllBeamEvents.at(ev).fTriggerID = -999;
       // Remove this event from the input vector
-      eventIDs.erase(std::remove(eventIDs.begin(),eventIDs.end(),ev),eventIDs.end());
+      it = eventIDs.erase(it);
       std::cout << "Issue found with event " << ev << ". Removing it from the trigger list - " << eventIDs.size() << " remain" << std::endl;
-//      std::cout << "We didn't find tracks " << trig2TrackIDs.at(ev) << " or " << trig1TrackIDs.at(ev) << " in " << treeName << std::endl;
-//      std::cout << " - PDGs: 1 = " << fAllBeamEvents.at(ev).fTriggeredParticleInfo.at("TRIG1").fPDG
-//                << " and 2 = " << fAllBeamEvents.at(ev).fTriggeredParticleInfo.at("TRIG2").fPDG << std::endl;
-//      for(const unsigned int index : triggerIndices.at(ev)){
-//        instrumentTree->GetEntry(index);
-//        std::cout << "- Choice = " << static_cast<int>(trackID) << " :: " << static_cast<int>(pdgCode) << std::endl;
+      //std::cout << "We didn't find tracks " << trig2TrackIDs.at(ev) << " or " << trig1TrackIDs.at(ev) << " in " << treeName << std::endl;
+      //std::cout << " - PDGs: 1 = " << fAllBeamEvents.at(ev).fTriggeredParticleInfo.at("TRIG1").fPDG
+      //          << " and 2 = " << fAllBeamEvents.at(ev).fTriggeredParticleInfo.at("TRIG2").fPDG << std::endl;
+      //for(const unsigned int index : triggerIndices.at(ev)){
+      //  instrumentTree->GetEntry(index);
+      //  std::cout << "- Choice = " << static_cast<int>(trackID) << " :: " << static_cast<int>(pdgCode) << std::endl;
+      //}
+    }
+    else {
+      ++it; 
     }
   }
 
@@ -1424,25 +1438,25 @@ std::string evgen::ProtoDUNETriggeredBeam::GetSecondaryProcess(
 }
 
 void evgen::ProtoDUNETriggeredBeam::SetMinMax() {
-  switch (fNominalP) {
-    case 2:
-      fMinima[0] = 1.6;
-      fMaxima[0] = 2.4;
-      break;
-    case 3:
-      fMinima[0] = 2.4;
-      fMaxima[0] = 3.6;
-      break;
-    case 6:
-      fMinima[0] = 5.0;
-      fMaxima[0] = 7.0;
-      break;
-    case 7:
-      fMinima[0] = 6.0;
-      fMaxima[0] = 8.0;
-      break;
-    default:
-      break;
+  if (fNominalP =="0.5") {
+    fMinima[0] = 0.3;
+    fMaxima[0] = 0.7;
+  }
+  else if (fNominalP =="2") {
+    fMinima[0] = 1.6;
+    fMaxima[0] = 2.4;
+  }
+  else if (fNominalP =="3") {
+    fMinima[0] = 2.4;
+    fMaxima[0] = 3.6;
+  }
+  else if (fNominalP =="6") {
+    fMinima[0] = 5.0;
+    fMaxima[0] = 7.0;
+  }
+  else if (fNominalP =="7") {
+    fMinima[0] = 6.0;
+    fMaxima[0] = 8.0;
   }
 }
 
@@ -2166,5 +2180,6 @@ std::string evgen::ProtoDUNETriggeredBeam::FindFile(const std::string filename) 
     return found_filename;
   }
 }
+
 
 DEFINE_ART_MODULE(evgen::ProtoDUNETriggeredBeam)
