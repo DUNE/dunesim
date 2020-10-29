@@ -579,6 +579,7 @@ void evgen::ProtoDUNETriggeredBeam::beginJob(){
       fTriggersGraph = tfs->makeAndRegister<TGraph>("Triggers", fBaseFileName.c_str(), 1);
       fTriggersGraph->SetPoint(0, 0., triggeredEventIDs.size());
       if (fUseDataDriven) {
+        fOutputTree = tfs->make<TTree>("tree", "");
         fOutputTree->Branch("PDG", &fOutputPDG);
         fOutputTree->Branch("Event", &fOutputEvent);
         fOutputTree->Branch("Momentum", &fOutputMomentum);
@@ -901,8 +902,14 @@ void evgen::ProtoDUNETriggeredBeam::FillInstrumentInformation(std::vector<int> &
     }
   }
 
-  for(const int ev : eventIDs){
-    if(foundTrackInEvent.at(ev)) continue;
+
+  for (auto it = eventIDs.begin(); it != eventIDs.end();) {
+    const int ev = *it;
+    if(foundTrackInEvent.at(ev)) {
+      ++it;
+      continue;
+    }
+
     // If we didn't find TRIG2 particle, then look for the TRIG1 one
     for(const unsigned int index : triggerIndices.at(ev)){
       instrumentTree->GetEntry(index);
@@ -917,7 +924,11 @@ void evgen::ProtoDUNETriggeredBeam::FillInstrumentInformation(std::vector<int> &
       }
     }
   
-    if(foundTrackInEvent.at(ev)) continue;
+
+    if(foundTrackInEvent.at(ev)) {
+      ++it;
+      continue;
+    }
     // In the rare case that we still don't have the particle, try the TRIG1 parent
     const int parentTrack = fAllBeamEvents.at(ev).fTriggeredParticleInfo.at("TRIG1").fParentID;
     for(const unsigned int index : triggerIndices.at(ev)){
@@ -929,21 +940,27 @@ void evgen::ProtoDUNETriggeredBeam::FillInstrumentInformation(std::vector<int> &
                             posX, posY, posZ, posT, momX, momY, momZ);
         fAllBeamEvents.at(thisEvent).fTriggeredParticleInfo.insert(std::make_pair(treeName,particle));
         foundTrackInEvent.at(thisEvent) = true;
+
         break;
       }
 
     }
+
     if(foundTrackInEvent.at(ev) == false){
       fAllBeamEvents.at(ev).fTriggerID = -999;
       // Remove this event from the input vector
-      eventIDs.erase(std::remove(eventIDs.begin(),eventIDs.end(),ev),eventIDs.end());
+      it = eventIDs.erase(it);
       std::cout << "Issue found with event " << ev << ". Removing it from the trigger list - " << eventIDs.size() << " remain" << std::endl;
-//      std::cout << "We didn't find tracks " << trig2TrackIDs.at(ev) << " or " << trig1TrackIDs.at(ev) << " in " << treeName << std::endl;
-//      std::cout << " - PDGs: 1 = " << fAllBeamEvents.at(ev).fTriggeredParticleInfo.at("TRIG1").fPDG
-//                << " and 2 = " << fAllBeamEvents.at(ev).fTriggeredParticleInfo.at("TRIG2").fPDG << std::endl;
-//      for(const unsigned int index : triggerIndices.at(ev)){
-//        instrumentTree->GetEntry(index);
-//        std::cout << "- Choice = " << static_cast<int>(trackID) << " :: " << static_cast<int>(pdgCode) << std::endl;
+      //std::cout << "We didn't find tracks " << trig2TrackIDs.at(ev) << " or " << trig1TrackIDs.at(ev) << " in " << treeName << std::endl;
+      //std::cout << " - PDGs: 1 = " << fAllBeamEvents.at(ev).fTriggeredParticleInfo.at("TRIG1").fPDG
+      //          << " and 2 = " << fAllBeamEvents.at(ev).fTriggeredParticleInfo.at("TRIG2").fPDG << std::endl;
+      //for(const unsigned int index : triggerIndices.at(ev)){
+      //  instrumentTree->GetEntry(index);
+      //  std::cout << "- Choice = " << static_cast<int>(trackID) << " :: " << static_cast<int>(pdgCode) << std::endl;
+      //}
+    }
+    else {
+      ++it; 
     }
   }
 
