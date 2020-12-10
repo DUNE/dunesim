@@ -15,6 +15,7 @@ services:
 
  ExptGeoHelperInterface:       @local::dune_geometry_helper
  Geometry:                     @local::iceberg_geo
+ GeometryConfigurationWriter: {}
  DetectorClocksService:        @local::dunefd_detectorclocks
  DetectorPropertiesService:    @local::protodune_detproperties
  LArPropertiesService:         @local::dunefd_properties
