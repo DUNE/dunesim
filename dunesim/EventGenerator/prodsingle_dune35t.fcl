@@ -14,6 +14,7 @@ services:
                 @table::dune35t_simulation_services
 }
 #services.ExptGeoHelperInterface: @local::dune_geometry_helper
+#services.GeometryConfigurationWriter: {}
 #services.Geometry.GDML: "dune35t4apa_v3.gdml"
 #services.Geometry.ROOT: "dune35t4apa_v3.gdml"
 #services.Geometry.SortingParameters.DetectorVersion: "dune35t4apa_v3"
