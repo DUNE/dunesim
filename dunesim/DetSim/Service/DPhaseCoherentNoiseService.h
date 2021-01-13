@@ -13,7 +13,7 @@
 #ifndef DPhaseCoherentNoiseService_H
 #define DPhaseCoherentNoiseService_H
 
-#include "dune/DuneInterface/ChannelNoiseService.h"
+#include "dune/DuneInterface/Service/ChannelNoiseService.h"
 #include <vector>
 #include <iostream>
 

@@ -11,7 +11,7 @@
 #ifndef WhiteChannelNoiseService_H
 #define WhiteChannelNoiseService_H
 
-#include "dune/DuneInterface/ChannelNoiseService.h"
+#include "dune/DuneInterface/Service/ChannelNoiseService.h"
 #include <vector>
 #include <iostream>
 

@@ -15,7 +15,7 @@
 #ifndef StuckBitAdcDistortionService_H
 #define StuckBitAdcDistortionService_H
 
-#include "dune/DuneInterface/AdcDistortionService.h"
+#include "dune/DuneInterface/Service/AdcDistortionService.h"
 #include <string>
 #include <iostream>
 #include "dune/DuneInterface/AdcTypes.h"

@@ -11,7 +11,7 @@
 #ifndef FixedZeroSuppressService_H
 #define FixedZeroSuppressService_H
 
-#include "dune/DuneInterface/AdcSuppressService.h"
+#include "dune/DuneInterface/Service/AdcSuppressService.h"
 
 #include <memory>
 #include <string>

@@ -13,7 +13,7 @@
 
 #include <vector>
 #include <string>
-#include "dune/DuneInterface/SimChannelExtractService.h"
+#include "dune/DuneInterface/Service/SimChannelExtractService.h"
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "lardata/Utilities/LArFFT.h"

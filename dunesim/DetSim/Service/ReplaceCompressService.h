@@ -12,7 +12,7 @@
 #ifndef ReplaceCompressService_H
 #define ReplaceCompressService_H
 
-#include "dune/DuneInterface/AdcCompressService.h"
+#include "dune/DuneInterface/Service/AdcCompressService.h"
 
 namespace fhicl {
 class ParameterSet;

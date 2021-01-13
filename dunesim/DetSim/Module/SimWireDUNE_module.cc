@@ -46,12 +46,12 @@
 
 #include "dune/DuneInterface/AdcTypes.h"
 #include "dune/DuneInterface/AdcSimulator.h"
-#include "dune/DuneInterface/AdcSuppressService.h"
-#include "dune/DuneInterface/AdcCompressService.h"
-#include "dune/DuneInterface/SimChannelExtractService.h"
-#include "dune/DuneInterface/ChannelNoiseService.h"
-#include "dune/DuneInterface/PedestalAdditionService.h"
-#include "dune/DuneInterface/AdcDistortionService.h"
+#include "dune/DuneInterface/Service/AdcSuppressService.h"
+#include "dune/DuneInterface/Service/AdcCompressService.h"
+#include "dune/DuneInterface/Service/SimChannelExtractService.h"
+#include "dune/DuneInterface/Service/ChannelNoiseService.h"
+#include "dune/DuneInterface/Service/PedestalAdditionService.h"
+#include "dune/DuneInterface/Service/AdcDistortionService.h"
 
 using std::ostringstream;
 using std::cout;
