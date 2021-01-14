@@ -12,7 +12,7 @@
 #include "fhiclcpp/intermediate_table.h"
 #include "fhiclcpp/make_ParameterSet.h"
 #include "art/Utilities/make_tool.h"
-#include "dune/DuneInterface/AdcSimulator.h"
+#include "dune/DuneInterface/Data/AdcSimulator.h"
 
 #undef NDEBUG
 #include <cassert>

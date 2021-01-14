@@ -44,8 +44,8 @@
 
 #include "dune/ArtSupport/DuneToolManager.h"
 
-#include "dune/DuneInterface/AdcTypes.h"
-#include "dune/DuneInterface/AdcSimulator.h"
+#include "dune/DuneInterface/Data/AdcTypes.h"
+#include "dune/DuneInterface/Data/AdcSimulator.h"
 #include "dune/DuneInterface/Service/AdcSuppressService.h"
 #include "dune/DuneInterface/Service/AdcCompressService.h"
 #include "dune/DuneInterface/Service/SimChannelExtractService.h"

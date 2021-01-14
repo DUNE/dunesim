@@ -18,7 +18,7 @@
 #include "dune/DuneInterface/Service/AdcDistortionService.h"
 #include <string>
 #include <iostream>
-#include "dune/DuneInterface/AdcTypes.h"
+#include "dune/DuneInterface/Data/AdcTypes.h"
 
 namespace fhicl {
 class ParameterSet;
