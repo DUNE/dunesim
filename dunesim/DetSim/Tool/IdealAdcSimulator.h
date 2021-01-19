@@ -18,7 +18,7 @@
 
 #include "art/Utilities/ToolMacros.h" 
 #include "fhiclcpp/ParameterSet.h" 
-#include "dune/DuneInterface/AdcSimulator.h"
+#include "dune/DuneInterface/Data/AdcSimulator.h"
 
 class IdealAdcSimulator : public AdcSimulator {
 

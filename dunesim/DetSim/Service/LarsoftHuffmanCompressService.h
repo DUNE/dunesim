@@ -22,7 +22,7 @@
 #ifndef LarsoftHuffmanCompressService_H
 #define LarsoftHuffmanCompressService_H
 
-#include "dune/DuneInterface/AdcCompressService.h"
+#include "dune/DuneInterface/Service/AdcCompressService.h"
 
 namespace fhicl {
 class ParameterSet;

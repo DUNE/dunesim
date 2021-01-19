@@ -19,7 +19,7 @@
 #ifndef SPhaseChannelNoiseService_H
 #define SPhaseChannelNoiseService_H
 
-#include "dune/DuneInterface/ChannelNoiseService.h"
+#include "dune/DuneInterface/Service/ChannelNoiseService.h"
 #include <vector>
 #include <iostream>
 

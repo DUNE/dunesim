@@ -15,7 +15,7 @@
 #ifndef ProvidedPedestalAdditionService_H
 #define ProvidedPedestalAdditionService_H
 
-#include "dune/DuneInterface/PedestalAdditionService.h"
+#include "dune/DuneInterface/Service/PedestalAdditionService.h"
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 
 class TH1;
