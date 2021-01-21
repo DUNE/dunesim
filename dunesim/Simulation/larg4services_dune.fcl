@@ -80,7 +80,7 @@ dune_physics_list_fastoptical:
 } 
 
 dune_physics_list_supernova: @local::dune_physics_list_fastoptical
-dune_physics_list_supernova.PhysicsListName: "QGSP_BERT_HP__LE"
+dune_physics_list_supernova.PhysicsListName: "QGSP_BERT_HP_EMZ"
 
 
 ##
