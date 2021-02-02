@@ -1,0 +1,8 @@
+#include "LArG4.fcl"
+
+BEGIN_PROLOG
+
+dunefd_larg4:    @local::standard_larg4
+protodune_larg4: @local::standard_larg4
+
+END_PROLOG

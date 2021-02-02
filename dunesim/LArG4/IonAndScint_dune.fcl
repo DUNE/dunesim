@@ -1,0 +1,39 @@
+BEGIN_PROLOG
+
+##
+# Dune FD
+##
+dunefd_ionandscint_correlated:
+{
+  module_type: "IonAndScint"
+  Instances:   "LArG4DetectorServicevolTPCInner;LArG4DetectorServicevolTPCPlaneVInner;LArG4DetectorServicevolTPCActiveOuter;LArG4DetectorServicevolTPCPlaneUInner;LArG4DetectorServicevolTPCPlaneZInner;LArG4DetectorServicevolTPCActiveInner" # separated by semicolon 
+  ISCalcAlg:   "Correlated"
+}   
+dunefd_ionandscint_nest: @local::dunefd_ionandscint_correlated
+dunefd_ionandscint_nest.ISCalcAlg: "NEST"
+
+# Choose *the* IonAndScint configuration
+dunefd_ionandscint: @local::dunefd_ionandscint_correlated
+
+##
+# ProtoDUNE-SP
+##
+protodune_ionandscint_correlated:
+{
+  module_type:  "IonAndScint"
+  Instances:    "LArG4DetectorServicevolTPCActive;LArG4DetectorServicevolTPCActiveOuter"
+  ISCalcAlg:    "Correlated"
+  SavePriorSCE: true
+}   
+protodune_ionandscint_nest: @local::protodune_ionandscint_correlated
+protodune_ionandscint_nest.ISCalcAlg: "NEST"
+
+protodune_ionandscint_separate: @local::protodune_ionandscint_correlated
+protodune_ionandscint_separate.ISCalcAlg: "Separate"
+
+# Choose *the* IonAndScint configuration
+protodune_ionandscint: @local::protodune_ionandscint_separate
+
+
+
+END_PROLOG
