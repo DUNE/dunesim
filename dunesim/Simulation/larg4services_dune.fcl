@@ -111,8 +111,11 @@ dune_particle_list_action:
                                            # being stored. This helps reduce memory usage in the root output stage
                                            # if there are many trajectory points.
   SparsifyMargin: 0.015      # required when SparsifyTrajectories is set to true
-  KeepTransportation: true 
-  KeepSecondToLast: true 
+  KeepTransportation: true   # When sparsifying: forces steps with the 'Transportation' process to be saved
+                             # --- Useful in protodune to keep the first step in the active volume
+  KeepSecondToLast: true     # Sparsifying could cut out the penultimate step point, which holds the correct info
+                             # of the end of the track (the final step is defined to have 0 kinetic energy)
+                             # --- This forces that true penultimate point to be saved, thus preserving the info
 }
 
 
