@@ -219,7 +219,7 @@ void SimWireDUNE::produce(art::Event& evt) {
   auto const clockData = art::ServiceHandle<detinfo::DetectorClocksService const>()->DataFor(evt);
   auto const detProp = art::ServiceHandle<detinfo::DetectorPropertiesService const>()->DataFor(evt, clockData);
   unsigned int nTickReadout  = detProp.ReadOutWindowSize();
-
+  m_pcns->newEvent();
   // Loop over channels.
   std::map<int,double>::iterator mapIter;
   for ( unsigned int chan = 0; chan<m_pgeo->Nchannels(); ++chan ) {
