@@ -68,6 +68,15 @@ namespace spacecharge {
       bool IsTooFarFromBoundaries(geo::Point_t const& point) const;
       geo::Point_t PretendAtBoundary(geo::Point_t const& point) const;
 
+      geo::Vector_t ElectronDiverterPosOffsets(geo::Point_t const& point) const;
+      std::vector<bool>   fEnableElectronDiverterDistortions;
+      std::vector<double> fEDZCenter;
+      std::vector<double> fEDAXPosOffs;
+      std::vector<double> fEDBZPosOffs;
+      std::vector<double> fEDs;
+      std::vector<double> fEDChargeLossZLow;
+      std::vector<double> fEDChargeLossZHigh;
+
       TSpline3* MakeSpline(TH3F* spline_hist, int dim1, int dim2_bin, int dim3_bin, int maptype, int driftvol) const;
       double InterpolateSplines(TH3F* interp_hist, double xVal, double yVal, double zVal, int dim, int maptype, int driftvol) const;
       

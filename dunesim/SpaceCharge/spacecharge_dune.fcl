@@ -11,6 +11,13 @@ protodune_spacecharge.InputFilename:  			"SpaceChargeProtoDUNE/SCE_DataDriven_18
 protodune_spacecharge.CalibrationInputFilename:	        "SpaceChargeProtoDUNE/SCE_DataDriven_180kV_v4.root"
 protodune_spacecharge.RepresentationType:               "Splines_TH3"
 protodune_spacecharge.service_provider:  		SpaceChargeServiceProtoDUNE
+protodune_spacecharge.EnableElectronDiverterDistortions: [ true, true ]
+protodune_spacecharge.EDZCenter:                         [ 231., 463.0 ] # gap center in cm
+protodune_spacecharge.EDAXPosOffs:                       [ -3.0, -3.0 ]  # X distortion shift scale in cm
+protodune_spacecharge.EDBZPosOffs:                       [ -1.0, -1.0 ] #  Z distoriton shift scale in cm
+protodune_spacecharge.EDs:                               [ 2.5, 2.5 ] # width of distortion function in cm
+protodune_spacecharge.EDChargeLossZLow:                  [ 229.0, 461.0 ] # range in which charge is lost, low end, cm in Z
+protodune_spacecharge.EDChargeLossZHigh:                 [ 233.0, 465.0 ] # range in which charge is lost, high end, cm in Z
 
 protodunedp_spacecharge:                                                  @local::standard_spacecharge
 protodunedp_spacecharge.InputFilename:                    "666_short_50kV.root"

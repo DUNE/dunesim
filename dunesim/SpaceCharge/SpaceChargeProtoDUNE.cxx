@@ -44,6 +44,31 @@ bool spacecharge::SpaceChargeProtoDUNE::Configure(fhicl::ParameterSet const& pse
   fEnableCalSpatialSCE = pset.get<bool>("EnableCalSpatialSCE");
   fEnableCalEfieldSCE = pset.get<bool>("EnableCalEfieldSCE");
   
+  fEnableElectronDiverterDistortions = pset.get<std::vector<bool>>("EnableElectronDiverterDistortions");
+  fEDZCenter                         = pset.get<std::vector<double>>("EDZCenter");
+  fEDAXPosOffs                       = pset.get<std::vector<double>>("EDAXPosOffs");
+  fEDBZPosOffs                       = pset.get<std::vector<double>>("EDBZPosOffs");
+  fEDs                               = pset.get<std::vector<double>>("EDs");
+  fEDChargeLossZLow                  = pset.get<std::vector<double>>("EDChargeLossZLow");
+  fEDChargeLossZHigh                 = pset.get<std::vector<double>>("EDChargeLossZHigh");
+
+  size_t ieds = fEnableElectronDiverterDistortions.size();
+  if (fEDZCenter.size() != ieds ||
+      fEDAXPosOffs.size() != ieds ||
+      fEDBZPosOffs.size() != ieds ||
+      fEDs.size() != ieds ||
+      fEDChargeLossZLow.size() != ieds ||
+      fEDChargeLossZHigh.size() != ieds)
+    {
+      throw cet::exception("SpaceChargeProtoDUNE") << "Inconsistent configuration sizes: " <<
+	ieds << " " << 
+	fEDAXPosOffs.size() << " " <<
+        fEDBZPosOffs.size() << " " <<
+        fEDs.size() << " " <<
+        fEDChargeLossZLow.size() << " " << 
+	fEDChargeLossZHigh.size();
+    }
+
   //auto const *detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
   //fEfield = detprop->Efield();
 
@@ -522,6 +547,12 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetPosOffsets(geo::Point_t cons
   }else if(fRepresentationType == "Parametric") thePosOffsets = GetPosOffsetsParametric(point.X(), point.Y(), point.Z());
   else thePosOffsets.resize(3,0.0); 
  
+  geo::Point_t pafteroffset(point.X()+thePosOffsets[0], point.Y()+thePosOffsets[1], point.Z()+thePosOffsets[2]);
+  geo::Vector_t edoffset = ElectronDiverterPosOffsets(pafteroffset);
+  thePosOffsets[0] += edoffset.X();
+  thePosOffsets[1] += edoffset.Y();
+  thePosOffsets[2] += edoffset.Z();
+
   return { thePosOffsets[0], thePosOffsets[1], thePosOffsets[2] };
 }
 
@@ -1502,4 +1533,35 @@ double spacecharge::SpaceChargeProtoDUNE::InterpolateSplines(TH3F* interp_hist, 
   }
 
   return interp_val;
+}
+
+
+geo::Vector_t spacecharge::SpaceChargeProtoDUNE::ElectronDiverterPosOffsets(geo::Point_t const& point) const
+{
+  double z = point.Z();
+  double offset[3] = {0,0,0};
+
+  for (size_t i=0; i<fEnableElectronDiverterDistortions.size(); ++i)
+    {
+      if (!fEnableElectronDiverterDistortions.at(i)) continue;
+      if (point.X()>0) continue;
+      if (z>fEDChargeLossZLow.at(i) && z<fEDChargeLossZHigh.at(i))
+        {
+          offset[0] = 2E9;
+          offset[1] = 2E9;
+          offset[2] = 2E9;
+        }
+      else
+	{
+	  double zdiff = z - fEDZCenter.at(i);
+	  double zexp = TMath::Exp( -TMath::Sq(zdiff/fEDs.at(i)) );
+	  offset[2] += fEDBZPosOffs.at(i) * zdiff * zexp;
+
+	  // the timing offsets need to be computed after the z shift
+	  double zdiffc = zdiff + offset[2];
+	  double zexpc = TMath::Exp( -TMath::Sq(zdiffc/fEDs.at(i)) );
+	  offset[0] += fEDAXPosOffs.at(i) * zexpc;
+	}
+    }
+  return {offset[0], offset[1], offset[2]};
 }
