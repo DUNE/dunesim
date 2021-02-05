@@ -54,6 +54,20 @@ simple_plugin(ExponentialChannelNoiseService   "service"
                 ${CLHEP}
                 ${ROOT_BASIC_LIB_LIST}
              )
+              
+simple_plugin(ShapedCohProtoDUNENoiseService   "service"
+                dune-raw-data_Services_ChannelMap_PdspChannelMapService_service
+                larcorealg_Geometry
+                SignalShapingServiceDUNE_service
+                ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
+                ${ART_ROOT_IO_TFILESERVICE_SERVICE}
+                nurandom_RandomUtils_NuRandomService_service
+                ${ART_FRAMEWORK_CORE}
+                art_Utilities canvas
+                cetlib cetlib_except
+                ${CLHEP}
+                ${ROOT_BASIC_LIB_LIST}
+             )
 
 simple_plugin(DPhaseRealisticNoiseService   "service"
                larcorealg_Geometry
