@@ -59,9 +59,9 @@ private:
   std::vector<std::vector<double>> m_FEMBCo_Phs_nominal;
 
   // Fast access
-  double m_FEMBCo_Frq_this_event_vec[m_n_apa][m_n_femb][m_n_max_coh_noise];
-  double m_FEMBCo_Amp_this_event_vec[m_n_apa][m_n_femb][m_n_max_coh_noise];
-  double m_FEMBCo_Phs_this_event_vec[m_n_apa][m_n_femb][m_n_max_coh_noise];
+  //dla double m_FEMBCo_Frq_this_event_vec[m_n_apa][m_n_femb][m_n_max_coh_noise];
+  //dla double m_FEMBCo_Amp_this_event_vec[m_n_apa][m_n_femb][m_n_max_coh_noise];
+  //dla double m_FEMBCo_Phs_this_event_vec[m_n_apa][m_n_femb][m_n_max_coh_noise];
 
   double m_FEMBCo_Wfm_this_event_vec[m_n_apa][m_n_femb][m_n_tick];
   
@@ -71,13 +71,13 @@ private:
   std::vector<double> m_HV1_Phs_nominal;
 
   // Fast access
-  double m_HV1_Frq_this_event_vec[m_n_max_coh_noise];
-  double m_HV1_Amp_this_event_vec[m_n_max_coh_noise];
-  double m_HV1_Phs_this_event_vec[m_n_max_coh_noise];
+  //dla double m_HV1_Frq_this_event_vec[m_n_max_coh_noise];
+  //dla double m_HV1_Amp_this_event_vec[m_n_max_coh_noise];
+  //dla double m_HV1_Phs_this_event_vec[m_n_max_coh_noise];
   double m_HV1_Wfm_this_event_vec[m_n_tick];
 
-  double previous_x = 1;
-  double previous_sine = 1;
+  //dla double previous_x = 1;
+  //dla double previous_sine = 1;
   bool m_init = 0;
 };
 
