@@ -453,18 +453,20 @@ evgen::ProtoDUNEBeam::ProtoDUNEBeam(fhicl::ParameterSet const & pset)
     // Or maybe there was --nskip specified in the command line or skipEvents in FHiCL?
     for (auto const & p : fhicl::ParameterSetRegistry::get())
     {
-        if (p.second.has_key("source.skipEvents"))
+        auto const& ps = p.second;
+        if (ps.has_key("source") && ps.has_key("source.skipEvents"))
         {
-            fStartEvent += p.second.get<int>("source.skipEvents");
+            fStartEvent += ps.get<int>("source.skipEvents");
             break; // take the first occurence
         } // no "else", if parameter not found, then just don't change anything
     }
     // ...and if there is -e option or firstEvent in FHiCL, this add up to the no. of events to skip.
     for (auto const & p : fhicl::ParameterSetRegistry::get())
     {
-        if (p.second.has_key("source.firstEvent"))
+        auto const& ps = p.second;
+        if (ps.has_key("source") && ps.has_key("source.firstEvent"))
         {
-            int fe = p.second.get<int>("source.firstEvent") - 1; // events base index is 1
+            int fe = ps.get<int>("source.firstEvent") - 1; // events base index is 1
             if (fe > 0) fStartEvent += fe;
             break; // take the first occurence
         } // no "else", if parameter not found, then just don't change anything
