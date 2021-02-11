@@ -16,6 +16,7 @@ simple_plugin(NoisyAdcSimulator   "tool"
   ${CLHEP}
   art_Utilities canvas
   cetlib cetlib_except
+  ${MF_MESSAGELOGGER}
   ${ART_FRAMEWORK_SERVICES_BASIC}
   ${ART_FRAMEWORK_SERVICES_REGISTRY}
   ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}

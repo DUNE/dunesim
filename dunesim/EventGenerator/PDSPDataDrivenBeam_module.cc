@@ -278,7 +278,7 @@ void PDSPDataDrivenBeam::beginJob() {
     //Scale according to the reco bin population
     TH2D * this_hist = fResolutionHists2D[part_type];
     for (int i = 1; i <= this_hist->GetNbinsX(); ++i) {
-      double integral = this_hist->Integral(i, i);
+      double integral = this_hist->TH1::Integral(i, i);
       std::cout << "Integral: " << integral << std::endl;
       double total = 0.;
       for (int j = 1; j <= this_hist->GetNbinsY(); ++j) {
@@ -797,7 +797,7 @@ void PDSPDataDrivenBeam::Scale2DRes() {
        it != fResolutionHists2D.end(); ++it) {
     TH2D * this_hist = it->second;
     for (int i = 1; i <= this_hist->GetNbinsX(); ++i) {
-      double integral = this_hist->Integral(i, i);
+      double integral = this_hist->TH1::Integral(i, i);
       double total = 0.;
       for (int j = 1; j <= this_hist->GetNbinsY(); ++j) {
         this_hist->SetBinContent(i, j,
@@ -812,7 +812,7 @@ void PDSPDataDrivenBeam::Scale2DRes() {
          it != fResolutionHists2DPlus.end(); ++it) {
       TH2D * this_hist = it->second;
       for (int i = 1; i <= this_hist->GetNbinsX(); ++i) {
-        double integral = this_hist->Integral(i, i);
+        double integral = this_hist->TH1::Integral(i, i);
         double total = 0.;
         for (int j = 1; j <= this_hist->GetNbinsY(); ++j) {
           this_hist->SetBinContent(i, j,
@@ -828,7 +828,7 @@ void PDSPDataDrivenBeam::Scale2DRes() {
          it != fResolutionHists2DMinus.end(); ++it) {
       TH2D * this_hist = it->second;
       for (int i = 1; i <= this_hist->GetNbinsX(); ++i) {
-        double integral = this_hist->Integral(i, i);
+        double integral = this_hist->TH1::Integral(i, i);
         double total = 0.;
         for (int j = 1; j <= this_hist->GetNbinsY(); ++j) {
           this_hist->SetBinContent(i, j,
