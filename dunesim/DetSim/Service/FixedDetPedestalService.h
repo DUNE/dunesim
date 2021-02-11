@@ -45,24 +45,17 @@ private:
   // Pedestal value.
   float m_PedMeanU;
   float m_PedMeanV;
-  float m_PedMeanX;
-  float m_PedMeanY;
   float m_PedMeanZ;
   float m_PedRmsU;
   float m_PedRmsV;
-  float m_PedRmsX;
-  float m_PedRmsY;
   float m_PedRmsZ;
   float m_PedMeanErrU;
   float m_PedMeanErrV;
-  float m_PedMeanErrX;
-  float m_PedMeanErrY;
   float m_PedMeanErrZ;
   float m_PedRmsErrU;
   float m_PedRmsErrV;
-  float m_PedRmsErrX;
-  float m_PedRmsErrY;
   float m_PedRmsErrZ;
+
 };
 
 DECLARE_ART_SERVICE_INTERFACE_IMPL(FixedDetPedestalService, lariov::DetPedestalService, LEGACY)
