@@ -143,7 +143,13 @@ dune10kt_1x2x6_v4_larg4detector:
     stepLimits    : [0.4, 0.4] # corresponding stepLimits in mm for the volumes in the volumeNames list
 }
 
-
+dunevd10kt_1x6x6_larg4detector:
+{
+    category      : "world"
+    gdmlFileName_ : @local::dunevd10kt_1x6x6_geo.GDML
+    volumeNames   : ["volTPCActive"] # list of volumes for which the stepLimit should be set
+    stepLimits    : [0.4]            # corresponding stepLimits in mm for the volumes in the volumeNames list
+}
 
 
 END_PROLOG
