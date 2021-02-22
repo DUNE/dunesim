@@ -1047,10 +1047,9 @@ void evgen::ProtoDUNETriggeredBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, co
   std::vector<int> secondary_pdgs;
   // Now we can add any secondaries produced in the interaction before NP04front
   if(trigEvent.fHasInteracted){
-    //int count = mcTruth.NParticles();
+    int count = mcTruth.NParticles();
     for(const int &id : trigEvent.fSecondaryTrackIDs){
-      trigOutputTrackID = -1*(mcTruth.NParticles() + 2/*1*/);
-      //trigOutputTrackID = -1*(count + 2);
+      trigOutputTrackID = -1*(count + 2);
       BeamParticle secondary = trigEvent.fParticlesFront.at(id);
       simb::MCParticle secondaryParticle = BeamParticleToMCParticle(
           secondary, trigOutputTrackID, triggerParticleTime+secondary.fPosT, 1,
@@ -1059,7 +1058,7 @@ void evgen::ProtoDUNETriggeredBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, co
       triggerParticle.AddDaughter(trigOutputTrackID);
       secondary_pdgs.push_back(secondary.fPDG);
       //mcTruth.Add(secondaryParticle);
-      //++count;
+      ++count;
     }
   }
 
