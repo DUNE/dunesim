@@ -407,21 +407,28 @@ evgen::ProtoDUNETriggeredBeam::ProtoDUNETriggeredBeam(fhicl::ParameterSet const 
     // Or maybe there was --nskip specified in the command line or skipEvents in FHiCL?
     for (auto const & p : fhicl::ParameterSetRegistry::get())
     {
-        if (p.second.has_key("source.skipEvents"))
+        if (p.second.has_key("source"))
         {
+          // Need to add in another layer here because of some change (maybe in art?) 
+          if (p.second.has_key("source.skipEvents")) 
+          {
             fStartEvent += p.second.get<int>("source.skipEvents");
             break; // take the first occurence
+          }
         } // no "else", if parameter not found, then just don't change anything
     }
     // ...and if there is -e option or firstEvent in FHiCL, this add up to the no. of events to skip.
     for (auto const & p : fhicl::ParameterSetRegistry::get())
     {
-        if (p.second.has_key("source.firstEvent"))
+        if (p.second.has_key("source"))
         {
-            int fe = p.second.get<int>("source.firstEvent") - 1; // events base index is 1
-            if (fe > 0) fStartEvent += fe;
-            break; // take the first occurence
-        } // no "else", if parameter not found, then just don't change anything
+          if (p.second.has_key("source.firstEvent"))
+          {
+              int fe = p.second.get<int>("source.firstEvent") - 1; // events base index is 1
+              if (fe > 0) fStartEvent += fe;
+              break; // take the first occurence
+          } // no "else", if parameter not found, then just don't change anything
+        }
     }
     mf::LogInfo("ProtoDUNETriggeredBeam") << "Skip " << fStartEvent << " first events from the input file.";
     
@@ -1040,8 +1047,9 @@ void evgen::ProtoDUNETriggeredBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, co
   std::vector<int> secondary_pdgs;
   // Now we can add any secondaries produced in the interaction before NP04front
   if(trigEvent.fHasInteracted){
+    int count = mcTruth.NParticles();
     for(const int &id : trigEvent.fSecondaryTrackIDs){
-      trigOutputTrackID = -1*(mcTruth.NParticles() + 2/*1*/);
+      trigOutputTrackID = -1*(count + 2);
       BeamParticle secondary = trigEvent.fParticlesFront.at(id);
       simb::MCParticle secondaryParticle = BeamParticleToMCParticle(
           secondary, trigOutputTrackID, triggerParticleTime+secondary.fPosT, 1,
@@ -1050,6 +1058,7 @@ void evgen::ProtoDUNETriggeredBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, co
       triggerParticle.AddDaughter(trigOutputTrackID);
       secondary_pdgs.push_back(secondary.fPDG);
       //mcTruth.Add(secondaryParticle);
+      ++count;
     }
   }
 
