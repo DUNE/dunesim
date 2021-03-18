@@ -79,7 +79,8 @@ ShapedCohProtoDUNENoiseService::~ShapedCohProtoDUNENoiseService() { }
 int ShapedCohProtoDUNENoiseService::addNoise(detinfo::DetectorClocksData const& clock,
                                              detinfo::DetectorPropertiesData const&,
                                              Channel c, AdcSignalVector& adcs) const {
-  
+
+  assert(adcs.size() <= m_n_tick);
   int ret = addFEMBNoise(c, adcs, clock) + addHVNoise(c, adcs, clock) + addShapedNoise(c, adcs, clock);
   return ret;
 }
@@ -107,14 +108,13 @@ int ShapedCohProtoDUNENoiseService::addShapedNoise(const Channel c, AdcSignalVec
   CLHEP::RandGauss rgauss(engine, 0, ampl);
   
   std::vector<double> noise_vec;
-  for (size_t i=0; i<adcs.size(); ++i)
+  for (size_t i=0; i<m_n_tick; ++i)
     noise_vec.push_back(rgauss.fire());
   
   art::ServiceHandle<util::SignalShapingServiceDUNE> sss;
   sss->ConvoluteElectronicResponse(clock, c, noise_vec);
   
   std::transform(adcs.begin(), adcs.end(), noise_vec.begin(), adcs.begin(), std::plus<double>());
-  
 
   return 0;
 }
