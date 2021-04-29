@@ -6,11 +6,14 @@ BEGIN_PROLOG
 dunefd_ionandscint_correlated:
 {
   module_type: "IonAndScint"
-  Instances:   "LArG4DetectorServicevolTPCInner;LArG4DetectorServicevolTPCPlaneVInner;LArG4DetectorServicevolTPCActiveOuter;LArG4DetectorServicevolTPCPlaneUInner;LArG4DetectorServicevolTPCPlaneZInner;LArG4DetectorServicevolTPCActiveInner" # separated by semicolon 
+  Instances:   "LArG4DetectorServicevolTPCInner;LArG4DetectorServicevolTPCPlaneVInner;LArG4DetectorServicevolTPCActiveOuter;LArG4DetectorServicevolTPCPlaneUInner;LArG4DetectorServicevolTPCPlaneZInner;LArG4DetectorServicevolTPCActiveInner;LArG4DetectorServicevolTPCActive" # separated by semicolon 
   ISCalcAlg:   "Correlated"
 }   
 dunefd_ionandscint_nest: @local::dunefd_ionandscint_correlated
 dunefd_ionandscint_nest.ISCalcAlg: "NEST"
+
+dunefd_ionandscint_separate: @local::dunefd_ionandscint_correlated
+dunefd_ionandscint_separate.ISCalcAlg: "Separate"
 
 # Choose *the* IonAndScint configuration
 dunefd_ionandscint: @local::dunefd_ionandscint_correlated
