@@ -12,11 +12,12 @@ cet_test(test_LarsoftHuffmanCompressService SOURCES test_LarsoftHuffmanCompressS
     lardataobj_RawData
 )
 
-#cet_test(test_FixedDetPedestalService SOURCES test_FixedDetPedestalService.cxx
-#  LIBRARIES
-#    dune_ArtSupport
-#    larcorealg_Geometry
-#)
+cet_test(test_FixedDetPedestalService SOURCES test_FixedDetPedestalService.cxx
+  LIBRARIES
+    dune_ArtSupport
+    larcorealg_Geometry
+    dune_DetSim_Service_FixedDetPedestalService_service
+)
 
 cet_test(test_ExponentialChannelNoiseService SOURCES test_ExponentialChannelNoiseService.cxx
   LIBRARIES
