@@ -10,6 +10,7 @@
 art_make( BASENAME_ONLY
           MODULE_LIBRARIES larcorealg_Geometry
 	        dune_Geometry
+ 	        lardataalg_detectorinfo
 			    larcore_Geometry_Geometry_service
 			    larsim_Simulation nug4_ParticleNavigation lardataobj_Simulation
 	        lardata_Utilities
