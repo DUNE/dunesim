@@ -28,3 +28,4 @@ art_make( NO_PLUGINS
 install_headers()
 install_fhicl()
 install_source()
+install_scripts()
