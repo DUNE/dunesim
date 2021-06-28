@@ -16,6 +16,7 @@ cet_test(test_FixedDetPedestalService SOURCES test_FixedDetPedestalService.cxx
   LIBRARIES
     dune_ArtSupport
     larcorealg_Geometry
+    dune_DetSim_Service_FixedDetPedestalService_service
 )
 
 cet_test(test_ExponentialChannelNoiseService SOURCES test_ExponentialChannelNoiseService.cxx
