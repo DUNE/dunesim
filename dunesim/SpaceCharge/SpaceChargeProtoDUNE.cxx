@@ -134,28 +134,61 @@ bool spacecharge::SpaceChargeProtoDUNE::Configure(fhicl::ParameterSet const& pse
       hEz_sim_neg->SetDirectory(0);
 
       if (fRepresentationType == "Splines_TH3") { 
-        for(int y = 1; y <= 31; y++){
-          for(int z = 1; z <= 37; z++){
-            spline_dx_fwd_neg[y-1][z-1] = MakeSpline(hDx_sim_neg,1,y,z,1,1);
-            spline_dx_fwd_pos[y-1][z-1] = MakeSpline(hDx_sim_pos,1,y,z,1,2);
-            spline_dEx_neg[y-1][z-1] = MakeSpline(hEx_sim_neg,1,y,z,3,1);
-            spline_dEx_pos[y-1][z-1] = MakeSpline(hEx_sim_pos,1,y,z,3,2);
+        int nBinsX = hDx_sim_pos_orig->GetNbinsX();
+        int nBinsY = hDx_sim_pos_orig->GetNbinsY();
+        int nBinsZ = hDx_sim_pos_orig->GetNbinsZ();
+        for(int y = 1; y <= nBinsY; y++){
+          spline_dx_fwd_neg.push_back(std::vector<TSpline3*>());
+          spline_dx_fwd_pos.push_back(std::vector<TSpline3*>());
+          for(int z = 1; z <= nBinsZ; z++){
+            spline_dx_fwd_neg.back().push_back(MakeSpline(hDx_sim_neg,1,y,z,1,1));
+            spline_dx_fwd_pos.back().push_back(MakeSpline(hDx_sim_pos,1,y,z,1,2));
           }
         }
-        for(int x = 1; x <= 19; x++){
-          for(int z = 1; z <= 37; z++){
-            spline_dy_fwd_neg[x-1][z-1] = MakeSpline(hDy_sim_neg,2,x,z,1,1);
-            spline_dy_fwd_pos[x-1][z-1] = MakeSpline(hDy_sim_pos,2,x,z,1,2);
-            spline_dEy_neg[x-1][z-1] = MakeSpline(hEy_sim_neg,2,x,z,3,1);
-            spline_dEy_pos[x-1][z-1] = MakeSpline(hEy_sim_pos,2,x,z,3,2);
+        for(int x = 1; x <= nBinsX; x++){
+          spline_dy_fwd_neg.push_back(std::vector<TSpline3*>());
+          spline_dy_fwd_pos.push_back(std::vector<TSpline3*>());
+
+          for(int z = 1; z <= nBinsZ; z++){
+            spline_dy_fwd_neg.back().push_back(MakeSpline(hDy_sim_neg,2,x,z,1,1));
+            spline_dy_fwd_pos.back().push_back(MakeSpline(hDy_sim_pos,2,x,z,1,2));
           }
         }
-        for(int x = 1; x <= 19; x++){
-          for(int y = 1; y <= 31; y++){
-            spline_dz_fwd_neg[x-1][y-1] = MakeSpline(hDz_sim_neg,3,x,y,1,1);
-            spline_dz_fwd_pos[x-1][y-1] = MakeSpline(hDz_sim_pos,3,x,y,1,2);
-            spline_dEz_neg[x-1][y-1] = MakeSpline(hEz_sim_neg,3,x,y,3,1);
-            spline_dEz_pos[x-1][y-1] = MakeSpline(hEz_sim_pos,3,x,y,3,2);
+        for(int x = 1; x <= nBinsX; x++){
+          spline_dz_fwd_neg.push_back(std::vector<TSpline3*>());
+          spline_dz_fwd_pos.push_back(std::vector<TSpline3*>());
+          for(int y = 1; y <= nBinsY; y++){
+            spline_dz_fwd_neg.back().push_back(MakeSpline(hDz_sim_neg,3,x,y,1,1));
+            spline_dz_fwd_pos.back().push_back(MakeSpline(hDz_sim_pos,3,x,y,1,2));
+          }
+        }
+
+        nBinsX = hEx_sim_pos_orig->GetNbinsX();
+        nBinsY = hEx_sim_pos_orig->GetNbinsY();
+        nBinsZ = hEx_sim_pos_orig->GetNbinsZ();
+        for(int y = 1; y <= nBinsY; y++){
+          spline_dEx_neg.push_back(std::vector<TSpline3*>());
+          spline_dEx_pos.push_back(std::vector<TSpline3*>());
+          for(int z = 1; z <= nBinsZ; z++){
+            spline_dEx_neg.back().push_back(MakeSpline(hEx_sim_neg,1,y,z,3,1));
+            spline_dEx_pos.back().push_back(MakeSpline(hEx_sim_pos,1,y,z,3,2));
+          }
+        }
+        for(int x = 1; x <= nBinsX; x++){
+          spline_dEy_neg.push_back(std::vector<TSpline3*>());
+          spline_dEy_pos.push_back(std::vector<TSpline3*>());
+
+          for(int z = 1; z <= nBinsZ; z++){
+            spline_dEy_neg.back().push_back(MakeSpline(hEy_sim_neg,2,x,z,3,1));
+            spline_dEy_pos.back().push_back(MakeSpline(hEy_sim_pos,2,x,z,3,2));
+          }
+        }
+        for(int x = 1; x <= nBinsX; x++){
+          spline_dEz_neg.push_back(std::vector<TSpline3*>());
+          spline_dEz_pos.push_back(std::vector<TSpline3*>());
+          for(int y = 1; y <= nBinsY; y++){
+            spline_dEz_neg.back().push_back(MakeSpline(hEz_sim_neg,3,x,y,3,1));
+            spline_dEz_pos.back().push_back(MakeSpline(hEz_sim_pos,3,x,y,3,2));
           }
         }
         created_efield_splines = true;
@@ -364,45 +397,67 @@ bool spacecharge::SpaceChargeProtoDUNE::Configure(fhicl::ParameterSet const& pse
       hEz_cal_neg->SetDirectory(0);
 
       if (fRepresentationType == "Splines_TH3") { 
-        for(int y = 1; y <= 31; y++){
-          for(int z = 1; z <= 37; z++){
-            spline_dx_bkwd_neg[y-1][z-1] = MakeSpline(hDx_cal_neg,1,y,z,2,1);
-            spline_dx_bkwd_pos[y-1][z-1] = MakeSpline(hDx_cal_pos,1,y,z,2,2);
+        int nBinsX = hDx_cal_pos_orig->GetNbinsX();
+        int nBinsY = hDx_cal_pos_orig->GetNbinsY();
+        int nBinsZ = hDx_cal_pos_orig->GetNbinsZ();
+
+        //TFile spline_file("splines.root", "RECREATE");
+        //gROOT->SetBatch(1);
+        for(int y = 1; y <= nBinsY; y++){
+          spline_dx_bkwd_neg.push_back(std::vector<TSpline3*>());
+          spline_dx_bkwd_pos.push_back(std::vector<TSpline3*>());
+          for(int z = 1; z <= nBinsZ; z++){
+            spline_dx_bkwd_neg.back().push_back(MakeSpline(hDx_cal_neg,1,y,z,2,1));
+            spline_dx_bkwd_pos.back().push_back(MakeSpline(hDx_cal_pos,1,y,z,2,2));
           }
         }
-        for(int x = 1; x <= 19; x++){
-          for(int z = 1; z <= 37; z++){
-            spline_dy_bkwd_neg[x-1][z-1] = MakeSpline(hDy_cal_neg,2,x,z,2,1);
-            spline_dy_bkwd_pos[x-1][z-1] = MakeSpline(hDy_cal_pos,2,x,z,2,2);
+        for(int x = 1; x <= nBinsX; x++){
+          spline_dy_bkwd_neg.push_back(std::vector<TSpline3*>());
+          spline_dy_bkwd_pos.push_back(std::vector<TSpline3*>());
+          for(int z = 1; z <= nBinsZ; z++){
+            spline_dy_bkwd_neg.back().push_back(MakeSpline(hDy_cal_neg,2,x,z,2,1));
+            spline_dy_bkwd_pos.back().push_back(MakeSpline(hDy_cal_pos,2,x,z,2,2));
           }
         }
-        for(int x = 1; x <= 19; x++){
-          for(int y = 1; y <= 31; y++){
-            spline_dz_bkwd_neg[x-1][y-1] = MakeSpline(hDz_cal_neg,3,x,y,2,1);
-            spline_dz_bkwd_pos[x-1][y-1] = MakeSpline(hDz_cal_pos,3,x,y,2,2);
+        for(int x = 1; x <= nBinsX; x++){
+          spline_dz_bkwd_neg.push_back(std::vector<TSpline3*>());
+          spline_dz_bkwd_pos.push_back(std::vector<TSpline3*>());
+          for(int y = 1; y <= nBinsY; y++){
+            spline_dz_bkwd_neg.back().push_back(MakeSpline(hDz_cal_neg,3,x,y,2,1));
+            spline_dz_bkwd_pos.back().push_back(MakeSpline(hDz_cal_pos,3,x,y,2,2));
           }
         }
         if(created_efield_splines == false){
-          for(int y = 1; y <= 31; y++){
-            for(int z = 1; z <= 37; z++){
-              spline_dEx_neg[y-1][z-1] = MakeSpline(hEx_cal_neg,1,y,z,3,1);
-              spline_dEx_pos[y-1][z-1] = MakeSpline(hEx_cal_pos,1,y,z,3,2);
+          nBinsX = hEx_cal_neg->GetNbinsX();
+          nBinsY = hEx_cal_neg->GetNbinsY();
+          nBinsZ = hEx_cal_neg->GetNbinsZ();
+          for(int y = 1; y <= nBinsY; y++){
+            spline_dEx_neg.push_back(std::vector<TSpline3*>());
+            spline_dEx_pos.push_back(std::vector<TSpline3*>());
+            for(int z = 1; z <= nBinsZ; z++){
+              spline_dEx_neg.back().push_back(MakeSpline(hEx_cal_neg,1,y,z,3,1));
+              spline_dEx_pos.back().push_back(MakeSpline(hEx_cal_pos,1,y,z,3,2));
             }
           }
-          for(int x = 1; x <= 19; x++){
-            for(int z = 1; z <= 37; z++){
-              spline_dEy_neg[x-1][z-1] = MakeSpline(hEy_cal_neg,2,x,z,3,1);
-              spline_dEy_pos[x-1][z-1] = MakeSpline(hEy_cal_pos,2,x,z,3,2);
+          for(int x = 1; x <= nBinsX; x++){
+            spline_dEy_neg.push_back(std::vector<TSpline3*>());
+            spline_dEy_pos.push_back(std::vector<TSpline3*>());
+            for(int z = 1; z <= nBinsZ; z++){
+              spline_dEy_neg.back().push_back(MakeSpline(hEy_cal_neg,2,x,z,3,1));
+              spline_dEy_pos.back().push_back(MakeSpline(hEy_cal_pos,2,x,z,3,2));
             }
           }
-          for(int x = 1; x <= 19; x++){
-            for(int y = 1; y <= 31; y++){
-              spline_dEz_neg[x-1][y-1] = MakeSpline(hEz_cal_neg,3,x,y,3,1);
-              spline_dEz_pos[x-1][y-1] = MakeSpline(hEz_cal_pos,3,x,y,3,2);
+          for(int x = 1; x <= nBinsX; x++){
+            spline_dEz_neg.push_back(std::vector<TSpline3*>());
+            spline_dEz_pos.push_back(std::vector<TSpline3*>());
+            for(int y = 1; y <= nBinsY; y++){
+              spline_dEz_neg.back().push_back(MakeSpline(hEz_cal_neg,3,x,y,3,1));
+              spline_dEz_pos.back().push_back(MakeSpline(hEz_cal_pos,3,x,y,3,2));
             }
           }
           created_efield_splines = true;
         }
+        //spline_file.Close();
       }
                 
       CalSCEhistograms = {hDx_cal_pos, hDy_cal_pos, hDz_cal_pos, hEx_cal_pos, hEy_cal_pos, hEz_cal_pos, hDx_cal_neg, hDy_cal_neg, hDz_cal_neg, hEx_cal_neg, hEy_cal_neg, hEz_cal_neg};
@@ -1173,7 +1228,55 @@ TSpline3* spacecharge::SpaceChargeProtoDUNE::MakeSpline(TH3F* spline_hist, int d
 {
   TSpline3 *spline = 0;
   
-  if(dim1 == 1)
+  std::vector<double> a, b;
+  if (dim1 == 1) {
+    for (int x = 1; x <= spline_hist->GetNbinsX(); ++x) {
+      a.push_back(spline_hist->GetXaxis()->GetBinCenter(x));
+      b.push_back(spline_hist->GetBinContent(x, dim2_bin, dim3_bin));
+    }
+  }
+  else if (dim1 == 2) {
+    for(int y = 1; y <= spline_hist->GetNbinsY(); ++y) {
+      a.push_back(spline_hist->GetYaxis()->GetBinCenter(y));
+      b.push_back(spline_hist->GetBinContent(dim2_bin, y, dim3_bin));
+    }
+  }
+  else if (dim1 == 3) {
+    for (int z = 1; z <= spline_hist->GetNbinsZ(); z++) {
+      a.push_back(spline_hist->GetZaxis()->GetBinCenter(z));
+      b.push_back(spline_hist->GetBinContent(dim2_bin, dim3_bin, z));
+    }
+  }
+  else {
+    cet::exception("SpaceChargeProtoDUNE::MakeSpline") << "Unkown dimension " << dim1 << "\n";
+  }
+
+  if(maptype == 1)
+  {
+    spline = new TSpline3(Form("spline_%d_%d_%d_%d_%d", dim1, dim2_bin,
+                          dim3_bin, maptype, driftvol), &a[0], &b[0], a.size(),
+                          "b2e2", 0, 0);
+    spline->SetName(Form("spline_%d_%d_%d_%d_%d", dim1, dim2_bin, dim3_bin,
+                    maptype, driftvol));
+  }
+  else if(maptype == 2)
+  {
+    spline = new TSpline3(Form("spline_%d_%d_%d_%d_%d", dim1, dim2_bin,
+                          dim3_bin, maptype, driftvol), &a[0], &b[0], a.size(),
+                          "b2e2", 0, 0);
+    spline->SetName(Form("spline_%d_%d_%d_%d_%d", dim1, dim2_bin, dim3_bin,
+                    maptype, driftvol));
+  }
+  else if(maptype == 3)
+  {
+    spline = new TSpline3(Form("spline_%d_%d_%d_%d_%d", dim1, dim2_bin,
+                          dim3_bin, maptype, driftvol), &a[0], &b[0], a.size(),
+                          "b2e2", 0, 0);
+    spline->SetName(Form("spline_%d_%d_%d_%d_%d", dim1, dim2_bin, dim3_bin,
+                    maptype, driftvol));
+  }
+
+  /*if(dim1 == 1)
   {
     double a[19];
     double b[19];
@@ -1250,7 +1353,7 @@ TSpline3* spacecharge::SpaceChargeProtoDUNE::MakeSpline(TH3F* spline_hist, int d
       spline = new TSpline3(Form("spline_%d_%d_%d_%d_%d",dim1,dim2_bin,dim3_bin,maptype,driftvol),a,b,37,"b2e2",0,0);
       spline->SetName(Form("spline_%d_%d_%d_%d_%d",dim1,dim2_bin,dim3_bin,maptype,driftvol));
     }
-  }
+  }*/
 
   return spline;
 }
@@ -1259,6 +1362,8 @@ TSpline3* spacecharge::SpaceChargeProtoDUNE::MakeSpline(TH3F* spline_hist, int d
 /// Interpolate given SCE map using splines
 double spacecharge::SpaceChargeProtoDUNE::InterpolateSplines(TH3F* interp_hist, double xVal, double yVal, double zVal, int dim, int maptype, int driftvol) const
 {
+
+  //std::cout << "Interpolating " << interp_hist->GetName() << std::endl;
   int bin_x = interp_hist->GetXaxis()->FindBin(xVal);
   int bin_y = interp_hist->GetYaxis()->FindBin(yVal);
   int bin_z = interp_hist->GetZaxis()->FindBin(zVal);
