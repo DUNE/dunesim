@@ -169,29 +169,53 @@ namespace spacecharge {
       TF1 *f4_Ez = new TF1("f4_Ez","pol4");
       TF1 *fFinal_Ez = new TF1("fFinal_Ez","pol3");
 
-      TSpline3 *spline_dx_fwd_neg[31][37];
-      TSpline3 *spline_dy_fwd_neg[19][37];
-      TSpline3 *spline_dz_fwd_neg[19][31];
+      std::vector<std::vector<TSpline3*>> spline_dx_fwd_neg;
+      std::vector<std::vector<TSpline3*>> spline_dy_fwd_neg;
+      std::vector<std::vector<TSpline3*>> spline_dz_fwd_neg;
 
-      TSpline3 *spline_dx_bkwd_neg[31][37];
-      TSpline3 *spline_dy_bkwd_neg[19][37];
-      TSpline3 *spline_dz_bkwd_neg[19][31];
+      std::vector<std::vector<TSpline3*>> spline_dx_bkwd_neg;
+      std::vector<std::vector<TSpline3*>> spline_dy_bkwd_neg;
+      std::vector<std::vector<TSpline3*>> spline_dz_bkwd_neg;
 
-      TSpline3 *spline_dEx_neg[31][37];
-      TSpline3 *spline_dEy_neg[19][37];
-      TSpline3 *spline_dEz_neg[19][31];
+      std::vector<std::vector<TSpline3*>> spline_dEx_neg;
+      std::vector<std::vector<TSpline3*>> spline_dEy_neg;
+      std::vector<std::vector<TSpline3*>> spline_dEz_neg;
 
-      TSpline3 *spline_dx_fwd_pos[31][37];
-      TSpline3 *spline_dy_fwd_pos[19][37];
-      TSpline3 *spline_dz_fwd_pos[19][31];
+      std::vector<std::vector<TSpline3*>> spline_dx_fwd_pos;
+      std::vector<std::vector<TSpline3*>> spline_dy_fwd_pos;
+      std::vector<std::vector<TSpline3*>> spline_dz_fwd_pos;
 
-      TSpline3 *spline_dx_bkwd_pos[31][37];
-      TSpline3 *spline_dy_bkwd_pos[19][37];
-      TSpline3 *spline_dz_bkwd_pos[19][31];
+      std::vector<std::vector<TSpline3*>> spline_dx_bkwd_pos;
+      std::vector<std::vector<TSpline3*>> spline_dy_bkwd_pos;
+      std::vector<std::vector<TSpline3*>> spline_dz_bkwd_pos;
 
-      TSpline3 *spline_dEx_pos[31][37];
-      TSpline3 *spline_dEy_pos[19][37];
-      TSpline3 *spline_dEz_pos[19][31];
+      std::vector<std::vector<TSpline3*>> spline_dEx_pos;
+      std::vector<std::vector<TSpline3*>> spline_dEy_pos;
+      std::vector<std::vector<TSpline3*>> spline_dEz_pos;
+
+      //TSpline3 *spline_dx_fwd_neg[31][37];
+      //TSpline3 *spline_dy_fwd_neg[19][37];
+      //TSpline3 *spline_dz_fwd_neg[19][31];
+
+      //TSpline3 *spline_dx_bkwd_neg[31][37];
+      //TSpline3 *spline_dy_bkwd_neg[19][37];
+      //TSpline3 *spline_dz_bkwd_neg[19][31];
+
+      //TSpline3 *spline_dEx_neg[31][37];
+      //TSpline3 *spline_dEy_neg[19][37];
+      //TSpline3 *spline_dEz_neg[19][31];
+
+      //TSpline3 *spline_dx_fwd_pos[31][37];
+      //TSpline3 *spline_dy_fwd_pos[19][37];
+      //TSpline3 *spline_dz_fwd_pos[19][31];
+
+      //TSpline3 *spline_dx_bkwd_pos[31][37];
+      //TSpline3 *spline_dy_bkwd_pos[19][37];
+      //TSpline3 *spline_dz_bkwd_pos[19][31];
+
+      //TSpline3 *spline_dEx_pos[31][37];
+      //TSpline3 *spline_dEy_pos[19][37];
+      //TSpline3 *spline_dEz_pos[19][31];
     
   }; // class SpaceChargeProtoDUNE
 } //namespace spacecharge

@@ -70,6 +70,8 @@ simple_plugin(ShapedCohProtoDUNENoiseService   "service"
              )
 
 simple_plugin(DPhaseRealisticNoiseService   "service"
+               lardata_Utilities_LArFFT_service
+	       lardataalg_detectorinfo
                larcorealg_Geometry
                SignalShapingServiceDUNEDPhase_service
                ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
@@ -84,6 +86,7 @@ simple_plugin(DPhaseRealisticNoiseService   "service"
 
  simple_plugin(DPhaseCoherentNoiseService   "service"
                 larcorealg_Geometry
+ 	        lardataalg_detectorinfo
                 SignalShapingServiceDUNEDPhase_service
                 ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
                 ${ART_ROOT_IO_TFILESERVICE_SERVICE}
