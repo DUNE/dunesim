@@ -3,6 +3,7 @@
 // January 2019
 
 #include "dune/DetSim/Service/SPhaseChannelNoiseService.h"
+#include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 #include <sstream>
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "lardata/Utilities/LArFFT.h"

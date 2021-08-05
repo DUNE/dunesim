@@ -1,6 +1,7 @@
 // ProtoDUNEChannelNoiseService.cxx
 
 #include "dune/DetSim/Service/ProtoDUNEChannelNoiseService.h"
+#include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 #include <sstream>
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "lardata/Utilities/LArFFT.h"

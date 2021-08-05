@@ -1,9 +1,11 @@
 // StuckBitAdcDistortionService_service.cc
 
 #include "dune/DetSim/Service/StuckBitAdcDistortionService.h"
+#include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "nurandom/RandomUtils/NuRandomService.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h"
+#include "messagefacility/MessageLogger/MessageLogger.h"
 #include "CLHEP/Random/JamesRandom.h"
 #include "CLHEP/Random/RandFlat.h"
 #include "TFile.h"

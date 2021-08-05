@@ -1,6 +1,7 @@
 // GenericSimChannelExtractService.cxx
 
 #include "GenericSimChannelExtractService.h"
+#include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 #include <string>
 #include "larcore/Geometry/Geometry.h"
 #include "lardataobj/Simulation/SimChannel.h"
