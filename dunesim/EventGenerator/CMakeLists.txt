@@ -9,24 +9,22 @@ art_make( BASENAME_ONLY
                         larsim_Simulation lardataobj_Simulation
                         lardataobj_RecoBase
                         nusimdata_SimulationBase
-                        ${ART_FRAMEWORK_CORE}
-                        ${ART_FRAMEWORK_PRINCIPAL}
-                        ${ART_FRAMEWORK_SERVICES_REGISTRY}
-                        ${ART_FRAMEWORK_SERVICES_OPTIONAL}
-                        ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
-                        ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
+                        ART_FRAMEWORK_CORE
+                        ART_FRAMEWORK_PRINCIPAL
+                        ART_FRAMEWORK_SERVICES_REGISTRY
+                        ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE
                         art_Persistency_Common
                         art_Persistency_Provenance
                         art_Utilities canvas
-                        ${MF_MESSAGELOGGER}
+                        messagefacility::MF_MessageLogger
                         hep_concurrency
-                        ${FHICLCPP}
+                        FHICLCPP
                         cetlib cetlib_except
-                        ${CLHEP}
-                        ${ROOT_BASIC_LIB_LIST}
-                        ${SQLITE3}
-                        ${ROOT_EG}
-                        ${IFDH}
+                        CLHEP
+                        ROOT_BASIC_LIB_LIST
+                        SQLITE3
+                        ROOT_EG
+                        IFDH
                         dune_EventGenerator_ProtoDUNEbeamDataProducts
  )
 
