@@ -5,13 +5,13 @@
 
 # Add plugin for each tool.
 
-simple_plugin(IdealAdcSimulator   "tool"
+cet_build_plugin(IdealAdcSimulator   art::tool
   art_Utilities canvas
   cetlib cetlib_except
   ROOT_BASIC_LIB_LIST
   )
 
-simple_plugin(NoisyAdcSimulator   "tool"
+cet_build_plugin(NoisyAdcSimulator   art::tool
   nurandom_RandomUtils_NuRandomService_service
   CLHEP
   art_Utilities canvas

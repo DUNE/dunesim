@@ -1,4 +1,4 @@
-simple_plugin(GenExtCounterFilter "module"
+cet_build_plugin(GenExtCounterFilter art::module
 		      lardataobj_RawData
 		      lardataobj_RecoBase
 		      dune_Geometry
@@ -22,7 +22,7 @@ simple_plugin(GenExtCounterFilter "module"
               BASENAME_ONLY
 )
 
-simple_plugin(LArG4ExtCounterFilter "module"
+cet_build_plugin(LArG4ExtCounterFilter art::module
 		      lardataobj_RawData
 		      lardataobj_RecoBase
 		      dune_Geometry

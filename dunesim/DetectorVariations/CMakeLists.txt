@@ -1,4 +1,4 @@
-simple_plugin(RandomChannelStatusService "service"
+cet_build_plugin(RandomChannelStatusService art::service
               larcorealg_Geometry
               ROOT_BASIC_LIB_LIST
               ROOT_GEOM

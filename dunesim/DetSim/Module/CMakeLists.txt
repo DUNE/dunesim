@@ -6,7 +6,7 @@
 art_make(
   BASENAME_ONLY
   MODULE_LIBRARIES
-    lardataalg_detectorinfo
+    lardataalg_DetectorInfo
     dune_ArtSupport
     dune_DetSim
     dune_Geometry

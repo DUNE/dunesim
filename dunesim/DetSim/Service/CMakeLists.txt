@@ -7,7 +7,7 @@
 
 # Add plugin for each service.
 
-simple_plugin(Dune35tSimChannelExtractService   "service"
+cet_build_plugin(Dune35tSimChannelExtractService   art::service
                 dune_DetSim
                 larcorealg_Geometry
                 larsim_Simulation nug4_ParticleNavigation lardataobj_Simulation
@@ -18,7 +18,7 @@ simple_plugin(Dune35tSimChannelExtractService   "service"
                 ROOT_BASIC_LIB_LIST
              )
 
-simple_plugin(GenericSimChannelExtractService   "service"
+cet_build_plugin(GenericSimChannelExtractService   art::service
                 dune_DetSim
                 larsim_Simulation nug4_ParticleNavigation lardataobj_Simulation
                 lardata_Utilities
@@ -28,7 +28,7 @@ simple_plugin(GenericSimChannelExtractService   "service"
                 ROOT_BASIC_LIB_LIST
              )
 
-simple_plugin(DPhaseSimChannelExtractService   "service"
+cet_build_plugin(DPhaseSimChannelExtractService   art::service
                 dune_DetSim
 	        larsim_Simulation nug4_ParticleNavigation lardataobj_Simulation
                 lardata_Utilities
@@ -42,7 +42,7 @@ simple_plugin(DPhaseSimChannelExtractService   "service"
 		CLHEP
              )
 
-simple_plugin(ExponentialChannelNoiseService   "service"
+cet_build_plugin(ExponentialChannelNoiseService   art::service
                 larcorealg_Geometry
                 SignalShapingServiceDUNE_service
                 ART_ROOT_IO_TFILE_SUPPORT
@@ -56,7 +56,7 @@ simple_plugin(ExponentialChannelNoiseService   "service"
                 ROOT_BASIC_LIB_LIST
              )
               
-simple_plugin(ShapedCohProtoDUNENoiseService   "service"
+cet_build_plugin(ShapedCohProtoDUNENoiseService   art::service
                 dune-raw-data_Services_ChannelMap_PdspChannelMapService_service
                 larcorealg_Geometry
                 SignalShapingServiceDUNE_service
@@ -71,9 +71,9 @@ simple_plugin(ShapedCohProtoDUNENoiseService   "service"
                 ROOT_BASIC_LIB_LIST
              )
 
-simple_plugin(DPhaseRealisticNoiseService   "service"
+cet_build_plugin(DPhaseRealisticNoiseService   art::service
                lardata_Utilities_LArFFT_service
-	       lardataalg_detectorinfo
+	       lardataalg_DetectorInfo
                larcorealg_Geometry
                SignalShapingServiceDUNEDPhase_service
                ART_ROOT_IO_TFILE_SUPPORT
@@ -87,9 +87,9 @@ simple_plugin(DPhaseRealisticNoiseService   "service"
                ROOT_BASIC_LIB_LIST
              )
 
- simple_plugin(DPhaseCoherentNoiseService   "service"
+cet_build_plugin(DPhaseCoherentNoiseService   art::service
                 larcorealg_Geometry
- 	        lardataalg_detectorinfo
+ 	        lardataalg_DetectorInfo
                 SignalShapingServiceDUNEDPhase_service
                 ART_ROOT_IO_TFILE_SUPPORT
                 ROOT::Core
@@ -102,7 +102,7 @@ simple_plugin(DPhaseRealisticNoiseService   "service"
                 ROOT_BASIC_LIB_LIST
               )
 
-simple_plugin(ProtoDUNEChannelNoiseService   "service"
+cet_build_plugin(ProtoDUNEChannelNoiseService   art::service
                 larcorealg_Geometry
                 SignalShapingServiceDUNE_service
                 ART_ROOT_IO_TFILE_SUPPORT
@@ -116,7 +116,7 @@ simple_plugin(ProtoDUNEChannelNoiseService   "service"
                 ROOT_BASIC_LIB_LIST
              )
 
-simple_plugin(SPhaseChannelNoiseService   "service"
+cet_build_plugin(SPhaseChannelNoiseService   art::service
                 larcorealg_Geometry
                 SignalShapingServiceDUNE_service
                 ART_ROOT_IO_TFILE_SUPPORT
@@ -131,7 +131,7 @@ simple_plugin(SPhaseChannelNoiseService   "service"
              )
 
 
-simple_plugin(WhiteChannelNoiseService   "service"
+cet_build_plugin(WhiteChannelNoiseService   art::service
                 larcorealg_Geometry
                 SignalShapingServiceDUNE_service
                 nurandom_RandomUtils_NuRandomService_service
@@ -145,7 +145,7 @@ simple_plugin(WhiteChannelNoiseService   "service"
                 ROOT_BASIC_LIB_LIST
              )
 
-simple_plugin(ProvidedPedestalAdditionService "service"
+cet_build_plugin(ProvidedPedestalAdditionService art::service
                 nurandom_RandomUtils_NuRandomService_service
                 ART_ROOT_IO_TFILE_SUPPORT
                 ROOT::Core
@@ -158,31 +158,31 @@ simple_plugin(ProvidedPedestalAdditionService "service"
                 ROOT_BASIC_LIB_LIST
              )
 
-simple_plugin(Dune35tZeroSuppressService        "service"
+cet_build_plugin(Dune35tZeroSuppressService        art::service
                 dune_DetSim
                 cetlib cetlib_except
 )
 
-simple_plugin(Legacy35tZeroSuppressService  "service"
+cet_build_plugin(Legacy35tZeroSuppressService  art::service
                 dune_DetSim
                 cetlib cetlib_except
 )
 
-simple_plugin(FixedZeroSuppressService      "service"
+cet_build_plugin(FixedZeroSuppressService      art::service
                 cetlib cetlib_except
 )
 
-simple_plugin(ReplaceCompressService        "service"
+cet_build_plugin(ReplaceCompressService        art::service
                 cetlib cetlib_except
 )
 
-simple_plugin(LarsoftHuffmanCompressService "service"
+cet_build_plugin(LarsoftHuffmanCompressService art::service
                 lardataobj_RawData
                 dune_DetSim_Service_ReplaceCompressService_service
                 cetlib cetlib_except
 )
 
-simple_plugin(StuckBitAdcDistortionService   "service"
+cet_build_plugin(StuckBitAdcDistortionService   art::service
                 larcorealg_Geometry
                 ART_ROOT_IO_TFILE_SUPPORT
                 ROOT::Core
@@ -196,14 +196,14 @@ simple_plugin(StuckBitAdcDistortionService   "service"
                 ROOT_BASIC_LIB_LIST
              )
 
-simple_plugin(FixedDetPedestalService "service"
+cet_build_plugin(FixedDetPedestalService art::service
                 larcorealg_Geometry
                 art_Utilities canvas
                 cetlib cetlib_except
                 ROOT_BASIC_LIB_LIST
 )
 
-simple_plugin(DPhaseFixedDetPedestalService "service"
+cet_build_plugin(DPhaseFixedDetPedestalService art::service
                 larcorealg_Geometry
                 art_Utilities canvas
                 cetlib cetlib_except

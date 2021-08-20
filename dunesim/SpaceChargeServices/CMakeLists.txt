@@ -1,4 +1,4 @@
-simple_plugin(SpaceChargeServiceProtoDUNE "service"
+cet_build_plugin(SpaceChargeServiceProtoDUNE art::service
               dune_SpaceCharge
               lardataalg_DetectorInfo
 	      ART_FRAMEWORK_CORE
@@ -16,7 +16,7 @@ simple_plugin(SpaceChargeServiceProtoDUNE "service"
   	      cetlib cetlib_except
    	      ROOT_BASIC_LIB_LIST
 )              
-simple_plugin(SpaceChargeServiceProtoDUNEdp "service"
+cet_build_plugin(SpaceChargeServiceProtoDUNEdp art::service
               dune_SpaceCharge
               lardataalg_DetectorInfo
               ART_FRAMEWORK_CORE
@@ -37,7 +37,7 @@ simple_plugin(SpaceChargeServiceProtoDUNEdp "service"
 )
 
 
-simple_plugin(SpaceChargeServiceDUNE35t "service"
+cet_build_plugin(SpaceChargeServiceDUNE35t art::service
               dune_SpaceCharge
 	      ART_FRAMEWORK_CORE
 	      ART_FRAMEWORK_PRINCIPAL
@@ -56,7 +56,7 @@ simple_plugin(SpaceChargeServiceDUNE35t "service"
               
 )
 
-simple_plugin(SpaceChargeService3x1x1dphase "service"
+cet_build_plugin(SpaceChargeService3x1x1dphase art::service
               dune_SpaceCharge
 	      ART_FRAMEWORK_CORE
 	      ART_FRAMEWORK_PRINCIPAL
