@@ -33,7 +33,7 @@ install_scripts()
 #                    MF_MessageLogger
 #                    
 #                    cetlib cetlib_except
-#                    ${ROOT_BASIC_LIB_LIST}
+#                    ROOT_BASIC_LIB_LIST
 #          NO_DICTIONARY )
 
 #art_dictionary( DICTIONARY_LIBRARIES lardataobj_Simulation )
