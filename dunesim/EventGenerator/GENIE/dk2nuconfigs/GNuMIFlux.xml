@@ -1,0 +1,28 @@
+<gnumi_config>
+  <param_set name="dune10kt_v1_1x2x6">
+    <units> m </units>
+    <beamdir type="series">
+      <rotation axis="x" units="rad"> +0.101 </rotation>
+    </beamdir>
+    <beampos> (0, 0, 0 ) = ( 0, 0, 1300000.0 ) </beampos>
+    <window>
+      <point coord="det"> -4.320000,-8.873246,-1.220425 </point>
+      <point coord="det"> -4.320000,7.053604,-2.834529 </point>
+      <point coord="det"> 4.320000,-8.873246,-1.220425 </point>
+    </window>
+    <enumax> 120. 1.05 1.05 2500000 </enumax>
+    <reuse> 10 </reuse>
+  </param_set>
+
+  <param_set name="dunevd10kt_v1_1x6x6">
+    <using_param_set>dune10kt_v1_1x2x6</using_param_set>
+    <beamdir type="series">
+      <rotation axis="y" units="rad"> -0.101 </rotation>
+    </beamdir>
+    <window>
+      <point coord="det"> -4.989416,  6.072000, -0.894593 </point>
+      <point coord="det">  3.820702,  6.072000, -1.787453 </point>
+      <point coord="det"> -4.989416, -6.072000, -0.894593 </point>
+    </window>
+  </param_set>
+</gnumi_config>
