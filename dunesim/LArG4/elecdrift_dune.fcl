@@ -1,0 +1,7 @@
+BEGIN_PROLOG
+dunefd_elecdrift: {
+    module_type:            "SimDriftElectrons"
+    SimulationLabel:        "IonAndScint"
+    StoreDriftedElectronClusters: false
+}
+END_PROLOG

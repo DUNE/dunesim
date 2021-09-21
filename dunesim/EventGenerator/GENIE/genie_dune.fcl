@@ -61,8 +61,8 @@ dune_fd_genie_anu_simple_flux_workspace_window_rotated_tpc.FluxFiles: ["gsimple_
 dune_fd_genie_nu_simple_flux_1x2x6_window: @local::dunefd_genie
 dune_fd_genie_nu_simple_flux_1x2x6_window.FiducialCut:  "mbox:-380,-620,-20,380,620,1420"
 dune_fd_genie_nu_simple_flux_1x2x6_window.FluxType: "simple_flux"
-dune_fd_genie_nu_simple_flux_1x2x6_window.FluxSearchPaths: "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/TaskForce_Flux/opt_03/neutrino/gsimple/far/nominal/"
-dune_fd_genie_nu_simple_flux_1x2x6_window.FluxFiles: ["gsimple_dune10kt_v1_1x2x6_g4lbne_v3r4p2_QGSP_BERT_CP_run15_12388_80GeV_neutrino_*root"]
+dune_fd_genie_nu_simple_flux_1x2x6_window.FluxSearchPaths: "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/Flux/g4lbne/v3r5p4/QGSP_BERT/OptimizedEngineeredNov2017/neutrino/dune10kt_horizdrift_1x2x6/"
+dune_fd_genie_nu_simple_flux_1x2x6_window.FluxFiles: ["gsimple_dune10kt_v1_1x2x6_g4lbne_v3r5p4_QGSP_BERT_OptimizedEngineeredNov2017_neutrino_*root"]
 dune_fd_genie_nu_simple_flux_1x2x6_window.FluxCopyMethod: "DIRECT"
 dune_fd_genie_nu_simple_flux_1x2x6_window.TopVolume: "volCryostat"
 
@@ -71,13 +71,21 @@ dune_fd_genie_nu_simple_flux_1x2x6_window_rotated_tpc.FluxSearchPaths: "/cvmfs/d
 dune_fd_genie_nu_simple_flux_1x2x6_window_rotated_tpc.FluxFiles: ["gsimple_dune10kt_v1_1x2x6_Rotate90Degrees_g4lbne_v3r4p2_QGSP_BERT_CP_run15_12388_80GeV_neutrino_*root"]
 
 dune_fd_genie_anu_simple_flux_1x2x6_window: @local::dune_fd_genie_nu_simple_flux_1x2x6_window
-dune_fd_genie_anu_simple_flux_1x2x6_window.FluxSearchPaths: "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/TaskForce_Flux/opt_03/antineutrino/gsimple/far/nominal/"
-dune_fd_genie_anu_simple_flux_1x2x6_window.FluxFiles: ["gsimple_dune10kt_v1_1x2x6_g4lbne_v3r4p2_QGSP_BERT_CP_run15_12388_80GeV_antineutrino_*root"]
+dune_fd_genie_anu_simple_flux_1x2x6_window.FluxSearchPaths: "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/Flux/g4lbne/v3r5p4/QGSP_BERT/OptimizedEngineeredNov2017/antineutrino/dune10kt_horizdrift_1x2x6/"
+dune_fd_genie_anu_simple_flux_1x2x6_window.FluxFiles: ["gsimple_dune10kt_v1_1x2x6_g4lbne_v3r5p4_QGSP_BERT_OptimizedEngineeredNov2017_antineutrino*root"]
 
 dune_fd_genie_anu_simple_flux_1x2x6_window_rotated_tpc: @local::dune_fd_genie_nu_simple_flux_1x2x6_window
 dune_fd_genie_anu_simple_flux_1x2x6_window_rotated_tpc.FluxSearchPaths: "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/TaskForce_Flux/opt_03/antineutrino/gsimple/far/Rotate90Degrees/"
 dune_fd_genie_anu_simple_flux_1x2x6_window_rotated_tpc.FluxFiles: ["gsimple_dune10kt_v1_1x2x6_Rotate90Degrees_g4lbne_v3r4p2_QGSP_BERT_CP_run15_12388_80GeV_antineutrino_*root"]
 
+dunefdvd_1x6x6_genie_lbnf_dk2nu: {
+    @table::dune_fd_genie_nu_simple_flux_1x2x6_window
+    FiducialCut: "mbox: -350, -530, -20, 350, 530, 920"
+    FluxType: "dk2nu"
+    DetectorLocation: "dunevd10kt_v1_1x6x6"
+    FluxSearchPaths: "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/Flux/g4lbne/v3r5p4/QGSP_BERT/OptimizedEngineeredNov2017/neutrino/flux/"
+    FluxFiles: ["g4lbne_v3r5p4_QGSP_BERT_OptimizedEngineeredNov2017_neutrino*.dk2nu.root"]
+}
 
 #atmospheric neutrino configurations
 
