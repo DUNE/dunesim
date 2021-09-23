@@ -1,77 +1,77 @@
-simple_plugin(SpaceChargeServiceProtoDUNE "service"
+cet_build_plugin(SpaceChargeServiceProtoDUNE art::service
               dune_SpaceCharge
               lardataalg_DetectorInfo
-	      ${ART_FRAMEWORK_CORE}
-	      ${ART_FRAMEWORK_PRINCIPAL}
-	      ${ART_FRAMEWORK_SERVICES_REGISTRY}
+	      ART_FRAMEWORK_CORE
+	      ART_FRAMEWORK_PRINCIPAL
+	      ART_FRAMEWORK_SERVICES_REGISTRY
 	      art_Persistency_Common canvas
 	      art_Persistency_Provenance canvas
-	      ${ART_FRAMEWORK_SERVICES_BASIC}
-	      ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
-	      ${ART_ROOT_IO_TFILESERVICE_SERVICE}
-	      ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}
+	      ART_ROOT_IO_TFILE_SUPPORT
+	      ROOT::Core
+	      ART_ROOT_IO_TFILESERVICE_SERVICE
+	      ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE
 	      art_Utilities canvas
-	      ${MF_MESSAGELOGGER}
+	      messagefacility::MF_MessageLogger
 	      
   	      cetlib cetlib_except
-   	      ${ROOT_BASIC_LIB_LIST}
+   	      ROOT_BASIC_LIB_LIST
 )              
-simple_plugin(SpaceChargeServiceProtoDUNEdp "service"
+cet_build_plugin(SpaceChargeServiceProtoDUNEdp art::service
               dune_SpaceCharge
               lardataalg_DetectorInfo
-              ${ART_FRAMEWORK_CORE}
-              ${ART_FRAMEWORK_PRINCIPAL}
-              ${ART_FRAMEWORK_SERVICES_REGISTRY}
+              ART_FRAMEWORK_CORE
+              ART_FRAMEWORK_PRINCIPAL
+              ART_FRAMEWORK_SERVICES_REGISTRY
               art_Persistency_Common canvas
               art_Persistency_Provenance canvas
-              ${ART_FRAMEWORK_SERVICES_BASIC}
-              ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
-              ${ART_ROOT_IO_TFILESERVICE_SERVICE}
-              ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}
+              ART_ROOT_IO_TFILE_SUPPORT
+              ROOT::Core
+              ART_ROOT_IO_TFILESERVICE_SERVICE
+              ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE
               art_Utilities canvas
-              ${MF_MESSAGELOGGER}
+              messagefacility::MF_MessageLogger
 
               cetlib cetlib_except
-              ${ROOT_BASIC_LIB_LIST}
+              ROOT_BASIC_LIB_LIST
 
 )
 
 
-simple_plugin(SpaceChargeServiceDUNE35t "service"
+cet_build_plugin(SpaceChargeServiceDUNE35t art::service
               dune_SpaceCharge
-	      ${ART_FRAMEWORK_CORE}
-	      ${ART_FRAMEWORK_PRINCIPAL}
-	      ${ART_FRAMEWORK_SERVICES_REGISTRY}
+	      ART_FRAMEWORK_CORE
+	      ART_FRAMEWORK_PRINCIPAL
+	      ART_FRAMEWORK_SERVICES_REGISTRY
 	      art_Persistency_Common canvas
 	      art_Persistency_Provenance canvas
-	      ${ART_FRAMEWORK_SERVICES_BASIC}
-	      ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
-	      ${ART_ROOT_IO_TFILESERVICE_SERVICE}
-	      ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}
+	      ART_ROOT_IO_TFILE_SUPPORT
+	      ROOT::Core
+	      ART_ROOT_IO_TFILESERVICE_SERVICE
+	      ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE
 	      art_Utilities canvas
-	      ${MF_MESSAGELOGGER}
+	      messagefacility::MF_MessageLogger
 	      
   	      cetlib cetlib_except
-   	      ${ROOT_BASIC_LIB_LIST}
+   	      ROOT_BASIC_LIB_LIST
               
 )
 
-simple_plugin(SpaceChargeService3x1x1dphase "service"
+cet_build_plugin(SpaceChargeService3x1x1dphase art::service
               dune_SpaceCharge
-	      ${ART_FRAMEWORK_CORE}
-	      ${ART_FRAMEWORK_PRINCIPAL}
-	      ${ART_FRAMEWORK_SERVICES_REGISTRY}
+	      ART_FRAMEWORK_CORE
+	      ART_FRAMEWORK_PRINCIPAL
+	      ART_FRAMEWORK_SERVICES_REGISTRY
 	      art_Persistency_Common canvas
 	      art_Persistency_Provenance canvas
-	      ${ART_FRAMEWORK_SERVICES_BASIC}
-	      ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
-	      ${ART_ROOT_IO_TFILESERVICE_SERVICE}
-	      ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}
+	      ART_ROOT_IO_TFILE_SUPPORT
+	      ROOT::Core
+	      ART_ROOT_IO_TFILESERVICE_SERVICE
+	      ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE
 	      art_Utilities canvas
-	      ${MF_MESSAGELOGGER}
+	      messagefacility::MF_MessageLogger
 	      
   	      cetlib cetlib_except
-   	      ${ROOT_BASIC_LIB_LIST}
+   	      ROOT_BASIC_LIB_LIST
               
 )
 

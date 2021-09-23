@@ -1,6 +1,7 @@
 // ProvidedPedestalAdditionService.cxx
 
 #include "dune/DetSim/Service/ProvidedPedestalAdditionService.h"
+#include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 #include "larevt/CalibrationDBI/Interface/DetPedestalService.h"
 #include "larevt/CalibrationDBI/Interface/DetPedestalProvider.h"
 #include "nurandom/RandomUtils/NuRandomService.h"

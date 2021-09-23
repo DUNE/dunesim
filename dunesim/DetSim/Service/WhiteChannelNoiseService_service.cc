@@ -1,5 +1,6 @@
 // WhiteChannelNoiseService.cxx
 
+#include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 #include "dune/DetSim/Service/WhiteChannelNoiseService.h"
 #include "larcore/Geometry/Geometry.h"
 #include "nurandom/RandomUtils/NuRandomService.h"
