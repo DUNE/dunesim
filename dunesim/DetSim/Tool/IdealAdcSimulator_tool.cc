@@ -39,3 +39,5 @@ IdealAdcSimulator::count(double vin, Channel, Tick) const {
 }
 
 //**********************************************************************
+
+DEFINE_ART_CLASS_TOOL(IdealAdcSimulator)

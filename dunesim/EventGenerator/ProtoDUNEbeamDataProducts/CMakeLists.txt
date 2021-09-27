@@ -4,19 +4,20 @@ include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
 art_make(
           MODULE_LIBRARIES dune_EventGenerator_ProtoDUNEbeamDataProducts
           LIB_LIBRARIES lardataobj_Simulation
-          ${ART_FRAMEWORK_CORE}
-          ${ART_FRAMEWORK_PRINCIPAL}
-          ${ART_FRAMEWORK_SERVICES_REGISTRY}
-          ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
-          ${ART_ROOT_IO_TFILESERVICE_SERVICE}
+          ART_FRAMEWORK_CORE
+          ART_FRAMEWORK_PRINCIPAL
+          ART_FRAMEWORK_SERVICES_REGISTRY
+          ART_ROOT_IO_TFILE_SUPPORT
+          ROOT::Core
+          ART_ROOT_IO_TFILESERVICE_SERVICE
           art_Persistency_Common
           art_Utilities 
           art_Persistency_Common
           art_Persistency_Provenance 
 	  canvas
-          ${MF_MESSAGELOGGER}
+          messagefacility::MF_MessageLogger
           cetlib cetlib_except
-          ${ROOT_BASIC_LIB_LIST}
+          ROOT_BASIC_LIB_LIST
         )
 
 install_headers()
@@ -32,7 +33,7 @@ install_scripts()
 #                    MF_MessageLogger
 #                    
 #                    cetlib cetlib_except
-#                    ${ROOT_BASIC_LIB_LIST}
+#                    ROOT_BASIC_LIB_LIST
 #          NO_DICTIONARY )
 
 #art_dictionary( DICTIONARY_LIBRARIES lardataobj_Simulation )

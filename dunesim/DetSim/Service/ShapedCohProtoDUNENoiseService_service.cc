@@ -4,6 +4,7 @@
 // Dec 2020
 
 #include "dune/DetSim/Service/ShapedCohProtoDUNENoiseService.h"
+#include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 
 #include "nurandom/RandomUtils/NuRandomService.h"
 #include "dune-raw-data/Services/ChannelMap/PdspChannelMapService.h"

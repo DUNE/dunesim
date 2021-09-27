@@ -1,5 +1,6 @@
 // LarsoftHuffmanCompressService.cxx
 
+#include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 #include "dune/DetSim/Service/LarsoftHuffmanCompressService.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "lardataobj/RawData/raw.h"

@@ -1,6 +1,7 @@
 // Dune35tZeroSuppressService.cxx
 
 #include "dune/DetSim/Service/Dune35tZeroSuppressService.h"
+#include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 #include <iomanip>
 #include "dune/DetSim/Utility/SignalTypeConverter.h"
 #include "fhiclcpp/ParameterSet.h"
