@@ -71,10 +71,8 @@ int test_IdealAdcSimulator(bool useExistingFcl) {
   cout << myname << "Creating parameter set." << endl;
   //putenv(const_cast<char*>("FHICL_FILE_PATH=./test:."));
   cet::filepath_lookup policy("FHICL_FILE_PATH");
-  fhicl::intermediate_table tbl;
-  fhicl::parse_document(fclfile, policy, tbl);
-  ParameterSet psTop;
-  fhicl::make_ParameterSet(tbl, psTop);
+  auto const psTop =
+    fhicl::ParameterSet::make(fhicl::parse_document(fclfile, policy));
 
   cout << myname << line << endl;
   cout << myname << "Checking tool type." << endl;

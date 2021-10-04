@@ -1,6 +1,7 @@
 // FixedZeroSuppressService.cxx
 
 #include "dune/DetSim/Service/FixedZeroSuppressService.h"
+#include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 #include <cmath>
 #include "fhiclcpp/ParameterSet.h"
 #include "dune/DetSim/Utility/AdcCodeHelper.h"

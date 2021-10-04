@@ -15,6 +15,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "dune/DetSim/Service/DPhaseCoherentNoiseService.h"
+#include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 #include <sstream>
 #include <string>
 //#include "art/canvas/Utilities/Exception.h"

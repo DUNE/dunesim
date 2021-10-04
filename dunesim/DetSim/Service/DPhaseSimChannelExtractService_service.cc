@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include "dune/ArtSupport/DuneToolManager.h"
+#include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 #include "larcore/Geometry/Geometry.h"
 #include "lardataobj/Simulation/SimChannel.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"

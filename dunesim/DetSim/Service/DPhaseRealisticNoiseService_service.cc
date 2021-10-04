@@ -12,6 +12,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "dune/DetSim/Service/DPhaseRealisticNoiseService.h"
+#include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 #include <sstream>
 #include <string>
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
