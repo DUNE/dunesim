@@ -18,6 +18,14 @@ dunefd_ionandscint_separate.ISCalcAlg: "Separate"
 # Choose *the* IonAndScint configuration
 dunefd_ionandscint: @local::dunefd_ionandscint_correlated
 
+# DUNE FD VD specific
+# active volume
+dunefdvd_ionandscint: @local::dunefd_ionandscint
+dunefdvd_ionandscint.Instances: "LArG4DetectorServicevolTPCActive"
+# external laterals volume
+dunefdvd_ionandscint_external: @local::dunefd_ionandscint
+dunefdvd_ionandscint_external.Instances: "LArG4DetectorServicevolExternalActive"
+
 ##
 # ProtoDUNE-SP
 ##
