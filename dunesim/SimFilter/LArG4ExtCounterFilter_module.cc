@@ -76,8 +76,7 @@ namespace filt{
 
 
     //Get the vector of particles
-    art::Handle<std::vector<simb::MCParticle> > particles;
-    e.getByLabel("largeant",particles);
+    auto particles = e.getHandle<std::vector<simb::MCParticle> >("largeant");
     //Loop through the particles
     for (unsigned int part_i = 0; part_i < particles->size(); part_i++){
       //Get the particle
