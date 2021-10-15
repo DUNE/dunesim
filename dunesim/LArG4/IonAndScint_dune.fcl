@@ -15,6 +15,9 @@ dunefd_ionandscint_nest.ISCalcAlg: "NEST"
 dunefd_ionandscint_separate: @local::dunefd_ionandscint_correlated
 dunefd_ionandscint_separate.ISCalcAlg: "Separate"
 
+dunefd_ionandscint_larql: @local::dunefd_ionandscint_correlated
+dunefd_ionandscint_larql.services.LArG4Parameters.UseModLarqlRecomb: true
+
 # Choose *the* IonAndScint configuration
 dunefd_ionandscint: @local::dunefd_ionandscint_correlated
 
@@ -23,7 +26,7 @@ dunefd_ionandscint: @local::dunefd_ionandscint_correlated
 dunefdvd_ionandscint: @local::dunefd_ionandscint
 dunefdvd_ionandscint.Instances: "LArG4DetectorServicevolTPCActive"
 # external laterals volume
-dunefdvd_ionandscint_external: @local::dunefd_ionandscint
+dunefdvd_ionandscint_external: @local::dunefd_ionandscint_larql
 dunefdvd_ionandscint_external.Instances: "LArG4DetectorServicevolExternalActive"
 
 ##
