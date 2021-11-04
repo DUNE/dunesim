@@ -24,7 +24,7 @@ art_make( BASENAME_ONLY
                         ROOT_BASIC_LIB_LIST
                         SQLITE3
                         ROOT_EG
-                        IFDH
+                        ifdh::ifdh
                         dune_EventGenerator_ProtoDUNEbeamDataProducts
  )
 

@@ -26,7 +26,7 @@ art_make(
                         ROOT_BASIC_LIB_LIST
                         SQLITE3
                         ROOT_EG
-                        IFDH
+                        ifdh::ifdh
         )
 
 install_headers()
