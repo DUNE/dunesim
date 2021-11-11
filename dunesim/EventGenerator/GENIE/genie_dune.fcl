@@ -10,7 +10,7 @@ dunefd_genie.EventsPerSpill:          1
 dunefd_genie.POTPerSpill:             0
 dunefd_genie.GlobalTimeOffset:        0
 dunefd_genie.RandomTimeOffset:        0
-dunefd_genie.EventGeneratorList:      "Default+CCMEC"
+dunefd_genie.EventGeneratorList:      "Default"
 
 dunefd_genie_hist:                    @local::dunefd_genie
 dunefd_genie_hist.FluxType:           "histogram"
@@ -102,7 +102,7 @@ dune_fd_genie_atmo: {
   BeamName:            "atm"
   GlobalTimeOffset:    0
   RandomTimeOffset:    0
-  EventGeneratorList:  "Default+CCMEC"
+  EventGeneratorList:  "Default"
   
   #
   # now fix the flux window parameters; from GENIE manual:
