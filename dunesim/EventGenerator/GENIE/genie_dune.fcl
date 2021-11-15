@@ -93,6 +93,12 @@ dunefdvd_1x8x14_genie_lbnf_dk2nu: {
     DetectorLocation: "dunevd10kt_v1_1x8x14"
 }
 
+dunefdvd_1x8x6_genie_lbnf_dk2nu: {
+    @table::dunefdvd_1x6x6_genie_lbnf_dk2nu
+    FiducialCut: "mbox: -370, -750, -30, 370, 750, 920"
+    DetectorLocation: "dunevd10kt_v1_1x8x6"
+}
+
 #atmospheric neutrino configurations
 
 # this configuration is tuned on the full geometry (10 kton) of the far detector:
