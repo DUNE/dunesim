@@ -10,7 +10,7 @@ dunefd_genie.EventsPerSpill:          1
 dunefd_genie.POTPerSpill:             0
 dunefd_genie.GlobalTimeOffset:        0
 dunefd_genie.RandomTimeOffset:        0
-dunefd_genie.EventGeneratorList:      "Default+CCMEC"
+dunefd_genie.EventGeneratorList:      "Default"
 
 dunefd_genie_hist:                    @local::dunefd_genie
 dunefd_genie_hist.FluxType:           "histogram"
@@ -93,6 +93,17 @@ dunefdvd_1x8x14_genie_lbnf_dk2nu: {
     DetectorLocation: "dunevd10kt_v1_1x8x14"
 }
 
+dunefdvd_1x8x6_genie_lbnf_dk2nu: {
+    @table::dunefdvd_1x6x6_genie_lbnf_dk2nu
+    FiducialCut: "mbox: -370, -750, -30, 370, 750, 920"
+    DetectorLocation: "dunevd10kt_v1_1x8x6"
+}
+
+dunefdvd_1x8x6_genie_anu_lbnf_dk2nu_fluxpaths: {
+    FluxSearchPaths: "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/Flux/g4lbne/v3r5p4/QGSP_BERT/OptimizedEngineeredNov2017/antineutrino/flux/"
+    FluxFiles: ["g4lbne_v3r5p4_QGSP_BERT_OptimizedEngineeredNov2017_antineutrino*.dk2nu.root"]
+}
+
 #atmospheric neutrino configurations
 
 # this configuration is tuned on the full geometry (10 kton) of the far detector:
@@ -102,7 +113,7 @@ dune_fd_genie_atmo: {
   BeamName:            "atm"
   GlobalTimeOffset:    0
   RandomTimeOffset:    0
-  EventGeneratorList:  "Default+CCMEC"
+  EventGeneratorList:  "Default"
   
   #
   # now fix the flux window parameters; from GENIE manual:

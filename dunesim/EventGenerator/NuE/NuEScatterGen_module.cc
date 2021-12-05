@@ -91,7 +91,6 @@ evgen::NuEScatterGen::NuEScatterGen(fhicl::ParameterSet const & p) : EDProducer{
   // [0] = gv   [1] = ga   [2] = Enu   [3] = eMass
   // ga and gv depend on neutrino flavor
   fdsigdT = new TF1("xsecform","TMath::Power([0] + [1],2) + TMath::Power([0] - [1],2) * TMath::Power(1-x/[2],2) - ([1]*[1] - [0]*[0] * TMath::Power([3]/[2],2))*x");
-  fRand = new TRandom3(0);
 }
 
 //------------------------------------------------------------------------------
@@ -111,6 +110,8 @@ void evgen::NuEScatterGen::beginJob()
   fNuebarE   = (TF1*)eventrates->Get("NuebarE");
   fNumubarE  = (TF1*)eventrates->Get("NumubarE");
   fNutaubarE = (TF1*)eventrates->Get("NutaubarE");
+
+  fRand = new TRandom3(0);
 }
 
 //------------------------------------------------------------------------------
