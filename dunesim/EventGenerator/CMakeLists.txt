@@ -5,21 +5,21 @@ art_make( BASENAME_ONLY
                         larcoreobj_SummaryData
                         larcorealg_Geometry
                         larcore_Geometry_Geometry_service
-                        nurandom_RandomUtils_NuRandomService_service
+                        nurandom::RandomUtils_NuRandomService_service
                         larsim_Simulation lardataobj_Simulation
                         lardataobj_RecoBase
-                        nusimdata_SimulationBase
+                        nusimdata::SimulationBase
                         ART_FRAMEWORK_CORE
                         ART_FRAMEWORK_PRINCIPAL
                         ART_FRAMEWORK_SERVICES_REGISTRY
                         ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE
-                        art_Persistency_Common
-                        art_Persistency_Provenance
-                        art_Utilities canvas
+                        art::Persistency_Common
+                        art::Persistency_Provenance
+                        art::Utilities canvas
                         messagefacility::MF_MessageLogger
                         hep_concurrency
-                        FHICLCPP
-                        cetlib cetlib_except
+                        fhiclcpp::fhiclcpp
+                        cetlib::cetlib cetlib_except
                         CLHEP
                         ROOT_BASIC_LIB_LIST
                         SQLITE3

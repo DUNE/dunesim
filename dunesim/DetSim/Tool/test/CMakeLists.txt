@@ -11,11 +11,11 @@ cet_enable_asserts()
 
 cet_test(test_IdealAdcSimulator SOURCES test_IdealAdcSimulator.cxx
   LIBRARIES
-    art_Utilities
-    canvas
+    art::Utilities
+    canvas::canvas
     fhiclcpp
-    cetlib cetlib_except
-    cetlib_except
+    cetlib::cetlib cetlib_except
+    cetlib_except::cetlib_except
     SQLITE3
-    ${Boost_FILESYSTEM_LIBRARY}
+    Boost::filesystem
 )

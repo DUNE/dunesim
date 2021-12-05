@@ -6,16 +6,16 @@
 # Add plugin for each tool.
 
 cet_build_plugin(IdealAdcSimulator   art::tool
-  art_Utilities canvas
-  cetlib cetlib_except
+  art::Utilities canvas
+  cetlib::cetlib cetlib_except
   ROOT_BASIC_LIB_LIST
   )
 
 cet_build_plugin(NoisyAdcSimulator   art::tool
-  nurandom_RandomUtils_NuRandomService_service
+  nurandom::RandomUtils_NuRandomService_service
   CLHEP
-  art_Utilities canvas
-  cetlib cetlib_except
+  art::Utilities canvas
+  cetlib::cetlib cetlib_except
   messagefacility::MF_MessageLogger
   ART_FRAMEWORK_SERVICES_REGISTRY
   ART_ROOT_IO_TFILE_SUPPORT
