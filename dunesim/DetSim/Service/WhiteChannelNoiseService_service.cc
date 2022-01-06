@@ -1,11 +1,11 @@
 // WhiteChannelNoiseService.cxx
 
 #include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
-#include "dune/DetSim/Service/WhiteChannelNoiseService.h"
+#include "dunesim/DetSim/Service/WhiteChannelNoiseService.h"
 #include "larcore/Geometry/Geometry.h"
 #include "nurandom/RandomUtils/NuRandomService.h"
 #include "art_root_io/TFileService.h"
-#include "dune/Utilities/SignalShapingServiceDUNE.h"
+#include "dunecore/Utilities/SignalShapingServiceDUNE.h"
 #include "CLHEP/Random/JamesRandom.h"
 #include "CLHEP/Random/RandGaussQ.h"
 #include "TH1F.h"

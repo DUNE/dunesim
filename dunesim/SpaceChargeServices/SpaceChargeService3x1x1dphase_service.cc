@@ -12,7 +12,7 @@
 #include <iostream>
 
 // LArSoft includes
-#include "dune/SpaceChargeServices/SpaceChargeService3x1x1dphase.h"
+#include "dunesim/SpaceChargeServices/SpaceChargeService3x1x1dphase.h"
 
 // ROOT includes
 #include "TMath.h"

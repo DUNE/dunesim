@@ -1,6 +1,6 @@
 // ExponentialChannelNoiseService.cxx
 
-#include "dune/DetSim/Service/ExponentialChannelNoiseService.h"
+#include "dunesim/DetSim/Service/ExponentialChannelNoiseService.h"
 #include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 #include <sstream>
 #include "lardata/Utilities/LArFFT.h"

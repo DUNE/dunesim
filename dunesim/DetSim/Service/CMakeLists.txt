@@ -8,32 +8,32 @@
 # Add plugin for each service.
 
 cet_build_plugin(Dune35tSimChannelExtractService   art::service
-                dune_DetSim
+                dunesim_DetSim
                 larcorealg_Geometry
                 larsim_Simulation nug4::ParticleNavigation lardataobj_Simulation
                 lardata_Utilities
-                SignalShapingServiceDUNE_service
+                dunecore::SignalShapingServiceDUNE_service
                 art::Utilities canvas
                 cetlib::cetlib cetlib_except
                 ROOT_BASIC_LIB_LIST
              )
 
 cet_build_plugin(GenericSimChannelExtractService   art::service
-                dune_DetSim
+                dunesim_DetSim
                 larsim_Simulation nug4::ParticleNavigation lardataobj_Simulation
                 lardata_Utilities
-                SignalShapingServiceDUNE_service
+                dunecore::SignalShapingServiceDUNE_service
                 art::Utilities canvas
                 cetlib::cetlib cetlib_except
                 ROOT_BASIC_LIB_LIST
              )
 
 cet_build_plugin(DPhaseSimChannelExtractService   art::service
-                dune_DetSim
+                dunesim_DetSim
 	        larsim_Simulation nug4::ParticleNavigation lardataobj_Simulation
                 lardata_Utilities
-                SignalShapingServiceDUNEDPhase_service
-                CrpGainService_service
+                dunecore::SignalShapingServiceDUNEDPhase_service
+                dunecore::CrpGainService_service
                 art::Utilities canvas
 		ART_FRAMEWORK_CORE
                 cetlib::cetlib cetlib_except
@@ -44,7 +44,7 @@ cet_build_plugin(DPhaseSimChannelExtractService   art::service
 
 cet_build_plugin(ExponentialChannelNoiseService   art::service
                 larcorealg_Geometry
-                SignalShapingServiceDUNE_service
+                dunecore::SignalShapingServiceDUNE_service
                 ART_ROOT_IO_TFILE_SUPPORT
                 ROOT::Core
                 ART_ROOT_IO_TFILESERVICE_SERVICE
@@ -59,7 +59,7 @@ cet_build_plugin(ExponentialChannelNoiseService   art::service
 cet_build_plugin(ShapedCohProtoDUNENoiseService   art::service
                 dune_raw_data::dune-raw-data_Services_ChannelMap_PdspChannelMapService_service
                 larcorealg_Geometry
-                SignalShapingServiceDUNE_service
+                dunecore::SignalShapingServiceDUNE_service
                 ART_ROOT_IO_TFILE_SUPPORT
                 ROOT::Core
                 ART_ROOT_IO_TFILESERVICE_SERVICE
@@ -75,7 +75,7 @@ cet_build_plugin(DPhaseRealisticNoiseService   art::service
                lardata_Utilities_LArFFT_service
 	       lardataalg_DetectorInfo
                larcorealg_Geometry
-               SignalShapingServiceDUNEDPhase_service
+               dunecore::SignalShapingServiceDUNEDPhase_service
                ART_ROOT_IO_TFILE_SUPPORT
                ROOT::Core
                ART_ROOT_IO_TFILESERVICE_SERVICE
@@ -90,7 +90,7 @@ cet_build_plugin(DPhaseRealisticNoiseService   art::service
 cet_build_plugin(DPhaseCoherentNoiseService   art::service
                 larcorealg_Geometry
  	        lardataalg_DetectorInfo
-                SignalShapingServiceDUNEDPhase_service
+                dunecore::SignalShapingServiceDUNEDPhase_service
                 ART_ROOT_IO_TFILE_SUPPORT
                 ROOT::Core
                 ART_ROOT_IO_TFILESERVICE_SERVICE
@@ -104,7 +104,7 @@ cet_build_plugin(DPhaseCoherentNoiseService   art::service
 
 cet_build_plugin(ProtoDUNEChannelNoiseService   art::service
                 larcorealg_Geometry
-                SignalShapingServiceDUNE_service
+                dunecore::SignalShapingServiceDUNE_service
                 ART_ROOT_IO_TFILE_SUPPORT
                 ROOT::Core
                 ART_ROOT_IO_TFILESERVICE_SERVICE
@@ -118,7 +118,7 @@ cet_build_plugin(ProtoDUNEChannelNoiseService   art::service
 
 cet_build_plugin(SPhaseChannelNoiseService   art::service
                 larcorealg_Geometry
-                SignalShapingServiceDUNE_service
+                dunecore::SignalShapingServiceDUNE_service
                 ART_ROOT_IO_TFILE_SUPPORT
                 ROOT::Core
                 ART_ROOT_IO_TFILESERVICE_SERVICE
@@ -133,7 +133,7 @@ cet_build_plugin(SPhaseChannelNoiseService   art::service
 
 cet_build_plugin(WhiteChannelNoiseService   art::service
                 larcorealg_Geometry
-                SignalShapingServiceDUNE_service
+                dunecore::SignalShapingServiceDUNE_service
                 nurandom::RandomUtils_NuRandomService_service
                 ART_ROOT_IO_TFILE_SUPPORT
                 ROOT::Core
@@ -159,12 +159,12 @@ cet_build_plugin(ProvidedPedestalAdditionService art::service
              )
 
 cet_build_plugin(Dune35tZeroSuppressService        art::service
-                dune_DetSim
+                dunesim_DetSim
                 cetlib::cetlib cetlib_except
 )
 
 cet_build_plugin(Legacy35tZeroSuppressService  art::service
-                dune_DetSim
+                dunesim_DetSim
                 cetlib::cetlib cetlib_except
 )
 
@@ -178,7 +178,7 @@ cet_build_plugin(ReplaceCompressService        art::service
 
 cet_build_plugin(LarsoftHuffmanCompressService art::service
                 lardataobj_RawData
-                dune_DetSim_Service_ReplaceCompressService_service
+                dunesim_DetSim_Service_ReplaceCompressService_service
                 cetlib::cetlib cetlib_except
 )
 

@@ -20,7 +20,7 @@
 #ifndef Legacy35tZeroSuppressService_H
 #define Legacy35tZeroSuppressService_H
 
-#include "dune/DuneInterface/Service/AdcSuppressService.h"
+#include "dunecore/DuneInterface/Service/AdcSuppressService.h"
 
 #include <memory>
 #include <string>

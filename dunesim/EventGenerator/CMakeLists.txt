@@ -25,7 +25,7 @@ art_make( BASENAME_ONLY
                         SQLITE3
                         ROOT_EG
                         ifdh::ifdh
-                        dune_EventGenerator_ProtoDUNEbeamDataProducts
+                        dunesim_EventGenerator_ProtoDUNEbeamDataProducts
  )
 
 

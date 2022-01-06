@@ -42,16 +42,16 @@
 #include "lardataobj/RawData/RawDigit.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 
-#include "dune/ArtSupport/DuneToolManager.h"
+#include "dunecore/ArtSupport/DuneToolManager.h"
 
-#include "dune/DuneInterface/Data/AdcTypes.h"
-#include "dune/DuneInterface/Data/AdcSimulator.h"
-#include "dune/DuneInterface/Service/AdcSuppressService.h"
-#include "dune/DuneInterface/Service/AdcCompressService.h"
-#include "dune/DuneInterface/Service/SimChannelExtractService.h"
-#include "dune/DuneInterface/Service/ChannelNoiseService.h"
-#include "dune/DuneInterface/Service/PedestalAdditionService.h"
-#include "dune/DuneInterface/Service/AdcDistortionService.h"
+#include "dunecore/DuneInterface/Data/AdcTypes.h"
+#include "dunecore/DuneInterface/Data/AdcSimulator.h"
+#include "dunecore/DuneInterface/Service/AdcSuppressService.h"
+#include "dunecore/DuneInterface/Service/AdcCompressService.h"
+#include "dunecore/DuneInterface/Service/SimChannelExtractService.h"
+#include "dunecore/DuneInterface/Service/ChannelNoiseService.h"
+#include "dunecore/DuneInterface/Service/PedestalAdditionService.h"
+#include "dunecore/DuneInterface/Service/AdcDistortionService.h"
 
 using std::ostringstream;
 using std::cout;

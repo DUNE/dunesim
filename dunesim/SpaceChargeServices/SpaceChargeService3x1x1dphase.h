@@ -15,7 +15,7 @@
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 #include "art/Framework/Principal/Run.h"
-#include "dune/SpaceCharge/SpaceCharge3x1x1dphase.h"
+#include "dunesim/SpaceCharge/SpaceCharge3x1x1dphase.h"
 #include "larevt/SpaceChargeServices/SpaceChargeService.h"
 
 

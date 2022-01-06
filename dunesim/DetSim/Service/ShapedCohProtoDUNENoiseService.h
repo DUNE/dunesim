@@ -5,10 +5,10 @@
 
 #pragma once
 
-#include "dune/DuneInterface/Service/ChannelNoiseService.h"
+#include "dunecore/DuneInterface/Service/ChannelNoiseService.h"
 
 #include "CLHEP/Random/JamesRandom.h"
-#include "dune/Utilities/SignalShapingServiceDUNE.h"
+#include "dunecore/Utilities/SignalShapingServiceDUNE.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "larcore/Geometry/Geometry.h"
 

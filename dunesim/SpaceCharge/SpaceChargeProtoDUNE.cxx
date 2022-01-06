@@ -14,7 +14,7 @@
 #include "math.h"
 #include "stdio.h"
 // LArSoft includes
-#include "dune/SpaceCharge/SpaceChargeProtoDUNE.h"
+#include "dunesim/SpaceCharge/SpaceChargeProtoDUNE.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 // Framework includes
 #include "cetlib_except/exception.h"

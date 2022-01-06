@@ -13,13 +13,13 @@
 
 #include <vector>
 #include <string>
-#include "dune/DuneInterface/Service/SimChannelExtractService.h"
+#include "dunecore/DuneInterface/Service/SimChannelExtractService.h"
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "lardata/Utilities/LArFFT.h"
-#include "dune/Utilities/SignalShapingServiceDUNEDPhase.h"
-#include "dune/Utilities/CrpGainService.h"
-//#include "dune/DetSim/Tool/CrpGainSimTool.h"
+#include "dunecore/Utilities/SignalShapingServiceDUNEDPhase.h"
+#include "dunecore/Utilities/CrpGainService.h"
+//#include "dunesim/DetSim/Tool/CrpGainSimTool.h"
 
 namespace sim {
   class SimChannel;

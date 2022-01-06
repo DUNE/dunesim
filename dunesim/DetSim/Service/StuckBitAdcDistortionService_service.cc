@@ -1,6 +1,6 @@
 // StuckBitAdcDistortionService_service.cc
 
-#include "dune/DetSim/Service/StuckBitAdcDistortionService.h"
+#include "dunesim/DetSim/Service/StuckBitAdcDistortionService.h"
 #include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "nurandom/RandomUtils/NuRandomService.h"

@@ -16,7 +16,7 @@
 #include "stdio.h"
 
 // LArSoft includes
-#include "dune/SpaceCharge/SpaceChargeDUNE35t.h"
+#include "dunesim/SpaceCharge/SpaceChargeDUNE35t.h"
 
 // Framework includes
 #include "cetlib_except/exception.h"

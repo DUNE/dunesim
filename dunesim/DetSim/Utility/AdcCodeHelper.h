@@ -15,7 +15,7 @@
 #ifndef AdcCodeHelper_H
 #define AdcCodeHelper_H
 
-#include "dune/DuneInterface/Data/AdcTypes.h"
+#include "dunecore/DuneInterface/Data/AdcTypes.h"
 
 class AdcCodeHelper {
 

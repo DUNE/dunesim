@@ -10,7 +10,7 @@
 
 #include <iostream>
 #include <fstream>
-#include "dune/EventGenerator/ProtoDUNEbeamDataProducts/ProtoDUNEbeamsim.h"
+#include "dunesim/EventGenerator/ProtoDUNEbeamDataProducts/ProtoDUNEbeamsim.h"
 #include <string.h>
 #include <time.h>
 #include <cmath>

@@ -1,6 +1,6 @@
 // FixedDetPedestalService_service.cc
 
-#include "dune/DetSim/Service/FixedDetPedestalService.h"
+#include "dunesim/DetSim/Service/FixedDetPedestalService.h"
 #include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "larcore/Geometry/Geometry.h"

@@ -15,11 +15,11 @@
 #define Dune35tSimChannelExtractService_H
 
 #include <vector>
-#include "dune/DuneInterface/Service/SimChannelExtractService.h"
+#include "dunecore/DuneInterface/Service/SimChannelExtractService.h"
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "lardata/Utilities/LArFFT.h"
-#include "dune/Utilities/SignalShapingServiceDUNE.h"
+#include "dunecore/Utilities/SignalShapingServiceDUNE.h"
 
 namespace sim {
 class SimChannel;

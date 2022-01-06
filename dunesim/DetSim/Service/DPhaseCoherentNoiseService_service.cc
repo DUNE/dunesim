@@ -14,7 +14,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "dune/DetSim/Service/DPhaseCoherentNoiseService.h"
+#include "dunesim/DetSim/Service/DPhaseCoherentNoiseService.h"
 #include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 #include <sstream>
 #include <string>

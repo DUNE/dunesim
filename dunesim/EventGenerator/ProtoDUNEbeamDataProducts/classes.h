@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////
-// dune/EventGenerator/ProtoDUNEbeamDataProducts/classes.h
+// dunesim/EventGenerator/ProtoDUNEbeamDataProducts/classes.h
 //
 // Caroline Zhang carolineligezhang@gmail.com 
 // August 15, 2017
@@ -13,6 +13,6 @@
 #include "nusimdata/SimulationBase/MCTruth.h"
 
 // DuneTPC includes
-//#include "dune/EventGenerator/ProtoDUNEbeamDataProducts/ProtoDUNEbeamsim.h"
-#include "dune/EventGenerator/ProtoDUNEbeamDataProducts/ProtoDUNEbeamsim.h"
-#include "dune/EventGenerator/ProtoDUNEbeamDataProducts/ProtoDUNEBeamInstrument.h"
+//#include "dunesim/EventGenerator/ProtoDUNEbeamDataProducts/ProtoDUNEbeamsim.h"
+#include "dunesim/EventGenerator/ProtoDUNEbeamDataProducts/ProtoDUNEbeamsim.h"
+#include "dunesim/EventGenerator/ProtoDUNEbeamDataProducts/ProtoDUNEBeamInstrument.h"

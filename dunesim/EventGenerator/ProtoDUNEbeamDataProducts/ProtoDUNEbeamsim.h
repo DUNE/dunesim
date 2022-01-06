@@ -24,7 +24,7 @@
 #include "TStyle.h"
 #include "TMath.h"
 
-#include "dune/EventGenerator/ProtoDUNEbeamDataProducts/ProtoDUNEBeamInstrument.h"
+#include "dunesim/EventGenerator/ProtoDUNEbeamDataProducts/ProtoDUNEBeamInstrument.h"
 
 namespace sim {
   class ProtoDUNEbeamsim  {

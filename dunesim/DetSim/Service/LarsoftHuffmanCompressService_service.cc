@@ -1,10 +1,10 @@
 // LarsoftHuffmanCompressService.cxx
 
 #include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
-#include "dune/DetSim/Service/LarsoftHuffmanCompressService.h"
+#include "dunesim/DetSim/Service/LarsoftHuffmanCompressService.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "lardataobj/RawData/raw.h"
-#include "dune/DetSim/Service/ReplaceCompressService.h"
+#include "dunesim/DetSim/Service/ReplaceCompressService.h"
 
 using std::string;
 using std::ostream;

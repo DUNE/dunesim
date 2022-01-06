@@ -25,7 +25,7 @@
 #include "lardata/DetectorInfoServices/DetectorClocksService.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 
-#include "dune/DuneInterface/Service/ChannelNoiseService.h"
+#include "dunecore/DuneInterface/Service/ChannelNoiseService.h"
 
 #include "cetlib/search_path.h"
 

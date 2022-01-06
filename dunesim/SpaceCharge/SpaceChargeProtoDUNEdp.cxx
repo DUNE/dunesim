@@ -15,7 +15,7 @@
 #include "math.h"
 #include "stdio.h"
 // LArSoft includes
-#include "dune/SpaceCharge/SpaceChargeProtoDUNEdp.h"
+#include "dunesim/SpaceCharge/SpaceChargeProtoDUNEdp.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "larcore/CoreUtils/ServiceUtil.h"
 #include "larcore/Geometry/Geometry.h"

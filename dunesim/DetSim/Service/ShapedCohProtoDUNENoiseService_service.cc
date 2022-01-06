@@ -3,7 +3,7 @@
 // Pierre Lasorak, Babak Abi
 // Dec 2020
 
-#include "dune/DetSim/Service/ShapedCohProtoDUNENoiseService.h"
+#include "dunesim/DetSim/Service/ShapedCohProtoDUNENoiseService.h"
 #include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 
 #include "nurandom/RandomUtils/NuRandomService.h"

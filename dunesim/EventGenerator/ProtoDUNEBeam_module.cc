@@ -38,15 +38,15 @@
 #include <vector>
 // Added for ProtoDUNE beam simulation storage
 //#include "lardataobj/Simulation/ProtoDUNEbeamsim.h"
-#include "dune/EventGenerator/ProtoDUNEbeamDataProducts/ProtoDUNEbeamsim.h"
-#include "dune/DuneObj/ProtoDUNEBeamEvent.h"
-#include "dune/DuneObj/ProtoDUNEBeamSpill.h"
+#include "dunesim/EventGenerator/ProtoDUNEbeamDataProducts/ProtoDUNEbeamsim.h"
+#include "dunecore/DuneObj/ProtoDUNEBeamEvent.h"
+#include "dunecore/DuneObj/ProtoDUNEBeamSpill.h"
 #include "lardataobj/RecoBase/TrackingTypes.h"
 #include "lardataobj/RecoBase/TrackTrajectory.h"
 #include "lardataobj/RecoBase/Track.h"
-#include "dune/EventGenerator/ProtoDUNEbeamDataProducts/ProtoDUNEBeamInstrument.h"
-//#include "dune/EventGenerator/ProtoDUNEbeamTPCmatching/ProtoDUNEbeammatch.h"
-//#include "dune/EventGenerator/ProtoDUNEbeamTPCmatching/ProtoDUNEBeamToF.h"
+#include "dunesim/EventGenerator/ProtoDUNEbeamDataProducts/ProtoDUNEBeamInstrument.h"
+//#include "dunesim/EventGenerator/ProtoDUNEbeamTPCmatching/ProtoDUNEbeammatch.h"
+//#include "dunesim/EventGenerator/ProtoDUNEbeamTPCmatching/ProtoDUNEBeamToF.h"
 #include "lardata/Utilities/AssociationUtil.h"
 // art extensions
 #include "nurandom/RandomUtils/NuRandomService.h"

@@ -18,7 +18,7 @@
 
 #include "art/Utilities/ToolMacros.h" 
 #include "fhiclcpp/ParameterSet.h" 
-#include "dune/DuneInterface/Data/AdcSimulator.h"
+#include "dunecore/DuneInterface/Data/AdcSimulator.h"
 
 #include "nurandom/RandomUtils/NuRandomService.h"
 #include "CLHEP/Random/JamesRandom.h"

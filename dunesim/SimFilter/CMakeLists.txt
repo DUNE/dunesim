@@ -1,7 +1,7 @@
 cet_build_plugin(GenExtCounterFilter art::module
 		      lardataobj_RawData
 		      lardataobj_RecoBase
-		      dune_Geometry
+		      dunecore_Geometry
 		        larcorealg_Geometry
 			larcore_Geometry_Geometry_service
 			lardata_Utilities
@@ -25,7 +25,7 @@ cet_build_plugin(GenExtCounterFilter art::module
 cet_build_plugin(LArG4ExtCounterFilter art::module
 		      lardataobj_RawData
 		      lardataobj_RecoBase
-		      dune_Geometry
+		      dunecore_Geometry
 		        larcorealg_Geometry
 			larcore_Geometry_Geometry_service
 			lardata_Utilities

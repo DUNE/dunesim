@@ -15,10 +15,10 @@
 #ifndef StuckBitAdcDistortionService_H
 #define StuckBitAdcDistortionService_H
 
-#include "dune/DuneInterface/Service/AdcDistortionService.h"
+#include "dunecore/DuneInterface/Service/AdcDistortionService.h"
 #include <string>
 #include <iostream>
-#include "dune/DuneInterface/Data/AdcTypes.h"
+#include "dunecore/DuneInterface/Data/AdcTypes.h"
 
 namespace fhicl {
 class ParameterSet;

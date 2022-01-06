@@ -7,17 +7,17 @@ art_make(
   BASENAME_ONLY
   MODULE_LIBRARIES
     lardataalg_DetectorInfo
-    dune_ArtSupport
-    dune_DetSim
-    dune_Geometry
+    dunecore_ArtSupport
+    dunesim_DetSim
+    dunecore_Geometry
     larcore_Geometry_Geometry_service
     larsim_Simulation nug4::ParticleNavigation lardataobj_Simulation
     lardata_Utilities
     larevt_Filters
     larcorealg_Geometry
     lardataobj_RawData
-    SignalShapingServiceDUNE_service
-    SignalShapingServiceDUNEDPhase_service
+    dunecore::SignalShapingServiceDUNE_service
+    dunecore::SignalShapingServiceDUNEDPhase_service
     nurandom::RandomUtils_NuRandomService_service
     ART_FRAMEWORK_CORE
     ART_FRAMEWORK_PRINCIPAL

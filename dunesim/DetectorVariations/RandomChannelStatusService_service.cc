@@ -1,6 +1,6 @@
 // Chris Backhouse - c.backhouse@ucl.ac.uk Dec 2017
 
-#include "dune/DetectorVariations/RandomChannelStatusService.h"
+#include "dunesim/DetectorVariations/RandomChannelStatusService.h"
 #include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 
 #include "larcore/Geometry/Geometry.h"

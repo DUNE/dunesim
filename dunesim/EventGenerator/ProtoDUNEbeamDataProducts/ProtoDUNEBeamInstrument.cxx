@@ -6,7 +6,7 @@
 /////////////////////////////////////////////////////////////
 
 #include <iostream>
-#include "dune/EventGenerator/ProtoDUNEbeamDataProducts/ProtoDUNEBeamInstrument.h"
+#include "dunesim/EventGenerator/ProtoDUNEbeamDataProducts/ProtoDUNEBeamInstrument.h"
 
 namespace sim{
 

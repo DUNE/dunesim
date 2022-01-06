@@ -6,7 +6,7 @@
 // Test FixedDetPedestalService.
 
 #include "../FixedDetPedestalService.h"
-#include "dune/ArtSupport/ArtServiceHelper.h"
+#include "dunecore/ArtSupport/ArtServiceHelper.h"
 #include "larcore/Geometry/Geometry.h"
 #include <string>
 #include <iostream>

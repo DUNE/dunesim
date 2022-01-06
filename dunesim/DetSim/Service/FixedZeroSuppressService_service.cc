@@ -1,10 +1,10 @@
 // FixedZeroSuppressService.cxx
 
-#include "dune/DetSim/Service/FixedZeroSuppressService.h"
+#include "dunesim/DetSim/Service/FixedZeroSuppressService.h"
 #include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 #include <cmath>
 #include "fhiclcpp/ParameterSet.h"
-#include "dune/DetSim/Utility/AdcCodeHelper.h"
+#include "dunesim/DetSim/Utility/AdcCodeHelper.h"
 
 using std::string;
 using std::ostream;

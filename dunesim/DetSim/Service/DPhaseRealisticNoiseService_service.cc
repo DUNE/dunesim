@@ -11,7 +11,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "dune/DetSim/Service/DPhaseRealisticNoiseService.h"
+#include "dunesim/DetSim/Service/DPhaseRealisticNoiseService.h"
 #include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 #include <sstream>
 #include <string>

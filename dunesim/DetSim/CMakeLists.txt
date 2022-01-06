@@ -9,15 +9,15 @@
 
 art_make( BASENAME_ONLY
           MODULE_LIBRARIES larcorealg_Geometry
-	        dune_Geometry
+	        dunecore_Geometry
  	        lardataalg_DetectorInfo
 			    larcore_Geometry_Geometry_service
 			    larsim_Simulation nug4::ParticleNavigation lardataobj_Simulation
 	        lardata_Utilities
 			    larevt_Filters
 			    lardataobj_RawData
-          SignalShapingServiceDUNE_service
-			    SignalShapingServiceDUNEDPhase_service
+          dunecore::SignalShapingServiceDUNE_service
+			    dunecore::SignalShapingServiceDUNEDPhase_service
           nurandom::RandomUtils_NuRandomService_service
           ART_FRAMEWORK_CORE
 			    ART_FRAMEWORK_PRINCIPAL

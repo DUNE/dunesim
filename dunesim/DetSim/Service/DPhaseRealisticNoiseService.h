@@ -11,7 +11,7 @@
 #ifndef DPhaseRealisticNoiseService_H
 #define DPhaseRealisticNoiseService_H
 
-#include "dune/DuneInterface/Service/ChannelNoiseService.h"
+#include "dunecore/DuneInterface/Service/ChannelNoiseService.h"
 #include <vector>
 #include <iostream>
 

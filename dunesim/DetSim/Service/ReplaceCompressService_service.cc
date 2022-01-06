@@ -1,6 +1,6 @@
 // ReplaceCompressService.cxx
 
-#include "dune/DetSim/Service/ReplaceCompressService.h"
+#include "dunesim/DetSim/Service/ReplaceCompressService.h"
 #include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 #include "fhiclcpp/ParameterSet.h"
 

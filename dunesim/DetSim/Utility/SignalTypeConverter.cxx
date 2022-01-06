@@ -1,6 +1,6 @@
 // SignalTypeConverter.cxx
 
-#include "dune/DetSim/Utility/SignalTypeConverter.h"
+#include "dunesim/DetSim/Utility/SignalTypeConverter.h"
 
 //**********************************************************************
 

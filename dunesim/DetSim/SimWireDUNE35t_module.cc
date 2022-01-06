@@ -36,7 +36,7 @@ extern "C" {
 #include "lardata/Utilities/LArFFT.h"
 #include "lardataobj/RawData/raw.h"
 #include "lardata/DetectorInfoServices/LArPropertiesService.h"
-#include "dune/Utilities/SignalShapingServiceDUNE.h"
+#include "dunecore/Utilities/SignalShapingServiceDUNE.h"
 #include "larcore/Geometry/Geometry.h"
 
 #include "lardataobj/Simulation/sim.h"

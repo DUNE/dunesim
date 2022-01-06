@@ -12,7 +12,7 @@
 
 // LArSoft includes
 #include "larcore/CoreUtils/ServiceUtil.h"
-#include "dune/SpaceChargeServices/SpaceChargeServiceProtoDUNE.h"
+#include "dunesim/SpaceChargeServices/SpaceChargeServiceProtoDUNE.h"
 #include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 
