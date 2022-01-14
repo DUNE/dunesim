@@ -48,5 +48,6 @@ include(BuildPlugins)
 
 add_subdirectory(dunesim)
 add_subdirectory(ups)
+add_subdirectory(macros)
 
 include(UseCPack)
