@@ -35,6 +35,8 @@ float FixedDetPedestalService::PedMean(raw::ChannelID_t ch) const {
   if      ( m_hgeo->View(ch) == geo::kZ ) return m_PedMeanZ;
   else if ( m_hgeo->View(ch) == geo::kU ) return m_PedMeanU;
   else if ( m_hgeo->View(ch) == geo::kV ) return m_PedMeanV;
+  else if ( m_hgeo->View(ch) == geo::kX ) return m_PedMeanV;
+  else if ( m_hgeo->View(ch) == geo::kY ) return m_PedMeanV;
   return -999.0;
 }
 
