@@ -203,11 +203,11 @@ cet_build_plugin(FixedDetPedestalService art::service
                 ROOT_BASIC_LIB_LIST
 )
 
-cet_build_plugin(DPhaseFixedDetPedestalService art::service
-                larcorealg_Geometry
-                art::Utilities canvas
-                cetlib::cetlib cetlib_except
-                ROOT_BASIC_LIB_LIST
-)
+#cet_build_plugin(DPhaseFixedDetPedestalService art::service
+#                larcorealg_Geometry
+#                art::Utilities canvas
+#                cetlib::cetlib cetlib_except
+#                ROOT_BASIC_LIB_LIST
+#)
 
 add_subdirectory(test)
