@@ -23,6 +23,7 @@ fwdir  product_dir config_data
 
 table_fragment_begin
     pathPrepend(FW_SEARCH_PATH, ${DUNESIM_DIR}/gdml)
+    pathPrepend(FW_SEARCH_PATH, ${DUNESIM_DIR}/config_data)
     pathPrepend(PYTHONPATH, ${DUNESIM_FQ_DIR}/bin)
 table_fragment_end
 
