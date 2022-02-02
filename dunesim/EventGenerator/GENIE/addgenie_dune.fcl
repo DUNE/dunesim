@@ -1,0 +1,113 @@
+#19th Jan 2022
+#Dom Brailsford
+#Producer definitions for adding predefined GENIE events to ART
+
+#include "AddGenieEventsToArt.fcl"
+
+BEGIN_PROLOG
+
+dunefd_add_genie:                    @local::standard_add_genie 
+dunefd_add_genie.fileList:           [ "" ] #this needds to be configured on a per job basis 
+dunefd_add_genie.timeConfig:         "none"
+dunefd_add_genie.addMCFlux:          false
+dunefd_add_genie.countConfig:        "fixed: 1"  # always exactly 1
+dunefd_add_genie.randomEntries:      false
+dunefd_add_genie.globalTimeOffset:   0  # or whatever
+dunefd_add_genie.vtxOffsets: {
+   xlo:  -746.0 # cm  #taken from dune10ktv1 dimensions on the dunewiki
+   xhi:  746.0
+   ylo:  -608.0
+   yhi:  608.0
+   zlo:  -1.0
+   zhi:  5809.0
+}
+
+dunefd_1x2x6_add_genie:             @local::dunefd_add_genie
+dunefd_1x2x6_add_genie.vtxOffsets: {
+   xlo:  -360.0 # meters
+   xhi:  360.0
+   ylo:  -600.0
+   yhi:  600.0 
+   zlo:  0.0
+   zhi:  1700.0
+}
+
+#All of these files need moving from app to dcache
+dune_add_genie_atm_ha_br_fileList: [ "/dune/app/users/jbarrow/NEW_WORK/atmospherics/NNBarAtm/hA_BodekRitchie/NNBarAtm_hA_BR_uncorrected.100000000.ghep.root" ]
+dune_add_genie_ndk_ha_br_fileList: [ "/dune/app/users/jbarrow/NEW_WORK/protondecay/hA_BodekRitchie/protondecay_hA_BodekRitchie.1000.ghep.root" ]
+dune_add_genie_nnbar_ha_br_fileList: [ "/dune/app/users/jbarrow/NEW_WORK/legacynnbar/hA_BodekRitchie/legacynnbar_hA_BodekRitchie.1000.ghep.root" ]
+
+dune_add_genie_bdm_ar_b10_m05_00a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b10_m05_z1_00a.0.ghep.root" ]          
+dune_add_genie_bdm_ar_b10_m05_00b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b10_m05_z1_00b.0.ghep.root" ]          
+dune_add_genie_bdm_ar_b10_m10_00a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b10_m10_z1_00a.0.ghep.root" ]          
+dune_add_genie_bdm_ar_b10_m10_00b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b10_m10_z1_00b.0.ghep.root" ]          
+dune_add_genie_bdm_ar_b10_m10_01a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b10_m10_z1_01a.0.ghep.root" ]          
+dune_add_genie_bdm_ar_b10_m10_01b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b10_m10_z1_01b.0.ghep.root" ]          
+dune_add_genie_bdm_ar_b10_m10_02a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b10_m10_z1_02a.0.ghep.root" ]          
+dune_add_genie_bdm_ar_b10_m10_02b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b10_m10_z1_02b.0.ghep.root" ]          
+dune_add_genie_bdm_ar_b10_m20_00a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b10_m20_z1_00a.0.ghep.root" ]          
+dune_add_genie_bdm_ar_b10_m20_00b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b10_m20_z1_00b.0.ghep.root" ]          
+dune_add_genie_bdm_ar_b10_m40_00a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b10_m40_z1_00a.0.ghep.root" ]          
+dune_add_genie_bdm_ar_b10_m40_00b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b10_m40_z1_00b.0.ghep.root" ]        
+dune_add_genie_bdm_ar_b1p1_m05_00a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b1p1_m05_z1_00a.0.ghep.root" ]       
+dune_add_genie_bdm_ar_b1p1_m05_00b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b1p1_m05_z1_00b.0.ghep.root" ]       
+dune_add_genie_bdm_ar_b1p1_m10_00a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b1p1_m10_z1_00a.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p1_m10_00b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b1p1_m10_z1_00b.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p1_m10_01a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b1p1_m10_z1_01a.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p1_m10_01b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b1p1_m10_z1_01b.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p1_m10_02a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b1p1_m10_z1_02a.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p1_m10_02b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b1p1_m10_z1_02b.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p1_m20_00a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b1p1_m20_z1_00a.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p1_m20_00b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b1p1_m20_z1_00b.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p1_m40_00a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b1p1_m40_z1_00a.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p1_m40_00b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b1p1_m40_z1_00b.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p5_m05_00a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b1p5_m05_z1_00a.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p5_m05_00b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b1p5_m05_z1_00b.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p5_m10_00a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b1p5_m10_z1_00a.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p5_m10_00b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b1p5_m10_z1_00b.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p5_m10_01a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b1p5_m10_z1_01a.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p5_m10_01b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b1p5_m10_z1_01b.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p5_m10_02a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b1p5_m10_z1_02a.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p5_m10_02b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b1p5_m10_z1_02b.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p5_m20_00a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b1p5_m20_z1_00a.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p5_m20_00b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b1p5_m20_z1_00b.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p5_m40_00a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b1p5_m40_z1_00a.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p5_m40_00b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_ar_b1p5_m40_z1_00b.0.ghep.root" ]
+dune_add_genie_bdm_ar_b10_m20_01a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m20_b10_01a.0.ghep.root" ]
+dune_add_genie_bdm_ar_b10_m20_01b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m20_b10_01b.0.ghep.root" ]
+dune_add_genie_bdm_ar_b10_m20_02a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m20_b10_02a.0.ghep.root" ]
+dune_add_genie_bdm_ar_b10_m20_02b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m20_b10_02b.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p1_m20_01a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m20_b1p1_01a.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p1_m20_01b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m20_b1p1_01b.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p1_m20_02a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m20_b1p1_02a.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p1_m20_02b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m20_b1p1_02b.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p5_m20_01a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m20_b1p5_01a.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p5_m20_01b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m20_b1p5_01b.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p5_m20_02a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m20_b1p5_02a.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p5_m20_02b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m20_b1p5_02b.0.ghep.root" ]
+dune_add_genie_bdm_ar_b10_m40_01a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m40_b10_01a.0.ghep.root" ]
+dune_add_genie_bdm_ar_b10_m40_01b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m40_b10_01b.0.ghep.root" ]
+dune_add_genie_bdm_ar_b10_m40_02a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m40_b10_02a.0.ghep.root" ]
+dune_add_genie_bdm_ar_b10_m40_02b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m40_b10_02b.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p1_m40_01a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m40_b1p1_01a.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p1_m40_01b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m40_b1p1_01b.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p1_m40_02a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m40_b1p1_02a.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p1_m40_02b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m40_b1p1_02b.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p5_m40_01a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m40_b1p5_01a.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p5_m40_01b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m40_b1p5_01b.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p5_m40_02a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m40_b1p5_02a.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p5_m40_02b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m40_b1p5_02b.0.ghep.root" ]
+dune_add_genie_bdm_ar_b10_m05_01a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m5_b10_01a.0.ghep.root" ]
+dune_add_genie_bdm_ar_b10_m05_01b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m5_b10_01b.0.ghep.root" ]
+dune_add_genie_bdm_ar_b10_m05_02a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m5_b10_02a.0.ghep.root" ]
+dune_add_genie_bdm_ar_b10_m05_02b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m5_b10_02b.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p1_m05_01a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m5_b1p1_01a.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p1_m05_01b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m5_b1p1_01b.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p1_m05_02a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m5_b1p1_02a.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p1_m05_02b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m5_b1p1_02b.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p5_m05_01a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m5_b1p5_01a.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p5_m05_01b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m5_b1p5_01b.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p5_m05_02a_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m5_b1p5_02a.0.ghep.root" ]
+dune_add_genie_bdm_ar_b1p5_m05_02b_fileList: [ "/pnfs/dune/persistent/users/petrillo/data/BoostedDM/20200926/GENIE/scalar_Ar_m5_b1p5_02b.0.ghep.root" ]
+
+END_PROLOG
