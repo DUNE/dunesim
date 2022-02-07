@@ -25,6 +25,9 @@ table_fragment_begin
     pathPrepend(FW_SEARCH_PATH, ${DUNESIM_DIR}/gdml)
     pathPrepend(FW_SEARCH_PATH, ${DUNESIM_DIR}/config_data)
     pathPrepend(PYTHONPATH, ${DUNESIM_FQ_DIR}/bin)
+    #dk2nu flux windows
+    envSet(GNUMIFLUXXML, ${DUNESIM_DIR}/dk2nuconfigs/GDk2Nu.xml)
+    envSet(GDK2NUFLUXXML,${DUNESIM_DIR}/dk2nuconfigs/GDk2Nu.xml)
 table_fragment_end
 
 # With "product  version" table below, we now define depdendencies
