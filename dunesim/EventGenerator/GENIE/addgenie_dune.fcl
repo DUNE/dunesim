@@ -29,7 +29,7 @@ dunefd_1x2x6_add_genie.vtxOffsets: {
    ylo:  -600.0
    yhi:  600.0 
    zlo:  0.0
-   zhi:  1700.0
+   zhi:  1390.0
 }
 
 #All of these files need moving from app to dcache
