@@ -16,14 +16,32 @@ BEGIN_PROLOG
 // Drop the 1x2x6 where necessary (everything "should work")
 
 #The Generator names provided that should be called from other files are:
-#dune10kt_1x2x6_39ar     #Ar39 in LAr
-#dune10kt_1x2x6_APA      #Co60 in APA frame
-#dune10kt_1x2x6_neutron  #Originally use for K40 in Field Cage. Now repurposed for Neutrons from concrete.
-#dune10kt_1x2x6_CPA      #K40 from CPA
-#dune10kt_1x2x6_85kr     #Kr in LAr
-#dune10kt_1x2x6_222rn    #Rn in LAr
-#dune10kt_1x2x6_210po    #po for 1 cm in front of PDs (approximates effect of Rn daughters on PDs
-#
+#dune10kt_39Ar_in_LAr                  #Ar39 in LAr
+#dune10kt_85kr_in_LAr                  #Kr85 in LAr
+#dune10kt_42Ar_in_LAr                  #Ar42 in LAr
+#dune10kt_42Kfrom42Ar_in_LAr           #K42 in LAr (from Ar42)
+#dune10kt_222Rn_chain_222RnOnly_in_LAr #Rn222 in LAr
+#dune10kt_222Rn_chain_218PoOnly_in_LAr #Po218 in LAr (with x distribution) from Rn222
+#dune10kt_222Rn_chain_214PbOnly_in_LAr #Pb214 in LAr (with x distribution) from Rn222
+#dune10kt_222Rn_chain_214BiOnly_in_LAr #Bi214 in LAr (with x distribution) from Rn222
+#dune10kt_222Rn_chain_210PbOnly_in_LAr #Pb210 in LAr (with x distribution) from Rn222
+
+#dune10kt_1x2x6_40K_in_CPA             #K40 in CPA
+#dune10kt_1x2x6_238U_chain_in_CPA      #U238 cahin in CPA
+#dune10kt_1x2x6_42Kfrom42Ar_in_CPA     #K42 in CPA (from LAr's Ar42)
+#dune10kt_222Rn_chain_218PoOnly_in_CPA #Po218 in CPA from LAr's Rn222
+#dune10kt_222Rn_chain_214PbOnly_in_CPA #Pb214 in CPA from LAr's Rn222
+#dune10kt_222Rn_chain_214BiOnly_in_CPA #Bi214 in CPA from LAr's Rn222
+#dune10kt_222Rn_chain_210PbOnly_in_CPA #Pb210 in CPA from LAr's Rn222
+#dune10kt_222Rn_chain_from210Bi_in_CPA #Bi210 in CPA from LAr's Rn222
+
+#dune10kt_1x2x6_60Co_in_APA            #Co60 from APA frame
+#dune10kt_1x2x6_238U_chain_in_APA      #U238 cahin in APA
+
+#dune10kt_1x2x6_neutron_from_rock      #Neutrons from concrete/rocks (from dune_radiological_model.fcl).
+
+#dune10kt_222Rn_chain_in_PDS           #Rn222 chain in PDS
+
 
 dune10kt_1x2x6_weird_beta_example_in_LAr: # a dummy example
 {
@@ -158,7 +176,7 @@ dune10kt_1x2x6_238U_chain_in_APA:{ // similar story as in the cathode
    BqPercc: 9.5e-2 # 12 Bq/kg, and then very similar story as before dune10kt_1x2x6_60Co_in_APA
 }
 
-dune10kt_222Rn_chain_in_LAr:{
+dune10kt_222Rn_chain_in_LAr:{ #only use this if x-profile not needed
    module_type:"Decay0Gen"
    BqPercc: 0.000001395
    volume_rand: "volCryostat"
