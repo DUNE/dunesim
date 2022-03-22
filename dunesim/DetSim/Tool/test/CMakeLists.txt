@@ -13,8 +13,8 @@ cet_test(test_IdealAdcSimulator SOURCES test_IdealAdcSimulator.cxx
   LIBRARIES
     art::Utilities
     canvas::canvas
-    fhiclcpp
-    cetlib::cetlib cetlib_except
+    fhiclcpp::fhiclcpp
+    cetlib::cetlib
     cetlib_except::cetlib_except
     SQLITE3
     Boost::filesystem
