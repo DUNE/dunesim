@@ -8,36 +8,38 @@
 # removed.
 
 art_make( BASENAME_ONLY
-          MODULE_LIBRARIES larcorealg_Geometry
-	        dunecore_Geometry
- 	        lardataalg_DetectorInfo
-			    larcore_Geometry_Geometry_service
-			    larsim_Simulation nug4::ParticleNavigation lardataobj_Simulation
-	        lardata_Utilities
-			    larevt_Filters
-			    lardataobj_RawData
-          dunecore::SignalShapingServiceDUNE_service
-			    dunecore::SignalShapingServiceDUNEDPhase_service
-          nurandom::RandomUtils_NuRandomService_service
-          ART_FRAMEWORK_CORE
-			    ART_FRAMEWORK_PRINCIPAL
-			    ART_FRAMEWORK_SERVICES_REGISTRY
-			    ART_ROOT_IO_TFILE_SUPPORT
-			    ROOT::Core
-			    ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE
-			    ART_ROOT_IO_TFILESERVICE_SERVICE
-			    art::Persistency_Common canvas
-			    art::Persistency_Provenance canvas
-			    art::Utilities canvas
-			    messagefacility::MF_MessageLogger
-			    
-	        fhiclcpp::fhiclcpp
-			    cetlib::cetlib cetlib_except
-			    CLHEP
-          ROOT_GEOM
-          ROOT_XMLIO
-          ROOT_GDML
-			    ROOT_BASIC_LIB_LIST
+          MODULE_LIBRARIES larcorealg::Geometry
+	                   dunecore::Geometry
+ 	                   lardataalg::DetectorInfo
+			   larcore::Geometry_Geometry_service
+			   larsim::Simulation 
+			   nug4::ParticleNavigation 
+			   lardataobj::Simulation
+	                   lardata::Utilities
+			   larevt::Filters
+			   lardataobj::RawData
+                           dunecore::SignalShapingServiceDUNE_service
+			   dunecore::SignalShapingServiceDUNEDPhase_service
+                           nurandom::RandomUtils_NuRandomService_service
+                           art::Framework_Core
+                           art::Framework_Principal
+                           art::Framework_Services_Registry
+                           art_root_io::tfile_support
+                           ROOT::Core
+                           art_root_io::TFileService_service
+                           art::Framework_Services_Optional_RandomNumberGenerator_service
+			   art::Persistency_Common
+			   art::Persistency_Provenance
+			   art::Utilities
+			   canvas::canvas
+			   messagefacility::MF_MessageLogger 
+ 	                   fhiclcpp::fhiclcpp
+			   cetlib::cetlib cetlib_except
+			   CLHEP
+                           ROOT_GEOM
+                           ROOT_XMLIO
+                           ROOT_GDML
+			   ROOT_BASIC_LIB_LIST
         )
 
 add_subdirectory(Utility)
