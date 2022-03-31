@@ -6,7 +6,7 @@
 FILE( GLOB src_files *.cxx )
 
 art_make_library(
-  LIBRARY_NAME dunesim_DetSim
+  LIBRARY_NAME dunesim::DetSim
   SOURCE ${src_files}
 )
 

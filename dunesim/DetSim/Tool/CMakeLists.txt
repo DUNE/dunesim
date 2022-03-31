@@ -5,24 +5,30 @@
 
 # Add plugin for each tool.
 
-cet_build_plugin(IdealAdcSimulator   art::tool
-  art::Utilities canvas
-  cetlib::cetlib cetlib_except
+cet_build_plugin(IdealAdcSimulator   
+  art::tool
+  art::Utilities 
+  canvas::canvas
+  cetlib::cetlib 
+  cetlib_except::cetlib_except
   ROOT_BASIC_LIB_LIST
   )
 
-cet_build_plugin(NoisyAdcSimulator   art::tool
+cet_build_plugin(NoisyAdcSimulator   
+  art::tool
   nurandom::RandomUtils_NuRandomService_service
   CLHEP
-  art::Utilities canvas
+  art::Utilities 
+  canvas::canvas
   cetlib::cetlib cetlib_except
   messagefacility::MF_MessageLogger
-  ART_FRAMEWORK_SERVICES_REGISTRY
-  ART_ROOT_IO_TFILE_SUPPORT
+  art::Framework_Services_Registry
+  art_root_io::tfile_support
   ROOT::Core
-  ART_ROOT_IO_TFILESERVICE_SERVICE
+  art_root_io::TFileService_service
+  art::Framework_Core
   ROOT_BASIC_LIB_LIST
-  ART_FRAMEWORK_CORE
+
   )
 
 add_subdirectory(test)
