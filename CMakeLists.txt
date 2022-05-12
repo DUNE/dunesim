@@ -6,7 +6,7 @@
 cmake_minimum_required (VERSION 3.19 FATAL_ERROR)
 
 project(dunesim LANGUAGES CXX)
-set(${PROJECT_NAME}_CMAKE_PROJECT_VERSION_STRING 09.49.00d00)
+set(${PROJECT_NAME}_CMAKE_PROJECT_VERSION_STRING 09.51.00d00)
 
 # cetbuildtools contains our cmake modules
 find_package(cetbuildtools REQUIRED)
@@ -35,6 +35,7 @@ find_ups_product( lardataobj )
 find_ups_product( larcore )
 find_ups_product( larcorealg )
 find_ups_product( larcoreobj )
+find_ups_product( nusimdata )
 find_ups_product( nurandom )
 find_ups_product( dunecore )
 find_ups_product( lardata )
