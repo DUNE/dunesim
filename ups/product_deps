@@ -35,7 +35,7 @@ table_fragment_end
 # Add the dependent product and version
 
 product          version
-cetbuildtools	 v8_18_09	-	only_for_build
+cetbuildtools	 v8_20_00	-	only_for_build
 dunecore         v09_52_00d00
 genie_xsec       v3_00_04a       -       optional
 genie_phyopt     v3_00_04
