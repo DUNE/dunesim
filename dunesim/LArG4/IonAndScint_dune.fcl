@@ -48,6 +48,20 @@ protodune_ionandscint_separate.ISCalcAlg: "Separate"
 # Choose *the* IonAndScint configuration
 protodune_ionandscint: @local::protodune_ionandscint_separate
 
+##
+# ProtoDUNE-HD
+##
+protodunehd_ionandscint_correlated: @local::protodune_ionandscint_correlated
+protodunehd_ionandscint_correlated.Instances:    "LArG4DetectorServicevolTPCActiveInner;LArG4DetectorServicevolTPCActiveOuter"
+
+protodunehd_ionandscint_nest: @local::protodunehd_ionandscint_correlated
+protodunehd_ionandscint_nest.ISCalcAlg: "NEST"
+
+protodunehd_ionandscint_separate: @local::protodunehd_ionandscint_correlated
+protodunehd_ionandscint_separate.ISCalcAlg: "Separate"
+
+# Choose *the* IonAndScint configuration
+protodunehd_ionandscint: @local::protodunehd_ionandscint_separate
 
 
 END_PROLOG
