@@ -47,7 +47,7 @@ private:
 
   void GenerateLaserPulse(simb::MCTruth & truth);
 
-  double fJouleToeV = 6.241509e18;
+  //double fJouleToeV = 6.241509e18;
 
   // Declare member data here.
   TRandom3 fRNG;
