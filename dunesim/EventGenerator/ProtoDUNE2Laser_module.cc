@@ -88,7 +88,20 @@ void evgen::ProtoDUNE2Laser::produce(art::Event& e) {
 }
 
 void evgen::ProtoDUNE2Laser::GenerateLaserPulse(simb::MCTruth & truth) {
-  for (size_t i = 0; i < fIntensity; ++i) {
+
+  
+  double energy = 1.0;//GeV/c?
+  double x = fRNG.Gaus(fCenterX, fWidthX);
+  double y = fRNG.Gaus(fCenterY, fWidthY);
+  const TLorentzVector pos(x, y, fCenterZ, 0.);
+
+  simb::MCParticle muon(0, -13, "primary");
+  const TLorentzVector mom(0., 0., sqrt(energy*energy - muon.Mass()*muon.Mass()), energy);
+  muon.AddTrajectoryPoint(pos, mom);
+  truth.Add(muon);
+ 
+
+  /*for (size_t i = 0; i < fIntensity; ++i) {
     simb::MCParticle photon(i, 22, "primary", -1, 0., 1);
     double energy = 1.e6*TMath::HC()*fJouleToeV/fWavelength;
     const TLorentzVector mom(0., 0., energy, energy);
@@ -101,7 +114,7 @@ void evgen::ProtoDUNE2Laser::GenerateLaserPulse(simb::MCTruth & truth) {
                  fCenterZ << ") with energy " << energy << std::endl;
     photon.AddTrajectoryPoint(pos, mom);
     truth.Add(photon);
-  }
+  }*/
 }
 
 DEFINE_ART_MODULE(evgen::ProtoDUNE2Laser)

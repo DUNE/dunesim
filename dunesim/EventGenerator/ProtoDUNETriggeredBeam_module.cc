@@ -247,6 +247,7 @@ namespace evgen{
 
         // Beam input file name and tree names (in beam order)
         std::string fFileName;
+        bool fStreamInput;
         std::string fBaseFileName;
         std::string fTOF1TreeName;
         std::string fBPROF1TreeName;
@@ -381,6 +382,7 @@ evgen::ProtoDUNETriggeredBeam::ProtoDUNETriggeredBeam(fhicl::ParameterSet const 
     // File reading variable initialisations
     fFileName = pset.get< std::string>("FileName");
     fBaseFileName = fFileName.substr(fFileName.rfind("/")+1);
+    fStreamInput = pset.get<bool>("StreamInput", false);
 
     // Tree names
     fTOF1TreeName      = pset.get<std::string>("TOF1TreeName");
@@ -505,7 +507,8 @@ void evgen::ProtoDUNETriggeredBeam::beginJob(){
 
     art::ServiceHandle<art::TFileService> tfs;
     
-    TFile *inputFile = new TFile(fFileName.c_str(),"READ");
+    //TFile *inputFile = new TFile(fFileName.c_str(),"READ");
+    TFile *inputFile = TFile::Open(fFileName.c_str());
     // Check we have the file
     if(inputFile == 0x0){
         throw cet::exception("ProtoDUNETriggeredBeam") << "Input file " << fFileName << " cannot be read.\n";
@@ -1690,6 +1693,16 @@ void evgen::ProtoDUNETriggeredBeam::SetDataDrivenBeamEvent(
 // Function written in similar way as "openDBs()" in CORSIKAGen_module.cc
 void evgen::ProtoDUNETriggeredBeam::OpenInputFile(std::string & filename)
 {
+
+    if (fStreamInput) {
+      if (fFileName.find("/pnfs") != 0) {
+        throw cet::exception("ProtoDUNETriggeredBeam") << "Filename " <<
+            fFileName << " does not start with /pnfs as required for streaming" << std::endl;
+      }
+      filename.replace(0, 5, "root://fndca1.fnal.gov:1094//pnfs/fnal.gov/usr");
+      return;
+    }
+
     // Setup ifdh object
     if (!fIFDH)
     {
