@@ -157,6 +157,21 @@ cet_build_plugin(SPhaseChannelNoiseService
                 ROOT_BASIC_LIB_LIST
              )
 
+cet_build_plugin(SPhaseUniqChannelNoiseService   
+                art::service
+                larcorealg::Geometry
+                dunecore::SignalShapingServiceDUNE_service
+                art_root_io::tfile_support
+                ROOT::Core
+                art_root_io::TFileService_service
+                nurandom::RandomUtils_NuRandomService_service
+                art::Framework_Core
+                art::Utilities canvas
+                cetlib::cetlib 
+		cetlib_except::cetlib_except
+                CLHEP
+                ROOT_BASIC_LIB_LIST
+             )
 
 cet_build_plugin(WhiteChannelNoiseService   
                 art::service
