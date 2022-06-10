@@ -21,6 +21,14 @@ standard_nuescattergen_solar:
    IsSupernova:  "false"
    NNu:          "1"
 
+   UseFixedDirection: false # use fixed SN direction specified by {XDir,YDir,ZDir}
+   XDir:              0     # X component of SN direction
+   YDir:              0     # Y component of SN direction
+   ZDir:              1     # Z component of SN direction
+   CustomNuFlavBR:    false # use custom BRs specified by NuFlavBR for each flavor
+   NuFlavBR:          [ 1., 0., 0., 0., 0., 0. ]
+   FlatESpectrum:     false # generate flat energy spectrum for neutrino
+
    EventRateFileName: "/pnfs/dune/resilient/users/dpershey/solar_nue_rates.root"
 }
 
@@ -44,6 +52,14 @@ standard_nuescattergen_supernova:
 
    IsSupernova:  "true"
    NNu:          "250"
+
+   UseFixedDirection: false # use fixed SN direction specified by {XDir,YDir,ZDir}
+   XDir:              0     # X component of SN direction
+   YDir:              0     # Y component of SN direction
+   ZDir:              1     # Z component of SN direction
+   CustomNuFlavBR:    false # use custom BRs specified by NuFlavBR for each flavor
+   NuFlavBR:          [ 1., 0., 0., 0., 0., 0. ]
+   FlatESpectrum:     false # generate flat energy spectrum for neutrino
 
    EventRateFileName: "/pnfs/dune/resilient/users/dpershey/supernova_nue_rates.root"
 }
