@@ -54,3 +54,7 @@ physics.producers.generator.Wavelength: 532
 physics.producers.generator.Intensity: 1e3
 physics.producers.generator.WidthX: .05
 physics.producers.generator.WidthY: .05
+
+#physics.producers.generator.InputFile: "input.root"
+physics.producers.generator.InputFile: "vert_rotate_input.root"
+physics.producers.generator.StartEvent: 0

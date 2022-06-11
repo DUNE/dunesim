@@ -19,6 +19,8 @@
 #include "nusimdata/SimulationBase/MCTruth.h"
 #include "nusimdata/SimulationBase/MCParticle.h"
 #include "TMath.h"
+#include "TFile.h"
+#include "TTree.h"
 #include "TRandom3.h"
 
 #include <memory>
@@ -57,7 +59,13 @@ private:
   //Laser settings 
   size_t fIntensity; //N photons
   double fWavelength; //wavelength in nm
+  std::string fInputFile;
+  int fCurrentEvent;
 
+  TTree * fInputTree;
+
+  double fX, fY, fZ, fTheta, fPhi;
+  double fToRad = TMath::Pi()/180.;
 };
 
 
@@ -66,10 +74,21 @@ evgen::ProtoDUNE2Laser::ProtoDUNE2Laser(fhicl::ParameterSet const& p)
     fCenterX(p.get<double>("CenterX")), fCenterY(p.get<double>("CenterY")),
     fCenterZ(p.get<double>("CenterZ")), fWidthX(p.get<double>("WidthX")),
     fWidthY(p.get<double>("WidthY")), fIntensity(p.get<size_t>("Intensity")),
-    fWavelength(p.get<double>("Wavelength")) {
+    fWavelength(p.get<double>("Wavelength")),
+    fInputFile(p.get<std::string>("InputFile")),
+    fCurrentEvent(p.get<int>("StartEvent")) {
 
   //MCTruth to hold set of photons
   produces<std::vector<simb::MCTruth>>();
+  auto * input_file = TFile::Open(fInputFile.c_str());
+  fInputTree = (TTree*)input_file->Get("tree");
+  //fInputTree->SetDirectory(0);
+
+  fInputTree->SetBranchAddress("x", &fX);
+  fInputTree->SetBranchAddress("y", &fY);
+  fInputTree->SetBranchAddress("z", &fZ);
+  fInputTree->SetBranchAddress("theta", &fTheta);
+  fInputTree->SetBranchAddress("phi", &fPhi);
 }
 
 void evgen::ProtoDUNE2Laser::produce(art::Event& e) {
@@ -89,32 +108,24 @@ void evgen::ProtoDUNE2Laser::produce(art::Event& e) {
 
 void evgen::ProtoDUNE2Laser::GenerateLaserPulse(simb::MCTruth & truth) {
 
+  fInputTree->GetEntry(fCurrentEvent); 
   
-  double energy = 1.0;//GeV/c?
-  double x = fRNG.Gaus(fCenterX, fWidthX);
-  double y = fRNG.Gaus(fCenterY, fWidthY);
-  const TLorentzVector pos(x, y, fCenterZ, 0.);
-
+  double momentum = 1.0;//GeV/c?
   simb::MCParticle muon(0, -13, "primary");
-  const TLorentzVector mom(0., 0., sqrt(energy*energy - muon.Mass()*muon.Mass()), energy);
+  double energy = sqrt(muon.Mass()*muon.Mass() + momentum*momentum);
+
+  double px = momentum*sin(fTheta*fToRad)*cos(fPhi*fToRad);
+  double py = momentum*sin(fTheta*fToRad)*sin(fPhi*fToRad);
+  double pz = momentum*cos(fTheta*fToRad);
+
+  std::cout << "(X, Y, Z)" << fX << " " << fY << " " << fZ << std::endl;
+  std::cout << "(PX, PY, PZ)" << px << " " << py << " " << pz << std::endl;
+  const TLorentzVector mom(px, py, pz, energy);
+  const TLorentzVector pos(fX, fY, fZ, 0.);
   muon.AddTrajectoryPoint(pos, mom);
   truth.Add(muon);
  
-
-  /*for (size_t i = 0; i < fIntensity; ++i) {
-    simb::MCParticle photon(i, 22, "primary", -1, 0., 1);
-    double energy = 1.e6*TMath::HC()*fJouleToeV/fWavelength;
-    const TLorentzVector mom(0., 0., energy, energy);
-
-    double x = fRNG.Gaus(fCenterX, fWidthX);
-    double y = fRNG.Gaus(fCenterY, fWidthY);
-    const TLorentzVector pos(x, y, fCenterZ, 0.);
-
-    std::cout << "Generating photon at (" << x << ", " << y << ", " <<
-                 fCenterZ << ") with energy " << energy << std::endl;
-    photon.AddTrajectoryPoint(pos, mom);
-    truth.Add(photon);
-  }*/
+  ++fCurrentEvent;
 }
 
 DEFINE_ART_MODULE(evgen::ProtoDUNE2Laser)
