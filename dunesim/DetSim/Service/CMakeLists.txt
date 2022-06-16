@@ -72,7 +72,7 @@ cet_build_plugin(ExponentialChannelNoiseService
              )
               
 cet_build_plugin(ShapedCohProtoDUNENoiseService   art::service
-                dune_raw_data::dune-raw-data_Services_ChannelMap_PdspChannelMapService_service
+                dunepdlegacy_Services_ChannelMap_PdspChannelMapService_service
                 larcorealg::Geometry
                 dunecore::SignalShapingServiceDUNE_service
                 art_root_io::tfile_support
