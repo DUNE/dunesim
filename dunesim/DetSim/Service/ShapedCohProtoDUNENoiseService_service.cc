@@ -7,7 +7,7 @@
 #include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 
 #include "nurandom/RandomUtils/NuRandomService.h"
-#include "dune-raw-data/Services/ChannelMap/PdspChannelMapService.h"
+#include "dunepdlegacy/Services/ChannelMap/PdspChannelMapService.h"
 
 #include "lardataalg/DetectorInfo/DetectorClocksData.h"
 #include "nurandom/RandomUtils/NuRandomService.h"
