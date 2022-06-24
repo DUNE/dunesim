@@ -28,6 +28,7 @@ art_make( BASENAME_ONLY MODULE_LIBRARIES
   cetlib cetlib_except
   ${ROOT_BASIC_LIB_LIST}
   EXCLUDE validation_decay0.C
+  EXCLUDE Plotter.C
   )
 
 # Ultimately we stop using the aclic insanity and use a real compiler
