@@ -194,8 +194,8 @@ dune10kt_neutron_from_rock: // 1 cm thick box of 5 sides (each column below is o
    Nuclide:               ["Concrete_DUNE10MeV", "Concrete_DUNE10MeV", "Concrete_DUNE10MeV", "Concrete_DUNE10MeV", "Concrete_DUNE10MeV" ]
    Material:              [".*",".*",".*",".*", ".*"]
    BqPercc:               [ 0.0000076, 0.0000076, 0.0000076, 0.0000076, 0.0000076 ] # activity -- Becquerels per cc. 0.0000076 assumes 10 neutrons/y/g per 10 ppm U-238 in concrete and a density of 2.40 g/cc for 10 cm mean depth in concrete -JReichenbacher (03/21/2017)
-   T0:                    [ -2246000.,-2246000.,-2246000.,-2246000.,-2246000 ] # ending time in ns
-   T1:                    [  2246000., 2246000., 2246000., 2246000., 2246000 ] # ending time in ns
+   T0:                    [ -4250000.,-4250000.,-4250000.,-4250000.,-4250000 ] # ending time in ns
+   T1:                    [  4250000., 4250000., 4250000., 4250000., 4250000 ] # ending time in ns
    
    X0:                    [ -420. , -420. , -420., -420. ,  320.5 ] # in cm in world coordinates, bottom corner of box 
    X1:                    [  320. ,  320. ,  320.,  320. ,  319.5 ] # in cm in world coordinates, top corner of box
