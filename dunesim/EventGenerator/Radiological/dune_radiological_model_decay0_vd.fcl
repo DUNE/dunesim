@@ -187,7 +187,7 @@ dune10kt_222Rn_chain_in_LAr:{ #only use this if x-profile not needed
 }
 
 // Neutrons below is copied straight from dune_radiological_model.fcl and roughtly adapted for VD.
-// This is MASSIVELY dependant on the geometry
+// This is MASSIVELY dependant on the geometry -> currently for 1x8x14 !!!
 dune10kt_neutron_from_rock: // 1 cm thick box of 5 sides (each column below is one side) around the LAr volume as the neutrons starting point. -X not included since middle of full detector (CPA position).
 {
    module_type:           "RadioGen"
@@ -197,29 +197,29 @@ dune10kt_neutron_from_rock: // 1 cm thick box of 5 sides (each column below is o
    T0:                    [ -4250000.,-4250000.,-4250000.,-4250000.,-4250000 ] # starting time in ns
    T1:                    [  4250000., 4250000., 4250000., 4250000., 4250000 ] # ending time in ns
    
-   X0:                    [   -425.0 ,   -425.0 ,   -426.0 ,    425.08, -425.0 , -425.0  ] # modifications by Gleb Sinev 23Jun2022
-   X1:                    [    425.08,    425.08,   -425.0 ,    426.08,  425.08,  425.08 ]
-   Y0:                    [   -775.0 ,    774.0 ,   -774.0 ,   -774.0 , -774.0 , -774.0  ]
-   Y1:                    [   -774.0 ,    775.0 ,    774.0 ,    774.0 ,  774.0 ,  774.0  ]
-   Z0:                    [   -100.0 ,   -100.0 ,   -100.0 ,   -100.0 , 2184.88, -101.0  ]
-   Z1:                    [   2184.88,   2184.88,   2184.88,   2184.88, 2185.88, -100.0  ]
+   X0:                    [   -425.0 ,   -425.0 ,    425.08, -425.0 , -425.0  ] # modifications by Gleb Sinev 23Jun2022
+   X1:                    [    425.08,    425.08,    426.08,  425.08,  425.08 ]
+   Y0:                    [   -775.0 ,    774.0 ,   -774.0 , -774.0 , -774.0  ]
+   Y1:                    [   -774.0 ,    775.0 ,    774.0 ,  774.0 ,  774.0  ]
+   Z0:                    [   -100.0 ,   -100.0 ,   -100.0 , 2184.88, -101.0  ]
+   Z1:                    [   2184.88,   2184.88,   2184.88, 2185.88, -100.0  ]
 }
 
 // gammas produced in the rock and shotcrete/concrete surrounding the detector because of natural radioactivity of those materials (we simulated K-40, the U-238 and Th-232 decay chains).
-dune10kt_caverngammas:
+dune10kt_caverngammas: // same as for neutrons above
 {
  module_type:           "RadioGen"
- Nuclide:               [ "CavernGammas", "CavernGammas", "CavernGammas", "CavernGammas", "CavernGammas", "CavernGammas" ] # replaced 40K with CavernGammas GS 23Jun2022
- Material:              [ ".*", ".*" ,".*" ,".*" ,".*" ,".*" ]
- BqPercc:               [ 0.064, 0.064, 0.064, 0.064, 0.064, 0.064 ] # 0.8 sec^-1 cm^2 / 25 cryostat attenuation * 4pi/2pi (JR 23Jun2022)
- X0:                    [   -425.0 ,   -425.0 ,   -426.0 ,    425.08, -425.0 , -425.0  ] # modifications by Gleb Sinev 23Jun2022
- X1:                    [    425.08,    425.08,   -425.0 ,    426.08,  425.08,  425.08 ]
- Y0:                    [   -775.0 ,    774.0 ,   -774.0 ,   -774.0 , -774.0 , -774.0  ]
- Y1:                    [   -774.0 ,    775.0 ,    774.0 ,    774.0 ,  774.0 ,  774.0  ]
- Z0:                    [   -100.0 ,   -100.0 ,   -100.0 ,   -100.0 , 2184.88, -101.0  ]
- Z1:                    [   2184.88,   2184.88,   2184.88,   2184.88, 2185.88, -100.0  ]
- T0:                    [-4250000.,-4250000.,-4250000.,-4250000.,-4250000.,-4250000.   ] # starting time in ns
- T1:                    [ 4250000., 4250000., 4250000., 4250000., 4250000., 4250000.   ] # ending time in ns
+ Nuclide:               [ "CavernGammas", "CavernGammas", "CavernGammas", "CavernGammas", "CavernGammas" ] # replaced 40K with CavernGammas GS 23Jun2022
+ Material:              [ ".*", ".*" ,".*" ,".*" ,".*" ]
+ BqPercc:               [ 0.064, 0.064, 0.064, 0.064, 0.064 ] # 0.8 sec^-1 cm^2 / 25 cryostat attenuation * 4pi/2pi (JR 23Jun2022)
+ X0:                    [   -425.0 ,   -425.0 ,    425.08, -425.0 , -425.0  ] # modifications by Gleb Sinev 23Jun2022
+ X1:                    [    425.08,    425.08,    426.08,  425.08,  425.08 ]
+ Y0:                    [   -775.0 ,    774.0 ,   -774.0 , -774.0 , -774.0  ]
+ Y1:                    [   -774.0 ,    775.0 ,    774.0 ,  774.0 ,  774.0  ]
+ Z0:                    [   -100.0 ,   -100.0 ,   -100.0 , 2184.88, -101.0  ]
+ Z1:                    [   2184.88,   2184.88,   2184.88, 2185.88, -100.0  ]
+ T0:                    [-4250000.,-4250000.,-4250000.,-4250000.,-4250000.   ] # starting time in ns
+ T1:                    [ 4250000., 4250000., 4250000., 4250000., 4250000.   ] # ending time in ns
 }
 
 ############ Not in use currently  ###########
