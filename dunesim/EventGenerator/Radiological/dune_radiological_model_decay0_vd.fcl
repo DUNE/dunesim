@@ -19,9 +19,9 @@ BEGIN_PROLOG
 #dune10kt_238U_chain_in_APA            #U238 chain in CRP (APA in title kept for backtracking capabilities)
 
 #dune10kt_neutron_from_rock            #Neutrons from concrete/rocks (from dune_radiological_model.fcl, with position adapted).
+#dune10kt_caverngammas                 #Gammas from concrete/rocks
 
 #dune10kt_222Rn_chain_in_PDS           #Rn222 chain in PDS
-
 
 dune10kt_weird_beta_example_in_LAr: # a dummy example
 {
