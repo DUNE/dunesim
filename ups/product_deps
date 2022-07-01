@@ -36,7 +36,7 @@ table_fragment_end
 
 product          version
 cetbuildtools	 v8_20_00	-	only_for_build
-dunecore         v09_53_02d00
+dunecore         v09_54_00d00
 genie_xsec       v3_00_04a       -       optional
 genie_phyopt     v3_00_04
 end_product_list
