@@ -111,7 +111,7 @@ void evgen::ProtoDUNE2Laser::GenerateLaserPulse(simb::MCTruth & truth) {
   fInputTree->GetEntry(fCurrentEvent); 
   
   double momentum = 1.0;//GeV/c?
-  simb::MCParticle muon(0, -13, "primary");
+  simb::MCParticle muon(0, 66613, "primary");
   double energy = sqrt(muon.Mass()*muon.Mass() + momentum*momentum);
 
   double px = momentum*sin(fTheta*fToRad)*cos(fPhi*fToRad);
