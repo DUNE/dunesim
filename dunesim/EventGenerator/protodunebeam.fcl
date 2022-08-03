@@ -160,7 +160,7 @@ protodunedp_triggeredbeam:
  TRIG1TreeName:     "VirtualDetector/TRIG1"
  BPROF4TreeName:    "VirtualDetector/BPROF4"
  TRIG2TreeName:     "VirtualDetector/TRIG2"
- NP04frontTreeName: "Detector/NP04front"
+ NP04frontTreeName: "Detector/NP02front"
 
  # Set true to use the data driven method for the primary beam particle
  UseDataDrivenPrimary: false
@@ -170,11 +170,10 @@ protodunedp_triggeredbeam:
  ReduceNP04frontArea: false
 
  StartEvent: 0
- # From protoDUNE_gensingle.fcl
- # Updated geometry values:
- BeamX: -4.994 # In cm
- BeamY: 448.449 
- BeamZ: -129.804
+ ##Given by Slavic Galymov
+ BeamX: 149.6 # In cm
+ BeamY: 94.8 
+ BeamZ: 194.6
  Verbose: false 
  IncludeAnti: true
 
@@ -192,14 +191,20 @@ protodunedp_triggeredbeam:
  RotateMonitorYZ:  7.00
  RotateMonitorXZ: 45.00
 
- L1: 1.98
- L2: 1.69472
- L3: 2.11666
- BeamBend: .12003
+ ## 
+ L1: 1.857
+ L2: 1.863
+ L3: 2.851
+ BeamBend: .05792
+
+ IsNP02: true
 
 
  ## New parameters for momentum spectrometer
- LMag: 2.1645
+ ## Calculated by comparing to PDSP
+ ## Lhd = BeamBendhd * (Lsp/BeamBendsp)
+ ## Same B field
+ LMag: 1.044470882
  NominalP: "1"
  B: 1.294817
 

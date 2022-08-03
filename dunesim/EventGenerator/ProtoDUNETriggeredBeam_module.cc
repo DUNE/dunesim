@@ -431,7 +431,7 @@ evgen::ProtoDUNETriggeredBeam::ProtoDUNETriggeredBeam(fhicl::ParameterSet const 
     fBPROF2TreeName    = pset.get<std::string>("BPROF2TreeName");
     fBPROF3TreeName    = pset.get<std::string>("BPROF3TreeName");
     fTRIG1TreeName     = pset.get<std::string>("TRIG1TreeName");
-    fBPROFEXTTreeName  = pset.get<std::string>("BPROFEXTTreeName");
+    fBPROFEXTTreeName  = pset.get<std::string>("BPROFEXTTreeName", "");
     fBPROF4TreeName    = pset.get<std::string>("BPROF4TreeName");
     fTRIG2TreeName      = pset.get<std::string>("TRIG2TreeName");
     fNP04frontTreeName = pset.get<std::string>("NP04frontTreeName");
