@@ -14,7 +14,8 @@ services:
   MemoryTracker:     @local::dune_memory_tracker
   RandomNumberGenerator: {} #ART native random number generator
   FileCatalogMetadata:  @local::art_file_catalog_mc
-  @table::protodune_simulation_services
+  #@table::protodune_simulation_services
+  @table::protodunedphase_simulation_services_legacy
 }
 
 #Start each new event with an empty event.
