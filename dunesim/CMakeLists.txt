@@ -1,8 +1,0 @@
-add_subdirectory(DetSim)
-add_subdirectory(Simulation)
-add_subdirectory(EventGenerator)
-add_subdirectory(SpaceCharge)
-add_subdirectory(SpaceChargeServices)
-add_subdirectory(SimFilter)
-add_subdirectory(DetectorVariations)
-add_subdirectory(LArG4)
