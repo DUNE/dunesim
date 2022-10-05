@@ -1,9 +1,9 @@
 #include "services_dune.fcl"
-#include "ProtoDUNE2Laser.fcl"
+#include "ProtoDUNEHDLaser.fcl"
 #include "corsika_protodune.fcl"
 #include "dune_radiological_model.fcl"
 
-process_name: PD2LaserGen
+process_name: PDHDLaserGen
 
 services:
 {
@@ -23,7 +23,7 @@ source:
 {
   module_type: EmptyEvent
   timestampPlugin: { plugin_type: "GeneratedEventTimestamp" }
-  maxEvents:   100
+  maxEvents:   10
   firstRun:    1           # Run number to use for this file
   firstEvent:  1           # number of first event in the file
 }
@@ -32,7 +32,7 @@ physics:
 {
  producers:
  {
-   generator: @local::protodune2_laser
+   generator: @local::protodune_hd_laser
    cosmicgenerator: @local::protodune_corsika_cmc  
    ar39:  @local::protodunesp_39ar
    ar42:  @local::protodunesp_42ar
@@ -51,7 +51,7 @@ outputs:
  out1:
  {
    module_type: RootOutput
-   fileName:    "gen_pd2laser_cosmics.root" #default file name, can override from command line with -o or --output
+   fileName:    "gen_pd_hd_laser_cosmics.root" #default file name, can override from command line with -o or --output
    dataTier: "generated"
    compressionLevel: 1
  }
