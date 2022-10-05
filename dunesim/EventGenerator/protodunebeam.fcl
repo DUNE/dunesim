@@ -171,9 +171,12 @@ protodunedp_triggeredbeam:
 
  StartEvent: 0
  ##Given by Slavic Galymov
- BeamX: 149.6 # In cm
- BeamY: 94.8 
- BeamZ: 194.6
+ #BeamX: 149.6 # In cm
+ #BeamY: 94.8 
+ #BeamZ: 194.6
+ BeamX: 132.33
+ BeamY: 420.2
+ BeamZ: 592.0
  Verbose: false 
  IncludeAnti: true
 
@@ -188,8 +191,13 @@ protodunedp_triggeredbeam:
 
  ###New rotations - same final z axis as those 
  ###from Paola, but the X axis is kept horizontal 
- RotateMonitorYZ:  7.00
- RotateMonitorXZ: 45.00
+
+ #7.7deg below horizontal
+ #45 degree between y/z in horizontal plane
+ #
+ #X is vertical
+ RotateMonitorYZ: -44.4857
+ RotateMonitorXZ: -169.1752
 
  ## 
  L1: 1.857
