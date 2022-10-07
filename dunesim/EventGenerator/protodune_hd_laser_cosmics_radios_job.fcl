@@ -1,0 +1,67 @@
+#include "services_dune.fcl"
+#include "ProtoDUNEHDLaser.fcl"
+#include "corsika_protodune.fcl"
+#include "dune_radiological_model.fcl"
+
+process_name: PDHDLaserGen
+
+services:
+{
+  # Load the service that manages root files for histograms.
+  TimeTracker:       {}
+  RandomNumberGenerator: {} #ART native random number generator
+  FileCatalogMetadata:  @local::art_file_catalog_mc
+  @table::protodunehd_simulation_services
+  #@table::protodune_simulation_services
+  #TFileService: { #closeFileFast: true
+  #                fileName: "datadriven_hist.root" #can be overridden by '-T'
+  #              }
+}
+
+#Start each new event with an empty event.
+source:
+{
+  module_type: EmptyEvent
+  timestampPlugin: { plugin_type: "GeneratedEventTimestamp" }
+  maxEvents:   10
+  firstRun:    1           # Run number to use for this file
+  firstEvent:  1           # number of first event in the file
+}
+
+physics:
+{
+ producers:
+ {
+   generator: @local::protodune_hd_laser
+   cosmicgenerator: @local::protodune_corsika_cmc  
+   ar39:  @local::protodunesp_39ar
+   ar42:  @local::protodunesp_42ar
+   kr85:  @local::protodunesp_85kr
+   rn222: @local::protodunesp_222rn
+   rns:       { module_type: "RandomNumberSaver" }
+ }
+ simulate: [ rns, generator, cosmicgenerator, ar39, ar42, kr85, rn222 ]
+ stream1:  [ out1 ]
+ trigger_paths: [simulate] 
+ end_paths:     [stream1]  
+}
+
+outputs:
+{
+ out1:
+ {
+   module_type: RootOutput
+   fileName:    "gen_pd_hd_laser_cosmics.root" #default file name, can override from command line with -o or --output
+   dataTier: "generated"
+   compressionLevel: 1
+ }
+}
+
+physics.producers.generator.Wavelength: 532
+physics.producers.generator.Intensity: 1e3
+physics.producers.generator.WidthX: .05
+physics.producers.generator.WidthY: .05
+
+#physics.producers.generator.InputFile: "input.root"
+physics.producers.generator.InputFile: "vert_rotate_input.root"
+physics.producers.generator.StartEvent: 0

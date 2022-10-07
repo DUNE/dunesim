@@ -1,7 +1,7 @@
 BEGIN_PROLOG
 
-protodune2_laser: {
-  module_type: "ProtoDUNE2Laser"
+protodune_hd_laser: {
+  module_type: "ProtoDUNEHDLaser"
   Seed: 0
   Wavelength: 532
 

@@ -1,7 +1,7 @@
 #include "services_dune.fcl"
-#include "ProtoDUNE2Laser.fcl"
+#include "ProtoDUNEHDLaser.fcl"
 
-process_name: PD2LaserGen
+process_name: PDHDLaserGen
 
 services:
 {
@@ -21,7 +21,7 @@ source:
 {
   module_type: EmptyEvent
   timestampPlugin: { plugin_type: "GeneratedEventTimestamp" }
-  maxEvents:   100
+  maxEvents:   10
   firstRun:    1           # Run number to use for this file
   firstEvent:  1           # number of first event in the file
 }
@@ -30,7 +30,7 @@ physics:
 {
  producers:
  {
-   generator: @local::protodune2_laser
+   generator: @local::protodune_hd_laser
    rns:       { module_type: "RandomNumberSaver" }
  }
  simulate: [ rns, generator ]
@@ -44,7 +44,7 @@ outputs:
  out1:
  {
    module_type: RootOutput
-   fileName:    "gen_pd2laser.root" #default file name, can override from command line with -o or --output
+   fileName:    "gen_pdhd_laser.root" #default file name, can override from command line with -o or --output
    dataTier: "generated"
    compressionLevel: 1
  }

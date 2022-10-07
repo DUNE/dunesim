@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////
-// Class:       ProtoDUNE2Laser
+// Class:       ProtoDUNEHDLaser
 // Plugin Type: producer (Unknown Unknown)
-// File:        ProtoDUNE2Laser_module.cc
+// File:        ProtoDUNEHDLaser_module.cc
 //
 // Generated at Mon Apr 18 11:20:27 2022 by Jacob Calcutt using cetskelgen
 // from  version .
@@ -26,21 +26,21 @@
 #include <memory>
 
 namespace evgen {
-  class ProtoDUNE2Laser;
+  class ProtoDUNEHDLaser;
 }
 
 
-class evgen::ProtoDUNE2Laser : public art::EDProducer {
+class evgen::ProtoDUNEHDLaser : public art::EDProducer {
 public:
-  explicit ProtoDUNE2Laser(fhicl::ParameterSet const& p);
+  explicit ProtoDUNEHDLaser(fhicl::ParameterSet const& p);
   // The compiler-generated destructor is fine for non-base
   // classes without bare pointers or other resource use.
 
   // Plugins should not be copied or assigned.
-  ProtoDUNE2Laser(ProtoDUNE2Laser const&) = delete;
-  ProtoDUNE2Laser(ProtoDUNE2Laser&&) = delete;
-  ProtoDUNE2Laser& operator=(ProtoDUNE2Laser const&) = delete;
-  ProtoDUNE2Laser& operator=(ProtoDUNE2Laser&&) = delete;
+  ProtoDUNEHDLaser(ProtoDUNEHDLaser const&) = delete;
+  ProtoDUNEHDLaser(ProtoDUNEHDLaser&&) = delete;
+  ProtoDUNEHDLaser& operator=(ProtoDUNEHDLaser const&) = delete;
+  ProtoDUNEHDLaser& operator=(ProtoDUNEHDLaser&&) = delete;
 
   // Required functions.
   void produce(art::Event& e) override;
@@ -69,7 +69,7 @@ private:
 };
 
 
-evgen::ProtoDUNE2Laser::ProtoDUNE2Laser(fhicl::ParameterSet const& p)
+evgen::ProtoDUNEHDLaser::ProtoDUNEHDLaser(fhicl::ParameterSet const& p)
   : EDProducer{p}, fRNG(p.get<int>("Seed", 0)),
     fCenterX(p.get<double>("CenterX")), fCenterY(p.get<double>("CenterY")),
     fCenterZ(p.get<double>("CenterZ")), fWidthX(p.get<double>("WidthX")),
@@ -91,7 +91,7 @@ evgen::ProtoDUNE2Laser::ProtoDUNE2Laser(fhicl::ParameterSet const& p)
   fInputTree->SetBranchAddress("phi", &fPhi);
 }
 
-void evgen::ProtoDUNE2Laser::produce(art::Event& e) {
+void evgen::ProtoDUNEHDLaser::produce(art::Event& e) {
   // Define the truth collection for this event.
   auto truthcol = std::make_unique<std::vector<simb::MCTruth>>();
   simb::MCTruth truth;
@@ -106,13 +106,13 @@ void evgen::ProtoDUNE2Laser::produce(art::Event& e) {
   e.put(std::move(truthcol));
 }
 
-void evgen::ProtoDUNE2Laser::GenerateLaserPulse(simb::MCTruth & truth) {
+void evgen::ProtoDUNEHDLaser::GenerateLaserPulse(simb::MCTruth & truth) {
 
   fInputTree->GetEntry(fCurrentEvent); 
   
   double momentum = 1.0;//GeV/c?
-  simb::MCParticle muon(0, -13, "primary");
-  double energy = sqrt(muon.Mass()*muon.Mass() + momentum*momentum);
+  simb::MCParticle laser(0, 66613, "primary");
+  double energy = sqrt(laser.Mass()*laser.Mass() + momentum*momentum);
 
   double px = momentum*sin(fTheta*fToRad)*cos(fPhi*fToRad);
   double py = momentum*sin(fTheta*fToRad)*sin(fPhi*fToRad);
@@ -122,10 +122,10 @@ void evgen::ProtoDUNE2Laser::GenerateLaserPulse(simb::MCTruth & truth) {
   std::cout << "(PX, PY, PZ)" << px << " " << py << " " << pz << std::endl;
   const TLorentzVector mom(px, py, pz, energy);
   const TLorentzVector pos(fX, fY, fZ, 0.);
-  muon.AddTrajectoryPoint(pos, mom);
-  truth.Add(muon);
+  laser.AddTrajectoryPoint(pos, mom);
+  truth.Add(laser);
  
   ++fCurrentEvent;
 }
 
-DEFINE_ART_MODULE(evgen::ProtoDUNE2Laser)
+DEFINE_ART_MODULE(evgen::ProtoDUNEHDLaser)
