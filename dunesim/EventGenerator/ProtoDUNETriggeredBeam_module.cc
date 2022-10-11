@@ -251,6 +251,10 @@ namespace evgen{
         // Distinguishes for running NP04 vs NP02
         bool fIsNP02;
 
+        //Will rotate beam into correct position for NP02  
+        double fNP02Rotation;
+        bool fNP02XDrift;
+
         //Names of detectors in real life
         std::string DetNameBProf1X;
         std::string DetNameBProf1Y;
@@ -424,6 +428,9 @@ evgen::ProtoDUNETriggeredBeam::ProtoDUNETriggeredBeam(fhicl::ParameterSet const 
       DetNameBProf4X   = "XBPF022716";
       DetNameBProf4Y   = "XBPF022717";
     }
+
+    fNP02XDrift = pset.get<bool>("NP02XDrift", true);
+    fNP02Rotation = pset.get<double>("NP02Rotation", 0.);
 
     // Tree names
     fTOF1TreeName      = pset.get<std::string>("TOF1TreeName");
@@ -1762,14 +1769,27 @@ void evgen::ProtoDUNETriggeredBeam::ConvertMomentum(float &px, float &py, float 
     py = py / 1000.;
     pz = pz / 1000.;
    
-    // If we want to rotate by changing theta and phi, do it here.
-    TVector3 momVec(px,py,pz);    
-    momVec.SetTheta(momVec.Theta() + fBeamThetaShift);
-    momVec.SetPhi(momVec.Phi() + fBeamPhiShift);
+    TVector3 momVec(px,py,pz);
 
-    px = momVec.X();
-    py = momVec.Y();
-    pz = momVec.Z();
+    if (!fIsNP02) {
+      //NP04: If we want to rotate by changing theta and phi, do it here.
+      momVec.SetTheta(momVec.Theta() + fBeamThetaShift);
+      momVec.SetPhi(momVec.Phi() + fBeamPhiShift);
+
+      px = momVec.X();
+      py = momVec.Y();
+      pz = momVec.Z();
+    }
+    else {
+      //NP02: Beam ntuples are in the 'world' coordinate system
+      //The beam is similar to the NP04 direction: ~ -8deg from Z
+      //In our simulation, it needs to be at -135deg
+      //Then we need to swap x and y
+      momVec.RotateY(fNP02Rotation*TMath::Pi()/180.);
+      px = (fNP02XDrift ? momVec.Y() : momVec.X());
+      py = (fNP02XDrift ? -1.*momVec.X() : momVec.Y());
+      pz = momVec.Z();
+    }
 }
 
 //-----------------------------------------------------------------------------

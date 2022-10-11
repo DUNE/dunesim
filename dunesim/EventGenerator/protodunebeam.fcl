@@ -174,9 +174,18 @@ protodunedp_triggeredbeam:
  #BeamX: 149.6 # In cm
  #BeamY: 94.8 
  #BeamZ: 194.6
+
  BeamX: 132.33
- BeamY: 420.2
+ BeamY: -421.7
+
+ #BeamX: -421.7
+ #BeamY: 132.33
+
  BeamZ: 592.0
+
+ NP02XDrift: true
+ NP02Rotation: -126.3
+
  Verbose: false 
  IncludeAnti: true
 
