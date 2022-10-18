@@ -60,8 +60,15 @@ protodunehd_ionandscint_nest.ISCalcAlg: "NEST"
 protodunehd_ionandscint_separate: @local::protodunehd_ionandscint_correlated
 protodunehd_ionandscint_separate.ISCalcAlg: "Separate"
 
-# Choose *the* IonAndScint configuration
+protodunehd_ionandscint_larql: @local::protodunehd_ionandscint_correlated
+protodunehd_ionandscint_larql.services.LArG4Parameters.UseModLarqlRecomb: true
+
+# active volume
 protodunehd_ionandscint: @local::protodunehd_ionandscint_separate
+protodunehd_ionandscint.Instances: "LArG4DetectorServicevolTPCActiveInner"
+# external laterals volume
+protodunehd_ionandscint_external: @local::protodunehd_ionandscint_larql
+protodunehd_ionandscint_external.Instances: "LArG4DetectorServicevolTPCActiveOuter"
 
 ##
 # ProtoDUNE-VD
