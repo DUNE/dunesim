@@ -36,7 +36,7 @@ table_fragment_end
 
 product          version
 cetbuildtools	 v8_20_00	-	only_for_build
-dunecore         v09_61_00d00
+dunecore         v09_61_00d00_genie_G1810b0211a
 genie_xsec       v3_00_04a       -       optional
 genie_phyopt     v3_00_04
 end_product_list
@@ -45,10 +45,10 @@ end_product_list
 # We now define allowed qualifiers and the corresponding qualifiers for the depdencies.
 # Make a table by adding columns before "notes".
 qualifier       dunecore      genie_xsec              genie_phyopt    notes
-c7:debug        c7:debug      G1810a0211a:k250:e1000  dkcharmtau   
-c7:prof         c7:prof       G1810a0211a:k250:e1000  dkcharmtau   
-e20:debug       e20:debug     G1810a0211a:k250:e1000  dkcharmtau    
-e20:prof        e20:prof      G1810a0211a:k250:e1000  dkcharmtau   
+c7:debug        c7:debug      G1810b0211a:k250:e1000  dkcharmtau   
+c7:prof         c7:prof       G1810b0211a:k250:e1000  dkcharmtau   
+e20:debug       e20:debug     G1810b0211a:k250:e1000  dkcharmtau    
+e20:prof        e20:prof      G1810b0211a:k250:e1000  dkcharmtau   
 end_qualifier_list
 
 # Preserve tabs and formatting in emacs and vi / vim:
