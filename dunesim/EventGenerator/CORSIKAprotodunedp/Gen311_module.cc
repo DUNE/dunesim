@@ -542,7 +542,7 @@ void evgendp::Gen311::openDBs(){
     //art::ServiceHandle<geo::Geometry> geom;
     for(unsigned int c = 0; c < geom->Ncryostats(); ++c){
       double bounds[6] = {0.};
-      geom->Cryostat(c).Boundaries(bounds);
+      geom->CryostatBoundaries(bounds, c);
       for (unsigned int bnd = 0; bnd<6; bnd++){
         mf::LogVerbatim("Gen311")<<"Cryo Boundary: "<<bnd<<"="<<bounds[bnd]<<" ( + Buffer="<<fBuffBox[bnd]<<")\n";
         if(fabs(bounds[bnd])>fabs(fShowerBounds[bnd])){
@@ -948,7 +948,7 @@ void evgendp::Trigger::GetCryoSize( double cryo[]){
 
   double dummy[6] = {0};
   for(unsigned int c = 0; c < geom->Ncryostats(); ++c){
-    geom->Cryostat(c).Boundaries(dummy);
+    geom->CryostatBoundaries(dummy, c);
   }
 
   for(int i=0;i<6;i++){cryo[i] = dummy[i];}
@@ -1175,7 +1175,7 @@ void evgendp::Trigger::MakeTrigger(CLHEP::HepRandomEngine& engine) {
       // if so, add it to the truth object.
       for(unsigned int c = 0; c < geom->Ncryostats(); ++c){
         double bounds[6] = {0.};
-        geom->Cryostat(c).Boundaries(bounds);
+        geom->CryostatBoundaries(bounds, c);
 
         //add a buffer box around the cryostat bounds to increase the acceptance and account for scattering
         //By default, the buffer box has zero size
