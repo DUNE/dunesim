@@ -93,10 +93,15 @@ namespace filt{
         for (unsigned int pt = 0; pt < npts; pt++){
           //Get the position at the point
           TLorentzVector pos4 = particle->Position(pt);
+          //The function which checks whether a position is contained in a counter requires a double[3].  So convert the position to that format
+          double pos[3];
+          pos[0] = pos4.X();
+          pos[1] = pos4.Y();
+          pos[2] = pos4.Z();
           //If the position is not contained in a counter, the function throws an exception.  We don't want to end the process when this happens
           try{
             //std::cout<<"AuxDetID: " << geom->FindAuxDetAtPosition(pos) << "  pdg: " << particle->PdgCode() << std::endl;
-            unsigned int counterID = geom->FindAuxDetAtPosition(geo::vect::toPoint(pos4.Vect()));
+            unsigned int counterID = geom->FindAuxDetAtPosition(pos);
             usedExtCounterIDs.insert(counterID);
           }
           catch(...){};

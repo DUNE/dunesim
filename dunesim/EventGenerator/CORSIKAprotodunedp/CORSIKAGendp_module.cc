@@ -375,7 +375,7 @@ namespace evgendp{
     art::ServiceHandle<geo::Geometry> geom;
     for(unsigned int c = 0; c < geom->Ncryostats(); ++c){
       double bounds[6] = {0.};
-      geom->Cryostat(c).Boundaries(bounds);
+      geom->CryostatBoundaries(bounds, c);
       for (unsigned int bnd = 0; bnd<6; bnd++){
         mf::LogVerbatim("CORSIKAGendp")<<"Cryo Boundary: "<<bnd<<"="<<bounds[bnd]<<" ( + Buffer="<<fBuffBox[bnd]<<")\n";
         if(fabs(bounds[bnd])>fabs(fShowerBounds[bnd])){
@@ -664,7 +664,7 @@ namespace evgendp{
       // if so, add it to the truth object.
       for(unsigned int c = 0; c < geom->Ncryostats(); ++c){
         double bounds[6] = {0.};
-        geom->Cryostat(c).Boundaries(bounds);
+        geom->CryostatBoundaries(bounds, c);
 
         //add a buffer box around the cryostat bounds to increase the acceptance and account for scattering
         //By default, the buffer box has zero size
