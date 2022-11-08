@@ -73,15 +73,15 @@ namespace detvar
   {
   public:
     RandomTPC(const geo::GeometryCore* geom)
-      : fCryos(VectorViaSet<geo::CryostatID>(geom->begin_cryostat_id(),
-                                             geom->end_cryostat_id()))
+      : fCryos(VectorViaSet<geo::CryostatID>(geom->begin<geo::CryostatID>(),
+                                             geom->end<geo::CryostatID>()))
     {
       for(geo::CryostatID c: fCryos){
-        fTPCs[c] = VectorViaSet<geo::TPCID>(geom->begin_TPC_id(c),
-                                            geom->end_TPC_id(c));
+        fTPCs[c] = VectorViaSet<geo::TPCID>(geom->begin<geo::TPCID>(c),
+                                            geom->end<geo::TPCID>(c));
 
-        fTPCsets[c] = VectorViaSet<readout::TPCsetID>(geom->begin_TPCset_id(c),
-                                                      geom->end_TPCset_id(c));
+        fTPCsets[c] = VectorViaSet<readout::TPCsetID>(geom->begin<readout::TPCsetID>(c),
+                                                      geom->end<readout::TPCsetID>(c));
       }
     }
 
@@ -149,7 +149,7 @@ namespace detvar
     // No good way of enumerating all the unique channels, or selecting them by
     // index. Have to figure them out from the wires.
     std::set<raw::ChannelID_t> chanset[3];
-    for(geo::WireID wire: geom->IterateWireIDs(tpc)){
+    for(geo::WireID const& wire: geom->Iterate<geo::WireID>(tpc)){
       const raw::ChannelID_t chan = geom->PlaneWireToChannel(wire);
       // But this also gives us wires that are actually attached to the other
       // face and just wrapped onto this face. So long as the order of the
@@ -217,7 +217,7 @@ namespace detvar
 
     // goodchans = allchans - badchans
     std::set<raw::ChannelID_t> allchans;
-    for(geo::WireID wire: geom->IterateWireIDs())
+    for(geo::WireID const& wire: geom->Iterate<geo::WireID>())
       allchans.insert(geom->PlaneWireToChannel(wire));
 
     std::set_difference(allchans.begin(), allchans.end(),
@@ -233,7 +233,7 @@ namespace detvar
     // Geometry doesn't have a way to iterate directly over channels. Iterate
     // over the wires and convert them. Use a set to remove duplicates
     std::set<raw::ChannelID_t> allchans;
-    for(geo::WireID wire: geom->IterateWireIDs())
+    for(geo::WireID const& wire: geom->Iterate<geo::WireID>())
       allchans.insert(geom->PlaneWireToChannel(wire));
 
     // But a vector is much easier to pick from randomly. This will be used for
@@ -258,11 +258,11 @@ namespace detvar
     art::ServiceHandle<geo::Geometry> geom;
 
     std::map<readout::TPCsetID, std::set<raw::ChannelID_t>> tpcset_to_chans;
-    for(const readout::TPCsetID& ts: geom->IterateTPCsetIDs()){
+    for(const readout::TPCsetID& ts: geom->Iterate<readout::TPCsetID>()){
       // There is no version of IterateWireIDs over a TPCset. Use another layer
       // of indirection.
       for(geo::TPCID t: geom->TPCsetToTPCs(ts)){
-        for(const geo::WireID& wire: geom->IterateWireIDs(t)){
+        for(const geo::WireID& wire: geom->Iterate<geo::WireID>(t)){
           const raw::ChannelID_t chan = geom->PlaneWireToChannel(wire);
           tpcset_to_chans[ts].insert(chan);
         }
@@ -290,18 +290,16 @@ namespace detvar
     art::ServiceHandle<geo::Geometry> geom;
 
     std::map<geo::TPCID, std::vector<raw::ChannelID_t>> tpc_to_chans;
-    for(const geo::TPCID& t: geom->IterateTPCIDs()){
+    for(const geo::WireID& wire: geom->Iterate<geo::WireID>()){
       // Geometry doesn't provide a way to directly iterate the channels in the
       // TPC. Instead iterate the wires and convert to channels
-      for(const geo::WireID& wire: geom->IterateWireIDs(t)){
         const raw::ChannelID_t chan = geom->PlaneWireToChannel(wire);
         // But this also gives us wires that are actually attached to the other
         // face and just wrapped onto this face. So long as the order of the
         // vector returned from this function is meaningful, this should work
         // to keep just the ones we need.
         if(geom->ChannelToWire(chan)[0] == wire)
-          tpc_to_chans[t].push_back(chan);
-      }
+        tpc_to_chans[wire.asPlaneID().asTPCID()].push_back(chan);
     }
 
     RandomTPC tpcs(geom.get());
