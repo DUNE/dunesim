@@ -183,7 +183,10 @@ namespace evgen{
         void GenerateTrueEvent(simb::MCTruth &mcTruth, const OverlaidTriggerEvent &overlayEvent, beam::ProtoDUNEBeamEvent & beamEvent);
 
         // Convert our BeamParticle struct into a MCParticle object
-        simb::MCParticle BeamParticleToMCParticle(const BeamParticle &beamParticle, const int outputTrackID, const float triggerParticleTime, const int primaryStatus, const std::string process, const int motherID = -1);
+        simb::MCParticle BeamParticleToMCParticle(
+            const BeamParticle &beamParticle, const int outputTrackID,
+            const float triggerParticleTime, const int primaryStatus,
+            const std::string process, const int motherID = -1);
 
         // Use DDMC to create a primary beam particle
         simb::MCParticle DataDrivenMCParticle(
@@ -245,9 +248,28 @@ namespace evgen{
         // Variables       
         CLHEP::RandFlat fFlatRnd;
 
+        // Distinguishes for running NP04 vs NP02
+        bool fIsNP02;
+
+        //Will rotate beam into correct position for NP02  
+        double fNP02Rotation;
+        bool fNP02XDrift;
+
+        //Names of detectors in real life
+        std::string DetNameBProf1X;
+        std::string DetNameBProf1Y;
+        std::string DetNameBProf2;
+        std::string DetNameBProf3;
+        std::string DetNameBProfExtX;
+        std::string DetNameBProfExtY;
+        std::string DetNameBProf4X;
+        std::string DetNameBProf4Y;
+
+        // Can stream with XRootD over using ifdh
+        bool fStreamInput;
+
         // Beam input file name and tree names (in beam order)
         std::string fFileName;
-        bool fStreamInput;
         std::string fBaseFileName;
         std::string fTOF1TreeName;
         std::string fBPROF1TreeName;
@@ -384,13 +406,39 @@ evgen::ProtoDUNETriggeredBeam::ProtoDUNETriggeredBeam(fhicl::ParameterSet const 
     fBaseFileName = fFileName.substr(fFileName.rfind("/")+1);
     fStreamInput = pset.get<bool>("StreamInput", false);
 
+    fIsNP02 = pset.get<bool>("IsNP02", false);
+    //Names of the detectors in real life
+    if (fIsNP02) {
+      DetNameBProf1X = "XBPF021655";
+      DetNameBProf1Y = "";
+      DetNameBProf2 = "XBPF021659";
+      DetNameBProf3 = "XPBF";
+      DetNameBProfExtX = "";
+      DetNameBProfExtY = "";
+      DetNameBProf4X = "XBPF021669";
+      DetNameBProf4Y = "XBPF021670";//Dummy for now 
+    }
+    else {
+      DetNameBProf1X   = "XBPF022697";
+      DetNameBProf1Y   = "XBPF022698";
+      DetNameBProf2    = "XBPF022701";
+      DetNameBProf3    = "XBPF022702";
+      DetNameBProfExtX = "XBPF022707";
+      DetNameBProfExtY = "XBPF022708";
+      DetNameBProf4X   = "XBPF022716";
+      DetNameBProf4Y   = "XBPF022717";
+    }
+
+    fNP02XDrift = pset.get<bool>("NP02XDrift", true);
+    fNP02Rotation = pset.get<double>("NP02Rotation", 0.);
+
     // Tree names
     fTOF1TreeName      = pset.get<std::string>("TOF1TreeName");
     fBPROF1TreeName    = pset.get<std::string>("BPROF1TreeName");
     fBPROF2TreeName    = pset.get<std::string>("BPROF2TreeName");
     fBPROF3TreeName    = pset.get<std::string>("BPROF3TreeName");
     fTRIG1TreeName     = pset.get<std::string>("TRIG1TreeName");
-    fBPROFEXTTreeName  = pset.get<std::string>("BPROFEXTTreeName");
+    fBPROFEXTTreeName  = pset.get<std::string>("BPROFEXTTreeName", "");
     fBPROF4TreeName    = pset.get<std::string>("BPROF4TreeName");
     fTRIG2TreeName      = pset.get<std::string>("TRIG2TreeName");
     fNP04frontTreeName = pset.get<std::string>("NP04frontTreeName");
@@ -540,7 +588,8 @@ void evgen::ProtoDUNETriggeredBeam::beginJob(){
     otherInstrumentTreeNames.push_back(fBPROF1TreeName.c_str());
     otherInstrumentTreeNames.push_back(fBPROF2TreeName.c_str());
     otherInstrumentTreeNames.push_back(fBPROF3TreeName.c_str());
-    otherInstrumentTreeNames.push_back(fBPROFEXTTreeName.c_str());
+    if (!fIsNP02)
+      otherInstrumentTreeNames.push_back(fBPROFEXTTreeName.c_str());
     otherInstrumentTreeNames.push_back(fBPROF4TreeName.c_str());
 
     for(const std::string treeName : otherInstrumentTreeNames){ 
@@ -694,6 +743,7 @@ void evgen::ProtoDUNETriggeredBeam::FillParticleMaps(TTree *frontFaceTree){
       ConvertCoordinates(posX,posY,posZ);
 
       // Keep only those particles that might reach the detector
+      // Need for NP02?
       if(fReduceNP04frontArea){
         if(posX < -500 || posX > 500) continue;
         if(posY < -150 || posY > 850) continue;
@@ -1118,7 +1168,10 @@ void evgen::ProtoDUNETriggeredBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, co
 
 //---------------------------------------------------------------------------------------
 
-simb::MCParticle evgen::ProtoDUNETriggeredBeam::BeamParticleToMCParticle(const BeamParticle &beamParticle, const int outputTrackID, const float timeOffset, const int primaryStatus, const std::string process, const int motherID){
+simb::MCParticle evgen::ProtoDUNETriggeredBeam::BeamParticleToMCParticle(
+    const BeamParticle &beamParticle, const int outputTrackID,
+    const float timeOffset, const int primaryStatus, const std::string process,
+    const int motherID){
 
   simb::MCParticle newParticle(outputTrackID,beamParticle.fPDG,process, motherID, -1.0, primaryStatus);
 
@@ -1319,15 +1372,6 @@ void evgen::ProtoDUNETriggeredBeam::SetDataDrivenPosMom(
   momentum = TLorentzVector(mom_vec, energy);
 }
 
-/*
-double evgen::ProtoDUNETriggeredBeam::(double momentum, int pdg) {
-  TF1 * res = fResolutions[fPDGToName[pdg]];
-  double mean = res->GetParameter(1);
-  double sigma = res->GetParameter(2);
-  double t = fRNG.Gaus(mean, sigma); //random number from momentum resolution
-  return (momentum/(t + 1.));
-}*/
-
 double evgen::ProtoDUNETriggeredBeam::UnsmearMomentum2D(double momentum, int pdg) {
 
   if (fVerbose) {
@@ -1486,40 +1530,6 @@ void evgen::ProtoDUNETriggeredBeam::Scale2DRes() {
       }
     }
   }
-
-/*
-  for (auto it = fResolutionHists2DPlus.begin();
-       it != fResolutionHists2DPlus.end(); ++it) {
-    TH2D * this_hist = it->second;
-    for (int i = 1; i <= this_hist->GetNbinsX(); ++i) {
-      double integral = this_hist->Integral(i, i);
-      double total = 0.;
-      for (int j = 1; j <= this_hist->GetNbinsY(); ++j) {
-        this_hist->SetBinContent(i, j,
-            this_hist->GetBinContent(i, j) / integral);
-        total += this_hist->GetBinContent(i, j);
-      }
-    }
-
-    this_hist->Divide(fResolutionHists2D[it->first]);
-  }
-
-  for (auto it = fResolutionHists2DMinus.begin();
-       it != fResolutionHists2DMinus.end(); ++it) {
-    TH2D * this_hist = it->second;
-    for (int i = 1; i <= this_hist->GetNbinsX(); ++i) {
-      double integral = this_hist->Integral(i, i);
-      double total = 0.;
-      for (int j = 1; j <= this_hist->GetNbinsY(); ++j) {
-        this_hist->SetBinContent(i, j,
-            this_hist->GetBinContent(i, j) / integral);
-        total += this_hist->GetBinContent(i, j);
-      }
-    }
-
-    this_hist->Divide(fResolutionHists2D[it->first]);
-  }
-  */
 }
 
 void evgen::ProtoDUNETriggeredBeam::Setup1GeV() {
@@ -1544,18 +1554,8 @@ void evgen::ProtoDUNETriggeredBeam::Setup1GeV() {
       res_name = "h" + part_type + "Res";
     }
 
-    //fResolutionHists[part_type] = (TH1D*)fResolutionFile->Get(res_name.c_str());
-
     res_name += "2D";
     fResolutionHists2D[part_type] = (TH2D*)fResolutionFile->Get(res_name.c_str());
-
-    /*
-    std::string plus_name = res_name + "Plus";
-    fResolutionHists2DPlus[part_type] = (TH2D*)fResolutionFile->Get(plus_name.c_str());
-
-    std::string minus_name = res_name + "Minus";
-    fResolutionHists2DMinus[part_type] = (TH2D*)fResolutionFile->Get(minus_name.c_str());
-    */
 
   }
 }
@@ -1769,14 +1769,27 @@ void evgen::ProtoDUNETriggeredBeam::ConvertMomentum(float &px, float &py, float 
     py = py / 1000.;
     pz = pz / 1000.;
    
-    // If we want to rotate by changing theta and phi, do it here.
-    TVector3 momVec(px,py,pz);    
-    momVec.SetTheta(momVec.Theta() + fBeamThetaShift);
-    momVec.SetPhi(momVec.Phi() + fBeamPhiShift);
+    TVector3 momVec(px,py,pz);
 
-    px = momVec.X();
-    py = momVec.Y();
-    pz = momVec.Z();
+    if (!fIsNP02) {
+      //NP04: If we want to rotate by changing theta and phi, do it here.
+      momVec.SetTheta(momVec.Theta() + fBeamThetaShift);
+      momVec.SetPhi(momVec.Phi() + fBeamPhiShift);
+
+      px = momVec.X();
+      py = momVec.Y();
+      pz = momVec.Z();
+    }
+    else {
+      //NP02: Beam ntuples are in the 'world' coordinate system
+      //The beam is similar to the NP04 direction: ~ -8deg from Z
+      //In our simulation, it needs to be at -135deg
+      //Then we need to swap x and y
+      momVec.RotateY(fNP02Rotation*TMath::Pi()/180.);
+      px = (fNP02XDrift ? momVec.Y() : momVec.X());
+      py = (fNP02XDrift ? -1.*momVec.X() : momVec.Y());
+      pz = momVec.Z();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -1872,7 +1885,7 @@ void evgen::ProtoDUNETriggeredBeam::RotateMonitorVector(TVector3 &vec){
 }
  
 //----------------------------------------------------------------------------------
-
+//NP02 needs something different
 void evgen::ProtoDUNETriggeredBeam::SetBackgroundPosition(BeamParticle &particle){
 
   const TVector3 pos(particle.fPosX,particle.fPosY,particle.fPosZ);
@@ -1900,7 +1913,6 @@ void evgen::ProtoDUNETriggeredBeam::SetBeamEvent(beam::ProtoDUNEBeamEvent & beam
   const std::string bprof2Name   = fBPROF2TreeName.substr(fBPROF2TreeName.find("/")+1);
   const std::string bprof3Name   = fBPROF3TreeName.substr(fBPROF3TreeName.find("/")+1);
   const std::string trig1Name    = fTRIG1TreeName.substr(fTRIG1TreeName.find("/")+1);
-  const std::string bprofEXTName = fBPROFEXTTreeName.substr(fBPROFEXTTreeName.find("/")+1);
   const std::string bprof4Name   = fBPROF4TreeName.substr(fBPROF4TreeName.find("/")+1);
   const std::string trig2Name    = fTRIG2TreeName.substr(fTRIG2TreeName.find("/")+1);
 
@@ -1914,24 +1926,31 @@ void evgen::ProtoDUNETriggeredBeam::SetBeamEvent(beam::ProtoDUNEBeamEvent & beam
   beamevt.SetCalibrations( 0., 0., 0., 0. );
   beamevt.DecodeTOF();
 
+  //NP02 -- Get the correct names
+
   // Fibre monitors
   const BeamParticle &bprof1Particle = triggerEvent.fTriggeredParticleInfo.at(bprof1Name);
   const BeamParticle &bprof2Particle = triggerEvent.fTriggeredParticleInfo.at(bprof2Name);
   const BeamParticle &bprof3Particle = triggerEvent.fTriggeredParticleInfo.at(bprof3Name);
-  const BeamParticle &bprofExtParticle = triggerEvent.fTriggeredParticleInfo.at(bprofEXTName);
   const BeamParticle &bprof4Particle = triggerEvent.fTriggeredParticleInfo.at(bprof4Name);
   // (x,y) for BPROF1
-  beamevt.SetFBMTrigger( "XBPF022697", MakeFiberMonitor( bprof1Particle.fPosX ) );
-  beamevt.SetFBMTrigger( "XBPF022698", MakeFiberMonitor( bprof1Particle.fPosY ) );
+  beamevt.SetFBMTrigger( DetNameBProf1X/*"XBPF022697"*/, MakeFiberMonitor( bprof1Particle.fPosX ) );
+  if (!fIsNP02)
+    beamevt.SetFBMTrigger( DetNameBProf1Y/*"XBPF022698"*/, MakeFiberMonitor( bprof1Particle.fPosY ) );
   // Just x for BPROF2 and BPROF3
-  beamevt.SetFBMTrigger( "XBPF022701", MakeFiberMonitor( bprof2Particle.fPosX ) );
-  beamevt.SetFBMTrigger( "XBPF022702", MakeFiberMonitor( bprof3Particle.fPosX ) );
-  // (x,y) for BPROFEXT
-  beamevt.SetFBMTrigger( "XBPF022707", MakeFiberMonitor( bprofExtParticle.fPosX ) );
-  beamevt.SetFBMTrigger( "XBPF022708", MakeFiberMonitor( bprofExtParticle.fPosY ) );
+  beamevt.SetFBMTrigger( DetNameBProf2/*"XBPF022701"*/, MakeFiberMonitor( bprof2Particle.fPosX ) );
+  beamevt.SetFBMTrigger( DetNameBProf3/*"XBPF022702"*/, MakeFiberMonitor( bprof3Particle.fPosX ) );
+  if (!fIsNP02) {
+    // (x,y) for BPROFEXT
+    const std::string bprofEXTName = fBPROFEXTTreeName.substr(fBPROFEXTTreeName.find("/")+1);
+    const BeamParticle &bprofExtParticle = triggerEvent.fTriggeredParticleInfo.at(bprofEXTName);
+    beamevt.SetFBMTrigger( DetNameBProfExtX/*"XBPF022707"*/, MakeFiberMonitor( bprofExtParticle.fPosX ) );
+    beamevt.SetFBMTrigger( DetNameBProfExtY/*"XBPF022708"*/, MakeFiberMonitor( bprofExtParticle.fPosY ) );
+  }
   // (x,y) for BPROF4
-  beamevt.SetFBMTrigger( "XBPF022716", MakeFiberMonitor( bprof4Particle.fPosX ) );
-  beamevt.SetFBMTrigger( "XBPF022717", MakeFiberMonitor( bprof4Particle.fPosY ) );
+  beamevt.SetFBMTrigger( DetNameBProf4X/*"XBPF022716"*/, MakeFiberMonitor( bprof4Particle.fPosX ) );
+  if (!fIsNP02)
+    beamevt.SetFBMTrigger( DetNameBProf4Y/*"XBPF022717"*/, MakeFiberMonitor( bprof4Particle.fPosY ) );
 
   // Cherenkovs aren't simulated, so set to dummy values
   beam::CKov dummy;
@@ -1948,106 +1967,9 @@ void evgen::ProtoDUNETriggeredBeam::SetBeamEvent(beam::ProtoDUNEBeamEvent & beam
   beamevt.SetT0( std::make_pair(0.,0.) );
  
   // Do the beamline instrumentation reconstruction
-  MakeTracks( beamevt );
+  if (!fIsNP02)
+    MakeTracks( beamevt );
   MomentumSpectrometer( beamevt );
-
-/*  
-  //This will just use the class members
-  beamevt.SetTOFs( std::vector<double>{ fGoodTRIG2_t - fGoodTOF1_t } );
-  beamevt.SetTOFChans( std::vector<int>{ 0 } );
-  beamevt.SetUpstreamTriggers( std::vector<size_t>{0} );
-  beamevt.SetDownstreamTriggers( std::vector<size_t>{0} );
-  beamevt.SetCalibrations( 0., 0., 0., 0. );
-  beamevt.DecodeTOF();
-
-  beamevt.SetMagnetCurrent( 0. );
-  beamevt.SetTimingTrigger( 12 );
-
-  beam::CKov dummy;
-  dummy.trigger = 0;
-  dummy.pressure = 0.;
-  dummy.timeStamp = 0.;
-  beamevt.SetCKov0( dummy );
-  beamevt.SetCKov1( dummy );
-
-  beamevt.SetActiveTrigger(0);
-  beamevt.SetT0( std::make_pair(0.,0.) );
-
-  beamevt.SetFBMTrigger( "XBPF022697", MakeFiberMonitor( fGoodBPROF1_x ) );
-  beamevt.SetFBMTrigger( "XBPF022698", MakeFiberMonitor( fGoodBPROF1_y ) );
-  beamevt.SetFBMTrigger( "XBPF022701", MakeFiberMonitor( fGoodBPROF2_x ) );
-  beamevt.SetFBMTrigger( "XBPF022702", MakeFiberMonitor( fGoodBPROF3_x ) );
-
-  beamevt.SetFBMTrigger( "XBPF022707", MakeFiberMonitor( fGoodBPROFEXT_x ) );
-  beamevt.SetFBMTrigger( "XBPF022708", MakeFiberMonitor( fGoodBPROFEXT_y ) );
-
-  beamevt.SetFBMTrigger( "XBPF022716", MakeFiberMonitor( fGoodBPROF4_x ) );
-  beamevt.SetFBMTrigger( "XBPF022717", MakeFiberMonitor( fGoodBPROF4_y ) );
-
-  MakeTracks( beamevt );
-  MomentumSpectrometer( beamevt );
-
-
-  if( fSaveOutputTree ){ 
-    fReco_p = beamevt.GetRecoBeamMomentum(0);
-    fReco_tof = beamevt.GetTOF();
-    std::cout << "TOF: " << beamevt.GetTOFs()[0] << " " << beamevt.GetTOF() << std::endl;
-    fNP04_PDG = fGoodNP04front_PDGid;
-
-    fNP04front_p = sqrt( fGoodNP04front_Px * fGoodNP04front_Px 
-                       + fGoodNP04front_Py * fGoodNP04front_Py 
-                       + fGoodNP04front_Pz * fGoodNP04front_Pz );
-
-    fXBPF697_p = sqrt( fGoodBPROF1_Px * fGoodBPROF1_Px 
-                     + fGoodBPROF1_Py * fGoodBPROF1_Py 
-                     + fGoodBPROF1_Pz * fGoodBPROF1_Pz );
-
-    fXBPF701_p = sqrt( fGoodBPROF2_Px*fGoodBPROF2_Px 
-                     + fGoodBPROF2_Py*fGoodBPROF2_Py 
-                     + fGoodBPROF2_Pz*fGoodBPROF2_Pz );
-
-    fXBPF702_p = sqrt( fGoodBPROF3_Px*fGoodBPROF3_Px 
-                     + fGoodBPROF3_Py*fGoodBPROF3_Py 
-                     + fGoodBPROF3_Pz*fGoodBPROF3_Pz );
-    fXBPF697_x = fGoodBPROF1_x;
-    fXBPF701_x = fGoodBPROF2_x;
-    fXBPF702_x = fGoodBPROF3_x;
-
-    fXBPF716_x = fGoodBPROF4_x;
-    fXBPF717_y = fGoodBPROF4_y;
-    fXBPF707_x = fGoodBPROFEXT_x;
-    fXBPF708_y = fGoodBPROFEXT_y;
-
-    
-    fXBPF697_f = beamevt.GetFBM( "XBPF022697" ).active[0];
-    fXBPF701_f = beamevt.GetFBM( "XBPF022701" ).active[0];
-    fXBPF702_f = beamevt.GetFBM( "XBPF022702" ).active[0];
-
-    fXBPF707_f = beamevt.GetFBM( "XBPF022707" ).active[0];
-    fXBPF708_f = beamevt.GetFBM( "XBPF022708" ).active[0];
-    fXBPF716_f = beamevt.GetFBM( "XBPF022716" ).active[0];
-    fXBPF717_f = beamevt.GetFBM( "XBPF022717" ).active[0];
-
-    fXBPF697_rx = GetPosition( fXBPF697_f ); 
-    fXBPF701_rx = GetPosition( fXBPF701_f ); 
-    fXBPF702_rx = GetPosition( fXBPF702_f ); 
-                                         
-    fXBPF716_rx = GetPosition( fXBPF716_f ); 
-    fXBPF717_ry = GetPosition( fXBPF717_f ); 
-    fXBPF707_rx = GetPosition( fXBPF707_f ); 
-    fXBPF708_ry = GetPosition( fXBPF708_f ); 
-
-    //fTrueFront_x = fGoodNP04front_x + fBeamX;
-    //fTrueFront_y = fGoodNP04front_y + fBeamY;
-    //fTrueFront_z = fGoodNP04front_z + fBeamZ;
-
-    fRecoFront_x = beamevt.GetBeamTrack(0).End().X();
-    fRecoFront_y = beamevt.GetBeamTrack(0).End().Y();
-    fRecoFront_z = beamevt.GetBeamTrack(0).End().Z();
-
-    fRecoTree->Fill();
-  }
-*/
 }
  
 //----------------------------------------------------------------------------------
@@ -2139,9 +2061,9 @@ TVector3 evgen::ProtoDUNETriggeredBeam::ProjectToTPC(TVector3 firstPoint, TVecto
 
 void evgen::ProtoDUNETriggeredBeam::MomentumSpectrometer( beam::ProtoDUNEBeamEvent & beamEvent ){
 
-  const short f1 = beamEvent.GetFBM( "XBPF022697" ).active[0];
-  const short f2 = beamEvent.GetFBM( "XBPF022701" ).active[0];
-  const short f3 = beamEvent.GetFBM( "XBPF022702" ).active[0];
+  const short f1 = beamEvent.GetFBM( DetNameBProf1X/*"XBPF022697"*/ ).active[0];
+  const short f2 = beamEvent.GetFBM( DetNameBProf2/*"XBPF022701"*/ ).active[0];
+  const short f3 = beamEvent.GetFBM( DetNameBProf3/*"XBPF022702"*/ ).active[0];
 
   const double x1 = -1.e-3 * GetPosition( f1 );
   const double x2 = -1.e-3 * GetPosition( f2 );
@@ -2174,12 +2096,6 @@ std::string evgen::ProtoDUNETriggeredBeam::FindFile(const std::string filename) 
   mf::LogInfo("evgen::ProtoDUNETriggeredBeam::FindFile") << "Searching for " << filename;
   if (cet::file_exists(filename)) {
     mf::LogInfo("evgen::ProtoDUNETriggeredBeam::FindFile") << "File exists. Opening " << filename;
-    /*theFile = new TFile(filename.c_str());
-    if (!theFile ||theFile->IsZombie() || !theFile->IsOpen()) {
-      delete theFile;
-      theFile = 0x0;
-      throw cet::exception("ProtoDUNECalibration.cxx") << "Could not open " << filename;
-    }*/
     return filename;
   }
   else {
@@ -2192,13 +2108,6 @@ std::string evgen::ProtoDUNETriggeredBeam::FindFile(const std::string filename) 
     }
 
     mf::LogInfo("evgen::ProtoDUNETriggeredBeam::FindFile") << "Found file " << found_filename;
-    /*
-    theFile = new TFile(found_filename.c_str());
-    if (!theFile ||theFile->IsZombie() || !theFile->IsOpen()) {
-      delete theFile;
-      theFile = 0x0;
-      throw cet::exception("ProtoDUNECalibration.cxx") << "Could not open " << found_filename;
-    }*/
     return found_filename;
   }
 }
