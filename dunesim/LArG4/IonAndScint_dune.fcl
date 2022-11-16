@@ -74,7 +74,7 @@ protodunehd_ionandscint_external.Instances: "LArG4DetectorServicevolTPCActiveOut
 # ProtoDUNE-VD
 ##
 protodunevd_ionandscint_correlated: @local::protodune_ionandscint_correlated
-protodunevd_ionandscint_correlated.Instances:    "LArG4DetectorServicevolTPCActive;LArG4DetectorServicevolCryostat"
+protodunevd_ionandscint_correlated.Instances:    "LArG4DetectorServicevolTPCActive"
 
 protodunevd_ionandscint_nest: @local::protodunevd_ionandscint_correlated
 protodunevd_ionandscint_nest.ISCalcAlg: "NEST"
