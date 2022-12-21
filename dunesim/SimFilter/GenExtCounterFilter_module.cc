@@ -208,10 +208,8 @@ namespace filt{
       //First step is to push the particle to the counter plane
       geo::AuxDetGeo const*counter = counters[i];
 
-      double counter_pos_array[3];
       //fCounterSetPairs[CSP_i].setA.front()->GetCenter(counter_pos_array);
-      counter->GetCenter(counter_pos_array);
-      TVector3 counter_pos(counter_pos_array[0], counter_pos_array[1], counter_pos_array[2]);
+      auto const counter_pos = geo::vect::convertTo<TVector3>(counter->GetCenter());
       TVector3 particle_pos = particle.Position().Vect();
       TVector3 particle_dir = particle.Momentum().Vect().Unit();
 
@@ -237,13 +235,7 @@ namespace filt{
       neg_corner += -1.*counter->HalfHeight()*counter_norm*fCounterSizeScaleFactor; 
 
       //Now lets to the same for the normal stored in the C++ object (this "normal" actually points out the top of a counter)
-      double counter_top_norm_array[3];
-      counter->GetNormalVector(counter_top_norm_array);
-      //Now package this up a TVector
-      TVector3 counter_top_norm;
-      counter_top_norm.SetX(counter_top_norm_array[0]);
-      counter_top_norm.SetY(counter_top_norm_array[1]);
-      counter_top_norm.SetZ(counter_top_norm_array[2]);
+      TVector3 const counter_top_norm = geo::vect::convertTo<TVector3>(counter->GetNormalVector());
       //OK now we can add the dimension to the corner vectors.  The relevant dimension this time is Length/2
       pos_corner += counter->Length()*counter_top_norm*0.5*fCounterSizeScaleFactor;
       neg_corner += -1.*counter->Length()*counter_top_norm*0.5*fCounterSizeScaleFactor;
