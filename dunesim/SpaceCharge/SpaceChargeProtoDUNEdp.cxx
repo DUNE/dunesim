@@ -59,7 +59,7 @@ bool spacecharge::SpaceChargeProtoDUNEdp::Configure(fhicl::ParameterSet const& p
 
   art::ServiceHandle<geo::Geometry> geom;
   //  auto const* geom = lar::providerFrom<geo::GeometryCore>();
-  driftcoordinate = geom->TPC(0).DetectDriftDirection();
+  driftcoordinate = geom->TPC().DetectDriftDirection();
   if( driftcoordinate==1 || driftcoordinate==2 )
    {
         std::cout<<" drift coordinate: "<<driftcoordinate<<std::endl;
