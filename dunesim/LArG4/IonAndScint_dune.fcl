@@ -22,12 +22,16 @@ dunefd_ionandscint_larql.services.LArG4Parameters.UseModLarqlRecomb: true
 dunefd_ionandscint: @local::dunefd_ionandscint_correlated
 
 # DUNE FD VD specific
-# active volume
+# active volume - Semi-analytical model
 dunefdvd_ionandscint: @local::dunefd_ionandscint
 dunefdvd_ionandscint.Instances: "LArG4DetectorServicevolTPCActive"
-# external laterals volume
+# external laterals volume - Semi-analytical model
 dunefdvd_ionandscint_external: @local::dunefd_ionandscint_larql
 dunefdvd_ionandscint_external.Instances: "LArG4DetectorServicevolExternalActive"
+# Config for ANN: The computable graph already includes the TPC and external laterals volumes
+dunefdvd_ionandscint_ann: @local::dunefd_ionandscint_larql
+dunefdvd_ionandscint_ann.Instances: "LArG4DetectorServicevolTPCActive; LArG4DetectorServicevolExternalActive"
+
 
 ##
 # ProtoDUNE-SP
