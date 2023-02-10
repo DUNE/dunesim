@@ -79,3 +79,6 @@ outputs:
 #  fix an error where the sampling fraction is 3E-2
 
 services.OpDetResponseInterface.QuantumEfficiency: 2.5E-2
+physics.producers.generator.X0: [ 20 ]
+physics.producers.generator.Y0: [ 50 ]
+physics.producers.generator.Z0: [ 0 ]
