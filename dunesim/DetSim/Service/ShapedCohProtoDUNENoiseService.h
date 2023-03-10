@@ -10,7 +10,6 @@
 #include "CLHEP/Random/JamesRandom.h"
 #include "dunecore/Utilities/SignalShapingServiceDUNE.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
-#include "larcore/Geometry/Geometry.h"
 
 class ShapedCohProtoDUNENoiseService : public ChannelNoiseService {
 public:
@@ -41,7 +40,6 @@ private:
   static const size_t m_n_max_coh_noise =    9;
   
   CLHEP::HepRandomEngine* m_pran;
-  art::ServiceHandle<geo::Geometry> m_geo;
 
   double m_collection_plane_noise;
   double m_induction_plane_noise;
