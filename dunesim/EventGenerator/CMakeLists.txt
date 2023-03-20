@@ -1,5 +1,15 @@
 include_directories( $ENV{IFDHC_FQ_DIR}/inc )
+ 
+
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
+
+
+#art_make_library( LIBRARY_NAME ProtoDUNETriggeredBeamUtils
+#		  SOURCE ProtoDUNETriggeredBeamUtils.cxx
+#		  LIBRARIES
+#                       ROOT_BASIC_LIB_LIST 
+#	    )
+
 art_make( BASENAME_ONLY
           MODULE_LIBRARIES 
                         larcoreobj_SummaryData
@@ -26,6 +36,7 @@ art_make( BASENAME_ONLY
                         ROOT_EG
                         ifdh::ifdh
                         dunesim_EventGenerator_ProtoDUNEbeamDataProducts
+                        ProtoDUNETriggeredBeamUtils
  )
 
 
@@ -42,3 +53,4 @@ add_subdirectory(NEUT)
 add_subdirectory(MUSUN)
 add_subdirectory(NuE)
 add_subdirectory(ProtoDUNEbeamDataProducts)
+add_subdirectory(Utils)
