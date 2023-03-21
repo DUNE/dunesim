@@ -1,4 +1,6 @@
-#include <TTree.h>
+#include "TTree.h"
+#include "TVector3.h"
+#include "TFile.h"
 #include <iostream>
 #include "fhiclcpp/ParameterSetRegistry.h"
 #include "fhiclcpp/ParameterSet.h"
@@ -97,24 +99,40 @@ namespace evgen {
    void FillParticleMaps(TTree * frontFaceTree,
                          std::map<int, BeamEvent> & allBeamEvents);
    void FillInstrumentInformation(
-      std::vector<int> &eventIDs, TTree *instrumentTree,
-      std::map<int, BeamEvent> & allBeamEvents);
-   void ConvertCoordinates(float x, float y, float z) {
+       std::vector<int> &eventIDs, TTree *instrumentTree,
+       std::map<int, BeamEvent> & allBeamEvents);
+   void ConvertCoordinates(float & x, float & y, float & z) {
      // Convert to cm and shift to the detector coordinate frame
      x = (x/10.) + fBeamX;
      y = (y/10.) + fBeamY;
      z = fBeamZ; // Just use the z position    
    };
-   void ConvertMomentum(float momX, float momY, float momZ);
-   void FindTriggeredEvents(TTree *trig1Tree, TTree *trig2Tree);
+   void ConvertMomentum(float & momX, float & momY, float & momZ);
+   TVector3 ConvertProfCoordinates(double x, double y, double z,
+       double zOffset);
+   std::vector<int> FindTriggeredEvents(
+       TFile * inputFile, std::string trig1TreeName, std::string trig2TreeName,
+       std::map<int, BeamEvent> & allBeamEvents);
+
+  void BeamMonitorBasisVectors();
+  void RotateMonitorVector(TVector3 &vec);
+
+  bool GetIsNP02() {return fIsNP02;};
 
   private:
    bool fReduceNP04frontArea;
-   double fBeamX, fBeamY, fBeamZ;
+   float fBeamX, fBeamY, fBeamZ;
    bool fIsNP02;
    bool fNP02XDrift;
    double fNP02Rotation;
    double fBeamPhiShift, fBeamThetaShift;
+   float fTRIG2Pos;
+   float fRotateMonitorXZ;
+   float fRotateMonitorYZ;
+   float fNP04frontPos;
+   TVector3 fBMBasisX; 
+   TVector3 fBMBasisY; 
+   TVector3 fBMBasisZ; 
  };
 }
 

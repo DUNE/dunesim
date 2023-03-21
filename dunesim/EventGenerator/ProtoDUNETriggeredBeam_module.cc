@@ -53,6 +53,8 @@
 #include "ifdh.h"
 #include <sys/stat.h>
 
+#include "dunesim/EventGenerator/Utils/ProtoDUNETriggeredBeamUtils.h"
+
 namespace evgen{
 
     class ProtoDUNETriggeredBeam;
@@ -77,7 +79,7 @@ namespace evgen{
         void endJob() override;
 
         // Simple struct to store the information for each particle at the front face
-        struct BeamParticle {
+        /*struct BeamParticle {
           BeamParticle(){
             fTrackID=-999;
             fPDG=-999;
@@ -110,11 +112,11 @@ namespace evgen{
           int fTrackID, fPDG, fParentID;
           float fPosX, fPosY, fPosZ, fPosT;
           float fMomX, fMomY, fMomZ;
-        };
+        };*/
 
         // Struct to contain the particles reaching the cryostat wall for each event
         // in the beam simulation files
-        struct BeamEvent {
+        /*struct BeamEvent {
           BeamEvent(){
             fEventID = -999;
             fTriggerID = -999;
@@ -143,11 +145,11 @@ namespace evgen{
           // Some events can interact before between TRIG2 and NP04front
           bool fHasInteracted;
           std::vector<int> fSecondaryTrackIDs;
-        };
+        };*/
 
         // Convenience struct to encapsulate all particles that would
         // deposit energy within one readout window of the TPC
-        struct OverlaidTriggerEvent {
+        /*struct OverlaidTriggerEvent {
 
           OverlaidTriggerEvent(int trigID){
             fTriggerEventID = trigID;
@@ -160,7 +162,7 @@ namespace evgen{
           std::vector<int> fOverlayEventIDs;
           int fTriggerEventID;
 
-        };
+        };*/
         
     private:
 
@@ -168,13 +170,13 @@ namespace evgen{
         void CalculateNOverlays();
         
         // Fill the above maps and vector.
-        void FillParticleMaps(TTree *frontFaceTree);
+        //void FillParticleMaps(TTree *frontFaceTree);
        
         // Find trigger events
         std::vector<int> FindTriggeredEvents(TTree *trig1Tree,TTree *trig2Tree);
  
         // Add the triggered particle information for a given instrument
-        void FillInstrumentInformation(std::vector<int> &eventIDs,TTree *instrumentTree);
+        //void FillInstrumentInformation(std::vector<int> &eventIDs,TTree *instrumentTree);
 
         // Group the events to overlay a number of background events on each trigger event
         OverlaidTriggerEvent GenerateOverlaidEvent(const int &trigEventID);
@@ -216,10 +218,10 @@ namespace evgen{
         void OpenInputFile(std::string & filename);
         
         // Convert to the detector coordinate frame
-        void ConvertCoordinates(float &x, float &y, float &z);
+        void ConvertCoordinates(float &x, float &y, float &z); //TODO REMOVE
         
         // Convert the momentum to GeV and rotate as required.
-        void ConvertMomentum(float &px, float &py, float &pz);
+        void ConvertMomentum(float &px, float &py, float &pz);  //TODO REMOVE
 
         // We need to rotate the beam monitor coordinates into the detector frame
         TLorentzVector ConvertBeamMonitorCoordinates(float x, float y, float z, float t, float offset);
@@ -374,6 +376,8 @@ namespace evgen{
         double fOutputHDownstream, fOutputVDownstream;
 
         bool fReduceNP04frontArea;
+
+        evgen::ProtoDUNETriggeredBeamUtils fBeamUtils;
         
         // Number of beam interactions to overlay.
         int fOverlays;
@@ -387,6 +391,7 @@ namespace {
   std::string const instanceName = "protoDUNEBeam";
 }
 
+using evgen::BeamParticle, evgen::BeamEvent, evgen::OverlaidTriggerEvent;
 
 //---------------------------------------------------------------------------------
 //----------------------------------------constructors-----------------------------
@@ -395,7 +400,8 @@ evgen::ProtoDUNETriggeredBeam::ProtoDUNETriggeredBeam(fhicl::ParameterSet const 
     // now create the engine (for example, use art); seed will be set
     // by calling declareEngine
   , fFlatRnd(createEngine(art::ServiceHandle<rndm::NuRandomService>{}->declareEngine(instanceName),
-                          "HepJamesRandom", instanceName))
+                          "HepJamesRandom", instanceName)),
+    fBeamUtils(evgen::ProtoDUNETriggeredBeamUtils(pset))
 {
     // Call appropriate produces<>() functions here.
     produces< std::vector<simb::MCTruth> >();
@@ -573,13 +579,15 @@ void evgen::ProtoDUNETriggeredBeam::beginJob(){
     CalculateNOverlays();
 
     // Fill all potential events from the NP04front tree
-    FillParticleMaps(frontFaceTree);
+    fBeamUtils.FillParticleMaps(frontFaceTree, fAllBeamEvents);
 
-    TTree *trig1Tree = (TTree*)inputFile->Get(fTRIG1TreeName.c_str());
-    TTree *trig2Tree = (TTree*)inputFile->Get(fTRIG2TreeName.c_str());
+    //TTree *trig1Tree = (TTree*)inputFile->Get(fTRIG1TreeName.c_str());
+    //TTree *trig2Tree = (TTree*)inputFile->Get(fTRIG2TreeName.c_str());
 
-    // Now search for trigger events
-    std::vector<int> triggeredEventIDs =  FindTriggeredEvents(trig1Tree,trig2Tree);
+    //// Now search for trigger events
+    //std::vector<int> triggeredEventIDs =  /*fBeamUtils.*/FindTriggeredEvents(trig1Tree,trig2Tree);
+    std::vector<int> triggeredEventIDs = fBeamUtils.FindTriggeredEvents(
+        inputFile, fTRIG1TreeName, fTRIG2TreeName, fAllBeamEvents);
     std::cout << "Proto trigger list has " << triggeredEventIDs.size() << " events" << std::endl; 
 
     // For triggered events, we now need to attach the other instrument information
@@ -594,7 +602,7 @@ void evgen::ProtoDUNETriggeredBeam::beginJob(){
 
     for(const std::string treeName : otherInstrumentTreeNames){ 
       TTree *instrumentTree = (TTree*)inputFile->Get(treeName.c_str());
-      FillInstrumentInformation(triggeredEventIDs,instrumentTree);
+      fBeamUtils.FillInstrumentInformation(triggeredEventIDs, instrumentTree, fAllBeamEvents);
       std::cout << " - Finished adding information from " << treeName << std::endl;
     }
     std::cout << "Final trigger list has " << triggeredEventIDs.size() << " events" << std::endl; 
@@ -709,7 +717,7 @@ void evgen::ProtoDUNETriggeredBeam::produce(art::Event & e)
 
 // Fill the particle maps using the input files. This links the events of interest
 // to the entry number in fAllParticlesTree.
-void evgen::ProtoDUNETriggeredBeam::FillParticleMaps(TTree *frontFaceTree){
+/*void evgen::ProtoDUNETriggeredBeam::FillParticleMaps(TTree *frontFaceTree){
     
     float eventID, trackID, pdgCode, parentID;
     float posX, posY, posZ, posT;
@@ -774,7 +782,7 @@ void evgen::ProtoDUNETriggeredBeam::FillParticleMaps(TTree *frontFaceTree){
 
     // Reset the branch addresses as the variables are going out of scope
     frontFaceTree->ResetBranchAddresses();
-}
+}*/
 
 //---------------------------------------------------------------------------------------
 
@@ -901,7 +909,7 @@ std::vector<int> evgen::ProtoDUNETriggeredBeam::FindTriggeredEvents(TTree *trig1
 
 //---------------------------------------------------------------------------------------
 
-void evgen::ProtoDUNETriggeredBeam::FillInstrumentInformation(std::vector<int> &eventIDs, TTree *instrumentTree){
+/*void evgen::ProtoDUNETriggeredBeam::FillInstrumentInformation(std::vector<int> &eventIDs, TTree *instrumentTree){
 
   float eventID, trackID, pdgCode, parentID;
   float posX, posY, posZ, posT;
@@ -1025,12 +1033,12 @@ void evgen::ProtoDUNETriggeredBeam::FillInstrumentInformation(std::vector<int> &
   }
 
   instrumentTree->ResetBranchAddresses();
-}
+}*/
 
 //---------------------------------------------------------------------------------------
 
 // Group the events to overlay a number of background events on each trigger event
-evgen::ProtoDUNETriggeredBeam::OverlaidTriggerEvent evgen::ProtoDUNETriggeredBeam::GenerateOverlaidEvent(const int &trigEventID)
+/*evgen::ProtoDUNETriggeredBeam::*/OverlaidTriggerEvent evgen::ProtoDUNETriggeredBeam::GenerateOverlaidEvent(const int &trigEventID)
 {
   OverlaidTriggerEvent newTriggerEvent(trigEventID);
   // Look to see if any of these neighbouring events had particles
@@ -1752,6 +1760,7 @@ void evgen::ProtoDUNETriggeredBeam::OpenInputFile(std::string & filename)
 
 //----------------------------------------------------------------------------------
 
+ //TODO REMOVE
 void evgen::ProtoDUNETriggeredBeam::ConvertCoordinates(float &x, float &y, float &z){
     
     // Convert to cm and shift to the detector coordinate frame
@@ -1762,6 +1771,7 @@ void evgen::ProtoDUNETriggeredBeam::ConvertCoordinates(float &x, float &y, float
 
 //--------------------------------------------------------------------------------
 
+ //TODO REMOVE
 void evgen::ProtoDUNETriggeredBeam::ConvertMomentum(float &px, float &py, float &pz){
     
     // Convert to GeV

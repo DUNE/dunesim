@@ -8,4 +8,9 @@ art_make_library( LIBRARY_NAME ProtoDUNETriggeredBeamUtils
                        ROOT_BASIC_LIB_LIST 
 	        )
 
+art_make_exec( NAME runEventCounter
+	       SOURCE runEventCounter.c++
+	       LIBRARIES ProtoDUNETriggeredBeamUtils 
+	    )
+
 

@@ -1,15 +1,38 @@
 #include "ProtoDUNETriggeredBeamUtils.h"
+#include "TMath.h"
 #include "TVector3.h"
 
 evgen::ProtoDUNETriggeredBeamUtils::ProtoDUNETriggeredBeamUtils(fhicl::ParameterSet const & pset)
  : fReduceNP04frontArea(pset.get<bool>("ReduceNP04frontArea")),
-   fBeamX(pset.get<double>("BeamX")),
-   fBeamY(pset.get<double>("BeamY")),
-   fBeamZ(pset.get<double>("BeamZ")),
+   fBeamX(pset.get<float>("BeamX")),
+   fBeamY(pset.get<float>("BeamY")),
+   fBeamZ(pset.get<float>("BeamZ")),
    fIsNP02(pset.get<bool>("IsNP02", false)),
+   fNP02XDrift(pset.get<bool>("NP02XDrift", true)),
    fNP02Rotation(pset.get<double>("NP02Rotation", 0.)),
    fBeamPhiShift(pset.get<double>("BeamPhiShift", 0.)),
-   fBeamThetaShift(pset.get<double>("BeamThetaShift", 0.)) {
+   fBeamThetaShift(pset.get<double>("BeamThetaShift", 0.)),
+   fTRIG2Pos(pset.get<float>("TRIG2PosZ")),
+   fRotateMonitorXZ(pset.get<float>("RotateMonitorXZ")),
+   fRotateMonitorYZ(pset.get<float>("RotateMonitorYZ")),
+   fNP04frontPos(pset.get<float>("NP04frontPosZ"))
+   {}
+
+TVector3 evgen::ProtoDUNETriggeredBeamUtils::ConvertProfCoordinates(double x, double y, double z, double zOffset){
+  const double off = fNP04frontPos - zOffset;
+
+//  TVector3 old(x,y,z);
+
+  double newX = x*fBMBasisX.X() + y*fBMBasisY.X() + /*(z-zOffset)*fBMBasisZ.X()*/ + off*fabs(fBMBasisZ.X());
+  double newY = x*fBMBasisX.Y() + y*fBMBasisY.Y() + /*(z-zOffset)*fBMBasisZ.Y()*/ + off*fabs(fBMBasisZ.Y());
+  double newZ = x*fBMBasisX.Z() + y*fBMBasisY.Z() + /*(z-zOffset)              */ - off*fabs(fBMBasisZ.Z());
+
+  newX += fBeamX*10.;
+  newY += fBeamY*10.;
+  newZ += fBeamZ*10.;
+
+  TVector3 result(newX/10., newY/10., newZ/10.);
+  return result;
 }
 
 void evgen::ProtoDUNETriggeredBeamUtils::FillParticleMaps(
@@ -80,7 +103,7 @@ void evgen::ProtoDUNETriggeredBeamUtils::FillParticleMaps(
   frontFaceTree->ResetBranchAddresses();
 }
 
-void evgen::ProtoDUNETriggeredBeamUtils::ConvertMomentum(float px, float py, float pz) {
+void evgen::ProtoDUNETriggeredBeamUtils::ConvertMomentum(float & px, float & py, float & pz) {
   // Convert to GeV
   px = px / 1000.;
   py = py / 1000.;
@@ -235,4 +258,150 @@ void evgen::ProtoDUNETriggeredBeamUtils::FillInstrumentInformation(
   }
 
   instrumentTree->ResetBranchAddresses();
+}
+
+std::vector<int> evgen::ProtoDUNETriggeredBeamUtils::FindTriggeredEvents(
+   TFile * inputFile, std::string trig1TreeName, std::string trig2TreeName,
+   std::map<int, BeamEvent> & allBeamEvents) {
+
+ TTree *trig1Tree = (TTree*)inputFile->Get(trig1TreeName.c_str());
+ TTree *trig2Tree = (TTree*)inputFile->Get(trig2TreeName.c_str());
+
+  const std::vector<int> allowedPDGs = {11,-11,13,-13,211,-211,321,-321,2212};
+  
+  float eventID, trackID, pdgCode, parentID;
+  float posX, posY, posZ, posT;
+  float momX, momY, momZ;
+
+  // Look at trigger two first to reduce computation
+  trig2Tree->SetBranchAddress("EventID",&eventID);
+  trig2Tree->SetBranchAddress("TrackID",&trackID);
+  trig2Tree->SetBranchAddress("PDGid",&pdgCode);
+  trig2Tree->SetBranchAddress("ParentID",&parentID);
+  trig2Tree->SetBranchAddress("x",&posX);
+  trig2Tree->SetBranchAddress("y",&posY);
+  trig2Tree->SetBranchAddress("z",&posZ);
+  trig2Tree->SetBranchAddress("t",&posT);
+  trig2Tree->SetBranchAddress("Px",&momX);
+  trig2Tree->SetBranchAddress("Py",&momY);
+  trig2Tree->SetBranchAddress("Pz",&momZ);
+
+  // Temporarily store the particle for events with particle in TRIG2. Just store
+  // the first one if there are two
+  std::map<int,BeamParticle> trig2Particles;
+
+  for(unsigned int p = 0; p < trig2Tree->GetEntries(); ++p){
+  
+    trig2Tree->GetEntry(p);
+  
+    const int intEventID = static_cast<int>(eventID);
+
+    // If this event didn't have any particles at NP04front then move on
+    if(allBeamEvents.find(intEventID) == allBeamEvents.end()) continue;
+
+    // Carry on if we already found a particle for this event
+    if(trig2Particles.find(intEventID) != trig2Particles.end()) continue;
+
+    // If the particle isn't of the type we want then move on
+    if(std::find(allowedPDGs.begin(),allowedPDGs.end(),static_cast<int>(pdgCode))==allowedPDGs.end()) continue;
+     
+
+    TVector3 det_pos = ConvertProfCoordinates(posX, posY, posZ, fTRIG2Pos);
+    BeamParticle particle(static_cast<int>(trackID), static_cast<int>(pdgCode), static_cast<int>(parentID),
+                          det_pos.X(), det_pos.Y(), det_pos.Z(), posT, momX, momY, momZ);
+                          //posX, posY, posZ, posT, momX, momY, momZ);
+    trig2Particles.insert(std::make_pair(intEventID,particle));
+  }
+
+  trig2Tree->ResetBranchAddresses();
+
+  // Now look at TRIG1
+  trig1Tree->SetBranchAddress("EventID",&eventID);
+  trig1Tree->SetBranchAddress("TrackID",&trackID);
+  trig1Tree->SetBranchAddress("PDGid",&pdgCode);
+  trig1Tree->SetBranchAddress("ParentID",&parentID);
+  trig1Tree->SetBranchAddress("x",&posX);
+  trig1Tree->SetBranchAddress("y",&posY);
+  trig1Tree->SetBranchAddress("z",&posZ);
+  trig1Tree->SetBranchAddress("t",&posT);
+  trig1Tree->SetBranchAddress("Px",&momX);
+  trig1Tree->SetBranchAddress("Py",&momY);
+  trig1Tree->SetBranchAddress("Pz",&momZ);
+
+  std::map<int,BeamParticle> trig1Particles;
+  for(unsigned int p = 0; p < trig1Tree->GetEntries(); ++p){
+
+    trig1Tree->GetEntry(p);
+    const int intEventID = static_cast<int>(eventID);
+
+    // Move on if this event had no particle in TRIG2
+    if(trig2Particles.find(intEventID) == trig2Particles.end()) continue;
+
+    if(std::find(allowedPDGs.begin(),allowedPDGs.end(),static_cast<int>(pdgCode))==allowedPDGs.end()) continue;
+     
+    BeamParticle particle(static_cast<int>(trackID), static_cast<int>(pdgCode), static_cast<int>(parentID),
+                          posX, posY, posZ, posT, momX, momY, momZ);
+    trig1Particles.insert(std::make_pair(intEventID,particle));
+  }
+
+  // Add the particle information at TRIG1 and TRIG2 to the triggered events
+  const std::string trig1TreeSubName = trig1TreeName.substr(trig1TreeName.find("/")+1);
+  const std::string trig2TreeSubName = trig2TreeName.substr(trig2TreeName.find("/")+1);
+
+  std::vector<int> trigEventIDs;
+  for(auto const &element : trig1Particles){
+    BeamEvent &event = allBeamEvents.at(element.first);
+    // Check that this makes sense... the same particle or one particle is the parent of the other
+    if((element.second.fTrackID != trig2Particles.at(element.first).fTrackID) &&
+       (element.second.fTrackID != trig2Particles.at(element.first).fParentID)) continue; 
+    
+    event.fTriggerID = trig2Particles.at(element.first).fTrackID;    
+    event.fTriggeredParticleInfo.insert(std::make_pair(trig1TreeSubName,element.second));
+    event.fTriggeredParticleInfo.insert(std::make_pair(trig2TreeSubName,trig2Particles.at(element.first)));
+
+    bool isTriggerEvent = false;
+    // There is a rare case where the TRIG2 particle can decay before NP04front
+    if(event.fParticlesFront.find(event.fTriggerID) == event.fParticlesFront.end()){
+      event.fHasInteracted = true;
+      // Find the child particle in the map
+      std::cout << "- Candidate event " << trigEventIDs.size() << " trigger particle of type " << trig2Particles.at(element.first).fPDG << " not at the front face... searching for children" << std::endl;
+        for(const std::pair<int,BeamParticle> &partPair : event.fParticlesFront){
+        if(partPair.second.fParentID == event.fTriggerID){
+          std::cout << "  - Found child with PDG = " << partPair.second.fPDG << std::endl;
+          event.fSecondaryTrackIDs.push_back(partPair.first);
+          isTriggerEvent = true;
+        }
+      }
+    }
+    else{
+      isTriggerEvent = true;
+    }
+
+    if(isTriggerEvent) trigEventIDs.push_back(element.first);
+  }
+
+  trig1Tree->ResetBranchAddresses();
+
+  return trigEventIDs;
+}
+
+void evgen::ProtoDUNETriggeredBeamUtils::BeamMonitorBasisVectors(){
+  fBMBasisX = TVector3(1.,0.,0.);
+  fBMBasisY = TVector3(0.,1.,0.);
+  fBMBasisZ = TVector3(0.,0.,1.);
+  RotateMonitorVector(fBMBasisX);
+  RotateMonitorVector(fBMBasisY);
+  RotateMonitorVector(fBMBasisZ);
+
+}
+ 
+//----------------------------------------------------------------------------------
+
+void evgen::ProtoDUNETriggeredBeamUtils::RotateMonitorVector(TVector3 &vec){
+
+  // Note: reordering how these are done in order to keep the basis
+  //       vectors of the monitors parallel to the ground. 
+  vec.RotateX( fRotateMonitorYZ * TMath::Pi() / 180. );
+  vec.RotateY( fRotateMonitorXZ * TMath::Pi() / 180. );
+
 }
