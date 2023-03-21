@@ -62,7 +62,7 @@ int main(int argc, char ** argv){
      nworkers = std::atoi(argv[++iArg]);
     }
     if (!strcasecmp(argv[iArg],"-h")) {
-      std::cout << "Usage: runEventCounter -c fclfile.fcl " << std::endl;
+      std::cout << "Usage: runEventCounter -c fclfile.fcl -o output_file [-n nthreads]" << std::endl;
       return 1;
     }
   }
@@ -75,25 +75,15 @@ int main(int argc, char ** argv){
   CountConfig config(generator);
   CountConfig config_cp(config);
   std::cout << config_cp.fNP04frontTreeName << std::endl;
-  //auto fNP04frontTreeName = generator.get<std::string>("NP04frontTreeName");
-  //auto fTOF1TreeName      = generator.get<std::string>("TOF1TreeName");
-  //auto fBPROF1TreeName    = generator.get<std::string>("BPROF1TreeName");
-  //auto fBPROF2TreeName    = generator.get<std::string>("BPROF2TreeName");
-  //auto fBPROF3TreeName    = generator.get<std::string>("BPROF3TreeName");
-  //auto fTRIG1TreeName     = generator.get<std::string>("TRIG1TreeName");
-  //auto fBPROFEXTTreeName  = generator.get<std::string>("BPROFEXTTreeName", "");
-  //auto fBPROF4TreeName    = generator.get<std::string>("BPROF4TreeName");
-  //auto fTRIG2TreeName      = generator.get<std::string>("TRIG2TreeName");
 
   //Make beam utils instance
   evgen::ProtoDUNETriggeredBeamUtils beam_utils(generator);
 
   std::ofstream output_file(output_filename);
 
-  //Loop(file_list, config, output_file, beam_utils);
+  ROOT::EnableThreadSafety();//Needed for root
 
-  //ROOT::EnableImplicitMT(nworkers);
-  ROOT::EnableThreadSafety();
+  //To split up the file list
   int nfiles = file_list.size() / nworkers;
   int remainder = file_list.size() % nworkers;
   std::vector<size_t> file_list_split(nworkers, nfiles);
@@ -109,44 +99,28 @@ int main(int argc, char ** argv){
     file_list_split[i] += 1;
   }
 
+  //Make threads
   std::vector<std::thread> workers;
-  //for (auto workerid : views::iota(0, nworkers)) {
-  for (size_t workerid = 0; workerid < static_cast<size_t>(nworkers); ++workerid) {
+  for (size_t workerid = 0; workerid < static_cast<size_t>(nworkers);
+       ++workerid) {
     std::thread worker(
-        &Loop, file_list, std::ref(config), std::ref(output_file), std::ref(beam_utils), workerid,
-        std::ref(file_list_split)
+        &Loop, file_list, std::ref(config), std::ref(output_file),
+        std::ref(beam_utils), workerid, std::ref(file_list_split)
     );
 
-    /*std::thread worker(&AbsCexDriver::RefillSampleLoop, this,
-        std::ref(events), std::ref(samples), std::ref(signal_sample_checks), std::ref(beam_energy_bins),
-        std::ref(signal_pars), std::ref(flux_pars), std::ref(syst_pars), fit_under_over,
-        tie_under_over, use_beam_inst_P, fill_incident, fix_factors,
-        workerid, events_split);*/
     workers.emplace_back(std::move(worker));
-    //workers.emplace_back(&AbsCexDriver::RefillSampleLoop, this,
-       // events, samples, signal_sample_checks, beam_energy_bins,
-       // signal_pars, flux_pars, syst_pars, fit_under_over,
-       // tie_under_over, use_beam_inst_P, fill_incident, fix_factors,
-       // workerid, events_split);
   }
-
   for (auto &&worker : workers) { worker.join();}
 
-  /*
-  for (std::string & filename : file_list) {
-    CountFile(filename, config, output_file, beam_utils);
-  }*/
   output_file.close();
 
   return 0;
 }
 
 void WriteOut(std::ofstream & outputfile, std::string filename, int count) {
-  std::cout << "Writing out " << filename << " " << std::to_string(count) << "\n";
+  std::cout << "Writing out " << filename << " " << std::to_string(count) << std::endl;
   std::lock_guard<std::mutex> guard(event_count_mutex);
-  std::cout << "Locked" << std::endl;
   outputfile << filename << " " << std::to_string(count) << "\n";
-  std::cout << "Done" << std::endl;
 }
 
 void Loop(std::vector<std::string> file_list, CountConfig config,
@@ -189,8 +163,6 @@ fhicl::ParameterSet GetPars(std::string fcl_file) {
   //fhicl::make_ParameterSet(fcl_file, lookupPolicy, pset);
   pset = fhicl::ParameterSet::make(fcl_file, lookupPolicy);
   return pset;
-
-  //return pset.get<fhicl::ParameterSet>("physics.producers.generator");
 
 }
 
