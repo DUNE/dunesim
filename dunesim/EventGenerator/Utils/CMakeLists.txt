@@ -13,4 +13,5 @@ art_make_exec( NAME runEventCounter
 	       LIBRARIES ProtoDUNETriggeredBeamUtils 
 	    )
 
-
+install_scripts()
+install_fhicl()
