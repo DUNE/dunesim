@@ -78,106 +78,11 @@ namespace evgen{
         void beginRun(art::Run& run) override;
         void endJob() override;
 
-        // Simple struct to store the information for each particle at the front face
-        /*struct BeamParticle {
-          BeamParticle(){
-            fTrackID=-999;
-            fPDG=-999;
-            fParentID=-999;
-            fPosX = -999;
-            fPosY = -999;
-            fPosZ = -999;
-            fPosT = -999;
-            fMomX = -999;
-            fMomY = -999;
-            fMomZ = -999; 
-          };
-          BeamParticle(int trackid, int pdg, int parentid, float posX, float posY, float posZ, float posT,
-                       float momX, float momY, float momZ){
-            fTrackID = trackid;
-            fPDG     = pdg;
-            fParentID= parentid;
-            fPosX    = posX;
-            fPosY    = posY;
-            fPosZ    = posZ;  
-            fPosT    = posT;
-            fMomX    = momX;
-            fMomY    = momY;
-            fMomZ    = momZ;
-          };
-          void Print(){
-            std::cout << "Particle " << fPDG << ": (" << fPosX << "," << fPosY << "," << fPosZ << "," << fPosT << ") "
-                                     << ": (" << fMomX << "," << fMomY << "," << fMomZ << ") " << std::endl;
-          };
-          int fTrackID, fPDG, fParentID;
-          float fPosX, fPosY, fPosZ, fPosT;
-          float fMomX, fMomY, fMomZ;
-        };*/
-
-        // Struct to contain the particles reaching the cryostat wall for each event
-        // in the beam simulation files
-        /*struct BeamEvent {
-          BeamEvent(){
-            fEventID = -999;
-            fTriggerID = -999;
-            fHasInteracted = false;
-          }
-          BeamEvent(int eventid){
-            fEventID = eventid;
-            fTriggerID = -999;
-            fHasInteracted = false;
-          };
-
-          void AddParticle(BeamParticle particle){
-            fParticlesFront.insert(std::make_pair(particle.fTrackID,particle));
-          };
-
-          int fEventID;
-
-          // Map of particles to the track ID
-          std::map<int,BeamParticle> fParticlesFront;
-
-          int fTriggerID;
-
-          // We need information for each point in the beamline
-          std::map<std::string,BeamParticle> fTriggeredParticleInfo;
-
-          // Some events can interact before between TRIG2 and NP04front
-          bool fHasInteracted;
-          std::vector<int> fSecondaryTrackIDs;
-        };*/
-
-        // Convenience struct to encapsulate all particles that would
-        // deposit energy within one readout window of the TPC
-        /*struct OverlaidTriggerEvent {
-
-          OverlaidTriggerEvent(int trigID){
-            fTriggerEventID = trigID;
-          };
-
-          void AddOverlay(int overlayID){
-            fOverlayEventIDs.push_back(overlayID);
-          };
-
-          std::vector<int> fOverlayEventIDs;
-          int fTriggerEventID;
-
-        };*/
-        
     private:
 
         // Calculate how many overlay events we need.
         void CalculateNOverlays();
         
-        // Fill the above maps and vector.
-        //void FillParticleMaps(TTree *frontFaceTree);
-       
-        // Find trigger events
-        std::vector<int> FindTriggeredEvents(TTree *trig1Tree,TTree *trig2Tree);
- 
-        // Add the triggered particle information for a given instrument
-        //void FillInstrumentInformation(std::vector<int> &eventIDs,TTree *instrumentTree);
-
         // Group the events to overlay a number of background events on each trigger event
         OverlaidTriggerEvent GenerateOverlaidEvent(const int &trigEventID);
 
@@ -217,17 +122,6 @@ namespace evgen{
         // Handle root files from beam instrumentation group
         void OpenInputFile(std::string & filename);
         
-        // Convert to the detector coordinate frame
-        void ConvertCoordinates(float &x, float &y, float &z); //TODO REMOVE
-        
-        // Convert the momentum to GeV and rotate as required.
-        void ConvertMomentum(float &px, float &py, float &pz);  //TODO REMOVE
-
-        // We need to rotate the beam monitor coordinates into the detector frame
-        TLorentzVector ConvertBeamMonitorCoordinates(float x, float y, float z, float t, float offset);
-
-        // Methods for making beam instrument tracks
-        TVector3 ConvertProfCoordinates(double x, double y, double z, double zOffset);
         TVector3 ProjectToTPC(TVector3 firstPoint, TVector3 secondPoint);
         double GetPosition( short fiber );
         void MakeTracks( beam::ProtoDUNEBeamEvent & beamEvent );
@@ -561,7 +455,6 @@ void evgen::ProtoDUNETriggeredBeam::beginJob(){
 
     art::ServiceHandle<art::TFileService> tfs;
     
-    //TFile *inputFile = new TFile(fFileName.c_str(),"READ");
     TFile *inputFile = TFile::Open(fFileName.c_str());
     // Check we have the file
     if(inputFile == 0x0){
@@ -581,11 +474,7 @@ void evgen::ProtoDUNETriggeredBeam::beginJob(){
     // Fill all potential events from the NP04front tree
     fBeamUtils.FillParticleMaps(frontFaceTree, fAllBeamEvents);
 
-    //TTree *trig1Tree = (TTree*)inputFile->Get(fTRIG1TreeName.c_str());
-    //TTree *trig2Tree = (TTree*)inputFile->Get(fTRIG2TreeName.c_str());
-
     //// Now search for trigger events
-    //std::vector<int> triggeredEventIDs =  /*fBeamUtils.*/FindTriggeredEvents(trig1Tree,trig2Tree);
     std::vector<int> triggeredEventIDs = fBeamUtils.FindTriggeredEvents(
         inputFile, fTRIG1TreeName, fTRIG2TreeName, fAllBeamEvents);
     std::cout << "Proto trigger list has " << triggeredEventIDs.size() << " events" << std::endl; 
@@ -715,330 +604,8 @@ void evgen::ProtoDUNETriggeredBeam::produce(art::Event & e)
 
 //--------------------------------------------------------------------------------------
 
-// Fill the particle maps using the input files. This links the events of interest
-// to the entry number in fAllParticlesTree.
-/*void evgen::ProtoDUNETriggeredBeam::FillParticleMaps(TTree *frontFaceTree){
-    
-    float eventID, trackID, pdgCode, parentID;
-    float posX, posY, posZ, posT;
-    float momX, momY, momZ;
-
-    frontFaceTree->SetBranchAddress("EventID",&eventID);
-    frontFaceTree->SetBranchAddress("TrackID",&trackID);
-    frontFaceTree->SetBranchAddress("PDGid",&pdgCode);
-    frontFaceTree->SetBranchAddress("ParentID",&parentID);
-    frontFaceTree->SetBranchAddress("x",&posX);
-    frontFaceTree->SetBranchAddress("y",&posY);
-    frontFaceTree->SetBranchAddress("z",&posZ);
-    frontFaceTree->SetBranchAddress("t",&posT);
-    frontFaceTree->SetBranchAddress("Px",&momX);
-    frontFaceTree->SetBranchAddress("Py",&momY);
-    frontFaceTree->SetBranchAddress("Pz",&momZ);
-
-    // Loop over all particles and group them by events
-    for(unsigned int p = 0; p < frontFaceTree->GetEntries(); ++p){
-
-      frontFaceTree->GetEntry(p);
-
-      // Don't consider nuclei here
-      const int intPdgCode = static_cast<int>(pdgCode);
-      if(intPdgCode > 10000) continue;
-
-      // If this particle is travelling backwards then it won't hit the detector
-      if(momZ < 0) continue;
-
-      // Convert to detector coordinate system
-      ConvertCoordinates(posX,posY,posZ);
-
-      // Keep only those particles that might reach the detector
-      // Need for NP02?
-      if(fReduceNP04frontArea){
-        if(posX < -500 || posX > 500) continue;
-        if(posY < -150 || posY > 850) continue;
-      }
-
-      // Convert momentum
-      ConvertMomentum(momX,momY,momZ);
-
-      const int intEventID = static_cast<int>(eventID);
-      const int intTrackID = static_cast<int>(trackID);
-      const int intParentID= static_cast<int>(parentID);
-      BeamParticle newParticle(intTrackID, intPdgCode, intParentID,
-                               posX, posY, posZ, posT, momX, momY, momZ);
-
-      std::map<int,BeamEvent>::iterator evIter = fAllBeamEvents.find(intEventID);
-      if(evIter == fAllBeamEvents.end()){
-        BeamEvent newBeamEvent(intEventID);
-        newBeamEvent.AddParticle(newParticle);
-        fAllBeamEvents.insert(std::make_pair(intEventID,newBeamEvent));
-      }
-      else{
-        evIter->second.AddParticle(newParticle); 
-      }
-
-    }
-
-    std::cout << "Found " << fAllBeamEvents.size() << " potential events" << std::endl;
-
-    // Reset the branch addresses as the variables are going out of scope
-    frontFaceTree->ResetBranchAddresses();
-}*/
-
-//---------------------------------------------------------------------------------------
-
-// Search for events that have particles in TRIG1 and TRIG2 planes
-std::vector<int> evgen::ProtoDUNETriggeredBeam::FindTriggeredEvents(TTree *trig1Tree, TTree *trig2Tree){
-
-  const std::vector<int> allowedPDGs = {11,-11,13,-13,211,-211,321,-321,2212};
-  
-  float eventID, trackID, pdgCode, parentID;
-  float posX, posY, posZ, posT;
-  float momX, momY, momZ;
-
-  // Look at trigger two first to reduce computation
-  trig2Tree->SetBranchAddress("EventID",&eventID);
-  trig2Tree->SetBranchAddress("TrackID",&trackID);
-  trig2Tree->SetBranchAddress("PDGid",&pdgCode);
-  trig2Tree->SetBranchAddress("ParentID",&parentID);
-  trig2Tree->SetBranchAddress("x",&posX);
-  trig2Tree->SetBranchAddress("y",&posY);
-  trig2Tree->SetBranchAddress("z",&posZ);
-  trig2Tree->SetBranchAddress("t",&posT);
-  trig2Tree->SetBranchAddress("Px",&momX);
-  trig2Tree->SetBranchAddress("Py",&momY);
-  trig2Tree->SetBranchAddress("Pz",&momZ);
-
-  // Temporarily store the particle for events with particle in TRIG2. Just store
-  // the first one if there are two
-  std::map<int,BeamParticle> trig2Particles;
-
-  for(unsigned int p = 0; p < trig2Tree->GetEntries(); ++p){
-  
-    trig2Tree->GetEntry(p);
-  
-    const int intEventID = static_cast<int>(eventID);
-
-    // If this event didn't have any particles at NP04front then move on
-    if(fAllBeamEvents.find(intEventID) == fAllBeamEvents.end()) continue;
-
-    // Carry on if we already found a particle for this event
-    if(trig2Particles.find(intEventID) != trig2Particles.end()) continue;
-
-    // If the particle isn't of the type we want then move on
-    if(std::find(allowedPDGs.begin(),allowedPDGs.end(),static_cast<int>(pdgCode))==allowedPDGs.end()) continue;
-     
-
-    TVector3 det_pos = ConvertProfCoordinates(posX, posY, posZ, fTRIG2Pos);
-    BeamParticle particle(static_cast<int>(trackID), static_cast<int>(pdgCode), static_cast<int>(parentID),
-                          det_pos.X(), det_pos.Y(), det_pos.Z(), posT, momX, momY, momZ);
-                          //posX, posY, posZ, posT, momX, momY, momZ);
-    trig2Particles.insert(std::make_pair(intEventID,particle));
-  }
-
-  trig2Tree->ResetBranchAddresses();
-
-  // Now look at TRIG1
-  trig1Tree->SetBranchAddress("EventID",&eventID);
-  trig1Tree->SetBranchAddress("TrackID",&trackID);
-  trig1Tree->SetBranchAddress("PDGid",&pdgCode);
-  trig1Tree->SetBranchAddress("ParentID",&parentID);
-  trig1Tree->SetBranchAddress("x",&posX);
-  trig1Tree->SetBranchAddress("y",&posY);
-  trig1Tree->SetBranchAddress("z",&posZ);
-  trig1Tree->SetBranchAddress("t",&posT);
-  trig1Tree->SetBranchAddress("Px",&momX);
-  trig1Tree->SetBranchAddress("Py",&momY);
-  trig1Tree->SetBranchAddress("Pz",&momZ);
-
-  std::map<int,BeamParticle> trig1Particles;
-  for(unsigned int p = 0; p < trig1Tree->GetEntries(); ++p){
-
-    trig1Tree->GetEntry(p);
-    const int intEventID = static_cast<int>(eventID);
-
-    // Move on if this event had no particle in TRIG2
-    if(trig2Particles.find(intEventID) == trig2Particles.end()) continue;
-
-    if(std::find(allowedPDGs.begin(),allowedPDGs.end(),static_cast<int>(pdgCode))==allowedPDGs.end()) continue;
-     
-    BeamParticle particle(static_cast<int>(trackID), static_cast<int>(pdgCode), static_cast<int>(parentID),
-                          posX, posY, posZ, posT, momX, momY, momZ);
-    trig1Particles.insert(std::make_pair(intEventID,particle));
-  }
-
-  // Add the particle information at TRIG1 and TRIG2 to the triggered events
-  const std::string trig1TreeName = fTRIG1TreeName.substr(fTRIG1TreeName.find("/")+1);
-  const std::string trig2TreeName = fTRIG2TreeName.substr(fTRIG2TreeName.find("/")+1);
-
-  std::vector<int> trigEventIDs;
-  for(auto const &element : trig1Particles){
-    BeamEvent &event = fAllBeamEvents.at(element.first);
-    // Check that this makes sense... the same particle or one particle is the parent of the other
-    if((element.second.fTrackID != trig2Particles.at(element.first).fTrackID) &&
-       (element.second.fTrackID != trig2Particles.at(element.first).fParentID)) continue; 
-    
-    event.fTriggerID = trig2Particles.at(element.first).fTrackID;    
-    event.fTriggeredParticleInfo.insert(std::make_pair(trig1TreeName,element.second));
-    event.fTriggeredParticleInfo.insert(std::make_pair(trig2TreeName,trig2Particles.at(element.first)));
-
-    bool isTriggerEvent = false;
-    // There is a rare case where the TRIG2 particle can decay before NP04front
-    if(event.fParticlesFront.find(event.fTriggerID) == event.fParticlesFront.end()){
-      event.fHasInteracted = true;
-      // Find the child particle in the map
-      std::cout << "- Candidate event " << trigEventIDs.size() << " trigger particle of type " << trig2Particles.at(element.first).fPDG << " not at the front face... searching for children" << std::endl;
-        for(const std::pair<int,BeamParticle> &partPair : event.fParticlesFront){
-        if(partPair.second.fParentID == event.fTriggerID){
-          std::cout << "  - Found child with PDG = " << partPair.second.fPDG << std::endl;
-          event.fSecondaryTrackIDs.push_back(partPair.first);
-          isTriggerEvent = true;
-        }
-      }
-    }
-    else{
-      isTriggerEvent = true;
-    }
-
-    if(isTriggerEvent) trigEventIDs.push_back(element.first);
-  }
-
-  trig1Tree->ResetBranchAddresses();
-
-  return trigEventIDs;
-}
-
-//---------------------------------------------------------------------------------------
-
-/*void evgen::ProtoDUNETriggeredBeam::FillInstrumentInformation(std::vector<int> &eventIDs, TTree *instrumentTree){
-
-  float eventID, trackID, pdgCode, parentID;
-  float posX, posY, posZ, posT;
-  float momX, momY, momZ;
-
-  instrumentTree->SetBranchAddress("EventID",&eventID);
-  instrumentTree->SetBranchAddress("TrackID",&trackID);
-  instrumentTree->SetBranchAddress("PDGid",&pdgCode);
-  instrumentTree->SetBranchAddress("ParentID",&parentID);
-  instrumentTree->SetBranchAddress("x",&posX);
-  instrumentTree->SetBranchAddress("y",&posY);
-  instrumentTree->SetBranchAddress("z",&posZ);
-  instrumentTree->SetBranchAddress("t",&posT);
-  instrumentTree->SetBranchAddress("Px",&momX);
-  instrumentTree->SetBranchAddress("Py",&momY);
-  instrumentTree->SetBranchAddress("Pz",&momZ);
-
-  // Buffer all of the tree entries for trigger events
-  std::map<const int,std::vector<unsigned int>> triggerIndices; 
-  std::map<const int,const bool> arePionDecays;
-  std::map<const int,const int> trig1TrackIDs;
-  std::map<const int,const int> trig2TrackIDs;
-  std::map<const int,bool> foundTrackInEvent;
-  for(const int &trigEventID : eventIDs){
-    BeamEvent &event = fAllBeamEvents.at(trigEventID);
-    const int trig1TrackID = event.fTriggeredParticleInfo.at("TRIG1").fTrackID;
-    const int trig2TrackID = event.fTriggeredParticleInfo.at("TRIG2").fTrackID;
-    const int trig1TrackPDG = event.fTriggeredParticleInfo.at("TRIG1").fPDG;
-    const int trig2TrackPDG = event.fTriggeredParticleInfo.at("TRIG2").fPDG;
-    const bool isPionDecay = ((trig1TrackPDG==211) && (trig2TrackPDG==-13)) || 
-                             ((trig1TrackPDG==-211) && (trig2TrackPDG==13));
-
-    arePionDecays.insert(std::make_pair(trigEventID,isPionDecay));
-    trig1TrackIDs.insert(std::make_pair(trigEventID,trig1TrackID));
-    trig2TrackIDs.insert(std::make_pair(trigEventID,trig2TrackID));
-    foundTrackInEvent.insert(std::make_pair(trigEventID,false));
-
-    triggerIndices.insert(std::make_pair(trigEventID,std::vector<unsigned int>()));
-  }
-
-  // Strip the first part of the tree name to get just the instrument name
-  std::string treeName = instrumentTree->GetName();
-  treeName = treeName.substr(treeName.find("/")+1);
-
-  for(unsigned int p = 0; p < instrumentTree->GetEntries(); ++p){
-    instrumentTree->GetEntry(p);
-    // If this isn't a triggered event then move on
-    const int thisEvent = static_cast<int>(eventID);
-    if(std::find(eventIDs.begin(),eventIDs.end(),thisEvent)==eventIDs.end()) continue;
-
-    triggerIndices.at(thisEvent).push_back(p);
-    const int thisParticle = static_cast<int>(trackID);
-    if(trig2TrackIDs.at(thisEvent) == thisParticle){
-      BeamParticle particle(static_cast<int>(trackID), static_cast<int>(pdgCode), static_cast<int>(parentID),
-                            posX, posY, posZ, posT, momX, momY, momZ);
-      fAllBeamEvents.at(thisEvent).fTriggeredParticleInfo.insert(std::make_pair(treeName,particle));
-      foundTrackInEvent.at(thisEvent) = true;
-    }
-  }
-
-
-  for (auto it = eventIDs.begin(); it != eventIDs.end();) {
-    const int ev = *it;
-    if(foundTrackInEvent.at(ev)) {
-      ++it;
-      continue;
-    }
-
-    // If we didn't find TRIG2 particle, then look for the TRIG1 one
-    for(const unsigned int index : triggerIndices.at(ev)){
-      instrumentTree->GetEntry(index);
-      const int thisEvent = static_cast<int>(eventID);
-      const int thisParticle = static_cast<int>(trackID);
-      if(trig1TrackIDs.at(thisEvent) == thisParticle){
-        BeamParticle particle(static_cast<int>(trackID), static_cast<int>(pdgCode), static_cast<int>(parentID),
-                            posX, posY, posZ, posT, momX, momY, momZ);
-        fAllBeamEvents.at(thisEvent).fTriggeredParticleInfo.insert(std::make_pair(treeName,particle));
-        foundTrackInEvent.at(thisEvent) = true;
-        break;
-      }
-    }
-  
-
-    if(foundTrackInEvent.at(ev)) {
-      ++it;
-      continue;
-    }
-    // In the rare case that we still don't have the particle, try the TRIG1 parent
-    const int parentTrack = fAllBeamEvents.at(ev).fTriggeredParticleInfo.at("TRIG1").fParentID;
-    for(const unsigned int index : triggerIndices.at(ev)){
-      instrumentTree->GetEntry(index);
-      const int thisEvent = static_cast<int>(eventID);
-      const int thisParticle = static_cast<int>(trackID);
-      if(parentTrack == thisParticle){
-        BeamParticle particle(static_cast<int>(trackID), static_cast<int>(pdgCode), static_cast<int>(parentID),
-                            posX, posY, posZ, posT, momX, momY, momZ);
-        fAllBeamEvents.at(thisEvent).fTriggeredParticleInfo.insert(std::make_pair(treeName,particle));
-        foundTrackInEvent.at(thisEvent) = true;
-
-        break;
-      }
-
-    }
-
-    if(foundTrackInEvent.at(ev) == false){
-      fAllBeamEvents.at(ev).fTriggerID = -999;
-      // Remove this event from the input vector
-      it = eventIDs.erase(it);
-      std::cout << "Issue found with event " << ev << ". Removing it from the trigger list - " << eventIDs.size() << " remain" << std::endl;
-      //std::cout << "We didn't find tracks " << trig2TrackIDs.at(ev) << " or " << trig1TrackIDs.at(ev) << " in " << treeName << std::endl;
-      //std::cout << " - PDGs: 1 = " << fAllBeamEvents.at(ev).fTriggeredParticleInfo.at("TRIG1").fPDG
-      //          << " and 2 = " << fAllBeamEvents.at(ev).fTriggeredParticleInfo.at("TRIG2").fPDG << std::endl;
-      //for(const unsigned int index : triggerIndices.at(ev)){
-      //  instrumentTree->GetEntry(index);
-      //  std::cout << "- Choice = " << static_cast<int>(trackID) << " :: " << static_cast<int>(pdgCode) << std::endl;
-      //}
-    }
-    else {
-      ++it; 
-    }
-  }
-
-  instrumentTree->ResetBranchAddresses();
-}*/
-
-//---------------------------------------------------------------------------------------
-
 // Group the events to overlay a number of background events on each trigger event
-/*evgen::ProtoDUNETriggeredBeam::*/OverlaidTriggerEvent evgen::ProtoDUNETriggeredBeam::GenerateOverlaidEvent(const int &trigEventID)
+OverlaidTriggerEvent evgen::ProtoDUNETriggeredBeam::GenerateOverlaidEvent(const int &trigEventID)
 {
   OverlaidTriggerEvent newTriggerEvent(trigEventID);
   // Look to see if any of these neighbouring events had particles
@@ -1319,10 +886,9 @@ void evgen::ProtoDUNETriggeredBeam::SetDataDrivenPosMom(
   const double downstreamY = 96. - sampledVDown;
 
 
-//rename these
-  TVector3 upstream_point = ConvertProfCoordinates(upstreamX, upstreamY, 0.,
+  TVector3 upstream_point = fBeamUtils.ConvertProfCoordinates(upstreamX, upstreamY, 0.,
                                                    fBPROFEXTPos);
-  TVector3 downstream_point = ConvertProfCoordinates(downstreamX, downstreamY, 0.,
+  TVector3 downstream_point = fBeamUtils.ConvertProfCoordinates(downstreamX, downstreamY, 0.,
                                                      fBPROF4Pos);
   TVector3 dR = (downstream_point - upstream_point).Unit();
 
@@ -1760,105 +1326,12 @@ void evgen::ProtoDUNETriggeredBeam::OpenInputFile(std::string & filename)
 
 //----------------------------------------------------------------------------------
 
- //TODO REMOVE
-void evgen::ProtoDUNETriggeredBeam::ConvertCoordinates(float &x, float &y, float &z){
-    
-    // Convert to cm and shift to the detector coordinate frame
-    x = (x/10.) + fBeamX;
-    y = (y/10.) + fBeamY;
-    z = fBeamZ; // Just use the z position    
-}
-
-//--------------------------------------------------------------------------------
-
- //TODO REMOVE
-void evgen::ProtoDUNETriggeredBeam::ConvertMomentum(float &px, float &py, float &pz){
-    
-    // Convert to GeV
-    px = px / 1000.;
-    py = py / 1000.;
-    pz = pz / 1000.;
-   
-    TVector3 momVec(px,py,pz);
-
-    if (!fIsNP02) {
-      //NP04: If we want to rotate by changing theta and phi, do it here.
-      momVec.SetTheta(momVec.Theta() + fBeamThetaShift);
-      momVec.SetPhi(momVec.Phi() + fBeamPhiShift);
-
-      px = momVec.X();
-      py = momVec.Y();
-      pz = momVec.Z();
-    }
-    else {
-      //NP02: Beam ntuples are in the 'world' coordinate system
-      //The beam is similar to the NP04 direction: ~ -8deg from Z
-      //In our simulation, it needs to be at -135deg
-      //Then we need to swap x and y
-      momVec.RotateY(fNP02Rotation*TMath::Pi()/180.);
-      px = (fNP02XDrift ? momVec.Y() : momVec.X());
-      py = (fNP02XDrift ? -1.*momVec.X() : momVec.Y());
-      pz = momVec.Z();
-    }
-}
-
-//-----------------------------------------------------------------------------
-
 void evgen::ProtoDUNETriggeredBeam::CalculateNOverlays(){
     
     // The number of events to overlay is as follows:
     // N = Intensity * 2.0 * ReadoutWindow / BeamSpillLength
     fOverlays = fIntensity * (2.0 * fReadoutWindow / 1000.) / fBeamSpillLength;
     std::cout << "Number of overlays = " << fOverlays << std::endl;   
-}
- 
-//----------------------------------------------------------------------------------
-
-// We need to rotate the beam monitor coordinates into the detector frame (matching NP04front)
-// This means they can later be treated in the same way as the standard NP04front positions
-TLorentzVector evgen::ProtoDUNETriggeredBeam::ConvertBeamMonitorCoordinates(float x, float y, float z, float t, float zOffset){
-
-  const float off = fNP04frontPos - zOffset;
-
-//  TLorentzVector old(x,y,z,t);
-
-  // Convert the coordinates using the rotated basis vectors
-  float newX = x*fBMBasisX.X() + y*fBMBasisY.X() + (z-zOffset)*fBMBasisZ.X() + off*fabs(fBMBasisZ.X());
-  float newY = x*fBMBasisX.Y() + y*fBMBasisY.Y() + (z-zOffset)*fBMBasisZ.Y() + off*fabs(fBMBasisZ.Y());
-  float newZ = x*fBMBasisX.Z() + y*fBMBasisY.Z() + (z-zOffset) - off*fabs(fBMBasisZ.Z());
-
-  // Account for the small differences between NP04front and the detector coordinates
-  newX += fBeamX*10.;
-  newY += fBeamY*10.;
-  newZ += fBeamZ*10.;
-
-  // Make our new beam monitor position in the detector coordinate system
-  TLorentzVector result(newX,newY,newZ,t);
-
-//  std::cout << "Coordinate transform..." << std::endl;
-//  old.Print();
-//  result.Print();
-
-  return result;
-}
- 
-//----------------------------------------------------------------------------------
-
-TVector3 evgen::ProtoDUNETriggeredBeam::ConvertProfCoordinates(double x, double y, double z, double zOffset){
-  const double off = fNP04frontPos - zOffset;
-
-//  TVector3 old(x,y,z);
-
-  double newX = x*fBMBasisX.X() + y*fBMBasisY.X() + /*(z-zOffset)*fBMBasisZ.X()*/ + off*fabs(fBMBasisZ.X());
-  double newY = x*fBMBasisX.Y() + y*fBMBasisY.Y() + /*(z-zOffset)*fBMBasisZ.Y()*/ + off*fabs(fBMBasisZ.Y());
-  double newZ = x*fBMBasisX.Z() + y*fBMBasisY.Z() + /*(z-zOffset)              */ - off*fabs(fBMBasisZ.Z());
-
-  newX += fBeamX*10.;
-  newY += fBeamY*10.;
-  newZ += fBeamZ*10.;
-
-  TVector3 result(newX/10., newY/10., newZ/10.);
-  return result;
 }
  
 //----------------------------------------------------------------------------------
@@ -2025,7 +1498,7 @@ void evgen::ProtoDUNETriggeredBeam::MakeTracks( beam::ProtoDUNEBeamEvent & beamE
   const double x1 = GetPosition( fx1 );
   const double y1 = GetPosition( fy1 );
 
-  TVector3 pos1 = ConvertProfCoordinates( x1, y1, 0., fBPROFEXTPos );
+  TVector3 pos1 = fBeamUtils.ConvertProfCoordinates( x1, y1, 0., fBPROFEXTPos );
 
   const short fx2 = beamEvent.GetFBM( "XBPF022716" ).active[0];
   const short fy2 = beamEvent.GetFBM( "XBPF022717" ).active[0];
@@ -2033,7 +1506,7 @@ void evgen::ProtoDUNETriggeredBeam::MakeTracks( beam::ProtoDUNEBeamEvent & beamE
   const double x2 = GetPosition( fx2 );
   const double y2 = GetPosition( fy2 );
 
-  TVector3 pos2 = ConvertProfCoordinates( x2, y2, 0., fBPROF4Pos );
+  TVector3 pos2 = fBeamUtils.ConvertProfCoordinates( x2, y2, 0., fBPROF4Pos );
  
   std::vector< TVector3 > thePoints = { pos1, pos2, ProjectToTPC( pos1, pos2 ) };
   std::vector< TVector3 > theMomenta = {

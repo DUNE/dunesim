@@ -96,20 +96,32 @@ namespace evgen {
  class ProtoDUNETriggeredBeamUtils {
   public:
    ProtoDUNETriggeredBeamUtils(fhicl::ParameterSet const & pset);
+
+   // Fill the above maps and vector.
    void FillParticleMaps(TTree * frontFaceTree,
                          std::map<int, BeamEvent> & allBeamEvents);
+
+   // Add the triggered particle information for a given instrument
    void FillInstrumentInformation(
        std::vector<int> &eventIDs, TTree *instrumentTree,
        std::map<int, BeamEvent> & allBeamEvents);
+
+   // Convert to the detector coordinate frame
    void ConvertCoordinates(float & x, float & y, float & z) {
      // Convert to cm and shift to the detector coordinate frame
      x = (x/10.) + fBeamX;
      y = (y/10.) + fBeamY;
      z = fBeamZ; // Just use the z position    
    };
+
+   // Convert the momentum to GeV and rotate as required.
    void ConvertMomentum(float & momX, float & momY, float & momZ);
+
+   // Methods for making beam instrument tracks
    TVector3 ConvertProfCoordinates(double x, double y, double z,
        double zOffset);
+
+   // Find trigger events
    std::vector<int> FindTriggeredEvents(
        TFile * inputFile, std::string trig1TreeName, std::string trig2TreeName,
        std::map<int, BeamEvent> & allBeamEvents);
