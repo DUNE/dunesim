@@ -180,6 +180,11 @@ void CountFile(std::string filename, CountConfig & config, std::ofstream & outpu
 
   auto * fIn = TFile::Open(filename.c_str());
   auto * tree = static_cast<TTree*>(fIn->Get("NTuples/GoodParticle"));
+  if (tree == nullptr) {
+    std::cout << "Error. File " << filename << " tree is malformed. Skipping" <<
+                 std::endl;
+    return;
+  }
   std::cout << tree->GetEntries() << std::endl;
 
   // Fill all potential events from the NP04front tree
