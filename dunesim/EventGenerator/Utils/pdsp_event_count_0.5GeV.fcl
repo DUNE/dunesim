@@ -1,0 +1,4 @@
+#include "PDSPG4Beamline0.5GeVFiles.fcl"
+#include "prod4_gen_protoDUNE_beam_cosmics.fcl"
+
+Files: @local::Files500MeV
