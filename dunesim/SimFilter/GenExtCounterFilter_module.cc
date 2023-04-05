@@ -82,11 +82,10 @@ namespace filt{
 
     auto const mclists = e.getMany<std::vector<simb::MCTruth>>();
     for (unsigned int i = 0; i < mclists.size() ; i++){
-      for (unsigned int j = 0; j < mclists[i]->size(); j++){
+      for (simb::MCTruth const& mc_truth : *mclists[i]) {
         //Should have the truth record for the event now
-        const art::Ptr<simb::MCTruth> mc_truth(mclists[i],j);
-        for (int part = 0; part < mc_truth->NParticles(); part++){
-          const simb::MCParticle particle = mc_truth->GetParticle(part);
+        for (int part = 0; part < mc_truth.NParticles(); part++){
+          const simb::MCParticle& particle = mc_truth.GetParticle(part);
           if (!IsInterestingParticle(particle)) continue;
           TVector3 particle_pos = particle.Position().Vect();
           TVector3 particle_dir = particle.Momentum().Vect().Unit();
