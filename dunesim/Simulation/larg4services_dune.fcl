@@ -118,8 +118,11 @@ dune_particle_list_action:
                              # --- This forces that true penultimate point to be saved, thus preserving the info
 }
 
-dunefdvd_particle_list_action: @local::dune_particle_list_action
-dunefdvd_particle_list_action.keepEMShowerDaughters: false  #roll up the shower children into the primary parent
+dunefd_particle_list_action: @local::dune_particle_list_action
+dunefd_particle_list_action.keepEMShowerDaughters: false  #roll up the shower children into the primary parent
+
+
+dunefdvd_particle_list_action: @local::dunefd_particle_list_action
 
 
 supernova_particle_list_action: @local::dune_particle_list_action
