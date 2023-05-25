@@ -6,8 +6,8 @@ BEGIN_PROLOG
 dunefd_largeantparameters:
 {
     @table::standard_largeantparameters
-    LongitudinalDiffusion: 4.0e-9 #cm^2/ns
-    TransverseDiffusion:   8.8e-9 #cm^2/ns 
+    LongitudinalDiffusion: 6.2e-9 #cm^2/ns
+    TransverseDiffusion:   1.63e-8 #cm^2/ns 
 }
 dunefd_larvoxelcalculator:   @local::standard_larvoxelcalculator
 dunefd_largeantparameters.UseLitePhotons: true
