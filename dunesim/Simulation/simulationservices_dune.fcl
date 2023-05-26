@@ -14,6 +14,7 @@ dunefd_largeantparameters.UseLitePhotons: true
 
 #FD2-VD
 dunefdvd_largeantparameters: @local::dunefd_largeantparameters
+dunefdvd_largeantparameters.UseModLarqlRecomb: true
 
 protodune_largeantparameters:   @local::standard_largeantparameters
 protodune_largeantparameters.UseCustomPhysics: true

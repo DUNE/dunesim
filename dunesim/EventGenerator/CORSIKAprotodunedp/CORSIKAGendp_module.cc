@@ -123,9 +123,11 @@ namespace evgendp{
       // create a default random engine; obtain the random seed from NuRandomService,
       // unless overridden in configuration with key "Seed"
       fGenEngine(art::ServiceHandle<rndm::NuRandomService>()
-                 ->createEngine(*this, "HepJamesRandom", "gen", p, { "Seed", "SeedGenerator" })),
+                 ->registerAndSeedEngine(createEngine(0, "HepJamesRandom", "gen"),
+                                         "HepJamesRandom", "gen", p, { "Seed", "SeedGenerator" })),
       fPoisEngine(art::ServiceHandle<rndm::NuRandomService>()
-                  ->createEngine(*this, "HepJamesRandom", "pois", p, "SeedPoisson"))
+                  ->registerAndSeedEngine(createEngine(0, "HepJamesRandom", "pois"),
+                                          "HepJamesRandom", "pois", p, "SeedPoisson"))
   {
 
     if(fShowerInputFiles.size() != fShowerFluxConstants.size() || fShowerInputFiles.size()==0 || fShowerFluxConstants.size()==0)
@@ -632,7 +634,7 @@ namespace evgendp{
 
     std::unique_ptr<sumdata::RunData> runcol(new sumdata::RunData(geo->DetectorName()));
 
-    run.put(std::move(runcol));
+    run.put(std::move(runcol), art::fullRun());
 
     return;
   }

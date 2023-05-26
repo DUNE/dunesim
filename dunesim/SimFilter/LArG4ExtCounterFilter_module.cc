@@ -41,7 +41,7 @@ namespace filt{
       double fParticleMinEnergy;  //The minimum energy of a particle to be filtered
       double fParticleMaxEnergy;  //The maximum energy of a particle to be filtered
   
-      bool IsInterestingParticle(const art::Ptr<simb::MCParticle> particle);  //Define whether a particular particle is initially worth saving e.g. is it a muon, pion etc
+      bool IsInterestingParticle(const simb::MCParticle& particle);  //Define whether a particular particle is initially worth saving e.g. is it a muon, pion etc
       bool UsesCounterSetPair(const CounterSetPair &CSP, const std::set<unsigned int> &usedCounterIDs); //Check if a list of counter IDs matches with those in a particular set pair
       bool UsesCounterSet(const std::vector<unsigned int> &counterIDs, const std::set<unsigned int> &usedCounterIDs); //Check if any of a list of counters are counter in a particular counter set
 
@@ -76,11 +76,9 @@ namespace filt{
 
 
     //Get the vector of particles
-    auto particles = e.getHandle<std::vector<simb::MCParticle> >("largeant");
+    auto const& particles = e.getProduct<std::vector<simb::MCParticle> >("largeant");
     //Loop through the particles
-    for (unsigned int part_i = 0; part_i < particles->size(); part_i++){
-      //Get the particle
-      const art::Ptr<simb::MCParticle> particle(particles,part_i);
+    for (simb::MCParticle const& particle : particles) {
       //Check if the particle is initially worth considering
       if (IsInterestingParticle(particle)){
         //OK so the particle matches the criteria we need.  Now we need to get the IDs of all external counters it passes through
@@ -88,14 +86,14 @@ namespace filt{
         //Use a set to store the counter IDs the particle passes through
         std::set<unsigned int> usedExtCounterIDs;
         //Now get the trajcectory points
-        unsigned int npts = particle->NumberTrajectoryPoints();
+        unsigned int npts = particle.NumberTrajectoryPoints();
         //Loop over those points
         for (unsigned int pt = 0; pt < npts; pt++){
           //Get the position at the point
-          TLorentzVector pos4 = particle->Position(pt);
+          TLorentzVector pos4 = particle.Position(pt);
           //If the position is not contained in a counter, the function throws an exception.  We don't want to end the process when this happens
           try{
-            //std::cout<<"AuxDetID: " << geom->FindAuxDetAtPosition(pos) << "  pdg: " << particle->PdgCode() << std::endl;
+            //std::cout<<"AuxDetID: " << geom->FindAuxDetAtPosition(pos) << "  pdg: " << particle.PdgCode() << std::endl;
             unsigned int counterID = geom->FindAuxDetAtPosition(geo::vect::toPoint(pos4.Vect()));
             usedExtCounterIDs.insert(counterID);
           }
@@ -159,13 +157,13 @@ namespace filt{
     }
   }
 
-  bool LArG4ExtCounterFilter::IsInterestingParticle(const art::Ptr<simb::MCParticle> particle){
+  bool LArG4ExtCounterFilter::IsInterestingParticle(const simb::MCParticle& particle){
     //Loop over the list of requested PDGs.  See if that matches the particle under consideration
     for (unsigned int i = 0; i < fInterestingPDGs.size(); i++){
       //Check if the particle under consideration has a requested PDG
-      if (particle->PdgCode() == fInterestingPDGs[i]){
+      if (particle.PdgCode() == fInterestingPDGs[i]){
         //Got a requested PDG,  now check that the energy matches the requested range
-        TLorentzVector mom4 = particle->Momentum();
+        TLorentzVector mom4 = particle.Momentum();
         if (mom4.T() > fParticleMinEnergy && mom4.T() < fParticleMaxEnergy){
           //std::cout<<"FOUND INTERESTING PARTICLE"<<std::endl;
           return true;
