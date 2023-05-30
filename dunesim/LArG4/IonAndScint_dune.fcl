@@ -27,10 +27,10 @@ dunefdvd_ionandscint: @local::dunefd_ionandscint
 dunefdvd_ionandscint.Instances: "LArG4DetectorServicevolTPCActive"
 # external laterals volume - Semi-analytical model
 dunefdvd_ionandscint_external: @local::dunefd_ionandscint_larql
-dunefdvd_ionandscint_external.Instances: "LArG4DetectorServicevolExternalActive"
+dunefdvd_ionandscint_external.Instances: "LArG4DetectorServicevolCryostat"
 # Config for ANN: The computable graph already includes the TPC and external laterals volumes
 dunefdvd_ionandscint_ann: @local::dunefd_ionandscint_larql
-dunefdvd_ionandscint_ann.Instances: "LArG4DetectorServicevolTPCActive; LArG4DetectorServicevolExternalActive"
+dunefdvd_ionandscint_ann.Instances: "LArG4DetectorServicevolTPCActive;LArG4DetectorServicevolCryostat"
 
 
 ##
@@ -78,7 +78,7 @@ protodunehd_ionandscint_external.Instances: "LArG4DetectorServicevolTPCActiveOut
 # ProtoDUNE-VD
 ##
 protodunevd_ionandscint_correlated: @local::protodune_ionandscint_correlated
-protodunevd_ionandscint_correlated.Instances:    "LArG4DetectorServicevolTPCActive"
+protodunevd_ionandscint_correlated.Instances:    "LArG4DetectorServicevolTPCActive;LArG4DetectorServicevolCryostat"
 
 protodunevd_ionandscint_nest: @local::protodunevd_ionandscint_correlated
 protodunevd_ionandscint_nest.ISCalcAlg: "NEST"
