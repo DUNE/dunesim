@@ -15,9 +15,6 @@ dunefd_ionandscint_nest.ISCalcAlg: "NEST"
 dunefd_ionandscint_separate: @local::dunefd_ionandscint_correlated
 dunefd_ionandscint_separate.ISCalcAlg: "Separate"
 
-dunefd_ionandscint_larql: @local::dunefd_ionandscint_correlated
-dunefd_ionandscint_larql.services.LArG4Parameters.UseModLarqlRecomb: true
-
 # Choose *the* IonAndScint configuration
 dunefd_ionandscint: @local::dunefd_ionandscint_correlated
 
@@ -26,10 +23,10 @@ dunefd_ionandscint: @local::dunefd_ionandscint_correlated
 dunefdvd_ionandscint: @local::dunefd_ionandscint
 dunefdvd_ionandscint.Instances: "LArG4DetectorServicevolTPCActive"
 # external laterals volume - Semi-analytical model
-dunefdvd_ionandscint_external: @local::dunefd_ionandscint_larql
+dunefdvd_ionandscint_external: @local::dunefd_ionandscint #larql is set in FDVD services
 dunefdvd_ionandscint_external.Instances: "LArG4DetectorServicevolCryostat"
 # Config for ANN: The computable graph already includes the TPC and external laterals volumes
-dunefdvd_ionandscint_ann: @local::dunefd_ionandscint_larql
+dunefdvd_ionandscint_ann: @local::dunefd_ionandscint
 dunefdvd_ionandscint_ann.Instances: "LArG4DetectorServicevolTPCActive;LArG4DetectorServicevolCryostat"
 
 
@@ -64,14 +61,11 @@ protodunehd_ionandscint_nest.ISCalcAlg: "NEST"
 protodunehd_ionandscint_separate: @local::protodunehd_ionandscint_correlated
 protodunehd_ionandscint_separate.ISCalcAlg: "Separate"
 
-protodunehd_ionandscint_larql: @local::protodunehd_ionandscint_correlated
-protodunehd_ionandscint_larql.services.LArG4Parameters.UseModLarqlRecomb: true
-
 # active volume
 protodunehd_ionandscint: @local::protodunehd_ionandscint_separate
 protodunehd_ionandscint.Instances: "LArG4DetectorServicevolTPCActiveInner"
 # external laterals volume
-protodunehd_ionandscint_external: @local::protodunehd_ionandscint_larql
+protodunehd_ionandscint_external: @local::protodunehd_ionandscint
 protodunehd_ionandscint_external.Instances: "LArG4DetectorServicevolTPCActiveOuter"
 
 ##
@@ -87,6 +81,6 @@ protodunevd_ionandscint_separate: @local::protodunevd_ionandscint_correlated
 protodunevd_ionandscint_separate.ISCalcAlg: "Separate"
 
 # Choose *the* IonAndScint configuration
-protodunevd_ionandscint: @local::protodunevd_ionandscint_separate
+protodunevd_ionandscint: @local::protodunevd_ionandscint_correlated
 
 END_PROLOG
