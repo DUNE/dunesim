@@ -1,4 +1,5 @@
 #include "ProtoDUNETriggeredBeamUtils.h"
+#include "BeamMiscUtils.h"
 #include "TROOT.h"
 #include <iostream>
 #include <fstream>
@@ -8,7 +9,7 @@
 #include <thread>
 //#include <ranges>
 
-struct CountConfig {
+/*struct CountConfig {
   CountConfig(fhicl::ParameterSet & generator)
     : fNP04frontTreeName(generator.get<std::string>("NP04frontTreeName")),
       fTOF1TreeName(generator.get<std::string>("TOF1TreeName")),
@@ -29,14 +30,14 @@ struct CountConfig {
   std::string fBPROFEXTTreeName;
   std::string fBPROF4TreeName;
   std::string fTRIG2TreeName;
-};
+};*/
 
 
-fhicl::ParameterSet GetGenerator(fhicl::ParameterSet & pset);
-fhicl::ParameterSet GetPars(std::string fcl_file);
+//fhicl::ParameterSet GetGenerator(fhicl::ParameterSet & pset);
+//fhicl::ParameterSet GetPars(std::string fcl_file);
 void WriteOut(std::ofstream & outputfile, std::string filename, int count);
-void CountFile(std::string filename, CountConfig & config, std::ofstream & output_file, evgen::ProtoDUNETriggeredBeamUtils & beam_utils);
-void Loop(std::vector<std::string> filelist, CountConfig config,
+void CountFile(std::string filename, beammisc::CountConfig & config, std::ofstream & output_file, evgen::ProtoDUNETriggeredBeamUtils & beam_utils);
+void Loop(std::vector<std::string> filelist, beammisc::CountConfig config,
           std::ofstream & output_file, evgen::ProtoDUNETriggeredBeamUtils beam_utils,
           size_t worker_id, std::vector<size_t> n_files);
 
@@ -48,7 +49,6 @@ int main(int argc, char ** argv){
   std::string fcl_file;
   std::string output_filename;
   std::string mc_file;
-  std::string data_file;
   int nworkers = 1;
   // Options to run
   for (int iArg = 1; iArg < argc; iArg++) {
@@ -68,13 +68,13 @@ int main(int argc, char ** argv){
   }
 
   //Fcl pars
-  auto pset = GetPars(fcl_file);
-  auto generator = GetGenerator(pset);
+  auto pset = beammisc::GetPars(fcl_file);
+  auto generator = beammisc::GetGenerator(pset);
   auto file_list = pset.get<std::vector<std::string>>("Files");
 
-  CountConfig config(generator);
-  CountConfig config_cp(config);
-  std::cout << config_cp.fNP04frontTreeName << std::endl;
+  beammisc::CountConfig config(generator);
+  //CountConfig config_cp(config);
+  //std::cout << config_cp.fNP04frontTreeName << std::endl;
 
   //Make beam utils instance
   evgen::ProtoDUNETriggeredBeamUtils beam_utils(generator);
@@ -123,7 +123,7 @@ void WriteOut(std::ofstream & outputfile, std::string filename, int count) {
   outputfile << filename << " " << std::to_string(count) << "\n";
 }
 
-void Loop(std::vector<std::string> file_list, CountConfig config,
+void Loop(std::vector<std::string> file_list, beammisc::CountConfig config,
           std::ofstream & output_file, evgen::ProtoDUNETriggeredBeamUtils beam_utils,
           size_t worker_id, std::vector<size_t> n_files) {
 
@@ -166,11 +166,11 @@ fhicl::ParameterSet GetPars(std::string fcl_file) {
 
 }
 
-fhicl::ParameterSet GetGenerator(fhicl::ParameterSet & pset) {
+/*fhicl::ParameterSet GetGenerator(fhicl::ParameterSet & pset) {
   return pset.get<fhicl::ParameterSet>("physics.producers.generator");
-}
+}*/
 
-void CountFile(std::string filename, CountConfig & config, std::ofstream & output_file, evgen::ProtoDUNETriggeredBeamUtils & beam_utils) {
+void CountFile(std::string filename, beammisc::CountConfig & config, std::ofstream & output_file, evgen::ProtoDUNETriggeredBeamUtils & beam_utils) {
   std::cout << filename << std::endl;
   if (filename.find("/pnfs") != 0) {
     throw cet::exception("ProtoDUNETriggeredBeam") << "Filename " <<
