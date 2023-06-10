@@ -142,7 +142,7 @@ void Loop(std::vector<std::string> file_list, beammisc::CountConfig config,
   } 
 }
 
-fhicl::ParameterSet GetPars(std::string fcl_file) {
+/*fhicl::ParameterSet GetPars(std::string fcl_file) {
   std::cout << "Fcl file: " << fcl_file << std::endl;
   fhicl::ParameterSet pset;
 
@@ -164,7 +164,7 @@ fhicl::ParameterSet GetPars(std::string fcl_file) {
   pset = fhicl::ParameterSet::make(fcl_file, lookupPolicy);
   return pset;
 
-}
+}*/
 
 /*fhicl::ParameterSet GetGenerator(fhicl::ParameterSet & pset) {
   return pset.get<fhicl::ParameterSet>("physics.producers.generator");

@@ -2,14 +2,21 @@
 #include "BeamMiscUtils.h"
 #include "TFile.h"
 #include "TTree.h"
+#include "TROOT.h"
 #include <thread>
+
+void CountFile(std::string filename, beammisc::CountConfig & config, evgen::ProtoDUNETriggeredBeamUtils & beam_utils);
+
+void Loop(std::vector<std::string> filelist, beammisc::CountConfig config,
+          evgen::ProtoDUNETriggeredBeamUtils beam_utils,
+          size_t worker_id, std::vector<size_t> n_files);
 
 int main(int argc, char ** argv){
 
   std::string fcl_file;
   std::string output_filename;
   std::string mc_file;
-  int nworkers = 1;
+  //int nworkers = 1;
   // Options to run
   for (int iArg = 1; iArg < argc; iArg++) {
     if (!strcasecmp(argv[iArg],"-c")) {
@@ -19,7 +26,7 @@ int main(int argc, char ** argv){
      output_filename = argv[++iArg];
     }
     if (!strcasecmp(argv[iArg],"-n")) {
-     nworkers = std::atoi(argv[++iArg]);
+     //nworkers = std::atoi(argv[++iArg]);
     }
     if (!strcasecmp(argv[iArg],"-h")) {
       std::cout << "Usage: runEventCounter -c fclfile.fcl -o output_file [-n nthreads]" << std::endl;
@@ -37,12 +44,34 @@ int main(int argc, char ** argv){
   //Make beam utils instance
   evgen::ProtoDUNETriggeredBeamUtils beam_utils(generator);
 
-  ROOT::EnableThreadSafety();//Needed for root
+  //ROOT::EnableThreadSafety();//Needed for root
+  //CountFile(filename, config, output_file, beam_utils);
+
+  Loop(file_list, config, beam_utils, 0, {1});
 
   return 0;
 }
 
-void CountFile(std::string filename, beammisc::CountConfig & config, std::ofstream & output_file, evgen::ProtoDUNETriggeredBeamUtils & beam_utils) {
+void Loop(std::vector<std::string> file_list, beammisc::CountConfig config,
+          evgen::ProtoDUNETriggeredBeamUtils beam_utils,
+          size_t worker_id, std::vector<size_t> n_files) {
+
+  size_t start_file = 0;
+  for (size_t i = 0; i < worker_id; ++i) {
+    start_file += n_files[i];
+  }
+
+  size_t end_file = start_file + n_files[worker_id];
+  std::cout << "Loop " << worker_id << " " << start_file << " " << end_file << std::endl;
+
+  for (size_t i = start_file; i != end_file; ++i) {
+    std::string & filename = file_list[i];
+    CountFile(filename, config, beam_utils);
+  } 
+}
+
+
+void CountFile(std::string filename, beammisc::CountConfig & config, evgen::ProtoDUNETriggeredBeamUtils & beam_utils) {
   std::cout << filename << std::endl;
   if (filename.find("/pnfs") != 0) {
     throw cet::exception("ProtoDUNETriggeredBeam") << "Filename " <<
@@ -84,7 +113,27 @@ void CountFile(std::string filename, beammisc::CountConfig & config, std::ofstre
     std::cout << " - Finished adding information from " << treeName << std::endl;
   }
   std::cout << "Final trigger list has " << triggeredEventIDs.size() << " events" << std::endl; 
-  WriteOut(output_file, filename, triggeredEventIDs.size());
+
+  //use this to find triggered particle
+  /*if(!trigEvent.fHasInteracted){
+    trigParticle = trigEvent.fParticlesFront.at(trigEvent.fTriggerID);
+  }
+  else{
+    const std::string trig2Name = fTRIG2TreeName.substr(fTRIG2TreeName.find("/")+1);
+    trigParticle = trigEvent.fTriggeredParticleInfo.at(trig2Name);
+    primaryStatus = 0;
+  }*/
+
+  for (auto & event : allBeamEvents) {
+    auto & front_particles = event.second.fParticlesFront;
+    std::cout << front_particles.size() << std::endl;
+    std::cout << "Triggered: " << event.second.fTriggerID << std::endl;
+    for (auto & part : front_particles) {
+      std::cout << "\t";
+      part.second.Print();
+      //std::cout << part.second << std::endl;  
+    }
+  }
 
   fIn->Close();
 }

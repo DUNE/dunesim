@@ -23,5 +23,12 @@ art_make_exec( NAME runEventCounter
                 BeamMiscUtils
 	    )
 
+art_make_exec( NAME runYieldTest
+	       SOURCE runYieldTest.c++
+	       LIBRARIES
+                ProtoDUNETriggeredBeamUtils 
+                BeamMiscUtils
+	    )
+
 install_scripts()
 install_fhicl()
