@@ -198,7 +198,7 @@ dunevd10kt_1x8x14_3view_larg4detector:
 {
     category      : "world"
     gdmlFileName_ : @local::dunevd10kt_1x8x14_3view_geo.GDML
-    volumeNames   : ["volTPCActive", "volCryostat"] # list of volumes for which the stepLimit should be set
+    volumeNames   : ["volTPCActive", "volExternalActive"] # list of volumes for which the stepLimit should be set
     stepLimits    : [0.4, 0.4]            # corresponding stepLimits in mm for the volumes in the volumeNames list
 }
 
@@ -214,7 +214,7 @@ dunevd10kt_1x8x14_2view_larg4detector:
 {
     category      : "world"
     gdmlFileName_ : @local::dunevd10kt_1x8x14_2view_geo.GDML
-    volumeNames   : ["volTPCActive", "volCryostat"] # list of volumes for which the stepLimit should be set
+    volumeNames   : ["volTPCActive", "volExternalActive"] # list of volumes for which the stepLimit should be set
     stepLimits    : [0.4, 0.4]            # corresponding stepLimits in mm for the volumes in the volumeNames list
 }
 
@@ -222,7 +222,7 @@ dunevd10kt_1x8x14backup_3view_larg4detector:
 {
     category      : "world"
     gdmlFileName_ : @local::dunevd10kt_1x8x14backup_3view_geo.GDML
-    volumeNames   : ["volTPCActive", "volCryostat"] # list of volumes for which the stepLimit should be set
+    volumeNames   : ["volTPCActive", "volExternalActive"] # list of volumes for which the stepLimit should be set
     stepLimits    : [0.4, 0.4]            # corresponding stepLimits in mm for the volumes in the volumeNames list
 }
 
@@ -230,7 +230,7 @@ dunevd10kt_1x8x6_3view_larg4detector:
 {
     category      : "world"
     gdmlFileName_ : @local::dunevd10kt_1x8x6_3view_geo.GDML
-    volumeNames   : ["volTPCActive", "volCryostat"] # list of volumes for which the stepLimit should be set
+    volumeNames   : ["volTPCActive", "volExternalActive"] # list of volumes for which the stepLimit should be set
     stepLimits    : [0.4, 0.4]            # corresponding stepLimits in mm for the volumes in the volumeNames list
 }
 
@@ -238,7 +238,7 @@ dunevd10kt_1x8x6_3view_30deg_larg4detector:
 {
     category      : "world"
     gdmlFileName_ : @local::dunevd10kt_1x8x6_3view_30deg_geo.GDML
-    volumeNames   : ["volTPCActive", "volCryostat"] # list of volumes for which the stepLimit should be set
+    volumeNames   : ["volTPCActive", "volExternalActive"] # list of volumes for which the stepLimit should be set
     stepLimits    : [0.4, 0.4]            # corresponding stepLimits in mm for the volumes in the volumeNames list
 }
 
@@ -246,7 +246,7 @@ dunevd10kt_1x8x6_2view_larg4detector:
 {
     category      : "world"
     gdmlFileName_ : @local::dunevd10kt_1x8x6_2view_geo.GDML
-    volumeNames   : ["volTPCActive", "volCryostat"] # list of volumes for which the stepLimit should be set
+    volumeNames   : ["volTPCActive", "volExternalActive"] # list of volumes for which the stepLimit should be set
     stepLimits    : [0.4, 0.4]            # corresponding stepLimits in mm for the volumes in the volumeNames list
 }
 
