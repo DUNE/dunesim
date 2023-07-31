@@ -1,0 +1,44 @@
+# prodsingle with a particle gun plus cosmics
+
+#include "prodsingle_iceberg.fcl"
+
+physics.producers.cosmicgenerator: {
+         BufferBox: [
+            -60,
+            60,
+            -60,
+            60,
+            -60,
+            60
+         ]
+         ProjectToHeight: 265
+         RandomXZShift: 1000
+         SampleTime: 6.45e-3
+         ShowerAreaExtension: 2000
+         ShowerFluxConstants: [
+            17200,
+            9200,
+            6200,
+            9200,
+            6200
+         ]
+         ShowerInputFiles: [
+            "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/Cosmics/CERN/CORSIKA/standard/p_showers_*db",
+            "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/Cosmics/CERN/CORSIKA/standard/He_showers_*db",
+            "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/Cosmics/CERN/CORSIKA/standard/N_showers_*db",
+            "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/Cosmics/CERN/CORSIKA/standard/Mg_showers_*db",
+            "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/Cosmics/CERN/CORSIKA/standard/Fe_showers_*db"
+         ]
+         TimeOffset: -3.325e-3
+         module_label: "cosmicgenerator"
+         module_type: "CORSIKAGen"
+      }
+
+physics.simulate: [
+  "generator",
+  "cosmicgenerator", 
+  "largeant",
+  "daq",
+  "rns"
+  ]
+

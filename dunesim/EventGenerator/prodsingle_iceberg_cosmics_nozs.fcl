@@ -1,0 +1,6 @@
+#include "prodsingle_iceberg_cosmics.fcl"
+
+physics.producers.daq.CompressionType: "none"
+physics.producers.daq.SaveEmptyChannel: true
+
+# physics.producers.daq.ZeroThreshold: 1
