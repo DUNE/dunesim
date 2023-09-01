@@ -84,7 +84,8 @@ dune10kt_42Kfrom42Ar_in_LAr:{
 dune10kt_42Kfrom42Ar_in_CPA:{ // if somebody change the geom of the cathode, the activity will need to change
    module_type: "Decay0Gen"
    isotope: "K42"
-   volume_gen: "volGroundGrid" // The rest of the 42K go to the cathode
+   // volume_gen: "volGroundGrid" // Name until geometry v4
+   volume_gen: "volCathodeGrid" // The rest of the 42K go to the cathode
    BqPercc: 0.0029 //!\\ beware this number need to be tunned based on the geometry of the cathode. Current one is based on HD and 1x2x6 geo.
    // This number needs to be adjusted such that:
    // The rate of decays of dune10kt_42Kfrom42Ar_in_LAr + dune10kt_42Kfrom42Ar_in_CPA = dune10kt_42Kfrom42Ar_in_LAr
@@ -94,14 +95,16 @@ dune10kt_42Kfrom42Ar_in_CPA:{ // if somebody change the geom of the cathode, the
 dune10kt_40K_in_CPA:{
    module_type: "Decay0Gen"
    isotope: "K40"
-   volume_gen: "volGroundGrid"
+   // volume_gen: "volGroundGrid" // Name until geometry v4
+   volume_gen: "volCathodeGrid" 
    material: ".*"
    BqPercc: 0.0091  # 4.9 Bq/kg (measured for 40K) times a density of 1.85 g/cc.
 }
 
 dune10kt_238U_chain_in_CPA:{
    module_type: "Decay0Gen"
-   volume_gen: "volGroundGrid"
+   // volume_gen: "volGroundGrid" // Name until geometry v4
+   volume_gen: "volCathodeGrid" 
    material: ".*"
    decay_chain:{ # ALL THESE ARE ASSUMED TO BE @ EQUILIBRIUM!!
       isotope_0:"U238"
