@@ -489,7 +489,7 @@ void evgen::ProtoDUNETriggeredBeam::beginJob(){
       otherInstrumentTreeNames.push_back(fBPROFEXTTreeName.c_str());
     otherInstrumentTreeNames.push_back(fBPROF4TreeName.c_str());
 
-    for(const std::string treeName : otherInstrumentTreeNames){ 
+    for(const std::string &treeName : otherInstrumentTreeNames){ 
       TTree *instrumentTree = (TTree*)inputFile->Get(treeName.c_str());
       fBeamUtils.FillInstrumentInformation(triggeredEventIDs, instrumentTree, fAllBeamEvents);
       std::cout << " - Finished adding information from " << treeName << std::endl;
