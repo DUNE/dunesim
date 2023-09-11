@@ -798,11 +798,11 @@ void PDSPDataDrivenBeam::Scale2DRes() {
     TH2D * this_hist = it->second;
     for (int i = 1; i <= this_hist->GetNbinsX(); ++i) {
       double integral = this_hist->TH1::Integral(i, i);
-      double total = 0.;
+      // double total = 0.; // unused
       for (int j = 1; j <= this_hist->GetNbinsY(); ++j) {
         this_hist->SetBinContent(i, j,
             this_hist->GetBinContent(i, j) / integral);
-        total += this_hist->GetBinContent(i, j);
+        // total += this_hist->GetBinContent(i, j); // unused
       }
     }
   }
@@ -813,11 +813,11 @@ void PDSPDataDrivenBeam::Scale2DRes() {
       TH2D * this_hist = it->second;
       for (int i = 1; i <= this_hist->GetNbinsX(); ++i) {
         double integral = this_hist->TH1::Integral(i, i);
-        double total = 0.;
+        // double total = 0.; // unused
         for (int j = 1; j <= this_hist->GetNbinsY(); ++j) {
           this_hist->SetBinContent(i, j,
               this_hist->GetBinContent(i, j) / integral);
-          total += this_hist->GetBinContent(i, j);
+          // total += this_hist->GetBinContent(i, j); // unused
         }
       }
 
@@ -829,11 +829,11 @@ void PDSPDataDrivenBeam::Scale2DRes() {
       TH2D * this_hist = it->second;
       for (int i = 1; i <= this_hist->GetNbinsX(); ++i) {
         double integral = this_hist->TH1::Integral(i, i);
-        double total = 0.;
+        // double total = 0.; // unused
         for (int j = 1; j <= this_hist->GetNbinsY(); ++j) {
           this_hist->SetBinContent(i, j,
               this_hist->GetBinContent(i, j) / integral);
-          total += this_hist->GetBinContent(i, j);
+          // total += this_hist->GetBinContent(i, j); // unused
         }
       }
 
