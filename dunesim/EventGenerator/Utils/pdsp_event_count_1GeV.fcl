@@ -1,8 +1,13 @@
 #include "PDSPG4Beamline1GeVFiles.fcl"
 #include "prod4_gen_protoDUNE_beam_cosmics.fcl"
 
+SkipGamma: true
+
 Files: [
-  "/pnfs/dune/persistent/dunepro/beam_data/simulation/G4beamlineVersion3.06/v34b_1GeV_G4beamlineVersion3.06/H4_v34b_1GeV_-27.7_10M_579.root"
+#  "/pnfs/dune/persistent/dunepro/beam_data/simulation/G4beamlineVersion3.06/v34b_1GeV_G4beamlineVersion3.06/H4_v34b_1GeV_-27.7_10M_579.root",
+#"/pnfs/dune/persistent/dunepro/beam_data/simulation/G4beamlineVersion3.06/v34b_1GeV_G4beamlineVersion3.06/H4_v34b_1GeV_-27.7_10M_580.root",
+#"/pnfs/dune/persistent/dunepro/beam_data/simulation/G4beamlineVersion3.06/v34b_1GeV_G4beamlineVersion3.06/H4_v34b_1GeV_-27.7_10M_581.root",
+"/pnfs/dune/persistent/dunepro/beam_data/simulation/G4beamlineVersion3.06/v34b_1GeV_G4beamlineVersion3.06/H4_v34b_1GeV_-27.7_10M_582.root"
 ]
 #Files: @local::Files1GeV
 #Files: [

@@ -405,3 +405,18 @@ void evgen::ProtoDUNETriggeredBeamUtils::RotateMonitorVector(TVector3 &vec){
   vec.RotateY( fRotateMonitorXZ * TMath::Pi() / 180. );
 
 }
+
+evgen::OverlaidTriggerEvent evgen::ProtoDUNETriggeredBeamUtils::GenerateOverlaidEvent(
+    const int &trigEventID, const std::map<int, BeamEvent> & allBeamEvents,
+    int overlays) {
+
+  OverlaidTriggerEvent newTriggerEvent(trigEventID);
+  // Look to see if any of these neighbouring events had particles
+  for(int overlayID = trigEventID - (overlays / 2); overlayID < trigEventID + (overlays/2); ++overlayID){
+    if(allBeamEvents.find(overlayID) == allBeamEvents.end()) continue;
+    
+    newTriggerEvent.AddOverlay(overlayID);
+  }
+
+  return newTriggerEvent;
+}

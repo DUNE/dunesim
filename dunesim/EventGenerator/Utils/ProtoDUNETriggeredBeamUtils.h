@@ -34,7 +34,7 @@ namespace evgen {
      fMomY    = momY;
      fMomZ    = momZ;
    };
-   void Print(){
+   void Print() const {
      std::cout << "Particle " << fPDG << ": (" << fPosX << "," << fPosY << "," << fPosZ << "," << fPosT << ") "
                               << ": (" << fMomX << "," << fMomY << "," << fMomZ << ") " << std::endl;
    };
@@ -130,6 +130,10 @@ namespace evgen {
   void RotateMonitorVector(TVector3 &vec);
 
   bool GetIsNP02() {return fIsNP02;};
+
+  OverlaidTriggerEvent GenerateOverlaidEvent(
+      const int & trigEventID, const std::map<int, BeamEvent> & allBeamEvents,
+      int overlays);
 
   private:
    bool fReduceNP04frontArea;

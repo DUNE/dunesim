@@ -15,7 +15,12 @@ struct CountConfig {
       fTRIG1TreeName(generator.get<std::string>("TRIG1TreeName")),
       fBPROFEXTTreeName(generator.get<std::string>("BPROFEXTTreeName", "")),
       fBPROF4TreeName(generator.get<std::string>("BPROF4TreeName")),
-      fTRIG2TreeName(generator.get<std::string>("TRIG2TreeName")) {};
+      fTRIG2TreeName(generator.get<std::string>("TRIG2TreeName")),
+      fIntensity(generator.get<float>("Intensity")),
+      fReadoutWindow(generator.get<float>("ReadoutWindow")),
+      fBeamSpillLength(generator.get<float>("BeamSpillLength")) {
+    fOverlays = fIntensity * (2.0 * fReadoutWindow / 1000.) / fBeamSpillLength;
+  };
 
   std::string fNP04frontTreeName;
   std::string fTOF1TreeName;
@@ -26,6 +31,10 @@ struct CountConfig {
   std::string fBPROFEXTTreeName;
   std::string fBPROF4TreeName;
   std::string fTRIG2TreeName;
+  float fIntensity;
+  float fReadoutWindow;
+  float fBeamSpillLength;
+  int fOverlays;
 };
 
 fhicl::ParameterSet GetGenerator(fhicl::ParameterSet & pset);

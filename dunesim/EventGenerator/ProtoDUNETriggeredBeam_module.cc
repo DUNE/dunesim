@@ -84,6 +84,7 @@ namespace evgen{
         void CalculateNOverlays();
         
         // Group the events to overlay a number of background events on each trigger event
+        // TODO -- DEPRECATED
         OverlaidTriggerEvent GenerateOverlaidEvent(const int &trigEventID);
 
         // Generate a true event based on a single entry from the input tree.
@@ -583,7 +584,9 @@ void evgen::ProtoDUNETriggeredBeam::produce(art::Event & e)
     beam::ProtoDUNEBeamEvent beamEvent;
  
     // Group the events together: a triggered event with fOverlay background events
-    OverlaidTriggerEvent overlayEvent = GenerateOverlaidEvent(fFinalTriggerEventIDs.at(fEventNumber));
+    //OverlaidTriggerEvent overlayEvent = GenerateOverlaidEvent(fFinalTriggerEventIDs.at(fEventNumber));
+    OverlaidTriggerEvent overlayEvent = fBeamUtils.GenerateOverlaidEvent(
+        fFinalTriggerEventIDs.at(fEventNumber), fAllBeamEvents, fOverlays);
 
     // Fill the MCTruth object
     fOutputEvent = e.id().event();
@@ -605,6 +608,7 @@ void evgen::ProtoDUNETriggeredBeam::produce(art::Event & e)
 //--------------------------------------------------------------------------------------
 
 // Group the events to overlay a number of background events on each trigger event
+// TODO -- DEPRECATED
 OverlaidTriggerEvent evgen::ProtoDUNETriggeredBeam::GenerateOverlaidEvent(const int &trigEventID)
 {
   OverlaidTriggerEvent newTriggerEvent(trigEventID);
