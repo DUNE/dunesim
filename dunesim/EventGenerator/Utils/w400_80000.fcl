@@ -1,0 +1,6 @@
+#include "PDSPG4Beamline1GeVFiles.fcl"
+#include "prod4_gen_protoDUNE_beam_cosmics.fcl"
+
+Files: [
+  "/pnfs/dune/scratch/users/calcuttj/August2023/H4Prod_80000_W400_1/H4_v34b_1GeV_W400_10M_1.root"
+]
