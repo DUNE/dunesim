@@ -152,7 +152,7 @@ protodunehd_larg4detector:
 protodunevd_larg4detector:
 {
     category      : "world"
-    gdmlFileName_ : @local::protodunevd_v2_geo.GDML
+    gdmlFileName_ : @local::protodunevd_v3_geo.GDML
     volumeNames   : ["volTPCActive", "volCryostat"] # list of volumes for which the stepLimit should be set
     stepLimits    : [0.3, 0.3] # corresponding stepLimits in mm for the volumes in the volumeNames list
 }
