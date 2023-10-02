@@ -293,4 +293,30 @@ dune_fd_genie_atmo_max_hondaflux.FluxCopyMethod: "DIRECT"
 dune_fd_genie_atmo_min_hondaflux: @local::dune_fd_genie_atmo_max_hondaflux
 dune_fd_genie_atmo_min_hondaflux.FluxFiles: ["hms-ally-20-12-solmin.d","hms-ally-20-12-solmin.d","hms-ally-20-12-solmin.d","hms-ally-20-12-solmin.d"]
 
+#Weighted generation framework for the HEP WG production
+dune_fd_genie_atmo_max_weighted_honda: @local::dune_fd_genie_atmo
+dune_fd_genie_atmo_max_weighted_honda.TopVolume:  "volCryostat"
+dune_fd_genie_atmo_max_weighted_honda.GenFlavors: [-14, 14, 12, -12, 16, -16]
+dune_fd_genie_atmo_max_weighted_honda.FluxType: "atmo_POWER"
+dune_fd_genie_atmo_max_weighted_honda.SpectralIndex: 2.5
+dune_fd_genie_atmo_max_weighted_honda.AtmoEmin: 0.1 
+dune_fd_genie_atmo_max_weighted_honda.AtmoEmax: 100 
+dune_fd_genie_atmo_max_weighted_honda.ForceApplyFlxWgt: true
+dune_fd_genie_atmo_max_weighted_honda.FluxSearchPaths: "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/TaskForce_Flux/atmos/Honda_interp/"                                                        
+dune_fd_genie_atmo_max_weighted_honda.FluxFiles: [
+  "honda_2d_homestake_2015_numu.root",
+  "honda_2d_homestake_2015_numu.root",
+  "honda_2d_homestake_2015_numu.root",
+  "honda_2d_homestake_2015_numu.root",
+  "honda_2d_homestake_2015_numu.root",
+  "honda_2d_homestake_2015_numu.root"
+  ] #Using nu_mu flux as a baseline to weight all the events.
+dune_fd_genie_atmo_max_weighted_honda.FluxCopyMethod: "DIRECT"
+dune_fd_genie_atmo_max_weighted_honda.FiducialCut: "mbox:-363,-608,-0,363,608,1394" #Only interactions in the active volume
+dune_fd_genie_atmo_max_weighted_honda: {
+    @table::dune_fd_genie_atmo_max_weighted_honda
+    @table::dune_fd_atmo_flux_rotation_precise
+}
+
+
 END_PROLOG
