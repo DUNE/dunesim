@@ -1510,7 +1510,7 @@ void evgen::ProtoDUNEBeam::MomentumSpectrometer( beam::ProtoDUNEBeamEvent & beam
   double x3 = -1.e-3 * GetPosition( f3 );
 
   double cos_theta = MomentumCosTheta( x1, x2, x3 );
-  double momentum = 299792458*fLB/(1.E9 * acos(cos_theta));
+  double momentum = 299792458.0*fLB/(1.E9 * acos(cos_theta));
   beamEvent.AddRecoBeamMomentum( momentum );
 
 }

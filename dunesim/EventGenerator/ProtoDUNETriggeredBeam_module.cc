@@ -1553,7 +1553,7 @@ void evgen::ProtoDUNETriggeredBeam::MomentumSpectrometer( beam::ProtoDUNEBeamEve
   const double x3 = -1.e-3 * GetPosition( f3 );
 
   const double cos_theta = MomentumCosTheta( x1, x2, x3 );
-  const double momentum = 299792458*fLB/(1.E9 * acos(cos_theta));
+  const double momentum = 299792458.0*fLB/(1.E9 * acos(cos_theta));
   beamEvent.AddRecoBeamMomentum( momentum );
 
 }
