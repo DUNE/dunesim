@@ -57,6 +57,7 @@ namespace sim{
     if (name == "TOF1" || name == "TRIG2"){
       Float_t delta_t = 20.;
 //      if (name == "TOF1") srand (static_cast <unsigned> (time(0)*9));
+//      error: implicit conversion from 'int' to 'float' changes value from 2147483647 to 2147483648
       Float_t t_test = t - delta_t/2. + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(delta_t)));
       Float_t p_test = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX));
       Float_t p_gauss = ProtoDUNEBeamInstrument::UnitGauss(t,t_test,fResolution);
@@ -70,11 +71,13 @@ namespace sim{
     if (name == "BPROFEXT" || name == "BPROF4"){
       Float_t delta_x = 40.;
 //      srand (static_cast <unsigned> (time(0)*99));
+//      error: implicit conversion from 'int' to 'float' changes value from 2147483647 to 2147483648
       Float_t x_test = x -delta_x/2. + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(delta_x)));
       Float_t p_test = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX));
       Float_t p_gauss = ProtoDUNEBeamInstrument::UnitGauss(x,x_test,fResolution);
       while (p_test > p_gauss){
         p_test = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX)); 
+//      error: implicit conversion from 'int' to 'float' changes value from 2147483647 to 2147483648
         x_test = x -delta_x/2. + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(delta_x)));
         p_gauss = ProtoDUNEBeamInstrument::UnitGauss(x,x_test,fResolution);
       }
