@@ -489,7 +489,7 @@ void evgen::ProtoDUNETriggeredBeam::beginJob(){
       otherInstrumentTreeNames.push_back(fBPROFEXTTreeName.c_str());
     otherInstrumentTreeNames.push_back(fBPROF4TreeName.c_str());
 
-    for(const std::string treeName : otherInstrumentTreeNames){ 
+    for(const std::string &treeName : otherInstrumentTreeNames){ 
       TTree *instrumentTree = (TTree*)inputFile->Get(treeName.c_str());
       fBeamUtils.FillInstrumentInformation(triggeredEventIDs, instrumentTree, fAllBeamEvents);
       std::cout << " - Finished adding information from " << treeName << std::endl;
@@ -1096,11 +1096,11 @@ void evgen::ProtoDUNETriggeredBeam::Scale2DRes() {
     TH2D * this_hist = it->second;
     for (int i = 1; i <= this_hist->GetNbinsX(); ++i) {
       const double integral = this_hist->TH1::Integral(i, i);
-      double total = 0.;
+      // double total = 0.; // unused
       for (int j = 1; j <= this_hist->GetNbinsY(); ++j) {
         this_hist->SetBinContent(i, j,
             this_hist->GetBinContent(i, j) / integral);
-        total += this_hist->GetBinContent(i, j);
+        // total += this_hist->GetBinContent(i, j); // unused
       }
     }
   }
@@ -1553,7 +1553,7 @@ void evgen::ProtoDUNETriggeredBeam::MomentumSpectrometer( beam::ProtoDUNEBeamEve
   const double x3 = -1.e-3 * GetPosition( f3 );
 
   const double cos_theta = MomentumCosTheta( x1, x2, x3 );
-  const double momentum = 299792458*fLB/(1.E9 * acos(cos_theta));
+  const double momentum = 299792458.0*fLB/(1.E9 * acos(cos_theta));
   beamEvent.AddRecoBeamMomentum( momentum );
 
 }

@@ -365,7 +365,7 @@ std::vector<int> evgen::ProtoDUNETriggeredBeamUtils::FindTriggeredEvents(
       event.fHasInteracted = true;
       // Find the child particle in the map
       std::cout << "- Candidate event " << trigEventIDs.size() << " trigger particle of type " << trig2Particles.at(element.first).fPDG << " not at the front face... searching for children" << std::endl;
-        for(const std::pair<int,BeamParticle> &partPair : event.fParticlesFront){
+        for(const std::pair<int,BeamParticle> partPair : event.fParticlesFront){
         if(partPair.second.fParentID == event.fTriggerID){
           std::cout << "  - Found child with PDG = " << partPair.second.fPDG << std::endl;
           event.fSecondaryTrackIDs.push_back(partPair.first);

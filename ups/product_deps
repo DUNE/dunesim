@@ -36,7 +36,7 @@ table_fragment_end
 
 product          version
 cetbuildtools	 v8_20_00	-	only_for_build
-dunecore         v09_78_03d01
+dunecore         v09_78_06d00
 genie_xsec       v3_04_00       -       optional
 genie_phyopt     v3_04_00
 end_product_list
@@ -45,8 +45,12 @@ end_product_list
 # We now define allowed qualifiers and the corresponding qualifiers for the depdencies.
 # Make a table by adding columns before "notes".
 qualifier       dunecore      genie_xsec              genie_phyopt    notes
+c14:debug       c14:debug     AR2320i00000:e1000:k250 dkcharmtau   
+c14:prof        c14:prof      AR2320i00000:e1000:k250 dkcharmtau   
 c7:debug        c7:debug      AR2320i00000:e1000:k250 dkcharmtau   
 c7:prof         c7:prof       AR2320i00000:e1000:k250 dkcharmtau   
+e26:debug       e26:debug     AR2320i00000:e1000:k250  dkcharmtau    
+e26:prof        e26:prof      AR2320i00000:e1000:k250  dkcharmtau   
 e20:debug       e20:debug     AR2320i00000:e1000:k250  dkcharmtau    
 e20:prof        e20:prof      AR2320i00000:e1000:k250  dkcharmtau   
 end_qualifier_list
