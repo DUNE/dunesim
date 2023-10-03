@@ -435,7 +435,8 @@ dune10kt_1x2x6_neutron_from_rock: // Center region is added to simulate neutrons
 dune10kt_1x2x6_gammas_from_cavernwall_atLAr: // Convinced myself again that best is to have only one 1cm thin vertical center plane at inner APA to emulate external backgrounds comming in through cryostat (and not at the CPAs that are unrealistically positioned on the outside in the 1x2x6), and then two 1cm thin planes on top and bottom both 25cm offset from TPC, and similarly at both faces. This should more accurately represent the worst case scenario in the FD HD. - J. Reichenbacher (05/05/2023)
 {
    module_type:           "RadioGen"
-   Nuclide:               ["CavernGammasAtLArFlux", "CavernGammasAtLArFlux", "CavernGammasAtLArFlux", "CavernGammasAtLArFlux", "CavernGammasAtLArFlux"] # downscaled above 3.3 MeV for overestimated (alpha, gamma) production in Geant4 -JReichenbacher (05/16/2023)
+   Nuclide:               ["FDcavernGammasAtLArFlux", "FDcavernGammasAtLArFlux", "FDcavernGammasAtLArFlux", "FDcavernGammasAtLArFlux", "FDcavernGammasAtLArFlux"] # downscaled above 3.3 MeV for overestimated (alpha, gamma) production in Geant4 -JReichenbacher (05/16/2023)
+   PathToFile:             "Flux/Radionuclides/v03_02_01/"
    Material:              [".*",".*",".*",".*",".*"]
    BqPercc:               [ 1.05104, 1.05104, 1.05104, 1.05104, 1.05104 ] # activity -- Becquerels per cc. 1.05104 assumes 4pi flux of 0.25597 gammas/(cm^2 sec) at LAr interface propagated from cavernwalls (rock+shotcrete SDSMT assay data) and impact factor 3.0 (~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
    T0:                    [ -2246000.,-2246000.,-2246000.,-2246000.,-2246000 ] # starting time in ns
@@ -454,7 +455,8 @@ dune10kt_1x2x6_gammas_from_cavernwall_atLAr: // Convinced myself again that best
 dune10kt_1x2x6_gammas_from_foam_atLAr: // Convinced myself again that best is to have only one 1cm thin vertical center plane at inner APA to emulate external backgrounds comming in through cryostat (and not at the CPAs that are unrealistically positioned on the outside in the 1x2x6), and then two 1cm thin planes on top and bottom both 25cm offset from TPC, and similarly at both faces. This should more accurately represent the worst case scenario in the FD HD. - J. Reichenbacher (05/05/2023)
 {
    module_type:           "RadioGen"
-   Nuclide:               ["foamGammasAtLArFlux", "foamGammasAtLArFlux", "foamGammasAtLArFlux", "foamGammasAtLArFlux", "foamGammasAtLArFlux"] # downscaled above 3.3 MeV for overestimated (alpha, gamma) production in Geant4 -JReichenbacher (05/16/2023)
+   Nuclide:               ["FDfoamGammasAtLArFlux", "FDfoamGammasAtLArFlux", "FDfoamGammasAtLArFlux", "FDfoamGammasAtLArFlux", "FDfoamGammasAtLArFlux"] # downscaled above 3.3 MeV for overestimated (alpha, gamma) production in Geant4 -JReichenbacher (05/16/2023)
+   PathToFile:             "Flux/Radionuclides/v03_02_01/"
    Material:              [".*",".*",".*",".*",".*"]
    BqPercc:               [ 0.0441274, 0.0441274, 0.0441274, 0.0441274, 0.0441274 ] # activity -- Becquerels per cc. is 4pi flux of 0.0441274 gammas/(cm^2 sec) at LAr interface propagated from R-PUF foam (ICPMS PNNL assay data from C. Jackson) -JReichenbacher (06/13/2023)
    T0:                    [ -2246000.,-2246000.,-2246000.,-2246000.,-2246000 ] # starting time in ns
@@ -473,7 +475,8 @@ dune10kt_1x2x6_gammas_from_foam_atLAr: // Convinced myself again that best is to
 dune10kt_1x2x6_neutrons_from_cavernwall_atLAr: // Convinced myself again that best is to have only one 1cm thin vertical center plane at inner APA to emulate external backgrounds comming in through cryostat (and not at the CPAs that are unrealistically positioned on the outside in the 1x2x6), and then two 1cm thin planes on top and bottom both 25cm offset from TPC, and similarly at both faces. This should more accurately represent the worst case scenario in the FD HD. - J. Reichenbacher (05/05/2023)
 {
    module_type:           "RadioGen"
-   Nuclide:               ["CavernNeutronsAtLArFlux", "CavernNeutronsAtLArFlux", "CavernNeutronsAtLArFlux", "CavernNeutronsAtLArFlux", "CavernNeutronsAtLArFlux"]
+   Nuclide:               ["FDcavernNeutronsAtLArFlux", "FDcavernNeutronsAtLArFlux", "FDcavernNeutronsAtLArFlux", "FDcavernNeutronsAtLArFlux", "FDcavernNeutronsAtLArFlux"]
+   PathToFile:             "Flux/Radionuclides/v03_02_01/"
    Material:              [".*",".*",".*",".*",".*"]
    BqPercc:               [ 0.00000026996, 0.00000026996, 0.00000026996, 0.00000026996, 0.00000026996 ] # activity -- Becquerels per cc. 0.00000026996 assumes 4pi flux of 0.00000009862 neutrons/(cm^2 sec) at LAr interface propagated from cavernwalls (rock+shotcrete SDSMT assay data) and impact factor 2.0 (less than for gammas, ~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
    T0:                    [ -2246000.,-2246000.,-2246000.,-2246000.,-2246000 ] # starting time in ns
@@ -492,7 +495,8 @@ dune10kt_1x2x6_neutrons_from_cavernwall_atLAr: // Convinced myself again that be
 dune10kt_1x2x6_CryostatNGammas_from_CavernNeutrons_atLAr: // Convinced myself again that best is to have only one 1cm thin vertical center plane at inner APA to emulate external backgrounds comming in through cryostat (and not at the CPAs that are unrealistically positioned on the outside in the 1x2x6), and then two 1cm thin planes on top and bottom both 25cm offset from TPC, and similarly at both faces. This should more accurately represent the worst case scenario in the FD HD. - J. Reichenbacher (05/05/2023)
 {
    module_type:           "RadioGen"
-   Nuclide:               ["CryostatNGammasAtLArFluxFromCavernNeutrons", "CryostatNGammasAtLArFluxFromCavernNeutrons", "CryostatNGammasAtLArFluxFromCavernNeutrons", "CryostatNGammasAtLArFluxFromCavernNeutrons", "CryostatNGammasAtLArFluxFromCavernNeutrons"]
+   Nuclide:               ["FDcryostatNGammasAtLArFluxFromCavernNeutrons", "FDcryostatNGammasAtLArFluxFromCavernNeutrons", "FDcryostatNGammasAtLArFluxFromCavernNeutrons", "FDcryostatNGammasAtLArFluxFromCavernNeutrons", "FDcryostatNGammasAtLArFluxFromCavernNeutrons"]
+   PathToFile:             "Flux/Radionuclides/v03_02_01/"
    Material:              [".*",".*",".*",".*",".*"]
    BqPercc:               [ 0.0000016793, 0.0000016793, 0.0000016793, 0.0000016793, 0.0000016793 ] # activity -- Becquerels per cc. 0.0000016793 assumes 4pi flux of 0.00000061347 Ngammas/(cm^2 sec) at LAr interface stemming from n-captures in cryostat due to propagated cavernwall neutrons (rock+shotcrete SDSMT assay data) and impact factor 2.0 (less than for caverngammas, ~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
    T0:                    [ -2246000.,-2246000.,-2246000.,-2246000.,-2246000 ] # starting time in ns
@@ -511,7 +515,8 @@ dune10kt_1x2x6_CryostatNGammas_from_CavernNeutrons_atLAr: // Convinced myself ag
 dune10kt_1x2x6_CavernNGammas_atLAr: // Convinced myself again that best is to have only one 1cm thin vertical center plane at inner APA to emulate external backgrounds comming in through cryostat (and not at the CPAs that are unrealistically positioned on the outside in the 1x2x6), and then two 1cm thin planes on top and bottom both 25cm offset from TPC, and similarly at both faces. This should more accurately represent the worst case scenario in the FD HD. - J. Reichenbacher (05/05/2023)
 {
    module_type:           "RadioGen"
-   Nuclide:               ["CavernNGammasAtLArFlux", "CavernNGammasAtLArFlux", "CavernNGammasAtLArFlux", "CavernNGammasAtLArFlux", "CavernNGammasAtLArFlux"]
+   Nuclide:               ["FDcavernNGammasAtLArFlux", "FDcavernNGammasAtLArFlux", "FDcavernNGammasAtLArFlux", "FDcavernNGammasAtLArFlux", "FDcavernNGammasAtLArFlux"]
+   PathToFile:             "Flux/Radionuclides/v03_02_01/"
    Material:              [".*",".*",".*",".*",".*"]
    BqPercc:               [ 0.0000005439, 0.0000005439, 0.0000005439, 0.0000005439, 0.0000005439 ] # activity -- Becquerels per cc. 0.0000005439 assumes 4pi flux of 0.0000001987 Ngammas/(cm^2 sec) at LAr interface propagated through cryostat stemming from n-captures in rock+shotcrete (SDSMT assay data) and impact factor 2.0 (for n-captures less than for direct caverngammas, ~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
    T0:                    [ -2246000.,-2246000.,-2246000.,-2246000.,-2246000 ] # starting time in ns
