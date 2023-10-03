@@ -50,7 +50,7 @@ namespace sim{
   ProtoDUNEBeamInstrument ProtoDUNEbeamsim::GetInstrument(std::string name) const{
     ProtoDUNEBeamInstrument temp;
     bool found = false;
-    for(auto const inst : fAllInstruments){
+    for(auto const &inst : fAllInstruments){
       if(name == inst.GetInstrumentName()){
         temp = inst;
         found = true;

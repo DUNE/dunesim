@@ -352,11 +352,13 @@ void DPhaseRealisticNoiseService::mirrorWaveform(AdcSignalVector& noise,
   }//end if
 
   //Correct the waveform inclination
-  double y, sx = 0, sy = 0, sxy = 0, sx2 = 0, sy2 = 0;
+  // double y, sx = 0, sy = 0, sxy = 0, sx2 = 0, sy2 = 0; // sy2 set but not used
+  double y, sx = 0, sy = 0, sxy = 0, sx2 = 0;
 
   for (size_t s = 0; s < (size_t)TimeSamples; ++s)
   {
-      y = noise[s]; sx += s; sy += y; sxy += s*y; sx2 += s*s; sy2 += y*y;
+      // y = noise[s]; sx += s; sy += y; sxy += s*y; sx2 += s*s; sy2 += y*y; // sy2 set but not used
+      y = noise[s]; sx += s; sy += y; sxy += s*y; sx2 += s*s;
   }
   double ssx = sx2 - ((sx * sx) / TimeSamples);
   double c = sxy - ((sx * sy) / TimeSamples);

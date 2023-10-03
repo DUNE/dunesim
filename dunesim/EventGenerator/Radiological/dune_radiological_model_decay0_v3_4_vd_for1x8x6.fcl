@@ -1,0 +1,464 @@
+#include "services_dune.fcl"
+
+BEGIN_PROLOG
+# -JReichenbacher (01/11/2017)
+#  v2.01/JS: use only generator and not also arGen
+#  v2.1-02142017/JR: moved photon paddles by (0.5+0.476+0.001) cm in x
+#  v2.2-02222017/JR: cut out LAr volume inside APA around PDs (-0.477,...,0.477) cm in x
+#  v2.3-03212017/JR: include neutrons emitted from concrete of membrane cryostat structure (temporarily placed at aluminum field cage positions in sim.)
+#  v2.4-05122017/JS: Removed the LAr cut out. Added in the 210po generation near the PDs. Disabled FC (Until Neutrons can be pushed to LArData.)
+#  v2.5-05252017/JS: Added in 85Kr as a background in LAr using the WARP collaboration rates. https://arxiv.org/pdf/astro-ph/0603131.pdf
+#  v2.6-05302017/JS: Added neutronGen back in, using the Concrete_DUNE1 spectrum (by JR). New spectrum will be in dune_pardata.
+#  v2.7-06062017/JS: Added material specific generation for LAr contaminants.
+#  v2.8-06092017/JS: Reconfigured this to be an include for a typical job. This file will now host generators for the various radiologicals, but will not run a simulation itself.
+#  v3.0-19072021/Pierre Lasorak: Copy and past dune_radiological_model.fcl, and addapt to decay0
+#  v3.1-05052023/Juergen Reichenbacher: Incorporate full 10kton geometry propagated external backgrounds (Gleb Sinev's TGraphs), 232Th decay chain, 220Rn in LAr, and more conservative APA radioimpurities
+#  v3.1.1-05162023/Juergen Reichenbacher: Incorporate more and worst shotcrete case full 10kton geometry propagated external backgrounds (use Juergen's scaled and normalized TGraphs that used Gleb Sinev's background propagation sim files), 232Th decay chain, 220Rn in LAr, and more conservative APA radioimpurities
+#  v3.1.2-06132023/Juergen Reichenbacher: Increased external background rates by area factor of 1.3687 (= cryostat surface / argon surface) and foamGammas rate by 4pi/2pi correction
+#  v3.1.3.VD-08142023/Juergen Reichenbacher: started porting v3 to VD (fine-tuned for external background planes upper z-position from 1000 cm to 996 cm based on Sergio Manthey's and Gleb Sinev's validations)
+#  v3.1.4.VD-09152023/Juergen Reichenbacher: Changed external background planes to have larger dead LAr gap of 78cm, except for top (25cm conservatively as ambiguous dimension numbers have been found for top)
+#                                            Checked on Arapuca and implemented Rn daughter plate-out for Tile X-Arapuca geometry, added 232Th decay chain background in Cathode, added U, Th, K backgrounds in CRP (Anode)
+#                                            Added migration backgrounds from 222Rn and 220Rn decay products in LAr & with new 'delta-fct.' method in LAr 5 cm above Cathode FRP frame
+#                                            Added more realistic migration of 42K from 42Ar to upper cathode mesh using new 'delta-fct.' method in LAr 5 cm above Cathode FRP frame too
+
+// Leave '1x2x6' and everything "should work" for '1x8x6' to minimize changes  -JReichenbacher (09/15/2023)
+
+#The Generator names provided that should be called from other files are:
+#dune10kt_1x2x6_39ar     #Ar39 in LAr
+#dune10kt_1x2x6_APA      #Co60 in APA frame
+#dune10kt_1x2x6_neutron  #Originally use for K40 in Field Cage. Now repurposed for Neutrons from concrete.
+#dune10kt_1x2x6_CPA      #K40 from CPA
+#dune10kt_1x2x6_85kr     #Kr in LAr
+#dune10kt_1x2x6_222rn    #Rn in LAr
+#dune10kt_1x2x6_210po    #po for 1 cm in front of PDs (approximates effect of Rn daughters on PDs
+#
+
+dune10kt_1x2x6_weird_beta_example_in_LAr: # a dummy example
+{
+   # module_type: "Decay0Gen"
+   module_type: "SpectrumVolumeGen"
+   isotope:     "11"
+   material:    "LAr"
+   spectrum_p_min: 0
+   spectrum_p_max: 0.01
+   spectrum: [0,0,1,1,1,1,4,4,1,1,0,0]
+   ## OR
+   # spectrum_p_min: 0
+   # spectrum_p_max: 0.01
+   # nbins:100
+   # function: "[0]*x+[1]*x*x+[2]"
+   # parameters: [100,0,0]
+   ## OR
+   # spectrum: [0,1,4,4,1.5]
+   # bins: [0.,0.02,0.04,0.08,0.15,0.3]
+   ## OR
+   # bins: [0.,0.02,0.04,0.08,0.15,0.3]
+   # function: "[0]*x+[1]*x*x+[2]"
+   # parameters: [100,0,0]
+   BqPercc: 0.00141 # activity -- Becquerels per cc. 0.00141 assumes 1.01 Bq/kg (typical for 39Ar) and a density of 1.396 g/cc for LAr
+   volume_rand: "volCryostat"
+}
+
+dune10kt_85Kr_in_LAr:{
+   module_type: "Decay0Gen"
+   isotope: "Kr85"
+   volume_rand: "volCryostat"
+   material: "LAr"
+   BqPercc: 0.00016# Rate tied to LAr using rates established by the WARP collaboration. https://arxiv.org/pdf/astro-ph/0603131.pdf
+}
+
+dune10kt_39Ar_in_LAr:{
+   module_type: "Decay0Gen"
+   isotope: "Ar39"
+   volume_rand: "volCryostat"
+   material: "LAr"
+   BqPercc: 0.00141 # activity -- Becquerels per cc. 0.00141 assumes 1.01 Bq/kg (typical for 39Ar) and a density of 1.396 g/cc for LAr
+}
+
+dune10kt_42Ar_in_LAr:{
+   module_type: "Decay0Gen"
+   isotope: "Ar42"
+   volume_rand: "volCryostat"
+   material: "LAr"
+   BqPercc: 0.0000001283768 // No clue where this number comes from (see dune_radiological_model.fcl) (Thiago 2022)
+   # JReichenbacher (09/14/2023): Checked above number matching rate from paper by Barabash in conference proceeding http://iopscience.iop.org/article/10.1088/1742-6596/718/6/062004/pdf
+}
+
+dune10kt_42Kfrom42Ar_in_LAr:{
+   module_type: "Decay0Gen"
+   isotope: "K42"
+   volume_rand: "volCryostat"
+   material:    "LAr"
+   BqPercc: 0.00000002567536 // = 0.0000001283768*.2  as only 20% of the 42K stays in the Argon...
+}
+
+dune10kt_42Kfrom42Ar_in_Cathode:{ // don't use this anymore as CathodeGrid is only the FRP frame with big void squares (use migration to upper cathode mesh below)
+   module_type: "Decay0Gen"
+   isotope: "K42"
+   #volume_gen: ".*Cathode.*" // The rest of the 42K goes to the cathode
+   volume_gen: "volCathodeGrid"
+   #material: ".*"
+   material: "G10"
+   BqPercc: 0.000033377968 // = 0.0000001283768*.8*650*2/4  80% of 42K drifts from 650 cm on 4 cm thick cathode box from 2 sides and 20% of the 42K stays in the Argon... (JR 08/14/2023)
+}
+
+dune10kt_42Kfrom42Ar_in_upperCathodeMesh:{
+   module_type: "Decay0Gen"
+   isotope: "K42"
+   volume_rand: "volCryostat"
+   material: "LAr"
+   BqPercc: 4.5394e-5 // CHANGED to 0.0000001283768*.8*650*0.68  80% of 42K drifts from 650 cm on upper cathode mesh from 1 side and 20% of the 42K stays in LAr (68 C.L. for +/- 1sigma=0.5 cm)  -JReichenbacher (09/26/2023)
+   distrib_x: "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
+}
+
+
+dune10kt_40K_in_Cathode:{ // does NOT depend anymore on thickness of 'CathodeGrid' for FRP frame in VD
+   module_type: "Decay0Gen"
+   isotope: "K40"
+   #volume_gen:".*Cathode.*"
+   volume_gen: "volCathodeGrid"
+   #material: ".*"
+   material: "G10"
+   #BqPercc: 0.0091
+   # Should be 4.9 Bq/kg (measured for 40K) times a density of 1.85 g/cc for 3 mm thick G10 -JReichenbacher (01/11/2017)
+   # For Decay0 assume for now FR4 sheet for VD cathode that is 1 cm thick and ignore 4 cm thickness for now (JR 08/30/2023)
+   BqPercc: 0.01225
+   # new SDSMT FR4 assay result on K40 is 7.0 Bq/kg and thickness of FRP frame beams is 4 cm with measured density of 1.75 g/cm^3 -JReichenbacher (09/22/2023)
+}
+
+dune10kt_238U_chain_in_Cathode:{ // does NOT depend anymore on thickness of 'CathodeGrid' for FRP frame in VD
+   module_type: "Decay0Gen"
+   volume_gen: "volCathodeGrid"
+   #material: ".*"
+   material: "G10"
+   decay_chain:{ # ALL THESE ARE ASSUMED TO BE @ EQUILIBRIUM!!
+      isotope_0:"U238"
+      isotope_1:"Th234"
+      isotope_2:"Pa234m"
+      isotope_3:"U234"
+      isotope_4:"Th230"
+      isotope_5:"Ra226"
+      isotope_6:"Rn222"
+      isotope_7:"Po218"
+      isotope_8:"Pb214"
+      isotope_9:"Bi214"
+      isotope_10:"Pb210"
+      isotope_11:"Bi210"
+      isotope_12:"Po210"
+   }
+   #BqPercc: 1.13e-4
+   # Should be 6.105e-2 Bq/kg times a density of 1.85 g/cc for 3 mm thick G10 -JReichenbacher (01/11/2017)
+   # For Decay0 3mm factor is not needed, since full cathode volume is retrieved from the MC geometry - TBezerra (18/02/2022)
+   BqPercc: 8.925e-3
+   # new SDSMT FR4 assay result on lateU w/U235 correction is 5.1 Bq/kg and thickness of FRP frame beams is 4 cm with measured density of 1.75 g/cm^3 -JReichenbacher (09/22/2023)
+}
+
+dune10kt_232Th_chain_in_Cathode:{ // does NOT depend anymore on thickness of 'CathodeGrid' for FRP frame in VD
+   module_type: "Decay0Gen"
+   volume_gen: "volCathodeGrid"
+   #material: ".*"
+   material: "G10"
+   decay_chain:{ # ALL THESE ARE ASSUMED TO BE @ EQUILIBRIUM!! Use decay_chain w/ isotope_x instead of Nuclide as a first for 232Th decay chain (JR 27Sept2022)
+      isotope_0:"Ra228"  # 232Th not yet defined in BxDecay0 (cf. https://github.com/BxCppDev/bxdecay0#list-of-standard-radioactive-isotopes-backgroundcalibration)
+      isotope_1:"Ac228"
+      isotope_2:"Pb212"  # 228Th, 224Ra, 220Rn, 216Po all not yet defined in BxDecay0
+      isotope_3:"Bi212"  # for Bi212+Po212
+      isotope_4:"Tl208"
+   }
+   BqPercc: 0.0126
+   # new SDSMT FR4 assay result on 232Th is 7.2 Bq/kg and thickness of FRP frame beams is 4 cm with measured density of 1.75 g/cm^3 -JReichenbacher (09/22/2023)
+}
+
+
+dune10kt_40K_in_Anode:{ // does depend on thickness of 'AnodePlate' for VD
+   module_type: "Decay0Gen"
+   isotope: "K40"
+   volume_gen: "volAnodePlate"
+   material: "vm2000"
+   BqPercc: 0.4001
+   # new SDSMT FR4 assay result on K40 is 7.0 Bq/kg and thickness of 2x PCBs (perforated FR4) is 0.25" with measured eff. density of 0.90 g/cm^3 that is placed into 0.01 cm thin AnodePlate (vm2000) -JReichenbacher (09/22/2023)
+   # 7.0 Bq / 1000 * 0.25*2.54 / 0.01 *0.9/cc = 0.4001 Bq/cc
+}
+
+dune10kt_238U_chain_in_Anode:{ // does depend on thickness of 'AnodePlate' for VD
+   module_type: "Decay0Gen"
+   volume_gen: "volAnodePlate"
+   material: "vm2000"
+   decay_chain:{ # ALL THESE ARE ASSUMED TO BE @ EQUILIBRIUM!!
+      isotope_0:"U238"
+      isotope_1:"Th234"
+      isotope_2:"Pa234m"
+      isotope_3:"U234"
+      isotope_4:"Th230"
+      isotope_5:"Ra226"
+      isotope_6:"Rn222"
+      isotope_7:"Po218"
+      isotope_8:"Pb214"
+      isotope_9:"Bi214"
+      isotope_10:"Pb210"
+      isotope_11:"Bi210"
+      isotope_12:"Po210"
+   }
+   BqPercc: 0.2915
+   # new SDSMT FR4 assay result on lateU w/U235 correction is 5.1 Bq/kg and thickness of 2x PCBs (perforated FR4) is 0.25" with measured eff. density of 0.90 g/cm^3 -JReichenbacher (09/22/2023)
+   # that is placed into 0.01 cm thin AnodePlate (vm2000) -JReichenbacher (09/22/2023)
+   # 5.1 Bq / 1000 * 0.25*2.54 / 0.01 *0.9/cc = 0.2915 Bq/cc
+}
+
+dune10kt_232Th_chain_in_Anode:{ // does depend on thickness of 'AnodePlate' for VD
+   module_type: "Decay0Gen"
+   volume_gen: "volAnodePlate"
+   material: "vm2000"
+   decay_chain:{ # ALL THESE ARE ASSUMED TO BE @ EQUILIBRIUM!! Use decay_chain w/ isotope_x instead of Nuclide as a first for 232Th decay chain (JR 27Sept2022)
+      isotope_0:"Ra228"  # 232Th not yet defined in BxDecay0 (cf. https://github.com/BxCppDev/bxdecay0#list-of-standard-radioactive-isotopes-backgroundcalibration)
+      isotope_1:"Ac228"
+      isotope_2:"Pb212"  # 228Th, 224Ra, 220Rn, 216Po all not yet defined in BxDecay0
+      isotope_3:"Bi212"  # for Bi212+Po212
+      isotope_4:"Tl208"
+   }
+   BqPercc: 0.4115
+   # new SDSMT FR4 assay result on 232Th is 7.2 Bq/kg and thickness of 2x PCBs (perforated FR4) is 0.25" with measured eff. density of 0.90 g/cm^3 -JReichenbacher (09/22/2023)
+   # 7.2 Bq / 1000 * 0.25*2.54 / 0.01 *0.9/cc = 0.4115 Bq/cc
+}
+
+
+dune10kt_222Rn_chain_in_LAr:{ #only use this if x-profile not needed
+   module_type:"Decay0Gen"
+   BqPercc: 0.000001395
+   volume_rand: "volCryostat"
+   material: "LAr"
+   decay_chain:{ # ALL THESE ARE ASSUMED TO BE @ EQUILIBRIUM!!
+      isotope_0:"Rn222"
+      isotope_1:"Po218"
+      isotope_2:"Pb214"
+      isotope_3:"Bi214"
+      isotope_4:"Pb210"
+      isotope_5:"Bi210"
+      isotope_6:"Po210"
+   }
+}
+
+
+dune10kt_222Rn_chain_222RnOnly_in_LAr:{
+   module_type:"Decay0Gen"
+   BqPercc: 0.000001395
+   volume_rand: "volCryostat"
+   material: "LAr"
+   isotope:"Rn222"
+}
+
+
+dune10kt_222Rn_chain_218PoOnly_in_LAr:{
+   @table::dune10kt_222Rn_chain_222RnOnly_in_LAr
+   isotope:"Po218"
+   BqPercc: 0.0000012942 # Rn222 rate minus the 7.2257% on the cathode
+   distrib_x: "10255.2+(41.3788*TMath::Abs(325.-x))-(0.135462*(325.-x)*(325.-x))+(0.000203379*TMath::Power(TMath::Abs(325.-x),3))-(1.14356e-007*TMath::Power(TMath::Abs(325.-x),4))"
+}
+dune10kt_222Rn_chain_218PoOnly_in_upperCathodeMesh:{
+   @table::dune10kt_222Rn_chain_218PoOnly_in_LAr
+#  module_type:"Decay0Gen"
+#  volume_rand: "volCryostat"
+#  material: "LAr"
+   isotope:"Po218"
+   BqPercc: 4.45529e-5 // CHANGED to 0.000001395*7.2257% ions * 1*650cm upper drift collection * 0.68 C.L. for +/- sigma of 0.5 cm range  -JReichenbacher (09/22/2023)
+#  BqPercc: 0.001 // only for quick check of 'delta-fct.' method (otherwise use line above!)
+   distrib_x: "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
+}
+
+
+dune10kt_222Rn_chain_214PbOnly_in_LAr:{
+   @table::dune10kt_222Rn_chain_222RnOnly_in_LAr
+   isotope:"Pb214"
+   BqPercc: 0.00000094574 # Rn222 rate minus the 32.2051% on the cathode
+   distrib_x: "6520.63+(26.8336*TMath::Abs(325.-x))-(0.0516248*(325.-x)*(325.-x))+(3.858e-005*TMath::Power(TMath::Abs(325.-x),3))"
+}
+dune10kt_222Rn_chain_214PbOnly_in_upperCathodeMesh:{
+   @table::dune10kt_222Rn_chain_214PbOnly_in_LAr
+   isotope:"Pb214"
+   BqPercc: 1.98573e-4 // CHANGED to 0.000001395*32.2051% ions * 1*650cm upper drift collection * 0.68 C.L. for +/- sigma of 0.5 cm range  -JReichenbacher (09/25/2023)
+   distrib_x: "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
+}
+
+
+dune10kt_222Rn_chain_214BiOnly_in_LAr:{
+   @table::dune10kt_222Rn_chain_222RnOnly_in_LAr
+   isotope:"Bi214"
+   BqPercc: 0.00000059253 # Rn222 rate minus the 57.5246% on the cathode
+   distrib_x: "2997.66+(14.8718*TMath::Abs(325.-x))-(0.00824868*(325.-x)*(325.-x))"
+}
+dune10kt_222Rn_chain_214BiOnly_in_upperCathodeMesh:{
+   @table::dune10kt_222Rn_chain_214BiOnly_in_LAr
+   isotope:"Bi214"
+   BqPercc: 3.54691e-4 // CHANGED to 0.000001395*57.5246% ions * 1*650cm upper drift collection * 0.68 C.L. for +/- sigma of 0.5 cm range  -JReichenbacher (09/25/2023)
+   distrib_x: "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
+}
+
+
+dune10kt_222Rn_chain_210PbOnly_in_LAr:{
+   @table::dune10kt_222Rn_chain_222RnOnly_in_LAr
+   isotope:"Pb210"
+   BqPercc: 0.00000037411 # Rn222 rate minus the 73.1822% on the cathode
+   distrib_x: "1863.42+(9.70072*TMath::Abs(325.-x))-(0.0057322*(325.-x)*(325.-x))"
+}
+dune10kt_222Rn_chain_210PbOnly_in_upperCathodeMesh:{
+   @table::dune10kt_222Rn_chain_210PbOnly_in_LAr
+   isotope:"Pb210"
+   BqPercc: 4.51234e-4 // CHANGED to 0.000001395*73.1822% ions * 1*650cm upper drift collection * 0.68 C.L. for +/- sigma of 0.5 cm range  -JReichenbacher (09/25/2023)
+   distrib_x: "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
+}
+
+
+dune10kt_222Rn_chain_from210Bi_in_upperCathodeMesh:{
+   @table::dune10kt_222Rn_chain_210PbOnly_in_upperCathodeMesh
+   BqPercc: 4.51234e-4 // CHANGED to same new number as for 210Pb in upperCathodeMesh b/c 210Bi is 210Pb daughter and assume decay products stay in upperCathodeMesh  -JReichenbacher (09/25/2023)
+   isotope: @erase
+   decay_chain:{ # ALL THESE ARE ASSUMED TO BE @ EQUILIBRIUM!!
+      isotope_0:"Bi210"
+      isotope_1:"Po210"
+   }
+   distrib_x: "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
+}
+
+
+dune10kt_222Rn_chain_in_PDS:{
+   module_type:"Decay0Gen"
+   # HD Arapucas have the following size: 2.3 x 11.8 x 209.2, this makes a total AREA of 5,953.72 cm^2
+   # 0.2 Bq/m^2 is the requirement
+   # total activity is then: 0.11907 Bq / Arapuca
+   # this translate to 0.11907/(2.3x11.8x209.2) = 0.000021 Bq/cm^3
+   #BqPercc: 0.000021  // Checked on the above calculation again for HD Arapucas and then adjusted it below for VD X-Arapuca Tiles  -JReichenbacher (09/21/2023)
+   # VD X-Arapuca Tiles have the following size: 2.5 cm thick x 63 cm x 63 cm (60cm x 60cm effective)
+   # this translate to 0.17136/(2.5x63x63) = 0.000017 Bq/cm^3
+   BqPercc: 0.000017
+   volume_gen: ".*Arapuca.*"
+   decay_chain:{ # ALL THESE ARE ASSUMED TO BE @ EQUILIBRIUM!!
+      isotope_0:"Pb210"
+      isotope_1:"Bi210"
+      isotope_2:"Po210"
+   }
+}
+
+
+dune10kt_220Rn_chain_212PbOnly_in_LAr:{
+   @table::dune10kt_222Rn_chain_in_LAr
+   BqPercc: 0.00000015252 # 0.00000045756 of Rn222 divided by 3 for Rn220 rate minus the 67.2% on the cathode (assume 1st order flat x-distribution  -JReichenbacher 09/25/2023)
+   distrib_x: @erase
+   isotope: @erase
+ decay_chain:{ # ALL THESE ARE ASSUMED TO BE @ EQUILIBRIUM!! Use decay_chain w/ isotope_x instead of Nuclide as a first for 232Th decay chain (JR 27Sept2022)
+    isotope_0:"Pb212"  # 228Th, 224Ra, 220Rn, 216Po all not yet defined in BxDecay0 (cf. https://github.com/BxCppDev/bxdecay0#list-of-standard-radioactive-isotopes-backgroundcalibration)
+    isotope_1:"Bi212"  # for Bi212+Po212
+    isotope_2:"Tl208"
+ }
+   # distrib_x:"259.482+1.58444*TMath::Abs(x)-0.00214077*x*x+1.95097e-06*TMath::Power(TMath::Abs(x),3)"  // better assume flat to 1st order as approximation over full 650 cm of VD drift
+}
+
+dune10kt_220Rn_chain_from212Pb_in_upperCathodeMesh:{
+   @table::dune10kt_222Rn_chain_in_LAr
+   BqPercc: 1.38116e-4 # from 222Rn decay chain divided by 3 corresponding to SD Mines assay results for ProtoDUNE Cu-getter and mol-sieve filter materials w/ accumulation as below  -JReichenbacher (09/25/2023)
+   # CHANGED to (0.000001395/3)*67.2% ions * 1*650cm upper drift collection * 0.68 C.L. for +/- sigma of 0.5 cm range
+   isotope: @erase
+ decay_chain:{ # ALL THESE ARE ASSUMED TO BE @ EQUILIBRIUM!! Use decay_chain w/ isotope_x instead of Nuclide as a first for 232Th decay chain (JR 27Sept2022)
+    isotope_0:"Pb212"  # 228Th, 224Ra, 220Rn, 216Po all not yet defined in BxDecay0 (cf. https://github.com/BxCppDev/bxdecay0#list-of-standard-radioactive-isotopes-backgroundcalibration)
+    isotope_1:"Bi212"  # for Bi212+Po212
+    isotope_2:"Tl208"
+ }
+   distrib_x: "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
+}
+
+
+// This is MASSIVELY dependent on the geometry
+dune10kt_1x8x6_gammas_from_cavernwall_atLAr: // Convinced myself that best is to have four 1cm thin vertical planes on sides (along x-drift in rotated VD geo) to emulate external backgrounds coming in through cryostat (but NO PLANE at the horizontal Cathode that is realistically positioned on the inside at half height in the VD), and then just one 1cm thin plane on top, all approx. 25cm offset from active TPC. This should more accurately represent the worst case scenario in the FD VD. - J. Reichenbacher (08/14/2023)
+{
+   module_type:           "RadioGen"
+   Nuclide:               ["CavernGammasAtLArFlux", "CavernGammasAtLArFlux", "CavernGammasAtLArFlux", "CavernGammasAtLArFlux", "CavernGammasAtLArFlux"] # downscaled above 3.3 MeV for overestimated (alpha, gamma) production in Geant4 -JReichenbacher (05/16/2023)
+   Material:              [".*",".*",".*",".*",".*"]
+   BqPercc:               [ 1.05104, 1.05104, 1.05104, 1.05104, 1.05104 ] # activity -- Becquerels per cc. 1.05104 assumes 4pi flux of 0.25597 gammas/(cm^2 sec) at LAr interface propagated from cavernwalls (rock+shotcrete SDSMT assay data) and impact factor 3.0 (~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
+   T0:                    [ -4285000.,-4285000.,-4285000.,-4285000.,-4285000 ] # starting time in ns
+   T1:                    [  4285000., 4285000., 4285000., 4285000., 4285000 ] # ending time in ns
+
+   X0:                    [ -420. , -420. , -420., -420. ,  349.5 ] # in cm in world coordinates, low x-values of planes
+   X1:                    [  350. ,  350. ,  350.,  350. ,  350.5 ] # in cm in world coordinates, high x-values of planes
+   Y0:                    [ -750. , -750. , -751.,  750. , -750.  ] # in cm in world coordinates, low y-values of planes
+   Y1:                    [  750. ,  750. , -750.,  751. ,  750.  ] # in cm in world coordinates, high y-values of planes
+   Z0:                    [  -78.5,  973.5,  -78.,  -78. ,  -78.  ] # in cm in world coordinates, low z-values of planes
+   Z1:                    [  -77.5,  974.5,  974.,  974. ,  974.  ] # in cm in world coordinates, high z-values of planes
+}
+
+
+// This is MASSIVELY dependent on the geometry
+dune10kt_1x8x6_gammas_from_foam_atLAr: // Convinced myself that best is to have four 1cm thin vertical planes on sides (along x-drift in rotated VD geo) to emulate external backgrounds coming in through cryostat (but NO PLANE at the horizontal Cathode that is realistically positioned on the inside at half height in the VD), and then just one 1cm thin plane on top, all approx. 25cm offset from active TPC. This should more accurately represent the worst case scenario in the FD VD. - J. Reichenbacher (08/14/2023)
+{
+   module_type:           "RadioGen"
+   Nuclide:               ["foamGammasAtLArFlux", "foamGammasAtLArFlux", "foamGammasAtLArFlux", "foamGammasAtLArFlux", "foamGammasAtLArFlux"] # downscaled above 3.3 MeV for overestimated (alpha, gamma) production in Geant4 -JReichenbacher (05/16/2023)
+   Material:              [".*",".*",".*",".*",".*"]
+   BqPercc:               [ 0.0441274, 0.0441274, 0.0441274, 0.0441274, 0.0441274 ] # activity -- Becquerels per cc. is 4pi flux of 0.0441274 gammas/(cm^2 sec) at LAr interface propagated from R-PUF foam (ICPMS PNNL assay data from C. Jackson) -JReichenbacher (06/13/2023)
+   T0:                    [ -4285000.,-4285000.,-4285000.,-4285000.,-4285000 ] # starting time in ns
+   T1:                    [  4285000., 4285000., 4285000., 4285000., 4285000 ] # ending time in ns
+
+   X0:                    [ -420. , -420. , -420., -420. ,  349.5 ] # in cm in world coordinates, low x-values of planes
+   X1:                    [  350. ,  350. ,  350.,  350. ,  350.5 ] # in cm in world coordinates, high x-values of planes
+   Y0:                    [ -750. , -750. , -751.,  750. , -750.  ] # in cm in world coordinates, low y-values of planes
+   Y1:                    [  750. ,  750. , -750.,  751. ,  750.  ] # in cm in world coordinates, high y-values of planes
+   Z0:                    [  -78.5,  973.5,  -78.,  -78. ,  -78.  ] # in cm in world coordinates, low z-values of planes
+   Z1:                    [  -77.5,  974.5,  974.,  974. ,  974.  ] # in cm in world coordinates, high z-values of planes
+}
+
+
+// This is MASSIVELY dependent on the geometry
+dune10kt_1x8x6_neutrons_from_cavernwall_atLAr: // Convinced myself that best is to have four 1cm thin vertical planes on sides (along x-drift in rotated VD geo) to emulate external backgrounds coming in through cryostat (but NO PLANE at the horizontal Cathode that is realistically positioned on the inside at half height in the VD), and then just one 1cm thin plane on top, all approx. 25cm offset from active TPC. This should more accurately represent the worst case scenario in the FD VD. - J. Reichenbacher (08/14/2023)
+{
+   module_type:           "RadioGen"
+   Nuclide:               ["CavernNeutronsAtLArFlux", "CavernNeutronsAtLArFlux", "CavernNeutronsAtLArFlux", "CavernNeutronsAtLArFlux", "CavernNeutronsAtLArFlux"]
+   Material:              [".*",".*",".*",".*",".*"]
+   BqPercc:               [ 0.00000026996, 0.00000026996, 0.00000026996, 0.00000026996, 0.00000026996 ] # activity -- Becquerels per cc. 0.00000026996 assumes 4pi flux of 0.00000009862 neutrons/(cm^2 sec) at LAr interface propagated from cavernwalls (rock+shotcrete SDSMT assay data) and impact factor 2.0 (less than for gammas, ~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
+   T0:                    [ -4285000.,-4285000.,-4285000.,-4285000.,-4285000 ] # starting time in ns
+   T1:                    [  4285000., 4285000., 4285000., 4285000., 4285000 ] # ending time in ns
+
+   X0:                    [ -420. , -420. , -420., -420. ,  349.5 ] # in cm in world coordinates, low x-values of planes
+   X1:                    [  350. ,  350. ,  350.,  350. ,  350.5 ] # in cm in world coordinates, high x-values of planes
+   Y0:                    [ -750. , -750. , -751.,  750. , -750.  ] # in cm in world coordinates, low y-values of planes
+   Y1:                    [  750. ,  750. , -750.,  751. ,  750.  ] # in cm in world coordinates, high y-values of planes
+   Z0:                    [  -78.5,  973.5,  -78.,  -78. ,  -78.  ] # in cm in world coordinates, low z-values of planes
+   Z1:                    [  -77.5,  974.5,  974.,  974. ,  974.  ] # in cm in world coordinates, high z-values of planes
+}
+
+
+// This is MASSIVELY dependent on the geometry
+dune10kt_1x8x6_CryostatNGammas_from_CavernNeutrons_atLAr: // Convinced myself that best is to have four 1cm thin vertical planes on sides (along x-drift in rotated VD geo) to emulate external backgrounds coming in through cryostat (but NO PLANE at the horizontal Cathode that is realistically positioned on the inside at half height in the VD), and then just one 1cm thin plane on top, all approx. 25cm offset from active TPC. This should more accurately represent the worst case scenario in the FD VD. - J. Reichenbacher (08/14/2023)
+{
+   module_type:           "RadioGen"
+   Nuclide:               ["CryostatNGammasAtLArFluxFromCavernNeutrons", "CryostatNGammasAtLArFluxFromCavernNeutrons", "CryostatNGammasAtLArFluxFromCavernNeutrons", "CryostatNGammasAtLArFluxFromCavernNeutrons", "CryostatNGammasAtLArFluxFromCavernNeutrons"]
+   Material:              [".*",".*",".*",".*",".*"]
+   BqPercc:               [ 0.0000016793, 0.0000016793, 0.0000016793, 0.0000016793, 0.0000016793 ] # activity -- Becquerels per cc. 0.0000016793 assumes 4pi flux of 0.00000061347 Ngammas/(cm^2 sec) at LAr interface stemming from n-captures in cryostat due to propagated cavernwall neutrons (rock+shotcrete SDSMT assay data) and impact factor 2.0 (less than for caverngammas, ~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
+   T0:                    [ -4285000.,-4285000.,-4285000.,-4285000.,-4285000 ] # starting time in ns
+   T1:                    [  4285000., 4285000., 4285000., 4285000., 4285000 ] # ending time in ns
+
+   X0:                    [ -420. , -420. , -420., -420. ,  349.5 ] # in cm in world coordinates, low x-values of planes
+   X1:                    [  350. ,  350. ,  350.,  350. ,  350.5 ] # in cm in world coordinates, high x-values of planes
+   Y0:                    [ -750. , -750. , -751.,  750. , -750.  ] # in cm in world coordinates, low y-values of planes
+   Y1:                    [  750. ,  750. , -750.,  751. ,  750.  ] # in cm in world coordinates, high y-values of planes
+   Z0:                    [  -78.5,  973.5,  -78.,  -78. ,  -78.  ] # in cm in world coordinates, low z-values of planes
+   Z1:                    [  -77.5,  974.5,  974.,  974. ,  974.  ] # in cm in world coordinates, high z-values of planes
+}
+
+
+// This is MASSIVELY dependent on the geometry
+dune10kt_1x8x6_CavernNGammas_atLAr: // Convinced myself that best is to have four 1cm thin vertical planes on sides (along x-drift in rotated VD geo) to emulate external backgrounds coming in through cryostat (but NO PLANE at the horizontal Cathode that is realistically positioned on the inside at half height in the VD), and then just one 1cm thin plane on top, all approx. 25cm offset from active TPC. This should more accurately represent the worst case scenario in the FD VD. - J. Reichenbacher (08/14/2023)
+{
+   module_type:           "RadioGen"
+   Nuclide:               ["CavernNGammasAtLArFlux", "CavernNGammasAtLArFlux", "CavernNGammasAtLArFlux", "CavernNGammasAtLArFlux", "CavernNGammasAtLArFlux"]
+   Material:              [".*",".*",".*",".*",".*"]
+   BqPercc:               [ 0.0000005439, 0.0000005439, 0.0000005439, 0.0000005439, 0.0000005439 ] # activity -- Becquerels per cc. 0.0000005439 assumes 4pi flux of 0.0000001987 Ngammas/(cm^2 sec) at LAr interface propagated through cryostat stemming from n-captures in rock+shotcrete (SDSMT assay data) and impact factor 2.0 (for n-captures less than for direct caverngammas, ~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
+   T0:                    [ -4285000.,-4285000.,-4285000.,-4285000.,-4285000 ] # starting time in ns
+   T1:                    [  4285000., 4285000., 4285000., 4285000., 4285000 ] # ending time in ns
+
+   X0:                    [ -420. , -420. , -420., -420. ,  349.5 ] # in cm in world coordinates, low x-values of planes
+   X1:                    [  350. ,  350. ,  350.,  350. ,  350.5 ] # in cm in world coordinates, high x-values of planes
+   Y0:                    [ -750. , -750. , -751.,  750. , -750.  ] # in cm in world coordinates, low y-values of planes
+   Y1:                    [  750. ,  750. , -750.,  751. ,  750.  ] # in cm in world coordinates, high y-values of planes
+   Z0:                    [  -78.5,  973.5,  -78.,  -78. ,  -78.  ] # in cm in world coordinates, low z-values of planes
+   Z1:                    [  -77.5,  974.5,  974.,  974. ,  974.  ] # in cm in world coordinates, high z-values of planes
+}
+
+
+END_PROLOG

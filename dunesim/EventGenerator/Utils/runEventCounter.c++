@@ -206,7 +206,7 @@ void CountFile(std::string filename, CountConfig & config, std::ofstream & outpu
     otherInstrumentTreeNames.push_back(config.fBPROFEXTTreeName.c_str());
   otherInstrumentTreeNames.push_back(config.fBPROF4TreeName.c_str());
 
-  for(const std::string treeName : otherInstrumentTreeNames){ 
+  for(const std::string &treeName : otherInstrumentTreeNames){ 
     TTree *instrumentTree = (TTree*)fIn->Get(treeName.c_str());
     beam_utils.FillInstrumentInformation(triggeredEventIDs, instrumentTree, allBeamEvents);
     std::cout << " - Finished adding information from " << treeName << std::endl;
