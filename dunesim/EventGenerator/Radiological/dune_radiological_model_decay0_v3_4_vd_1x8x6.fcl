@@ -18,7 +18,6 @@ dune10kt_1x8x6_gammas_from_cavernwall_atLAr:
    BqPercc:               [ 1.05104, 1.05104, 1.05104, 1.05104, 1.05104 ] # activity -- Becquerels per cc. 1.05104 assumes 4pi flux of 0.25597 gammas/(cm^2 sec) at LAr interface propagated from cavernwalls (rock+shotcrete SDSMT assay data) and impact factor 3.0 (~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
    T0:                    [ -4285000.,-4285000.,-4285000.,-4285000.,-4285000 ] # starting time in ns
    T1:                    [  4285000., 4285000., 4285000., 4285000., 4285000 ] # ending time in ns
-
    X0:                    [ -420. , -420. , -420., -420. ,  349.5 ] # in cm in world coordinates, low x-values of planes
    X1:                    [  350. ,  350. ,  350.,  350. ,  350.5 ] # in cm in world coordinates, high x-values of planes
    Y0:                    [ -750. , -750. , -751.,  750. , -750.  ] # in cm in world coordinates, low y-values of planes

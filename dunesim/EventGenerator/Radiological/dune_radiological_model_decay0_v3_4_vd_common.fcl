@@ -12,55 +12,41 @@ BEGIN_PROLOG
 // Leave '1x2x6' and everything "should work" for '1x8x6' to minimize changes  -JReichenbacher (09/15/2023)
 
 
-dune10kt_42Kfrom42Ar_in_Cathode:{ // don't use this anymore as CathodeGrid is only the FRP frame with big void squares (use migration to upper cathode mesh below)
-   module_type: "Decay0Gen"
-   isotope: "K42"
-   #volume_gen: ".*Cathode.*" // The rest of the 42K goes to the cathode
-   volume_gen: "volCathodeGrid"
-   material: "G10"
-   BqPercc: 0.000033377968 // = 0.0000001283768*.8*650*2/4  80% of 42K drifts from 650 cm on 4 cm thick cathode box from 2 sides and 20% of the 42K stays in the Argon... (JR 08/14/2023)
-}
-
 dune10kt_42Kfrom42Ar_in_upperCathodeMesh:{
    module_type: "Decay0Gen"
    isotope: "K42"
    volume_rand: "volCryostat"
    material: "LAr"
-   BqPercc: 4.5394e-5 // CHANGED to 0.0000001283768*.8*650*0.68  80% of 42K drifts from 650 cm on upper cathode mesh from 1 side and 20% of the 42K stays in LAr (68 C.L. for +/- 1sigma=0.5 cm)  -JReichenbacher (09/26/2023)
+   BqPercc: 4.5394e-5 # CHANGED to 0.0000001283768*.8*650*0.68  80% of 42K drifts from 650 cm on upper cathode mesh from 1 side and 20% of the 42K stays in LAr (68 C.L. for +/- 1sigma=0.5 cm)  -JReichenbacher (09/26/2023)
    distrib_x: "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
 }
 
 
-dune10kt_40K_in_Cathode:{ // does NOT depend anymore on thickness of 'CathodeGrid' for FRP frame in VD
+dune10kt_40K_in_Cathode:{ /#/ does NOT depend anymore on thickness of 'CathodeGrid' for FRP frame in VD
    module_type: "Decay0Gen"
    isotope: "K40"
    volume_gen: "volCathodeGrid"
    material: "G10"
-   #BqPercc: 0.0091
    # Should be 4.9 Bq/kg (measured for 40K) times a density of 1.85 g/cc for 3 mm thick G10 -JReichenbacher (01/11/2017)
    # For Decay0 assume for now FR4 sheet for VD cathode that is 1 cm thick and ignore 4 cm thickness for now (JR 08/30/2023)
    BqPercc: 0.01225
    # new SDSMT FR4 assay result on K40 is 7.0 Bq/kg and thickness of FRP frame beams is 4 cm with measured density of 1.75 g/cm^3 -JReichenbacher (09/22/2023)
 }
 
-dune10kt_238U_chain_in_Cathode:             @local::dune10kt_1x2x6_238U_chain_in_CPA  // does NOT depend anymore on thickness of 'CathodeGrid' for FRP frame in VD
+dune10kt_238U_chain_in_Cathode:             @local::dune10kt_1x2x6_238U_chain_in_CPA  # does NOT depend anymore on thickness of 'CathodeGrid' for FRP frame in VD
 dune10kt_238U_chain_in_Cathode.volume_gen:  "volCathodeGrid"
 dune10kt_238U_chain_in_Cathode.material:    "G10"
-   #BqPercc: 1.13e-4
-   # Should be 6.105e-2 Bq/kg times a density of 1.85 g/cc for 3 mm thick G10 -JReichenbacher (01/11/2017)
-   # For Decay0 3mm factor is not needed, since full cathode volume is retrieved from the MC geometry - TBezerra (18/02/2022)
 dune10kt_238U_chain_in_Cathode.BqPercc:     8.925e-3
-}
+
 
 dune10kt_232Th_chain_in_Cathode:              @local:: dune10kt_1x2x6_232Th_chain_in_CPA #does NOT depend anymore on thickness of 'CathodeGrid' for FRP frame in VD
 dune10kt_232Th_chain_in_Cathode.volume_gen:   "volCathodeGrid"
 dune10kt_232Th_chain_in_Cathode.material:     "G10"
 dune10kt_232Th_chain_in_Cathode.BqPercc:      0.0126
    # new SDSMT FR4 assay result on 232Th is 7.2 Bq/kg and thickness of FRP frame beams is 4 cm with measured density of 1.75 g/cm^3 -JReichenbacher (09/22/2023)
-}
 
 
-dune10kt_40K_in_Anode:{ // does depend on thickness of 'AnodePlate' for VD
+dune10kt_40K_in_Anode:{ # does depend on thickness of 'AnodePlate' for VD
    module_type: "Decay0Gen"
    isotope: "K40"
    volume_gen: "volAnodePlate"
