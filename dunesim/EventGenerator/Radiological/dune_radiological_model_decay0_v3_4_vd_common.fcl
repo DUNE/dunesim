@@ -1,5 +1,5 @@
 #include "services_dune.fcl"
-#include "dune_radiological_model_decay0_v3_4_vd_common.fcl"
+#include "dune_radiological_model_decay0_v3_4_hd_common.fcl"
 
 BEGIN_PROLOG
 # -JReichenbacher (01/11/2017)
@@ -22,16 +22,13 @@ dune10kt_42Kfrom42Ar_in_upperCathodeMesh:{
 }
 
 
-dune10kt_40K_in_Cathode:{ /#/ does NOT depend anymore on thickness of 'CathodeGrid' for FRP frame in VD
-   module_type: "Decay0Gen"
-   isotope: "K40"
-   volume_gen: "volCathodeGrid"
-   material: "G10"
+dune10kt_40K_in_Cathode:              @local::dune10kt_1x2x6_40K_in_CPA # does NOT depend anymore on thickness of 'CathodeGrid' for FRP frame in VD
+dune10kt_40K_in_Cathode.volume_gen:   "volCathodeGrid"
+dune10kt_40K_in_Cathode.material:     "G10"
    # Should be 4.9 Bq/kg (measured for 40K) times a density of 1.85 g/cc for 3 mm thick G10 -JReichenbacher (01/11/2017)
    # For Decay0 assume for now FR4 sheet for VD cathode that is 1 cm thick and ignore 4 cm thickness for now (JR 08/30/2023)
-   BqPercc: 0.01225
+dune10kt_40K_in_Cathode.BqPercc:      0.01225
    # new SDSMT FR4 assay result on K40 is 7.0 Bq/kg and thickness of FRP frame beams is 4 cm with measured density of 1.75 g/cm^3 -JReichenbacher (09/22/2023)
-}
 
 dune10kt_238U_chain_in_Cathode:             @local::dune10kt_1x2x6_238U_chain_in_CPA  # does NOT depend anymore on thickness of 'CathodeGrid' for FRP frame in VD
 dune10kt_238U_chain_in_Cathode.volume_gen:  "volCathodeGrid"
@@ -39,24 +36,21 @@ dune10kt_238U_chain_in_Cathode.material:    "G10"
 dune10kt_238U_chain_in_Cathode.BqPercc:     8.925e-3
 
 
-dune10kt_232Th_chain_in_Cathode:              @local:: dune10kt_1x2x6_232Th_chain_in_CPA #does NOT depend anymore on thickness of 'CathodeGrid' for FRP frame in VD
+dune10kt_232Th_chain_in_Cathode:              @local::dune10kt_1x2x6_232Th_chain_in_CPA #does NOT depend anymore on thickness of 'CathodeGrid' for FRP frame in VD
 dune10kt_232Th_chain_in_Cathode.volume_gen:   "volCathodeGrid"
 dune10kt_232Th_chain_in_Cathode.material:     "G10"
 dune10kt_232Th_chain_in_Cathode.BqPercc:      0.0126
    # new SDSMT FR4 assay result on 232Th is 7.2 Bq/kg and thickness of FRP frame beams is 4 cm with measured density of 1.75 g/cm^3 -JReichenbacher (09/22/2023)
 
 
-dune10kt_40K_in_Anode:{ # does depend on thickness of 'AnodePlate' for VD
-   module_type: "Decay0Gen"
-   isotope: "K40"
-   volume_gen: "volAnodePlate"
-   material: "vm2000"
-   BqPercc: 0.4001
+dune10kt_40K_in_Anode:             @local::dune10kt_40K_in_APAboards   # does depend on thickness of 'AnodePlate' for VD
+dune10kt_40K_in_Anode.volume_gen:  "volAnodePlate"
+dune10kt_40K_in_Anode.material:    "vm2000"
+dune10kt_40K_in_Anode.BqPercc:     0.4001
    # new SDSMT FR4 assay result on K40 is 7.0 Bq/kg and thickness of 2x PCBs (perforated FR4) is 0.25" with measured eff. density of 0.90 g/cm^3 that is placed into 0.01 cm thin AnodePlate (vm2000) -JReichenbacher (09/22/2023)
    # 7.0 Bq / 1000 * 0.25*2.54 / 0.01 *0.9/cc = 0.4001 Bq/cc
-}
 
-dune10kt_238U_chain_in_Anode:             @local::dune10kt_1x2x6_238U_chain_in_APAboards #does depend on thickness of 'AnodePlate' for VD
+dune10kt_238U_chain_in_Anode:             @local::dune10kt_238U_chain_in_APAboards #does depend on thickness of 'AnodePlate' for VD
 dune10kt_238U_chain_in_Anode.volume_gen:  "volAnodePlate"
 dune10kt_238U_chain_in_Anode.material:    "vm2000"
 dune10kt_238U_chain_in_Anode.BqPercc:     0.2915
@@ -65,7 +59,7 @@ dune10kt_238U_chain_in_Anode.BqPercc:     0.2915
    # 5.1 Bq / 1000 * 0.25*2.54 / 0.01 *0.9/cc = 0.2915 Bq/cc
 
 
-dune10kt_232Th_chain_in_Anode:             @local::dune10kt_1x2x6_232Th_chain_in_APAboards #does depend on thickness of 'AnodePlate' for VD
+dune10kt_232Th_chain_in_Anode:             @local::dune10kt_232Th_chain_in_APAboards #does depend on thickness of 'AnodePlate' for VD
 dune10kt_232Th_chain_in_Anode.volume_gen:  "volAnodePlate"
 dune10kt_232Th_chain_in_Anode.material:    "vm2000"
 dune10kt_232Th_chain_in_Anode.BqPercc:     0.4115
@@ -73,128 +67,80 @@ dune10kt_232Th_chain_in_Anode.BqPercc:     0.4115
    # 7.2 Bq / 1000 * 0.25*2.54 / 0.01 *0.9/cc = 0.4115 Bq/cc
 
 
-#THIS MODULE HAS THE SAME NAME AS IN HD BUT WITH A DIFFERENT DISTRIB_X (LP)
-dune10kt_222Rn_chain_218PoOnly_in_LAr:{
-   @table::dune10kt_222Rn_chain_222RnOnly_in_LAr
-   isotope:"Po218"
-   BqPercc: 0.0000012942 # Rn222 rate minus the 7.2257% on the cathode
-   distrib_x: "10255.2+(41.3788*TMath::Abs(325.-x))-(0.135462*(325.-x)*(325.-x))+(0.000203379*TMath::Power(TMath::Abs(325.-x),3))-(1.14356e-007*TMath::Power(TMath::Abs(325.-x),4))"
-}
+#Changed the name of this (LP)
+dune10kt_222Rn_chain_218PoOnly_in_LAr_VD:             @local::dune10kt_222Rn_chain_218PoOnly_in_LAr_HD
+dune10kt_222Rn_chain_218PoOnly_in_LAr_VD.BqPercc:     0.0000012942 # Rn222 rate minus the 7.2257% on the cathode
+dune10kt_222Rn_chain_218PoOnly_in_LAr_VD.distrib_x:   "10255.2+(41.3788*TMath::Abs(325.-x))-(0.135462*(325.-x)*(325.-x))+(0.000203379*TMath::Power(TMath::Abs(325.-x),3))-(1.14356e-007*TMath::Power(TMath::Abs(325.-x),4))"
 
 
 dune10kt_222Rn_chain_218PoOnly_in_upperCathodeMesh:{
-   @table::dune10kt_222Rn_chain_218PoOnly_in_LAr
-#  module_type:"Decay0Gen"
-#  volume_rand: "volCryostat"
-#  material: "LAr"
-   isotope:"Po218"
+   @table::dune10kt_222Rn_chain_218PoOnly_in_LAr_VD
+#   isotope:"Po218" //Just check if the config is ok then remove this line (LP)
    BqPercc: 4.45529e-5 // CHANGED to 0.000001395*7.2257% ions * 1*650cm upper drift collection * 0.68 C.L. for +/- sigma of 0.5 cm range  -JReichenbacher (09/22/2023)
 #  BqPercc: 0.001 // only for quick check of 'delta-fct.' method (otherwise use line above!)
    distrib_x: "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
 }
 
-
-dune10kt_222Rn_chain_214PbOnly_in_LAr:{
-   @table::dune10kt_222Rn_chain_222RnOnly_in_LAr
-   isotope:"Pb214"
-   BqPercc: 0.00000094574 # Rn222 rate minus the 32.2051% on the cathode
-   distrib_x: "6520.63+(26.8336*TMath::Abs(325.-x))-(0.0516248*(325.-x)*(325.-x))+(3.858e-005*TMath::Power(TMath::Abs(325.-x),3))"
-}
+#Changed the name of this (LP)
+dune10kt_222Rn_chain_214PbOnly_in_LAr_VD:            @local::dune10kt_222Rn_chain_214PbOnly_in_LAr_HD
+dune10kt_222Rn_chain_214PbOnly_in_LAr_VD.BqPercc:    0.00000094574 # Rn222 rate minus the 32.2051% on the cathode
+dune10kt_222Rn_chain_214PbOnly_in_LAr_VD.distrib_x:  "6520.63+(26.8336*TMath::Abs(325.-x))-(0.0516248*(325.-x)*(325.-x))+(3.858e-005*TMath::Power(TMath::Abs(325.-x),3))"
 
 dune10kt_222Rn_chain_214PbOnly_in_upperCathodeMesh:{
-   @table::dune10kt_222Rn_chain_214PbOnly_in_LAr
-   isotope:"Pb214"
-   BqPercc: 1.98573e-4 // CHANGED to 0.000001395*32.2051% ions * 1*650cm upper drift collection * 0.68 C.L. for +/- sigma of 0.5 cm range  -JReichenbacher (09/25/2023)
+   @table::dune10kt_222Rn_chain_214PbOnly_in_LAr_VD
+#   isotope:"Pb214" //Just check if config is ok then remove this line (LP)
+   BqPercc: 1.98573e-4 # CHANGED to 0.000001395*32.2051% ions * 1*650cm upper drift collection * 0.68 C.L. for +/- sigma of 0.5 cm range  -JReichenbacher (09/25/2023)
    distrib_x: "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
 }
 
-#THIS MODULE HAS THE SAME NAME IN COMMON HD BUT WITH DIFFERENT ACTIVITY AND DISTRIBUTION (LP)
-dune10kt_222Rn_chain_214BiOnly_in_LAr:{
-   @table::dune10kt_222Rn_chain_222RnOnly_in_LAr
-   isotope:"Bi214"
-   BqPercc: 0.00000059253 # Rn222 rate minus the 57.5246% on the cathode
-   distrib_x: "2997.66+(14.8718*TMath::Abs(325.-x))-(0.00824868*(325.-x)*(325.-x))"
-}
+#Changed the name of this (LP)
+dune10kt_222Rn_chain_214BiOnly_in_LAr_VD:             @local::dune10kt_222Rn_chain_214BiOnly_in_LAr_HD
+dune10kt_222Rn_chain_214BiOnly_in_LAr_VD.BqPercc:     0.00000059253 # Rn222 rate minus the 57.5246% on the cathode
+dune10kt_222Rn_chain_214BiOnly_in_LAr_VD.distrib_x:   "2997.66+(14.8718*TMath::Abs(325.-x))-(0.00824868*(325.-x)*(325.-x))"
 
 dune10kt_222Rn_chain_214BiOnly_in_upperCathodeMesh:{
-   @table::dune10kt_222Rn_chain_214BiOnly_in_LAr
-   isotope:"Bi214"
+   @table::dune10kt_222Rn_chain_214BiOnly_in_LAr_HD
+#   isotope:"Bi214" //Just check if config is ok then remove this line (LP)
    BqPercc: 3.54691e-4 // CHANGED to 0.000001395*57.5246% ions * 1*650cm upper drift collection * 0.68 C.L. for +/- sigma of 0.5 cm range  -JReichenbacher (09/25/2023)
    distrib_x: "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
 }
 
-#THIS MODULE HAS THE SAME NAME IN COMMON HD BUT WITH DIFFERENT ACTIVITY AND DISTRIBUTION (LP)
-dune10kt_222Rn_chain_210PbOnly_in_LAr:{
-   @table::dune10kt_222Rn_chain_222RnOnly_in_LAr
-   isotope:"Pb210"
-   BqPercc: 0.00000037411 # Rn222 rate minus the 73.1822% on the cathode
-   distrib_x: "1863.42+(9.70072*TMath::Abs(325.-x))-(0.0057322*(325.-x)*(325.-x))"
-}
+#Changed the name of this module (LP)
+dune10kt_222Rn_chain_210PbOnly_in_LAr_VD:             @local::dune10kt_222Rn_chain_210PbOnly_in_LAr_HD
+dune10kt_222Rn_chain_210PbOnly_in_LAr_VD.BqPercc:     0.00000037411 # Rn222 rate minus the 73.1822% on the cathode
+dune10kt_222Rn_chain_210PbOnly_in_LAr_VD.distrib_x:   "1863.42+(9.70072*TMath::Abs(325.-x))-(0.0057322*(325.-x)*(325.-x))"
 
-dune10kt_222Rn_chain_210PbOnly_in_upperCathodeMesh:{
-   @table::dune10kt_222Rn_chain_210PbOnly_in_LAr
-   isotope:"Pb210"
-   BqPercc: 4.51234e-4 // CHANGED to 0.000001395*73.1822% ions * 1*650cm upper drift collection * 0.68 C.L. for +/- sigma of 0.5 cm range  -JReichenbacher (09/25/2023)
-   distrib_x: "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
-}
+dune10kt_222Rn_chain_210PbOnly_in_upperCathodeMesh:            @local::dune10kt_222Rn_chain_210PbOnly_in_LAr_HD
+#   isotope:"Pb210" //Check if config is ok then remove (LP)
+dune10kt_222Rn_chain_210PbOnly_in_upperCathodeMesh.BqPercc:    4.51234e-4 # CHANGED to 0.000001395*73.1822% ions * 1*650cm upper drift collection * 0.68 C.L. for +/- sigma of 0.5 cm range  -JReichenbacher (09/25/2023)
+dune10kt_222Rn_chain_210PbOnly_in_upperCathodeMesh.distrib_x:  "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
 
-dune10kt_222Rn_chain_from210Bi_in_upperCathodeMesh:{
-   @table::dune10kt_222Rn_chain_210PbOnly_in_upperCathodeMesh
-   BqPercc: 4.51234e-4 // CHANGED to same new number as for 210Pb in upperCathodeMesh b/c 210Bi is 210Pb daughter and assume decay products stay in upperCathodeMesh  -JReichenbacher (09/25/2023)
-   isotope: @erase
-   decay_chain:{ # ALL THESE ARE ASSUMED TO BE @ EQUILIBRIUM!!
-      isotope_0:"Bi210"
-      isotope_1:"Po210"
-   }
-   distrib_x: "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
-}
 
-#THIS MODULE HAS THE SAME NAME IN HD BUT DIFFERENT CONFIG
-dune10kt_222Rn_chain_in_PDS:{
-   module_type:"Decay0Gen"
-   # HD Arapucas have the following size: 2.3 x 11.8 x 209.2, this makes a total AREA of 5,953.72 cm^2
-   # 0.2 Bq/m^2 is the requirement
-   # total activity is then: 0.11907 Bq / Arapuca
-   # this translate to 0.11907/(2.3x11.8x209.2) = 0.000021 Bq/cm^3
+dune10kt_222Rn_chain_from210Bi_in_upperCathodeMesh:            @local::dune10kt_222Rn_chain_from210Bi_in_CPA
+dune10kt_222Rn_chain_from210Bi_in_upperCathodeMesh.BqPercc:    4.51234e-4 # CHANGED to same new number as for 210Pb in upperCathodeMesh b/c 210Bi is 210Pb daughter and assume decay products stay in upperCathodeMesh  -JReichenbacher (09/25/2023)
+dune10kt_222Rn_chain_from210Bi_in_upperCathodeMesh.distrib_x:  "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
+
+#Changed the name of this. Need to confirm decay chain with Juergen which is different from HD (LP)
+dune10kt_222Rn_chain_in_PDS_VD:            @local::dune10kt_222Rn_chain_in_PDS_HD
    #BqPercc: 0.000021  // Checked on the above calculation again for HD Arapucas and then adjusted it below for VD X-Arapuca Tiles  -JReichenbacher (09/21/2023)
    # VD X-Arapuca Tiles have the following size: 2.5 cm thick x 63 cm x 63 cm (60cm x 60cm effective)
    # this translate to 0.17136/(2.5x63x63) = 0.000017 Bq/cm^3
-   BqPercc: 0.000017
-   volume_gen: ".*Arapuca.*"
-   decay_chain:{ # ALL THESE ARE ASSUMED TO BE @ EQUILIBRIUM!!
+dune10kt_222Rn_chain_in_PDS_VD.BqPercc:    0.000017
+dune10kt_222Rn_chain_in_PDS_VD.decay_chain:{ # ALL THESE ARE ASSUMED TO BE @ EQUILIBRIUM!!
       isotope_0:"Pb210"
       isotope_1:"Bi210"
       isotope_2:"Po210"
    }
-}
 
 
-#THIS MODULE HAS THE SAME NAME IN HD BUT DIFFERENT CONFIG
-dune10kt_220Rn_chain_212PbOnly_in_LAr:{
-   @table::dune10kt_222Rn_chain_in_LAr
-   BqPercc: 0.00000015252 # 0.00000045756 of Rn222 divided by 3 for Rn220 rate minus the 67.2% on the cathode (assume 1st order flat x-distribution  -JReichenbacher 09/25/2023)
-   distrib_x: @erase
-   isotope: @erase
- decay_chain:{ # ALL THESE ARE ASSUMED TO BE @ EQUILIBRIUM!! Use decay_chain w/ isotope_x instead of Nuclide as a first for 232Th decay chain (JR 27Sept2022)
-    isotope_0:"Pb212"  # 228Th, 224Ra, 220Rn, 216Po all not yet defined in BxDecay0 (cf. https://github.com/BxCppDev/bxdecay0#list-of-standard-radioactive-isotopes-backgroundcalibration)
-    isotope_1:"Bi212"  # for Bi212+Po212
-    isotope_2:"Tl208"
- }
-   # distrib_x:"259.482+1.58444*TMath::Abs(x)-0.00214077*x*x+1.95097e-06*TMath::Power(TMath::Abs(x),3)"  // better assume flat to 1st order as approximation over full 650 cm of VD drift
-}
+# Changed the name of this module, waiting on sonfirmation of no distrib_x (LP)
+dune10kt_220Rn_chain_212PbOnly_in_LAr_VD:              @local::dune10kt_220Rn_chain_212PbOnly_in_LAr
+dune10kt_220Rn_chain_212PbOnly_in_LAr_VD.distrib_x:    @erase
 
-dune10kt_220Rn_chain_from212Pb_in_upperCathodeMesh:{
-   @table::dune10kt_222Rn_chain_in_LAr
-   BqPercc: 1.38116e-4 # from 222Rn decay chain divided by 3 corresponding to SD Mines assay results for ProtoDUNE Cu-getter and mol-sieve filter materials w/ accumulation as below  -JReichenbacher (09/25/2023)
+dune10kt_220Rn_chain_from212Pb_in_upperCathodeMesh:            @local::dune10kt_220Rn_chain_212PbOnly_in_LAr_VD
+dune10kt_220Rn_chain_from212Pb_in_upperCathodeMesh.BqPercc:    1.38116e-4 # from 222Rn decay chain divided by 3 corresponding to SD Mines assay results for ProtoDUNE Cu-getter and mol-sieve filter materials w/ accumulation as below  -JReichenbacher (09/25/2023)
    # CHANGED to (0.000001395/3)*67.2% ions * 1*650cm upper drift collection * 0.68 C.L. for +/- sigma of 0.5 cm range
-   isotope: @erase
- decay_chain:{ # ALL THESE ARE ASSUMED TO BE @ EQUILIBRIUM!! Use decay_chain w/ isotope_x instead of Nuclide as a first for 232Th decay chain (JR 27Sept2022)
-    isotope_0:"Pb212"  # 228Th, 224Ra, 220Rn, 216Po all not yet defined in BxDecay0 (cf. https://github.com/BxCppDev/bxdecay0#list-of-standard-radioactive-isotopes-backgroundcalibration)
-    isotope_1:"Bi212"  # for Bi212+Po212
-    isotope_2:"Tl208"
- }
-   distrib_x: "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
-}
+dune10kt_220Rn_chain_from212Pb_in_upperCathodeMesh.distrib_x:  "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
 
 
 END_PROLOG
