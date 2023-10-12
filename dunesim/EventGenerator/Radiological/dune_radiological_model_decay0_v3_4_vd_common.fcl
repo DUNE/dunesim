@@ -9,8 +9,6 @@ BEGIN_PROLOG
 #                                            Added migration backgrounds from 222Rn and 220Rn decay products in LAr & with new 'delta-fct.' method in LAr 5 cm above Cathode FRP frame
 #                                            Added more realistic migration of 42K from 42Ar to upper cathode mesh using new 'delta-fct.' method in LAr 5 cm above Cathode FRP frame too
 
-// Leave '1x2x6' and everything "should work" for '1x8x6' to minimize changes  -JReichenbacher (09/15/2023)
-
 
 dune10kt_42Kfrom42Ar_in_upperCathodeMesh:{
    module_type: "Decay0Gen"
@@ -110,15 +108,21 @@ dune10kt_222Rn_chain_210PbOnly_in_LAr_VD:             @local::dune10kt_222Rn_cha
 dune10kt_222Rn_chain_210PbOnly_in_LAr_VD.BqPercc:     0.00000037411 # Rn222 rate minus the 73.1822% on the cathode
 dune10kt_222Rn_chain_210PbOnly_in_LAr_VD.distrib_x:   "1863.42+(9.70072*TMath::Abs(325.-x))-(0.0057322*(325.-x)*(325.-x))"
 
-dune10kt_222Rn_chain_210PbOnly_in_upperCathodeMesh:            @local::dune10kt_222Rn_chain_210PbOnly_in_LAr_HD
+dune10kt_222Rn_chain_210PbOnly_in_upperCathodeMesh:            @local::dune10kt_222Rn_chain_210PbOnly_in_CPA
 #   isotope:"Pb210" //Check if config is ok then remove (LP)
 dune10kt_222Rn_chain_210PbOnly_in_upperCathodeMesh.BqPercc:    4.51234e-4 # CHANGED to 0.000001395*73.1822% ions * 1*650cm upper drift collection * 0.68 C.L. for +/- sigma of 0.5 cm range  -JReichenbacher (09/25/2023)
 dune10kt_222Rn_chain_210PbOnly_in_upperCathodeMesh.distrib_x:  "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
+dune10kt_222Rn_chain_210PbOnly_in_upperCathodeMesh.material:   LAr
+dune10kt_222Rn_chain_210PbOnly_in_upperCathodeMesh.volume_gen: @erase
 
 
-dune10kt_222Rn_chain_from210Bi_in_upperCathodeMesh:            @local::dune10kt_222Rn_chain_from210Bi_in_CPA
+dune10kt_222Rn_chain_from210Bi_in_upperCathodeMesh:            @local::dune10kt_222Rn_chain_210PbOnly_in_upperCathodeMesh
 dune10kt_222Rn_chain_from210Bi_in_upperCathodeMesh.BqPercc:    4.51234e-4 # CHANGED to same new number as for 210Pb in upperCathodeMesh b/c 210Bi is 210Pb daughter and assume decay products stay in upperCathodeMesh  -JReichenbacher (09/25/2023)
-dune10kt_222Rn_chain_from210Bi_in_upperCathodeMesh.distrib_x:  "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
+dune10kt_222Rn_chain_from210Bi_in_upperCathodeMesh.isotope:    @erase
+dune10kt_222Rn_chain_from210Bi_in_upperCathodeMesh.decay_chain:{
+           isotope_0: "Bi210"
+           isotope_1: "Po210"
+} 
 
 #Changed the name of this. Need to confirm decay chain with Juergen which is different from HD (LP)
 dune10kt_222Rn_chain_in_PDS_VD:            @local::dune10kt_222Rn_chain_in_PDS_HD

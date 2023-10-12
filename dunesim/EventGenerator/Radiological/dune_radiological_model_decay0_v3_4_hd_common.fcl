@@ -21,44 +21,6 @@ BEGIN_PROLOG
 #  HD 1x2x2 version v3.1.4 is same as HD 1x2x6 version v3.1.4, except external backgrounds stop at z=490cm and face plane at z=490cm is left out to make it more representative for a 10 kton HD module  -JReichenbacher (09/15/2023)
 #  ==================================================================================================================================================================================================================================
 
-# IS THIS COMMENT NECESSARY? (LP)
-#The Generator names provided that should be called from other files are:
-#dune10kt_1x2x6_39ar     #Ar39 in LAr
-#dune10kt_1x2x6_APA      #Co60 in APA frame
-#dune10kt_1x2x6_neutron  #Originally use for K40 in Field Cage. Now repurposed for Neutrons from concrete.
-#dune10kt_1x2x6_CPA      #K40 from CPA
-#dune10kt_1x2x6_85kr     #Kr in LAr
-#dune10kt_1x2x6_222rn    #Rn in LAr
-#dune10kt_1x2x6_210po    #po for 1 cm in front of PDs (approximates effect of Rn daughters on PDs
-
-
-# IS THIS EXAMPLE NECESSARY? (LP)
-dune10kt_1x2x6_weird_beta_example_in_LAr: # a dummy example
-{
-   # module_type: "Decay0Gen"
-   module_type: "SpectrumVolumeGen"
-   isotope:     "11"
-   material:    "LAr"
-   spectrum_p_min: 0
-   spectrum_p_max: 0.01
-   spectrum: [0,0,1,1,1,1,4,4,1,1,0,0]
-   ## OR
-   # spectrum_p_min: 0
-   # spectrum_p_max: 0.01
-   # nbins:100
-   # function: "[0]*x+[1]*x*x+[2]"
-   # parameters: [100,0,0]
-   ## OR
-   # spectrum: [0,1,4,4,1.5]
-   # bins: [0.,0.02,0.04,0.08,0.15,0.3]
-   ## OR
-   # bins: [0.,0.02,0.04,0.08,0.15,0.3]
-   # function: "[0]*x+[1]*x*x+[2]"
-   # parameters: [100,0,0]
-   BqPercc: 0.00141 # activity -- Becquerels per cc. 0.00141 assumes 1.01 Bq/kg (typical for 39Ar) and a density of 1.396 g/cc for LAr
-   volume_rand: "volCryostat"
-}
-
 
 dune10kt_39Ar_in_LAr:{
    module_type: "Decay0Gen"
@@ -205,23 +167,6 @@ dune10kt_1x2x6_232Th_chain_in_APA.material:    "STEEL_STAINLESS_Fe7Cr2Ni"
    # BqPercc: 4.8373 # 610.0 Bq/kg (hottest steel on radiopurity.org is ILIAS UKDM steel sheet and scaffold), and then very similar story as before dune10kt_1x2x6_60Co_in_APA  -JReichenbacher (05/05/2023)
 dune10kt_1x2x6_232Th_chain_in_APA.BqPercc:     2.7914e-4 # 35.2 mBq/kg (new Th_late upper 90%CL limit measured at South Dakota (SDSMT+SURF) for APA steel sample from Daresbury), and then very similar story as before dune10kt_1x2x6_60Co_in_APA  -JReichenbacher (08/22/2023)
 
-
-# didn't find this one in the running fhicl (LP)
-dune10kt_222Rn_chain_in_LAr:{
-   module_type:"Decay0Gen"
-   BqPercc: 0.000001395
-   volume_rand: "volCryostat"
-   material: "LAr"
-   decay_chain:{ # ALL THESE ARE ASSUMED TO BE @ EQUILIBRIUM!!
-      isotope_0:"Rn222"
-      isotope_1:"Po218"
-      isotope_2:"Pb214"
-      isotope_3:"Bi214"
-      isotope_4:"Pb210"
-      isotope_5:"Bi210"
-      isotope_6:"Po210"
-   }
-}
 
 #Changed the name of this one (LP)
 dune10kt_222Rn_chain_in_PDS_HD:{
