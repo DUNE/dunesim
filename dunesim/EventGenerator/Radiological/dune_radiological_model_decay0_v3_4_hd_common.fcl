@@ -30,26 +30,21 @@ dune10kt_39Ar_in_LAr:{
    BqPercc: 0.00141 # activity -- Becquerels per cc. 0.00141 assumes 1.01 Bq/kg (typical for 39Ar) and a density of 1.396 g/cc for LAr
 }
 
-
 dune10kt_85Kr_in_LAr:          @local::dune10kt_39Ar_in_LAr
 dune10kt_85Kr_in_LAr.isotope:  "Kr85"
 dune10kt_85Kr_in_LAr.BqPercc:  0.00016 #Rate tied to LAr using rates established by the WARP collaboration. https://arxiv.org/pdf/astro-ph/0603131.pdf
-
 
 dune10kt_42Ar_in_LAr:          @local::dune10kt_39Ar_in_LAr
 dune10kt_42Ar_in_LAr.isotope:  "Ar42"
 dune10kt_42Ar_in_LAr.BqPercc:  0.0000001283768 # JReichenbacher (09/14/2023): Number matching rate from paper by Barabash in conference proceeding http://iopscience.iop.org/article/10.1088/1742-6596/718/6/062004/pdf
 
-
 dune10kt_42Kfrom42Ar_in_LAr:          @local::dune10kt_39Ar_in_LAr
 dune10kt_42Kfrom42Ar_in_LAr.isotope:  "K42"
 dune10kt_42Kfrom42Ar_in_LAr.BqPercc:  0.00000002567536 # = 0.0000001283768*.2  as only 20% of the 42K stays in the Argon...
 
-
 dune10kt_222Rn_chain_222RnOnly_in_LAr:          @local::dune10kt_39Ar_in_LAr
 dune10kt_222Rn_chain_222RnOnly_in_LAr.isotope:  "Rn222"
 dune10kt_222Rn_chain_222RnOnly_in_LAr.BqPercc:  0.000001395
-
 
 #I don't understand this comment because it is the same thing for the 1x2x2... (LP)
 dune10kt_1x2x6_42Kfrom42Ar_in_CPA:{ // if somebody change the geom of the cathode, the activity will need to change (hence I didn't drop the 1x2x6 spec here)
@@ -118,7 +113,6 @@ dune10kt_1x2x6_232Th_chain_in_CPA:{ // again beware of geometry change here
    # new SDSMT FR4 assay result on 232Th is 7.2 Bq/kg and thickness of CPA changed back to 3 mm with measured density of 1.75 g/cm^3 -JReichenbacher (09/14/2023)
 }
 
-
 dune10kt_40K_in_APAboards:{ # newly implemented gdml volume ref. as 'G10HeadBoards' -JReichenbacher (09/14/2023)
    module_type: "Decay0Gen"
    isotope: "K40"
@@ -127,7 +121,6 @@ dune10kt_40K_in_APAboards:{ # newly implemented gdml volume ref. as 'G10HeadBoar
    BqPercc: 0.01225
    # new SDSMT FR4 assay result on K40 is 7.0 Bq/kg with measured density of 1.75 g/cm^3 -JReichenbacher (09/14/2023)
 }
-
 
 dune10kt_238U_chain_in_APAboards:             @local::dune10kt_1x2x6_238U_chain_in_CPA # newly implemented gdml volume ref. as 'G10HeadBoards' -JReichenbacher (09/14/2023)
 dune10kt_238U_chain_in_APAboards.volume_gen:  ".*G10HeadBoards.*"
@@ -139,7 +132,6 @@ dune10kt_232Th_chain_in_APAboards:             @local::dune10kt_1x2x6_232Th_chai
 dune10kt_232Th_chain_in_APAboards.volume_gen:  ".*G10HeadBoards.*"
 dune10kt_232Th_chain_in_APAboards.BqPercc:     0.0126
    # new SDSMT FR4 assay result on 232Th is 7.2 Bq/kg with measured density of 1.75 g/cm^3 -JReichenbacher (09/14/2023)
-
 
 #Same here (LP)
 dune10kt_1x2x6_60Co_in_APA:{ // similar story as in the cathode
@@ -160,16 +152,13 @@ dune10kt_1x2x6_238U_chain_in_APA.material:    "STEEL_STAINLESS_Fe7Cr2Ni"
    # BqPercc: 1.586e-2 # 2.0 Bq/kg (hottest steel on radiopurity.org is ILIAS UKDM steel sheet and scaffold), and then very similar story as before dune10kt_1x2x6_60Co_in_APA  -JReichenbacher (05/05/2023)
 dune10kt_1x2x6_238U_chain_in_APA.BqPercc:     1.6653e-4 # 21 mBq/kg (new U_late measurement at South Dakota (SDSMT+SURF) for APA steel sample from Daresbury), and then very similar story as before dune10kt_1x2x6_60Co_in_APA  -JReichenbacher (08/22/2023)
 
-
 dune10kt_1x2x6_232Th_chain_in_APA:             @local::dune10kt_1x2x6_232Th_chain_in_CPA // similar story as in the cathode
 dune10kt_1x2x6_232Th_chain_in_APA.volume_gen:  ".*APA.*"
 dune10kt_1x2x6_232Th_chain_in_APA.material:    "STEEL_STAINLESS_Fe7Cr2Ni"
    # BqPercc: 4.8373 # 610.0 Bq/kg (hottest steel on radiopurity.org is ILIAS UKDM steel sheet and scaffold), and then very similar story as before dune10kt_1x2x6_60Co_in_APA  -JReichenbacher (05/05/2023)
 dune10kt_1x2x6_232Th_chain_in_APA.BqPercc:     2.7914e-4 # 35.2 mBq/kg (new Th_late upper 90%CL limit measured at South Dakota (SDSMT+SURF) for APA steel sample from Daresbury), and then very similar story as before dune10kt_1x2x6_60Co_in_APA  -JReichenbacher (08/22/2023)
 
-
-#Changed the name of this one (LP)
-dune10kt_222Rn_chain_in_PDS_HD:{
+dune10kt_222Rn_chain_in_PDS:{
    module_type:"Decay0Gen"
    # Arapucas have the following size: 2.3 x 11.8 x 209.2, this makes a total AREA of 5,953.72 cm^2
    # 0.2 Bq/m^2 is the requirement
@@ -177,86 +166,74 @@ dune10kt_222Rn_chain_in_PDS_HD:{
    # this translate to 0.11907/(2.3x11.8x209.2) = 0.000021 Bq/cm^3
    BqPercc: 0.000021
    volume_gen: ".*Arapuca.*"
+     # truncated Rn-222 chain to only long-lived Pb-210 and daughters
+     # for plate-out during construction and installation  -JReichenbacher (10/12/2023) 
    decay_chain:{ # ALL THESE ARE ASSUMED TO BE @ EQUILIBRIUM!!
-      isotope_0:"Rn222"
-      isotope_1:"Po218"
-      isotope_2:"Pb214"
-      isotope_3:"Bi214"
-      isotope_4:"Pb210"
-      isotope_5:"Bi210"
-      isotope_6:"Po210"
+      isotope_0:"Pb210"
+      isotope_1:"Bi210"
+      isotope_2:"Po210"
    }
 }
 
-
-#Changed the name of this (LP)
-dune10kt_222Rn_chain_218PoOnly_in_LAr_HD:{
+dune10kt_222Rn_chain_218PoOnly_in_LAr:{
    @table::dune10kt_39Ar_in_LAr
    isotope:"Po218"
    BqPercc: 0.000001203885 # Rn222 rate minus the 13.7% on the cathode
    distrib_x: "936.088+2.81714*TMath::Abs(x)-0.00403933*x*x-1.24485e-06*TMath::Power(TMath::Abs(x),3)"
 }
 
-
 dune10kt_222Rn_chain_218PoOnly_in_CPA:{
-   @table::dune10kt_222Rn_chain_218PoOnly_in_LAr_HD
+   @table::dune10kt_222Rn_chain_218PoOnly_in_LAr
    volume_gen: ".*Cathode.*"
    material: @erase
    BqPercc: 5.717e-4 # 0.00528 CHANGED to 0.000001395*13.7% ions * 2*350cm drift collection / 0.3cm CPA thickness / 78% coverage -JReichenbacher (09/14/2023)
    distrib_x: @erase
 }
 
-
-dune10kt_222Rn_chain_214PbOnly_in_LAr_HD:{
+dune10kt_222Rn_chain_214PbOnly_in_LAr:{
    @table::dune10kt_39Ar_in_LAr
    isotope:"Pb214"
    BqPercc: 0.000000827235 # Rn222 rate minus the 40.7% on the cathode
    distrib_x: "590.016+1.83392*TMath::Abs(x)+0.00012101*x*x-5.42539e-06*TMath::Power(TMath::Abs(x),3)"
 }
 
-
 dune10kt_222Rn_chain_214PbOnly_in_CPA:{
-   @table::dune10kt_222Rn_chain_214PbOnly_in_LAr_HD
+   @table::dune10kt_222Rn_chain_214PbOnly_in_LAr
    volume_gen: ".*Cathode.*"
    material: @erase
    BqPercc: 1.6984e-3 # 0.015678 CHANGED to 0.000001395*40.7% ions * 2*350cm drift collection / 0.3cm CPA thickness / 78% coverage -JReichenbacher (09/14/2023)
    distrib_x: @erase
 }
 
-#Changed the name of this (LP)
-dune10kt_222Rn_chain_214BiOnly_in_LAr_HD:{
+dune10kt_222Rn_chain_214BiOnly_in_LAr:{
    @table::dune10kt_39Ar_in_LAr
    isotope:"Bi214"
    BqPercc:0.00000045756 # Rn222 rate minus the 67.2% on the cathode
    distrib_x: "263.835+1.32691*TMath::Abs(x)-0.000128904*x*x-1.64996e-06*TMath::Power(TMath::Abs(x),3)"
 }
 
-
 dune10kt_222Rn_chain_214BiOnly_in_CPA:{
-   @table::dune10kt_222Rn_chain_214BiOnly_in_LAr_HD
+   @table::dune10kt_222Rn_chain_214BiOnly_in_LAr
    volume_gen: ".*Cathode.*" // The rest of the 42K go to the cathode
    material: @erase
    BqPercc: 2.8043e-3 # 0.025886 CHANGED to 0.000001395*67.2% ions * 2*350cm drift collection / 0.3cm CPA thickness / 78% coverage -JReichenbacher (09/14/2023)
    distrib_x: @erase
 }
 
-
-dune10kt_222Rn_chain_210PbOnly_in_LAr_HD:{
+dune10kt_222Rn_chain_210PbOnly_in_LAr:{
    @table::dune10kt_39Ar_in_LAr
    isotope:"Pb210"
    BqPercc:0.00000045756 # Rn222 rate minus the 67.2% on the cathode
    distrib_x:"259.482+1.58444*TMath::Abs(x)-0.00214077*x*x+1.95097e-06*TMath::Power(TMath::Abs(x),3)"
 }
 
-
 dune10kt_222Rn_chain_210PbOnly_in_CPA:{
-   @table::dune10kt_222Rn_chain_210PbOnly_in_LAr_HD
+   @table::dune10kt_222Rn_chain_210PbOnly_in_LAr
    volume_gen: ".*Cathode.*" // The rest of the 42K go to the cathode
    material: @erase
    BqPercc: 2.8043e-3 # 0.025886 CHANGED to 0.000001395*67.2% (shouldn't this be 80% ???) ions * 2*350cm drift collection / 0.3cm CPA thickness / 78% coverage -JReichenbacher (09/14/2023)
    distrib_x: @erase
 }
-
 
 dune10kt_222Rn_chain_from210Bi_in_CPA:{
    @table::dune10kt_222Rn_chain_210PbOnly_in_CPA
@@ -267,7 +244,6 @@ dune10kt_222Rn_chain_from210Bi_in_CPA:{
       isotope_1:"Po210"
    }
 }
-
 
 dune10kt_220Rn_chain_212PbOnly_in_LAr:{
    @table::dune10kt_39Ar_in_LAr
@@ -280,7 +256,6 @@ dune10kt_220Rn_chain_212PbOnly_in_LAr:{
    }
    distrib_x:"259.482+1.58444*TMath::Abs(x)-0.00214077*x*x+1.95097e-06*TMath::Power(TMath::Abs(x),3)"
 }
-
 
 dune10kt_220Rn_chain_from212Pb_in_CPA:{
    @table::dune10kt_222Rn_chain_210PbOnly_in_CPA // not sure if that is most appropriate but it works
@@ -296,6 +271,5 @@ dune10kt_220Rn_chain_from212Pb_in_CPA:{
     isotope_2:"Tl208"
  }
 }
-
 
 END_PROLOG
