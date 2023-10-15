@@ -1,0 +1,57 @@
+#include "services_dune.fcl"
+#include "dune_radiological_model_decay0_v3_4_vd_1x8x6.fcl"
+
+BEGIN_PROLOG
+
+
+# This is MASSIVELY dependent on the geometry
+# Convinced myself that best is to have four 1cm thin vertical planes on sides (along x-drift in rotated VD geo) to emulate external backgrounds coming in through cryostat (but NO PLANE at the horizontal Cathode that is realistically positioned on the inside at half height in the VD), and then just one 1cm thin plane on top, all approx. 25cm offset from active TPC. This should more accurately represent the worst case scenario in the FD VD. - J. Reichenbacher (08/14/2023)
+#  VD 1x8x14 version v3.1.4 is same as VD 1x8x6 version v3.1.4, except external backgrounds extend to z=2174cm and upper cathode mesh BGs have geometry caused larger 'rate' values by factor 2.1364  -JReichenbacher (10/13/2023)
+
+
+dunevd10kt_1x8x14_42Kfrom42Ar_in_upperCathodeMesh:           @local::dunevd10kt_1x8x6_42Kfrom42Ar_in_upperCathodeMesh
+dunevd10kt_1x8x14_42Kfrom42Ar_in_upperCathodeMesh.rate:      1.94372  # 0.0000001283768 BqPercc * 0.80 * 2*0.004285s * 650cm drift * (4*337.5cm + 2*78cm) width * (7*300cm + 2*78cm) length  =  1.94372  events in [-0.004285s, 0.004285s]  -JReichenbacher (10/13/2023)
+
+dunevd10kt_1x8x14_222Rn_chain_218PoOnly_in_upperCathodeMesh:       @local::dunevd10kt_1x8x6_222Rn_chain_218PoOnly_in_upperCathodeMesh
+dunevd10kt_1x8x14_222Rn_chain_218PoOnly_in_upperCathodeMesh.rate:  1.90771 # 0.000001395 BqPercc * 7.2257% ions * 2*0.004285s * 650cm drift * (4*337.5cm + 2*78cm) width * (7*300cm + 2*78cm) length  =  1.90771  events in [-0.004285s, 0.004285s]  -JReichenbacher (10/13/2023)
+
+dunevd10kt_1x8x14_222Rn_chain_214PbOnly_in_upperCathodeMesh:           @local::dunevd10kt_1x8x6_222Rn_chain_214PbOnly_in_upperCathodeMesh
+dunevd10kt_1x8x14_222Rn_chain_214PbOnly_in_upperCathodeMesh.rate:      8.5027 # 0.000001395 BqPercc * 32.2051% ions * 2*0.004285s * 650cm drift * (4*337.5cm + 2*78cm) width * (7*300cm + 2*78cm) length  =  8.5027  events in [-0.004285s, 0.004285s]  -JReichenbacher (10/13/2023)
+
+dunevd10kt_1x8x14_222Rn_chain_214BiOnly_in_upperCathodeMesh:           @local::dunevd10kt_1x8x6_222Rn_chain_214BiOnly_in_upperCathodeMesh
+dunevd10kt_1x8x14_222Rn_chain_214BiOnly_in_upperCathodeMesh.rate:      15.1875 # 0.000001395 BqPercc * 57.5246% ions * 2*0.004285s * 650cm drift * (4*337.5cm + 2*78cm) width * (7*300cm + 2*78cm) length  =  15.1875 events in [-0.004285s, 0.004285s]  -JReichenbacher (10/13/2023)
+
+dunevd10kt_1x8x14_222Rn_chain_210PbOnly_in_upperCathodeMesh:            @local::dunevd10kt_1x8x6_222Rn_chain_210PbOnly_in_upperCathodeMesh
+dunevd10kt_1x8x14_222Rn_chain_210PbOnly_in_upperCathodeMesh.rate:       19.3214 # 0.000001395 BqPercc * 73.1822% ions * 2*0.004285s * 650cm drift * (4*337.5cm + 2*78cm) width * (7*300cm + 2*78cm) length  =  19.3214 events in [-0.004285s, 0.004285s]  -JReichenbacher (10/13/2023)
+
+dunevd10kt_1x8x14_222Rn_chain_from210Bi_in_upperCathodeMesh:            @local::dunevd10kt_1x8x6_222Rn_chain_from210Bi_in_upperCathodeMesh
+dunevd10kt_1x8x14_222Rn_chain_from210Bi_in_upperCathodeMesh.rate:       19.3214 # 0.000001395 BqPercc * 73.1822% ions * 2*0.004285s * 650cm drift * (4*337.5cm + 2*78cm) width * (7*300cm + 2*78cm) length  =  19.3214 events in [-0.004285s, 0.004285s]  -JReichenbacher (10/13/2023)
+
+dunevd10kt_1x8x14_220Rn_chain_from212Pb_in_upperCathodeMesh:            @local::dunevd10kt_1x8x6_220Rn_chain_from212Pb_in_upperCathodeMesh
+dunevd10kt_1x8x14_220Rn_chain_from212Pb_in_upperCathodeMesh.rate:       5.91399 # (0.000001395/3) BqPercc * 67.2% ions * 2*0.004285s * 650cm drift * (4*337.5cm + 2*78cm) width * (7*300cm + 2*78cm) length  =  5.91399 events in [-0.004285s, 0.004285s]  -JReichenbacher (10/13/2023)
+
+dunevd10kt_1x8x14_gammas_from_cavernwall_atLAr:        @local::dunevd10kt_1x8x6_gammas_from_cavernwall_atLAr
+dunevd10kt_1x8x14_gammas_from_cavernwall_atLAr.Z0:     [  -78.5,  2173.5,  -78.,  -78. ,  -78.  ] # in cm in world coordinates, low z-values of planes for VD 1x8x14  -JReichenbacher (10/13/2023)
+dunevd10kt_1x8x14_gammas_from_cavernwall_atLAr.Z1:     [  -77.5,  2174.5, 2174., 2174. , 2174.  ] # in cm in world coordinates, high z-values of planes for VD 1x8x14 -JReichenbacher (10/13/2023)
+
+dunevd10kt_1x8x14_gammas_from_foam_atLAr:                   @local::dunevd10kt_1x8x14_gammas_from_cavernwall_atLAr
+dunevd10kt_1x8x14_gammas_from_foam_atLAr.Nuclide:           ["FDfoamGammasAtLArFlux", "FDfoamGammasAtLArFlux", "FDfoamGammasAtLArFlux", "FDfoamGammasAtLArFlux", "FDfoamGammasAtLArFlux"] # downscaled above 3.3 MeV for overestimated (alpha, gamma) production in Geant4 -JReichenbacher (05/16/2023)
+dunevd10kt_1x8x14_gammas_from_foam_atLAr.BqPercc:           [ 0.0441274, 0.0441274, 0.0441274, 0.0441274, 0.0441274 ] # activity -- Becquerels per cc. is 4pi flux of 0.0441274 gammas/(cm^2 sec) at LAr interface propagated from R-PUF foam (ICPMS PNNL assay data from C. Jackson) -JReichenbacher (06/13/2023)
+
+
+dunevd10kt_1x8x14_neutrons_from_cavernwall_atLAr:           @local::dunevd10kt_1x8x14_gammas_from_cavernwall_atLAr
+dunevd10kt_1x8x14_neutrons_from_cavernwall_atLAr.Nuclide:   ["FDcavernNeutronsAtLArFlux", "FDcavernNeutronsAtLArFlux", "FDcavernNeutronsAtLArFlux", "FDcavernNeutronsAtLArFlux", "FDcavernNeutronsAtLArFlux"]
+dunevd10kt_1x8x14_neutrons_from_cavernwall_atLAr.BqPercc:   [ 0.00000026996, 0.00000026996, 0.00000026996, 0.00000026996, 0.00000026996 ] # activity -- Becquerels per cc. 0.00000026996 assumes 4pi flux of 0.00000009862 neutrons/(cm^2 sec) at LAr interface propagated from cavernwalls (rock+shotcrete SDSMT assay data) and impact factor 2.0 (less than for gammas, ~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
+
+
+dunevd10kt_1x8x14_CryostatNGammas_from_CavernNeutrons_atLAr:          @local::dunevd10kt_1x8x14_gammas_from_cavernwall_atLAr
+dunevd10kt_1x8x14_CryostatNGammas_from_CavernNeutrons_atLAr.Nuclide:  ["FDcryostatNGammasAtLArFluxFromCavernNeutrons", "FDcryostatNGammasAtLArFluxFromCavernNeutrons", "FDcryostatNGammasAtLArFluxFromCavernNeutrons", "FDcryostatNGammasAtLArFluxFromCavernNeutrons", "FDcryostatNGammasAtLArFluxFromCavernNeutrons"]
+dunevd10kt_1x8x14_CryostatNGammas_from_CavernNeutrons_atLAr.BqPercc:  [ 0.0000016793, 0.0000016793, 0.0000016793, 0.0000016793, 0.0000016793 ] # activity -- Becquerels per cc. 0.0000016793 assumes 4pi flux of 0.00000061347 Ngammas/(cm^2 sec) at LAr interface stemming from n-captures in cryostat due to propagated cavernwall neutrons (rock+shotcrete SDSMT assay data) and impact factor 2.0 (less than for caverngammas, ~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
+
+
+dunevd10kt_1x8x14_CavernNGammas_atLAr:                      @local::dunevd10kt_1x8x14_gammas_from_cavernwall_atLAr
+dunevd10kt_1x8x14_CavernNGammas_atLAr.Nuclide:              ["FDcavernNGammasAtLArFlux", "FDcavernNGammasAtLArFlux", "FDcavernNGammasAtLArFlux", "FDcavernNGammasAtLArFlux", "FDcavernNGammasAtLArFlux"]
+dunevd10kt_1x8x14_CavernNGammas_atLAr.BqPercc:              [ 0.0000005439, 0.0000005439, 0.0000005439, 0.0000005439, 0.0000005439 ] # activity -- Becquerels per cc. 0.0000005439 assumes 4pi flux of 0.0000001987 Ngammas/(cm^2 sec) at LAr interface propagated through cryostat stemming from n-captures in rock+shotcrete (SDSMT assay data) and impact factor 2.0 (for n-captures less than for direct caverngammas, ~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
+
+
+END_PROLOG

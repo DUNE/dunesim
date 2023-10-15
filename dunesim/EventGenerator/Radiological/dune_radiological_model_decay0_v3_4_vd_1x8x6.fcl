@@ -8,6 +8,51 @@ BEGIN_PROLOG
 # Convinced myself that best is to have four 1cm thin vertical planes on sides (along x-drift in rotated VD geo) to emulate external backgrounds coming in through cryostat (but NO PLANE at the horizontal Cathode that is realistically positioned on the inside at half height in the VD), and then just one 1cm thin plane on top, all approx. 25cm offset from active TPC. This should more accurately represent the worst case scenario in the FD VD. - J. Reichenbacher (08/14/2023)
 
 
+dunevd10kt_1x8x6_42Kfrom42Ar_in_upperCathodeMesh:           @local::dune10kt_42Kfrom42Ar_in_LAr
+dunevd10kt_1x8x6_42Kfrom42Ar_in_upperCathodeMesh.rate:      0.909829 # 0.0000001283768 BqPercc * 0.80 * 2*0.004285s * 650cm drift * (4*337.5cm + 2*78cm) width * (3*300cm + 2*78cm) length  =  0.909829 events in [-0.004285s, 0.004285s]  -JReichenbacher (10/11/2023)
+dunevd10kt_1x8x6_42Kfrom42Ar_in_upperCathodeMesh.BqPercc:   @erase #4.5394e-5 // CHANGED to 0.0000001283768*.8*650*0.68  80% of 42K drifts from 650 cm on upper cathode mesh from 1 side and 20% of the 42K stays in LAr (68 C.L. for +/- 1sigma=0.5 cm)  -JReichenbacher (09/26/2023)
+dunevd10kt_1x8x6_42Kfrom42Ar_in_upperCathodeMesh.distrib_x: "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
+
+dunevd10kt_1x8x6_222Rn_chain_218PoOnly_in_upperCathodeMesh:{
+   @table::dunevd10kt_222Rn_chain_218PoOnly_in_LAr
+   rate: 0.892971 # 0.000001395 BqPercc * 7.2257% ions * 2*0.004285s * 650cm drift * (4*337.5cm + 2*78cm) width * (3*300cm + 2*78cm) length  =  0.892971 events in [-0.004285s, 0.004285s]  -JReichenbacher (10/11/2023)
+   BqPercc: @erase #4.45529e-5 // CHANGED to 0.000001395*7.2257% ions * 1*650cm upper drift collection * 0.68 C.L. for +/- sigma of 0.5 cm range  -JReichenbacher (09/22/2023)
+#  BqPercc: 0.001 // only for quick check of 'delta-fct.' method (otherwise use line above!)
+   distrib_x: "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
+}
+
+dunevd10kt_1x8x6_222Rn_chain_214PbOnly_in_upperCathodeMesh:           @local::dunevd10kt_222Rn_chain_214PbOnly_in_LAr
+dunevd10kt_1x8x6_222Rn_chain_214PbOnly_in_upperCathodeMesh.BqPercc:   @erase #1.98573e-4 # CHANGED to 0.000001395*32.2051% ions * 1*650cm upper drift collection * 0.68 C.L. for +/- sigma of 0.5 cm range  -JReichenbacher (09/25/2023)
+dunevd10kt_1x8x6_222Rn_chain_214PbOnly_in_upperCathodeMesh.rate:      3.97999 # 0.000001395 BqPercc * 32.2051% ions * 2*0.004285s * 650cm drift * (4*337.5cm + 2*78cm) width * (3*300cm + 2*78cm) length  =  3.97999 events in [-0.004285s, 0.004285s]  -JReichenbacher (10/11/2023)
+dunevd10kt_1x8x6_222Rn_chain_214PbOnly_in_upperCathodeMesh.distrib_x: "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
+
+dunevd10kt_1x8x6_222Rn_chain_214BiOnly_in_upperCathodeMesh:           @local::dune10kt_222Rn_chain_214BiOnly_in_LAr
+dunevd10kt_1x8x6_222Rn_chain_214BiOnly_in_upperCathodeMesh.BqPercc:   @erase #3.54691e-4 # CHANGED to 0.000001395*57.5246% ions * 1*650cm upper drift collection * 0.68 C.L. for +/- sigma of 0.5 cm range  -JReichenbacher (09/25/2023)
+dunevd10kt_1x8x6_222Rn_chain_214BiOnly_in_upperCathodeMesh.rate:      7.10904 # 0.000001395 BqPercc * 57.5246% ions * 2*0.004285s * 650cm drift * (4*337.5cm + 2*78cm) width * (3*300cm + 2*78cm) length  =  7.10904 events in [-0.004285s, 0.004285s]  -JReichenbacher (10/11/2023)
+dunevd10kt_1x8x6_222Rn_chain_214BiOnly_in_upperCathodeMesh.distrib_x: "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
+
+dunevd10kt_1x8x6_222Rn_chain_210PbOnly_in_upperCathodeMesh:            @local::dune10kt_222Rn_chain_210PbOnly_in_CPA
+dunevd10kt_1x8x6_222Rn_chain_210PbOnly_in_upperCathodeMesh.BqPercc:    @erase #4.51234e-4 # CHANGED to 0.000001395*73.1822% ions * 1*650cm upper drift collection * 0.68 C.L. for +/- sigma of 0.5 cm range  -JReichenbacher (09/25/2023)
+dunevd10kt_1x8x6_222Rn_chain_210PbOnly_in_upperCathodeMesh.rate:       9.04405 #0.000001395 BqPercc * 73.1822% ions * 2*0.004285s * 650cm drift * (4*337.5cm + 2*78cm) width * (3*300cm + 2*78cm) length  =  9.04405 events in [-0.004285s, 0.004285s]  -JReichenbacher (10/11/2023)
+dunevd10kt_1x8x6_222Rn_chain_210PbOnly_in_upperCathodeMesh.distrib_x:  "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
+dunevd10kt_1x8x6_222Rn_chain_210PbOnly_in_upperCathodeMesh.material:   LAr
+dunevd10kt_1x8x6_222Rn_chain_210PbOnly_in_upperCathodeMesh.volume_gen: @erase
+
+dunevd10kt_1x8x6_222Rn_chain_from210Bi_in_upperCathodeMesh:            @local::dunevd10kt_1x8x6_222Rn_chain_210PbOnly_in_upperCathodeMesh
+dunevd10kt_1x8x6_222Rn_chain_from210Bi_in_upperCathodeMesh.BqPercc:    @erase #4.51234e-4 # CHANGED to same new number as for 210Pb in upperCathodeMesh b/c 210Bi is 210Pb daughter and assume decay products stay in upperCathodeMesh  -JReichenbacher (09/25/2023)
+dunevd10kt_1x8x6_222Rn_chain_from210Bi_in_upperCathodeMesh.rate:       9.04405 #0.000001395 BqPercc * 73.1822% ions * 2*0.004285s * 650cm drift * (4*337.5cm + 2*78cm) width * (3*300cm + 2*78cm) length  =  9.04405 events in [-0.004285s, 0.004285s]  -JReichenbacher (10/11/2023)
+dunevd10kt_1x8x6_222Rn_chain_from210Bi_in_upperCathodeMesh.isotope:    @erase
+dunevd10kt_1x8x6_222Rn_chain_from210Bi_in_upperCathodeMesh.decay_chain:{
+           isotope_0: "Bi210"
+           isotope_1: "Po210"
+} 
+
+dunevd10kt_1x8x6_220Rn_chain_from212Pb_in_upperCathodeMesh:            @local::dunevd10kt_220Rn_chain_212PbOnly_in_LAr
+dunevd10kt_1x8x6_220Rn_chain_from212Pb_in_upperCathodeMesh.BqPercc:    @erase #1.38116e-4 # from 222Rn decay chain divided by 3 corresponding to SD Mines assay results for ProtoDUNE Cu-getter and mol-sieve filter materials w/ accumulation as below  -JReichenbacher (09/25/2023)
+dunevd10kt_1x8x6_220Rn_chain_from212Pb_in_upperCathodeMesh.rate:       2.76825 # (0.000001395/3) BqPercc * 67.2% ions * 2*0.004285s * 650cm drift * (4*337.5cm + 2*78cm) width * (3*300cm + 2*78cm) length  =  2.76825 events in [-0.004285s, 0.004285s]  -JReichenbacher (10/11/2023)
+   # CHANGED to (0.000001395/3)*67.2% ions * 1*650cm upper drift collection * 0.68 C.L. for +/- sigma of 0.5 cm range
+dunevd10kt_1x8x6_220Rn_chain_from212Pb_in_upperCathodeMesh.distrib_x:  "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
+
 #COULD INHERIT FROM HD 1X2X6 TO MAKE MAINTAINANCE EASIER (LP)
 dunevd10kt_1x8x6_gammas_from_cavernwall_atLAr: 
 {
