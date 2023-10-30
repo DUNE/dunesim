@@ -30,6 +30,14 @@ standard_nuescattergen_solar:
    FlatESpectrum:     false # generate flat energy spectrum for neutrino
 
    EventRateFileName: "/pnfs/dune/resilient/users/dpershey/solar_nue_rates.root"
+
+   NpxNueE:      1500            # number of samples for TH1::GetRandom
+   NpxNumuE:     1500            
+   NpxNutauE:    1500            
+   NpxNuebarE:   1500
+   NpxNumubarE:  1500            
+   NpxNutaubarE: 1500            
+   
 }
 
 standard_nuescattergen_supernova:
@@ -62,6 +70,13 @@ standard_nuescattergen_supernova:
    FlatESpectrum:     false # generate flat energy spectrum for neutrino
 
    EventRateFileName: "/pnfs/dune/resilient/users/dpershey/supernova_nue_rates.root"
+
+   NpxNueE:      1500            # number of samples for TH1::GetRandom
+   NpxNumuE:     1500            
+   NpxNutauE:    1500            
+   NpxNuebarE:   1500
+   NpxNumubarE:  1500            
+   NpxNutaubarE: 1500            
 }
 
 
