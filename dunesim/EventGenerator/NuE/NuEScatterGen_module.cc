@@ -238,12 +238,12 @@ void evgen::NuEScatterGen::reconfigure(fhicl::ParameterSet const & p)
   
   if (!fFlatESpectrum || !fCustomNuFlavBR) {
     fEventRateFileName = p.get<std::string>("EventRateFileName");
-    fNpxNueE           = p.get<int>("fNpxNueE",1500);
-    fNpxNumuE          = p.get<int>("fNpxNumuE",1500);
-    fNpxNutauE         = p.get<int>("fNpxNutauE",1500);
-    fNpxNuebarE        = p.get<int>("fNpxNuebarE",1500);
-    fNpxNumubarE       = p.get<int>("fNpxNumubarE",1500);
-    fNpxNutaubarE      = p.get<int>("fNpxNutaubarE",1500);
+    fNpxNueE           = p.get<int>("NpxNueE");
+    fNpxNumuE          = p.get<int>("NpxNumuE");
+    fNpxNutauE         = p.get<int>("NpxNutauE");
+    fNpxNuebarE        = p.get<int>("NpxNuebarE");
+    fNpxNumubarE       = p.get<int>("NpxNumubarE");
+    fNpxNutaubarE      = p.get<int>("NpxNutaubarE");
 
   }
   if (fCustomNuFlavBR) {
