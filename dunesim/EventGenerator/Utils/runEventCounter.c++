@@ -79,6 +79,8 @@ int main(int argc, char ** argv){
   std::string output_root_filename;
   std::string mc_file = "";
   int nworkers = 1;
+  int start_file = 0;
+  int max_files = -1;
   // Options to run
   for (int iArg = 1; iArg < argc; iArg++) {
     if (!strcasecmp(argv[iArg],"-c")) {
@@ -96,6 +98,12 @@ int main(int argc, char ** argv){
     if (!strcasecmp(argv[iArg], "-t")) {
       output_root_filename = argv[++iArg];
     }
+    if (!strcasecmp(argv[iArg], "--nskip")) {
+      start_file = std::atoi(argv[++iArg]);
+    }
+    if (!strcasecmp(argv[iArg], "--nfiles")) {
+      max_files = size_t(std::atoi(argv[++iArg]));
+    }
     if (!strcasecmp(argv[iArg],"-h")) {
       std::cout << "Usage: runEventCounter -c fclfile.fcl -o output_file -t output_root_file [-n nthreads]" << std::endl;
       return 1;
@@ -111,6 +119,28 @@ int main(int argc, char ** argv){
   }
   else {
     file_list = pset.get<std::vector<std::string>>("Files");
+
+    //split up file list if necessary
+    if (start_file > int(file_list.size())) {
+      throw cet::exception("runEventCounter") <<
+            "Error requested start_file more than file list size " <<
+            start_file << " " << file_list.size() << std::endl;
+    }
+    else if (start_file < 0) {
+      std::cout << "Warning requested start_file less than 0. " <<
+                   "Will default to 0" << std::endl;
+      start_file = 0;
+    }
+    if ((max_files + start_file) > int(file_list.size()) || max_files < 0) {
+      std::cout << "Warning requested (start_file + max_files) or start -1" <<
+                   "more than file list size. " <<
+                   "Will default to file list size" << std::endl;
+      max_files = int(file_list.size()) - start_file; 
+    }
+    file_list = std::vector<std::string>(
+        file_list.begin() + start_file,
+        file_list.begin() + start_file + max_files);
+    std::cout << "Files: " << file_list.size() << std::endl;
   }
 
   //bool skip_gamma = pset.get<bool>("SkipGamma", false);

@@ -32,3 +32,5 @@ art_make_exec( NAME runYieldTest
 
 install_scripts()
 install_fhicl()
+INSTALL(FILES h4_vle_studies.cfg
+        DESTINATION ${product}/${version}/cfg_files)
