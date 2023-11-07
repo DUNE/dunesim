@@ -76,6 +76,17 @@ private:
   TF1 *fNumubarE;
   TF1 *fNutaubarE;
 
+  // NPx samples for the above functions.  See
+  // https://root-forum.cern.ch/t/problem-generating-a-distribution-using-tf1-getrandom-function/44812
+  // the default sampling from these functions makes TF1::GetRandom hang.
+  
+  int fNpxNueE;
+  int fNpxNumuE;
+  int fNpxNutauE;
+  int fNpxNuebarE;
+  int fNpxNumubarE;
+  int fNpxNutaubarE;
+
   // The neutrino direction, which may be the same for multiple neutrinos
   TVector3 fNuDir;
 
@@ -126,6 +137,12 @@ void evgen::NuEScatterGen::beginJob()
     fNuebarE   = (TF1*)eventrates->Get("NuebarE");
     fNumubarE  = (TF1*)eventrates->Get("NumubarE");
     fNutaubarE = (TF1*)eventrates->Get("NutaubarE");
+    fNueE->SetNpx(fNpxNueE);
+    fNumuE->SetNpx(fNpxNumuE);
+    fNutauE->SetNpx(fNpxNutauE);
+    fNuebarE->SetNpx(fNpxNuebarE);
+    fNumubarE->SetNpx(fNpxNumubarE);
+    fNutaubarE->SetNpx(fNpxNutaubarE);
   }
   if (fCustomNuFlavBR) {
     totNueE      = fNuFlavBR.at(0);
@@ -217,8 +234,17 @@ void evgen::NuEScatterGen::reconfigure(fhicl::ParameterSet const & p)
   }
 
   fCustomNuFlavBR = p.get<bool>("CustomNuFlavBR");
+  fFlatESpectrum = p.get<bool>("FlatESpectrum",false);
+  
   if (!fFlatESpectrum || !fCustomNuFlavBR) {
     fEventRateFileName = p.get<std::string>("EventRateFileName");
+    fNpxNueE           = p.get<int>("NpxNueE");
+    fNpxNumuE          = p.get<int>("NpxNumuE");
+    fNpxNutauE         = p.get<int>("NpxNutauE");
+    fNpxNuebarE        = p.get<int>("NpxNuebarE");
+    fNpxNumubarE       = p.get<int>("NpxNumubarE");
+    fNpxNutaubarE      = p.get<int>("NpxNutaubarE");
+
   }
   if (fCustomNuFlavBR) {
     fNuFlavBR = p.get<std::vector<double>>("NuFlavBR");
