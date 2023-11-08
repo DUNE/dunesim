@@ -28,7 +28,7 @@ services:
 
 services.LArFFT.FFTOption: "" 
 services.Geometry.GDML: "dune4apa36deg.gdml"
-services.Geometry.ROOT: "dune4apa36deg.gdml"
+services.AuxDetGeometry.GDML: @local::services.Geometry.GDML
 
 #Start each new event with an empty event.
 source:

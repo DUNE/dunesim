@@ -7,7 +7,7 @@
 #include <sstream>
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "lardata/Utilities/LArFFT.h"
-#include "larcore/Geometry/Geometry.h"
+#include "larcore/Geometry/WireReadout.h"
 #include "nurandom/RandomUtils/NuRandomService.h"
 #include "art_root_io/TFileService.h"
 #include "CLHEP/Random/JamesRandom.h"
@@ -155,8 +155,7 @@ SPhaseUniqChannelNoiseService(fhicl::ParameterSet const& pset)
   } else {
     makeCoherentGroupsByOfflineChannel(fNChannelsPerCoherentGroup);
     if ( !fSpecifyNoisePoint ) {
-      art::ServiceHandle<geo::Geometry> geo;
-      fNoiseArrayPoints = geo->Nchannels();
+      fNoiseArrayPoints = art::ServiceHandle<geo::WireReadout>()->Get().Nchannels();
       fCohNoiseArrayPoints = fNCoherentGroups;
     }
   }
@@ -226,8 +225,7 @@ int SPhaseUniqChannelNoiseService::addNoise(detinfo::DetectorClocksData const&,
     }
   }
   
-  art::ServiceHandle<geo::Geometry> geo;
-  const geo::View_t view = geo->View(chan);
+  const geo::View_t view = art::ServiceHandle<geo::WireReadout>()->Get().View(chan);
   for ( unsigned int itck=0; itck<sigs.size(); ++itck ) {
     double tnoise = 0;
     if ( view==geo::kU ) {
@@ -547,8 +545,7 @@ generateCoherentNoise(detinfo::DetectorClocksData const& clockData,
 void SPhaseUniqChannelNoiseService::makeCoherentGroupsByOfflineChannel(unsigned int nchpergroup) {
 	CLHEP::RandFlat flat(*m_pran);
   CLHEP::RandGauss gaus(*m_pran);
-	art::ServiceHandle<geo::Geometry> geo;
-	const unsigned int nchan = geo->Nchannels();
+        const unsigned int nchan = art::ServiceHandle<geo::WireReadout>()->Get().Nchannels();
 	fChannelGroupMap.resize(nchan);
 	fNCoherentGroups = 0;
 	if(nchan%nchpergroup == 0) fNCoherentGroups = nchan/nchpergroup;

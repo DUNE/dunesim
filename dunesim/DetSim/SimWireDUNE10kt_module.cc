@@ -39,7 +39,7 @@ extern "C" {
 #include "lardataobj/RawData/raw.h"
 #include "lardata/DetectorInfoServices/LArPropertiesService.h"
 #include "dunecore/Utilities/SignalShapingServiceDUNE.h"
-#include "larcore/Geometry/Geometry.h"
+#include "larcore/Geometry/WireReadout.h"
 
 #include "lardataobj/Simulation/sim.h"
 #include "lardataobj/Simulation/SimChannel.h"
@@ -192,12 +192,10 @@ namespace detsim {
 				      << "greater than FFTSize!";
 
     fChargeWork.resize(fNTicks, 0.);
-    art::ServiceHandle<geo::Geometry> geo;
     
     //Generate noise if selected to be on
     if(fNoiseOn && fNoiseModel==1){
 
-      //fNoise.resize(geo->Nchannels());
       fNoiseZ.resize(fNoiseArrayPoints);
       fNoiseU.resize(fNoiseArrayPoints);
       fNoiseV.resize(fNoiseArrayPoints);
@@ -247,7 +245,7 @@ namespace detsim {
   void SimWireDUNE10kt::produce(art::Event& evt)
   {
     // get the geometry to be able to figure out signal types and chan -> plane mappings
-    art::ServiceHandle<geo::Geometry> geo;
+    auto const& wireReadout = art::ServiceHandle<geo::WireReadout>()->Get();
     unsigned int signalSize = fNTicks;
 
     // vectors for working
@@ -264,7 +262,7 @@ namespace detsim {
     // of entries as the number of channels in the detector
     // and set the entries for the channels that have signal on them
     // using the chanHandle
-    std::vector<const sim::SimChannel*> channels(geo->Nchannels());
+    std::vector<const sim::SimChannel*> channels(wireReadout.Nchannels());
     for(size_t c = 0; c < chanHandle.size(); ++c){
       channels[chanHandle[c]->Channel()] = chanHandle[c];
     }
@@ -291,14 +289,14 @@ namespace detsim {
 
     std::map<int,double>::iterator mapIter;
 
-    digcol->reserve(geo->Nchannels());
+    digcol->reserve(wireReadout.Nchannels());
     if (prepost) {
-      digcolPreSpill->reserve(geo->Nchannels());
-      digcolPostSpill->reserve(geo->Nchannels());
+      digcolPreSpill->reserve(wireReadout.Nchannels());
+      digcolPostSpill->reserve(wireReadout.Nchannels());
     }
     
     auto const clockData = art::ServiceHandle<detinfo::DetectorClocksService const>()->DataFor(evt);
-    for(chan = 0; chan < geo->Nchannels(); chan++) {
+    for(chan = 0; chan < wireReadout.Nchannels(); chan++) {
       
       fChargeWork.clear();
       // fChargeWork.resize(fNTicks, 0.);
@@ -315,7 +313,7 @@ namespace detsim {
       // get the sim::SimChannel for this channel
       const sim::SimChannel* sc = channels[chan];
 
-      const geo::View_t view = geo->View(chan);
+      const geo::View_t view = wireReadout.View(chan);
 
       if( sc ){
 
@@ -344,7 +342,7 @@ namespace detsim {
       }
       
       float ped_mean = fCollectionPed;
-      geo::SigType_t sigtype = geo->SignalType(chan);
+      geo::SigType_t sigtype = wireReadout.SignalType(chan);
       if (sigtype == geo::kInduction){
         ped_mean = fInductionPed;
       }

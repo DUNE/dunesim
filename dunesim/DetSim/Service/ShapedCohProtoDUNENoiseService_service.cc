@@ -9,6 +9,7 @@
 #include "nurandom/RandomUtils/NuRandomService.h"
 #include "dunepdlegacy/Services/ChannelMap/PdspChannelMapService.h"
 
+#include "larcore/Geometry/WireReadout.h"
 #include "lardataalg/DetectorInfo/DetectorClocksData.h"
 #include "nurandom/RandomUtils/NuRandomService.h"
 
@@ -88,8 +89,7 @@ int ShapedCohProtoDUNENoiseService::addNoise(detinfo::DetectorClocksData const& 
 
 int ShapedCohProtoDUNENoiseService::addShapedNoise(const Channel c, AdcSignalVector& adcs, detinfo::DetectorClocksData const& clock) const {
   
-  art::ServiceHandle<geo::Geometry> geo;
-  const geo::View_t view = geo->View(c);
+  const geo::View_t view = art::ServiceHandle<geo::WireReadout>()->Get().View(c);
   CLHEP::HepRandomEngine& engine = *m_pran;
   CLHEP::RandGauss g_ind(engine, m_induction_plane_noise , m_induction_plane_noise_rms );
   CLHEP::RandGauss g_col(engine, m_collection_plane_noise, m_collection_plane_noise_rms);
