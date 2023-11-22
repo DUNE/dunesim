@@ -18,8 +18,6 @@ BEGIN_PROLOG
 #  v3.1.3-08222023/Juergen Reichenbacher: Reduced activity in APA steel to numbers measured at South Dakota (SDSMT+SURF) for APA steel sample from Daresbury production site
 #  v3.1.4-09142023/Juergen Reichenbacher: Included backgrounds from APA electronics boards based on SDSMT assays of FR4 Sussex boards and changed activity in CPA to assayed FR4 activities too (CPA->3mm =>adjusted K42&RnDaughters on CPA)
 #  ==================================================================================================================================================================================================================================
-#  HD 1x2x2 version v3.1.4 is same as HD 1x2x6 version v3.1.4, except external backgrounds stop at z=490cm and face plane at z=490cm is left out to make it more representative for a 10 kton HD module  -JReichenbacher (09/15/2023)
-#  ==================================================================================================================================================================================================================================
 
 
 dune10kt_39Ar_in_LAr:{
