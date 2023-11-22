@@ -304,7 +304,7 @@ evgen::ProtoDUNETriggeredBeam::ProtoDUNETriggeredBeam(fhicl::ParameterSet const 
     // File reading variable initialisations
     fFileName = pset.get< std::string>("FileName");
     fBaseFileName = fFileName.substr(fFileName.rfind("/")+1);
-    fStreamInput = pset.get<bool>("StreamInput", false);
+    fStreamInput = pset.get<bool>("StreamInput", true);
 
     fIsNP02 = pset.get<bool>("IsNP02", false);
     //Names of the detectors in real life
@@ -1269,11 +1269,9 @@ void evgen::ProtoDUNETriggeredBeam::OpenInputFile(std::string & filename)
 {
 
     if (fStreamInput) {
-      if (fFileName.find("/pnfs") != 0) {
-        throw cet::exception("ProtoDUNETriggeredBeam") << "Filename " <<
-            fFileName << " does not start with /pnfs as required for streaming" << std::endl;
+      if (filename.find("/pnfs") == 0) {
+        filename.replace(0, 5, "root://fndca1.fnal.gov:1094//pnfs/fnal.gov/usr");
       }
-      filename.replace(0, 5, "root://fndca1.fnal.gov:1094//pnfs/fnal.gov/usr");
       return;
     }
 
