@@ -1,0 +1,91 @@
+#include "services_dune.fcl"
+#include "dune_radiological_model_decay0_v3_4_hd_common.fcl"
+
+BEGIN_PROLOG
+# -JReichenbacher (01/11/2017)
+#  v3.1.3.VD-08142023/Juergen Reichenbacher: started porting v3 to VD (fine-tuned for external background planes upper z-position from 1000 cm to 996 cm based on Sergio Manthey's and Gleb Sinev's validations)
+#  v3.1.4.VD-09152023/Juergen Reichenbacher: Changed external background planes to have larger dead LAr gap of 78cm, except for top (25cm conservatively as ambiguous dimension numbers have been found for top)
+#                                            Checked on Arapuca and implemented Rn daughter plate-out for Tile X-Arapuca geometry, added 232Th decay chain background in Cathode, added U, Th, K backgrounds in CRP (Anode)
+#                                            Added migration backgrounds from 222Rn and 220Rn decay products in LAr & with new 'delta-fct.' method in LAr 5 cm above Cathode FRP frame
+#                                            Added more realistic migration of 42K from 42Ar to upper cathode mesh using new 'delta-fct.' method in LAr 5 cm above Cathode FRP frame too
+#                                            Use 'rate' instead of 'BqPercc' command for new 'delta-fct.' 42K method in LAr 5 cm above Cathode FRP frame ('rate' value needs to be adjusted if volume changes!!!)
+#                                            Modify 'rate' values by multiplying by 2*0.004285s to accomodate that in larsimrad Twindow is not multiplied to rate (in contrast to documentation v1) -> Remember: adjust if volume changes!!!
+
+dunevd10kt_39Ar_in_LAr:                   @local::dune10kt_39Ar_in_LAr
+
+dunevd10kt_85Kr_in_LAr:                   @local::dune10kt_85Kr_in_LAr
+
+dunevd10kt_42Ar_in_LAr:                   @local::dune10kt_42Ar_in_LAr
+    
+dunevd10kt_42Kfrom42Ar_in_LAr:            @local::dune10kt_42Kfrom42Ar_in_LAr
+
+dunevd10kt_222Rn_chain_222RnOnly_in_LAr:  @local::dune10kt_222Rn_chain_222RnOnly_in_LAr
+    
+dunevd10kt_40K_in_Cathode:              @local::dune10kt_1x2x6_40K_in_CPA # does NOT depend anymore on thickness of 'CathodeGrid' for FRP frame in VD
+dunevd10kt_40K_in_Cathode.volume_gen:   "volCathodeGrid"
+dunevd10kt_40K_in_Cathode.material:     "G10"
+   # Should be 4.9 Bq/kg (measured for 40K) times a density of 1.85 g/cc for 3 mm thick G10 -JReichenbacher (01/11/2017)
+   # For Decay0 assume for now FR4 sheet for VD cathode that is 1 cm thick and ignore 4 cm thickness for now (JR 08/30/2023)
+dunevd10kt_40K_in_Cathode.BqPercc:      0.01225
+   # new SDSMT FR4 assay result on K40 is 7.0 Bq/kg and thickness of FRP frame beams is 4 cm with measured density of 1.75 g/cm^3 -JReichenbacher (09/22/2023)
+
+dunevd10kt_238U_chain_in_Cathode:             @local::dune10kt_1x2x6_238U_chain_in_CPA  # does NOT depend anymore on thickness of 'CathodeGrid' for FRP frame in VD
+dunevd10kt_238U_chain_in_Cathode.volume_gen:  "volCathodeGrid"
+dunevd10kt_238U_chain_in_Cathode.material:    "G10"
+dunevd10kt_238U_chain_in_Cathode.BqPercc:     8.925e-3
+
+dunevd10kt_232Th_chain_in_Cathode:              @local::dune10kt_1x2x6_232Th_chain_in_CPA #does NOT depend anymore on thickness of 'CathodeGrid' for FRP frame in VD
+dunevd10kt_232Th_chain_in_Cathode.volume_gen:   "volCathodeGrid"
+dunevd10kt_232Th_chain_in_Cathode.material:     "G10"
+dunevd10kt_232Th_chain_in_Cathode.BqPercc:      0.0126
+   # new SDSMT FR4 assay result on 232Th is 7.2 Bq/kg and thickness of FRP frame beams is 4 cm with measured density of 1.75 g/cm^3 -JReichenbacher (09/22/2023)
+
+dunevd10kt_40K_in_Anode:             @local::dune10kt_40K_in_APAboards   # does depend on thickness of 'AnodePlate' for VD
+dunevd10kt_40K_in_Anode.volume_gen:  "volAnodePlate"
+dunevd10kt_40K_in_Anode.material:    "vm2000"
+dunevd10kt_40K_in_Anode.BqPercc:     0.4001
+   # new SDSMT FR4 assay result on K40 is 7.0 Bq/kg and thickness of 2x PCBs (perforated FR4) is 0.25" with measured eff. density of 0.90 g/cm^3 that is placed into 0.01 cm thin AnodePlate (vm2000) -JReichenbacher (09/22/2023)
+   # 7.0 Bq / 1000 * 0.25*2.54 / 0.01 *0.9/cc = 0.4001 Bq/cc
+
+dunevd10kt_238U_chain_in_Anode:             @local::dune10kt_238U_chain_in_APAboards #does depend on thickness of 'AnodePlate' for VD
+dunevd10kt_238U_chain_in_Anode.volume_gen:  "volAnodePlate"
+dunevd10kt_238U_chain_in_Anode.material:    "vm2000"
+dunevd10kt_238U_chain_in_Anode.BqPercc:     0.2915
+   # new SDSMT FR4 assay result on lateU w/U235 correction is 5.1 Bq/kg and thickness of 2x PCBs (perforated FR4) is 0.25" with measured eff. density of 0.90 g/cm^3 -JReichenbacher (09/22/2023)
+   # that is placed into 0.01 cm thin AnodePlate (vm2000) -JReichenbacher (09/22/2023)
+   # 5.1 Bq / 1000 * 0.25*2.54 / 0.01 *0.9/cc = 0.2915 Bq/cc
+
+
+dunevd10kt_232Th_chain_in_Anode:             @local::dune10kt_232Th_chain_in_APAboards #does depend on thickness of 'AnodePlate' for VD
+dunevd10kt_232Th_chain_in_Anode.volume_gen:  "volAnodePlate"
+dunevd10kt_232Th_chain_in_Anode.material:    "vm2000"
+dunevd10kt_232Th_chain_in_Anode.BqPercc:     0.4115
+   # new SDSMT FR4 assay result on 232Th is 7.2 Bq/kg and thickness of 2x PCBs (perforated FR4) is 0.25" with measured eff. density of 0.90 g/cm^3 -JReichenbacher (09/22/2023)
+   # 7.2 Bq / 1000 * 0.25*2.54 / 0.01 *0.9/cc = 0.4115 Bq/cc
+
+dunevd10kt_222Rn_chain_218PoOnly_in_LAr:             @local::dune10kt_222Rn_chain_218PoOnly_in_LAr
+dunevd10kt_222Rn_chain_218PoOnly_in_LAr.BqPercc:     0.0000012942 # Rn222 rate minus the 7.2257% on the cathode
+dunevd10kt_222Rn_chain_218PoOnly_in_LAr.distrib_x:   "10255.2+(41.3788*TMath::Abs(325.-x))-(0.135462*(325.-x)*(325.-x))+(0.000203379*TMath::Power(TMath::Abs(325.-x),3))-(1.14356e-007*TMath::Power(TMath::Abs(325.-x),4))"
+
+dunevd10kt_222Rn_chain_214PbOnly_in_LAr:            @local::dune10kt_222Rn_chain_214PbOnly_in_LAr
+dunevd10kt_222Rn_chain_214PbOnly_in_LAr.BqPercc:    0.00000094574 # Rn222 rate minus the 32.2051% on the cathode
+dunevd10kt_222Rn_chain_214PbOnly_in_LAr.distrib_x:  "6520.63+(26.8336*TMath::Abs(325.-x))-(0.0516248*(325.-x)*(325.-x))+(3.858e-005*TMath::Power(TMath::Abs(325.-x),3))"
+
+dunevd10kt_222Rn_chain_214BiOnly_in_LAr:             @local::dune10kt_222Rn_chain_214BiOnly_in_LAr
+dunevd10kt_222Rn_chain_214BiOnly_in_LAr.BqPercc:     0.00000059253 # Rn222 rate minus the 57.5246% on the cathode
+dunevd10kt_222Rn_chain_214BiOnly_in_LAr.distrib_x:   "2997.66+(14.8718*TMath::Abs(325.-x))-(0.00824868*(325.-x)*(325.-x))"
+
+dunevd10kt_222Rn_chain_210PbOnly_in_LAr:             @local::dune10kt_222Rn_chain_210PbOnly_in_LAr
+dunevd10kt_222Rn_chain_210PbOnly_in_LAr.BqPercc:     0.00000037411 # Rn222 rate minus the 73.1822% on the cathode
+dunevd10kt_222Rn_chain_210PbOnly_in_LAr.distrib_x:   "1863.42+(9.70072*TMath::Abs(325.-x))-(0.0057322*(325.-x)*(325.-x))"
+
+dunevd10kt_222Rn_chain_in_PDS:            @local::dune10kt_222Rn_chain_in_PDS
+   #BqPercc: 0.000021  // Checked on the above calculation again for HD Arapucas and then adjusted it below for VD X-Arapuca Tiles  -JReichenbacher (09/21/2023)
+   # VD X-Arapuca Tiles have the following size: 2.5 cm thick x 63 cm x 63 cm (60cm x 60cm effective)
+   # this translate to 0.17136/(2.5x63x63) = 0.000017 Bq/cm^3
+dunevd10kt_222Rn_chain_in_PDS.BqPercc:    0.000017
+
+dunevd10kt_220Rn_chain_212PbOnly_in_LAr:              @local::dune10kt_220Rn_chain_212PbOnly_in_LAr
+dunevd10kt_220Rn_chain_212PbOnly_in_LAr.distrib_x:    @erase
+
+END_PROLOG
