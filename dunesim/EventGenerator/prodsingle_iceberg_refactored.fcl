@@ -87,7 +87,7 @@ services.Geometry.ROOT: "iceberg_v2_refactored.gdml"
 
 services.LArG4Detector: {
       category: "world"
-      gdmlFileName_: "protodune_v7_refactored_nowires.gdml"
+      gdmlFileName_: "iceberg_v2_refactored_nowires.gdml"
       stepLimits: [
          3e-1,
          3e-1
