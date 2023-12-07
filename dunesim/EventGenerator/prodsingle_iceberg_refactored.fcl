@@ -44,7 +44,7 @@ physics:
  {
    generator: @local::iceberg_singlep	  
    largeant:  @local::protodune_larg4	  
-   tpcrawdecoder: @local::tpcrawdecoder_iceberg
+   tpcrawdecoder: @local::tpcrawdecoder_iceberg_splusn
    rns:       { module_type: "RandomNumberSaver" }
  }
 
