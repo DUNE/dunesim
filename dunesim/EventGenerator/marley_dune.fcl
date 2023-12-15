@@ -36,4 +36,12 @@ dune_marley_solar_nue_cc_flat.marley_parameters.reactions: ["ve40ArCC_Bhattachar
 dune_marley_solar_nue_es_flat: @local::dune_marley_solar_flat
 dune_marley_solar_nue_es_flat.marley_parameters.reactions: ["ES.react" ]
 
+# VD-specific MARLEY configurations to include the region between FC and Cryo wall in the neutrino gen position
+dunevd_marley_nue_cc_flat: @local::dune_marley_nue_cc_flat
+dunevd_marley_nue_cc_flat.vertex: { type: "box"  min_position: [ -327.0, -732.0, 0.0 ]  max_position: [ 375.0, 732.0, 2100.0 ]  check_active: false }
+
+dunevd_marley_nue_es_flat: @local::dunevd_marley_nue_es_flat
+dunevd_marley_nue_es_flat.vertex: { type: "box"  min_position: [ -327.0, -732.0, 0.0 ]  max_position: [ 375.0, 732.0, 2100.0 ]  check_active: false }
+
+
 END_PROLOG
