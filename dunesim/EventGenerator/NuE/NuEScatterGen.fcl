@@ -29,7 +29,7 @@ standard_nuescattergen_solar:
    NuFlavBR:          [ 1., 0., 0., 0., 0., 0. ]
    FlatESpectrum:     false # generate flat energy spectrum for neutrino
 
-   EventRateFileName: "/pnfs/dune/persistent/stash/Flux/Solar/v1/solar_nu-e_rates_KamLAND_bestfit.root"
+   EventRateFileName: "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/Flux/Solar/v1/solar_nu-e_rates_KamLAND_bestfit.root"
 
    NpxNueE:      1500            # number of samples for TH1::GetRandom
    NpxNumuE:     1500            
@@ -69,7 +69,7 @@ standard_nuescattergen_supernova:
    NuFlavBR:          [ 1., 0., 0., 0., 0., 0. ]
    FlatESpectrum:     false # generate flat energy spectrum for neutrino
 
-   EventRateFileName: "/pnfs/dune/persistent/stash/Flux/Supernova/v1/supernova_nu-e_rates_Garching.root"
+   EventRateFileName: "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/Flux/Solar/v1/supernova_nu-e_rates_Garching.root"
 
    NpxNueE:      1500            # number of samples for TH1::GetRandom
    NpxNumuE:     1500            
