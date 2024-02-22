@@ -19,7 +19,7 @@ cet_build_plugin(Dune35tSimChannelExtractService
                 art::Utilities canvas
                 cetlib::cetlib 
 		cetlib_except::cetlib_except
-                ROOT_BASIC_LIB_LIST
+                ROOT::Core
              )
 
 cet_build_plugin(GenericSimChannelExtractService   
@@ -34,7 +34,7 @@ cet_build_plugin(GenericSimChannelExtractService
 		canvas::canvas
                 cetlib::cetlib 
 		cetlib_except::cetlib_except
-                ROOT_BASIC_LIB_LIST
+                ROOT::Core
              )
 
 cet_build_plugin(DPhaseSimChannelExtractService   
@@ -50,9 +50,9 @@ cet_build_plugin(DPhaseSimChannelExtractService
                 art::Framework_Core
                 cetlib::cetlib 
 		cetlib_except::cetlib_except
-                ROOT_BASIC_LIB_LIST
+                ROOT::Core
 		nurandom::RandomUtils_NuRandomService_service
-		CLHEP
+		CLHEP::CLHEP
              )
 
 cet_build_plugin(ExponentialChannelNoiseService   
@@ -67,8 +67,8 @@ cet_build_plugin(ExponentialChannelNoiseService
                 art::Utilities canvas
                 cetlib::cetlib 
 		cetlib_except::cetlib_except
-                CLHEP
-                ROOT_BASIC_LIB_LIST
+                CLHEP::CLHEP
+                ROOT::Core
              )
               
 cet_build_plugin(ShapedCohProtoDUNENoiseService   art::service
@@ -84,8 +84,8 @@ cet_build_plugin(ShapedCohProtoDUNENoiseService   art::service
 		canvas::canvas
                 cetlib::cetlib 
 		cetlib_except::cetlib_except
-                CLHEP
-                ROOT_BASIC_LIB_LIST
+                CLHEP::CLHEP
+                ROOT::Core
              )
 
 cet_build_plugin(DPhaseRealisticNoiseService   
@@ -103,8 +103,8 @@ cet_build_plugin(DPhaseRealisticNoiseService
 	       canvas::canvas
                cetlib::cetlib 
 	       cetlib_except::cetlib_except
-               CLHEP
-               ROOT_BASIC_LIB_LIST
+               CLHEP::CLHEP
+               ROOT::Core
              )
 
 cet_build_plugin(DPhaseCoherentNoiseService   
@@ -121,8 +121,8 @@ cet_build_plugin(DPhaseCoherentNoiseService
 		canvas::canvas
                 cetlib::cetlib 
 		cetlib_except::cetlib_except
-                CLHEP
-                ROOT_BASIC_LIB_LIST
+                CLHEP::CLHEP
+                ROOT::Core
               )
 
 cet_build_plugin(ProtoDUNEChannelNoiseService   
@@ -137,8 +137,8 @@ cet_build_plugin(ProtoDUNEChannelNoiseService
                 art::Utilities canvas
                 cetlib::cetlib 
 		cetlib_except::cetlib_except
-                CLHEP
-                ROOT_BASIC_LIB_LIST
+                CLHEP::CLHEP
+                ROOT::Core
              )
 
 cet_build_plugin(SPhaseChannelNoiseService   
@@ -153,8 +153,8 @@ cet_build_plugin(SPhaseChannelNoiseService
                 art::Utilities canvas
                 cetlib::cetlib 
 		cetlib_except::cetlib_except
-                CLHEP
-                ROOT_BASIC_LIB_LIST
+                CLHEP::CLHEP
+                ROOT::Core
              )
 
 cet_build_plugin(SPhaseUniqChannelNoiseService   
@@ -169,8 +169,8 @@ cet_build_plugin(SPhaseUniqChannelNoiseService
                 art::Utilities canvas
                 cetlib::cetlib 
 		cetlib_except::cetlib_except
-                CLHEP
-                ROOT_BASIC_LIB_LIST
+                CLHEP::CLHEP
+                ROOT::Core
              )
 
 cet_build_plugin(WhiteChannelNoiseService   
@@ -186,8 +186,8 @@ cet_build_plugin(WhiteChannelNoiseService
 		canvas::canvas
                 cetlib::cetlib 
 		cetlib_except::cetlib_except
-                CLHEP
-                ROOT_BASIC_LIB_LIST
+                CLHEP::CLHEP
+                ROOT::Core
              )
 
 cet_build_plugin(ProvidedPedestalAdditionService 
@@ -202,8 +202,8 @@ cet_build_plugin(ProvidedPedestalAdditionService
                 cetlib::cetlib 
 		cetlib_except::cetlib_except
                 messagefacility::MF_MessageLogger
-                CLHEP
-                ROOT_BASIC_LIB_LIST
+                CLHEP::CLHEP
+		ROOT::Hist
              )
 
 cet_build_plugin(Dune35tZeroSuppressService        
@@ -252,8 +252,8 @@ cet_build_plugin(StuckBitAdcDistortionService
                 messagefacility::MF_MessageLogger
                 cetlib::cetlib 
 		cetlib_except::cetlib_except
-                CLHEP
-                ROOT_BASIC_LIB_LIST
+                CLHEP::CLHEP
+                ROOT::Core
              )
 
 cet_build_plugin(FixedDetPedestalService 
@@ -262,7 +262,7 @@ cet_build_plugin(FixedDetPedestalService
                 art::Utilities canvas
                 cetlib::cetlib 
 		cetlib_except::cetlib_except
-                ROOT_BASIC_LIB_LIST
+                ROOT::Core
 )
 
 #cet_build_plugin(DPhaseFixedDetPedestalService 
@@ -271,7 +271,7 @@ cet_build_plugin(FixedDetPedestalService
 #                art::Utilities canvas
 #                cetlib::cetlib 
 #                cetlib_except::cetlib_except
-#                ROOT_BASIC_LIB_LIST
+#                ROOT::Core
 #)
 
 add_subdirectory(test)

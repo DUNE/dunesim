@@ -11,7 +11,6 @@ cet_build_plugin(IdealAdcSimulator
   canvas::canvas
   cetlib::cetlib 
   cetlib_except::cetlib_except
-  ROOT_BASIC_LIB_LIST
   )
 
 cet_build_plugin(NoisyAdcSimulator   
@@ -27,7 +26,6 @@ cet_build_plugin(NoisyAdcSimulator
   ROOT::Core
   art_root_io::TFileService_service
   art::Framework_Core
-  ROOT_BASIC_LIB_LIST
 
   )
 

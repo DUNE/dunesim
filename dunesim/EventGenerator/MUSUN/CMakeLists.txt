@@ -1,17 +1,11 @@
 art_make(
           MODULE_LIBRARIES
-                        larcoreobj_SummaryData
-                        larcore_Geometry_Geometry_service
-                        larcorealg_Geometry
+                        larcoreobj::SummaryData
+                        larcore::Geometry_Geometry_service
+                        larcorealg::Geometry
                         larsim_Simulation lardataobj_Simulation
                         nusimdata::SimulationBase
-                        ART_FRAMEWORK_CORE
-                        ART_FRAMEWORK_PRINCIPAL
-                        ART_FRAMEWORK_SERVICES_REGISTRY
-                        ART_ROOT_IO_TFILE_SUPPORT
                         ROOT::Core
-                        ART_ROOT_IO_TFILESERVICE_SERVICE
-                        ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE
                         art::Persistency_Common
                         art::Persistency_Provenance
                         art::Utilities
@@ -19,10 +13,9 @@ art_make(
                         messagefacility::MF_MessageLogger
                         fhiclcpp::fhiclcpp
                         cetlib::cetlib cetlib_except
-                        CLHEP
-                        ROOT_BASIC_LIB_LIST
-                        ROOT_GEOM
-        )
+			CLHEP::CLHEP
+                        ROOT::Geom
+        ) ### MIGRATE-ACTION-RECOMMENDED (migrate-3.22.02) - deprecated: use art_make_library(), art_dictonary(), and cet_build_plugin() with explicit source lists and plugin base types
 
 install_headers()
 install_fhicl()

@@ -34,11 +34,10 @@ art_make(
     fhiclcpp::fhiclcpp
     cetlib::cetlib 
     cetlib_except::cetlib_except
-    CLHEP
-    ROOT_GEOM
-    ROOT_XMLIO
-    ROOT_GDML
-    ROOT_BASIC_LIB_LIST
-)
+    CLHEP::CLHEP
+    ROOT::Geom
+    ROOT::XMLIO
+    ROOT::Gdml
+) ### MIGRATE-ACTION-RECOMMENDED (migrate-3.22.02) - deprecated: use art_make_library(), art_dictonary(), and cet_build_plugin() with explicit source lists and plugin base types
 
 install_source()

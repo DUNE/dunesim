@@ -16,6 +16,6 @@ cet_test(test_IdealAdcSimulator SOURCES test_IdealAdcSimulator.cxx
     fhiclcpp::fhiclcpp
     cetlib::cetlib
     cetlib_except::cetlib_except
-    SQLITE3
+    SQLite::SQLite3
     Boost::filesystem
 )

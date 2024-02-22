@@ -6,10 +6,6 @@ art_make(
                         nurandom::RandomUtils_NuRandomService_service
                         larsim_Simulation lardataobj_Simulation
                         nusimdata::SimulationBase
-                        ART_FRAMEWORK_CORE
-                        ART_FRAMEWORK_PRINCIPAL
-                        ART_FRAMEWORK_SERVICES_REGISTRY
-                        ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE
                         art::Persistency_Common
                         art::Persistency_Provenance
                         art::Utilities
@@ -18,11 +14,12 @@ art_make(
                         fhiclcpp::fhiclcpp
                         cetlib::cetlib cetlib_except
                         CLHEP
-                        ROOT_BASIC_LIB_LIST
-                        SQLITE3
-                        ROOT_EG
+			ROOT::Core
+			ROOT::Hist
+			SQLite::SQLite3
+                        ROOT::EG
                         ifdh::ifdh
-        )
+        ) ### MIGRATE-ACTION-RECOMMENDED (migrate-3.22.02) - deprecated: use art_make_library(), art_dictonary(), and cet_build_plugin() with explicit source lists and plugin base types
 
 install_headers()
 install_fhicl()
