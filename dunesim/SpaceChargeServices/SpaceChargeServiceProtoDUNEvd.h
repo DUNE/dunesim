@@ -25,7 +25,7 @@ namespace spacecharge{
       // this enables art to print the configuration help:
       //using Parameters = art::ServiceTable<spacecharge::SpaceChargeProtoDUNEhd::ConfigurationParameters_t>;
       
-      SpaceChargeServiceProtoDUNEhd(fhicl::ParameterSet const& pset, art::ActivityRegistry& reg);
+      SpaceChargeServiceProtoDUNEvd(fhicl::ParameterSet const& pset, art::ActivityRegistry& reg);
 
       void   reconfigure(fhicl::ParameterSet const& pset);
       void   preBeginRun(const art::Run& run);
