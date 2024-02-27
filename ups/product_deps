@@ -248,10 +248,10 @@ gdmldir	product_dir	gdml
 #
 ####################################
 product		version		qual	flags		<table_format=2>
-dunecore	v09_82_02d01	-
+dunecore	v09_83_01d00	-
 genie_phyopt	v3_04_00	-
-cetmodules	v3_22_02	-	only_for_build
 genie_xsec	v3_04_00	-	optional
+cetmodules	v3_22_02	-	only_for_build
 end_product_list
 ####################################
 
