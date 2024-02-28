@@ -20,7 +20,7 @@ cet_build_plugin(SpaceChargeServiceProtoDUNEhd art::service
               art::Persistency_Provenance canvas
               art_root_io::tfile_support
               ROOT::Core
-              art_root_io::Tfileservice_service
+              art_root_io::TFileService_service
               art::Framework_Services_System_FileCatalogMetadata_service
               art::Utilities canvas
               messagefacility::MF_MessageLogger
