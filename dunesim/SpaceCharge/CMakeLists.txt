@@ -1,19 +1,19 @@
 art_make( NO_PLUGINS
           
           LIB_LIBRARIES
-          				lardataobj_RecoBase
-                        lardata_Utilities
-                         lardataalg_DetectorInfo
-              larevt_SpaceCharge
-			larcorealg_Geometry
+          				lardataobj::RecoBase
+                        lardata::Utilities
+                         lardataalg::DetectorInfo
+              larevt::SpaceCharge
+			larcorealg::Geometry
                         messagefacility::MF_MessageLogger
                         art::Framework_Services_Registry 
-                        cetlib::cetlib cetlib_except
+                        cetlib::cetlib cetlib_except::cetlib_except
 			    art_root_io::tfile_support
 			    ROOT::Core
-			    art::Persistency_Common canvas
-			    art::Persistency_Provenance canvas
-			    art::Utilities canvas
+			    art::Persistency_Common
+			    art::Persistency_Provenance canvas::canvas
+			    art::Utilities
 			fhiclcpp::fhiclcpp
                             ROOT::Hist
 			

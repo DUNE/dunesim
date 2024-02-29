@@ -1,5 +1,8 @@
 cet_build_plugin(RandomChannelStatusService art::service
-              larcorealg_Geometry
+              larcorealg::Geometry
+              larevt::CalibrationDBI_Providers
+              larcore::headers
+              lardataobj::Simulation
               ROOT::Geom
               ROOT::Core
               )

@@ -1,10 +1,10 @@
 art_make(
           MODULE_LIBRARIES
-                        larcoreobj_SummaryData
-                        larcore_Geometry_Geometry_service
-			larcorealg_Geometry
+                        larcoreobj::SummaryData
+                        larcore::Geometry_Geometry_service
+			larcorealg::Geometry
                         nurandom::RandomUtils_NuRandomService_service
-                        larsim_Simulation lardataobj_Simulation
+                        larsim::Simulation lardataobj::Simulation
                         nusimdata::SimulationBase
                         art::Persistency_Common
                         art::Persistency_Provenance
@@ -12,8 +12,8 @@ art_make(
                         canvas::canvas
                         messagefacility::MF_MessageLogger
                         fhiclcpp::fhiclcpp
-                        cetlib::cetlib cetlib_except
-                        CLHEP
+                        cetlib::cetlib cetlib_except::cetlib_except
+                        CLHEP::CLHEP
 			ROOT::Core
 			ROOT::Hist
 			SQLite::SQLite3

@@ -11,26 +11,28 @@ include_directories( ${CMAKE_CURRENT_SOURCE_DIR} ) ### MIGRATE-ACTION-RECOMMENDE
 
 art_make( BASENAME_ONLY
           MODULE_LIBRARIES 
-                        larcoreobj_SummaryData
-                        larcorealg_Geometry
-                        larcore_Geometry_Geometry_service
+                        larcoreobj::SummaryData
+                        larcorealg::Geometry
+                        larcore::Geometry_Geometry_service
                         nurandom::RandomUtils_NuRandomService_service
-                        larsim_Simulation lardataobj_Simulation
-                        lardataobj_RecoBase
+                        larsim::Simulation lardataobj::Simulation
+                        lardataobj::RecoBase
+                        lardata::Utilities
                         nusimdata::SimulationBase
                         art::Persistency_Common
                         art::Persistency_Provenance
-                        art::Utilities canvas
+                        art::Utilities canvas::canvas
                         messagefacility::MF_MessageLogger
-                        hep_concurrency
+                        hep_concurrency::hep_concurrency
                         fhiclcpp::fhiclcpp
-                        cetlib::cetlib cetlib_except
+                        cetlib::cetlib cetlib_except::cetlib_except
 			CLHEP::CLHEP
 			SQLite::SQLite3
                         ROOT::EG
 			ROOT::Tree
                         ifdh::ifdh
                         dunesim_EventGenerator_ProtoDUNEbeamDataProducts
+                        dunecore::ArtSupport
                         ProtoDUNETriggeredBeamUtils
  ) ### MIGRATE-ACTION-RECOMMENDED (migrate-3.22.02) - deprecated: use art_make_library(), art_dictonary(), and cet_build_plugin() with explicit source lists and plugin base types
 

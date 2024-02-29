@@ -11,7 +11,7 @@ art_make(
     dunesim::DetSim
     dunecore::Geometry
     larcore::Geometry_Geometry_service
-    larsim::Simulation nug4::ParticleNavigation lardataobj_Simulation
+    larsim::Simulation nug4::ParticleNavigation lardataobj::Simulation
     lardata::Utilities
     larevt::Filters
     larcorealg::Geometry

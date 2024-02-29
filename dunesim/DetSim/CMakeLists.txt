@@ -34,8 +34,8 @@ art_make( BASENAME_ONLY
 			   canvas::canvas
 			   messagefacility::MF_MessageLogger 
  	                   fhiclcpp::fhiclcpp
-			   cetlib::cetlib cetlib_except
-			   CLHEP
+			   cetlib::cetlib cetlib_except::cetlib_except
+			   CLHEP::CLHEP
                            ROOT::Geom
                            ROOT::XMLIO
                            ROOT::Gdml
