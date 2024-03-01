@@ -14,7 +14,7 @@ dunefd_neutrontpcfilter: @local::standard_larg4particlefilter
 dunefd_neutrontpcfilter.InterestingPDGs:                [ 2112 ] # Demand a neutron
 dunefd_neutrontpcfilter.ParticleMinMomentum:            [ -1 ]   # Do not demand a lower momentum bound          
 dunefd_neutrontpcfilter.ParticleMaxMomentum:            [ -1 ]   # Do not demand an upper momentum bound
-dunefd_neutrontpcfilter.StartInTPC:                     [ -1 ]   # Do not demand that the neutron starts in the TPC
+dunefd_neutrontpcfilter.StartInTPC:                     [  0 ]   # Do not demand that the neutron starts in the TPC
 dunefd_neutrontpcfilter.StopInTPC:                      [  1 ]   # DO demand that the neutron stops in the TPC
 dunefd_neutrontpcfilter.ParticleMinTPCLength:           [ -1 ]   # Do not demand that the neutron has a minimum trajectory length in the TPC
 dunefd_neutrontpcfilter.RequireAllInterestingParticles: true
