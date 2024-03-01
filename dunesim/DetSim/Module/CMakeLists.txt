@@ -11,7 +11,7 @@ art_make(
     dunesim::DetSim
     dunecore::Geometry
     larcore::Geometry_Geometry_service
-    larsim::Simulation nug4::ParticleNavigation lardataobj_Simulation
+    larsim::Simulation nug4::ParticleNavigation lardataobj::Simulation
     lardata::Utilities
     larevt::Filters
     larcorealg::Geometry
@@ -34,11 +34,10 @@ art_make(
     fhiclcpp::fhiclcpp
     cetlib::cetlib 
     cetlib_except::cetlib_except
-    CLHEP
-    ROOT_GEOM
-    ROOT_XMLIO
-    ROOT_GDML
-    ROOT_BASIC_LIB_LIST
+    CLHEP::CLHEP
+    ROOT::Geom
+    ROOT::XMLIO
+    ROOT::Gdml
 )
 
 install_source()

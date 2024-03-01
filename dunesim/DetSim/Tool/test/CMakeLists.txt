@@ -12,10 +12,11 @@ cet_enable_asserts()
 cet_test(test_IdealAdcSimulator SOURCES test_IdealAdcSimulator.cxx
   LIBRARIES
     art::Utilities
+    dunecore::DuneInterface_Data
     canvas::canvas
     fhiclcpp::fhiclcpp
     cetlib::cetlib
     cetlib_except::cetlib_except
-    SQLITE3
+    SQLite::SQLite3
     Boost::filesystem
 )
