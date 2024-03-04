@@ -1129,29 +1129,27 @@ double spacecharge::SpaceChargeProtoDUNEhd::GetOneEfieldOffsetParametric(double 
   return offsetValNew;
 }
 //----------------------------------------------------------------------------
-/// Transform X to SCE X coordinate:  [0.0,3.6] --> [0.0,3.6]
+/// Transform X to SCE X coordinate:  [0.0,3.52949] --> [0.0,3.6]
 double spacecharge::SpaceChargeProtoDUNEhd::TransformX(double xVal) const
 {
   double xValNew;
-  xValNew = (fabs(xVal)/100.0);
-  //xValNew -= 1.8;
+  xValNew = (3.6/3.52949)*(fabs(xVal)/100.0);
   return xValNew;
 }
 //----------------------------------------------------------------------------
-/// Transform Y to SCE Y coordinate:  [0.0,6.08] --> [0.0,6.0]
+/// Transform Y to SCE Y coordinate:  [0.036375,6.03861] --> [0.0,6.0]
 double spacecharge::SpaceChargeProtoDUNEhd::TransformY(double yVal) const
 {
   double yValNew;
-  yValNew = (6.00/6.08)*((yVal+0.2)/100.0);
-  //yValNew -= 3.0;
+  yValNew = (6.00/(6.03861-0.036375))*((yVal-3.6375)/100.0);
   return yValNew;
 }
 //----------------------------------------------------------------------------
-/// Transform Z to SCE Z coordinate:  [0.0,6.97] --> [0.0,7.2]
+/// Transform Z to SCE Z coordinate:  [-0.0059375,4.63126] --> [0.0,4.8]
 double spacecharge::SpaceChargeProtoDUNEhd::TransformZ(double zVal) const
 {
   double zValNew;
-  zValNew = (7.20/6.97)*((zVal+0.8)/100.0);
+  zValNew = (4.8/(4.63126+0.0059375))*((zVal+0.59375)/100.0);
   return zValNew;
 }
 //----------------------------------------------------------------------------
@@ -1160,15 +1158,15 @@ bool spacecharge::SpaceChargeProtoDUNEhd::IsInsideBoundaries(geo::Point_t const&
 {
   if((fRepresentationType=="Voxelized_TH3") || (fRepresentationType == "Splines_TH3")){
   	return !(
-         (TMath::Abs(point.X()) <= 0.0) || (TMath::Abs(point.X()) >= 360.0)
-      || (point.Y()             <= 5.2) || (point.Y()             >= 604.0)
-      || (point.Z()             <= -0.5) || (point.Z()             >= 695.3)
+         (TMath::Abs(point.X()) <= 0.0) || (TMath::Abs(point.X()) >= 352.949)
+      || (point.Y()             <= 3.6375) || (point.Y()             >= 603.861)
+      || (point.Z()             <= -0.59375) || (point.Z()             >= 463.126)
     );
   } else{
   	return !(
-         (TMath::Abs(point.X()) <=  0.0) || (TMath::Abs(point.X()) >= 360.0)
-      || (point.Y()             <= -0.2) || (point.Y()             >= 607.8)
-      || (point.Z()             <= -0.8) || (point.Z()             >= 696.2)
+         (TMath::Abs(point.X()) <=  0.0) || (TMath::Abs(point.X()) >= 352.949)
+      || (point.Y()             <= 3.6375) || (point.Y()             >= 603.861)
+      || (point.Z()             <= -0.59375) || (point.Z()             >= 463.126)
     );
   }
 } 
@@ -1177,15 +1175,15 @@ bool spacecharge::SpaceChargeProtoDUNEhd::IsTooFarFromBoundaries(geo::Point_t co
 {
   if((fRepresentationType=="Voxelized_TH3") || (fRepresentationType == "Splines_TH3")){
     return (
-         (TMath::Abs(point.X()) < -20.0) || (TMath::Abs(point.X())  >= 360.0)
-      || (point.Y()             < -14.8) || (point.Y()              >  624.0)
-      || (point.Z()             < -20.5) || (point.Z()              >  715.3)
+         (TMath::Abs(point.X()) < -20.0) || (TMath::Abs(point.X())  >= 352.949)
+      || (point.Y()             < -16.3625) || (point.Y()              >  623.861)
+      || (point.Z()             < -20.59375) || (point.Z()              >  483.126)
     );
   } else {
     return (
-         (TMath::Abs(point.X()) < -20.0) || (TMath::Abs(point.X())  >= 360.0)
-      || (point.Y()             < -20.2) || (point.Y()              >  627.8)
-      || (point.Z()             < -20.8) || (point.Z()              >  716.2)
+         (TMath::Abs(point.X()) < -20.0) || (TMath::Abs(point.X())  >= 352.949)
+      || (point.Y()             < -16.3625) || (point.Y()              >  623.861)
+      || (point.Z()             < -20.59375) || (point.Z()              >  483.126)
     );
   }
 }
@@ -1198,26 +1196,26 @@ geo::Point_t spacecharge::SpaceChargeProtoDUNEhd::PretendAtBoundary(geo::Point_t
   
     if      (TMath::Abs(point.X()) ==    0.0    ) x =                           -0.00001;
     else if (TMath::Abs(point.X()) <	 0.00001) x =   TMath::Sign(point.X(),1)*0.00001; 
-    else if (TMath::Abs(point.X()) >=    360.0  ) x = TMath::Sign(point.X(),1)*359.99999;
+    else if (TMath::Abs(point.X()) >=    352.949  ) x = TMath::Sign(point.X(),1)*352.94899;
   
-    if      (point.Y() <=   5.2) y =   5.20001;
-    else if (point.Y() >= 604.0) y = 603.99999;
+    if      (point.Y() <=   3.6375) y =   3.63751;
+    else if (point.Y() >= 603.861) y = 603.86099;
   
-    if      (point.Z() <=   -0.5) z =   -0.49999;
-    else if (point.Z() >= 695.3) z = 695.29999;
+    if      (point.Z() <=   -0.59375) z =   -0.59374;
+    else if (point.Z() >= 463.126) z = 463.12599;
     
   } else { 
-  
-    if      (TMath::Abs(point.X()) ==    0.0) x =                           -0.00001;
-    else if (TMath::Abs(point.X()) <	 0.0) x =   TMath::Sign(point.X(),1)*0.00001; 
-    else if (TMath::Abs(point.X()) >=  360.0) x = TMath::Sign(point.X(),1)*359.99999;
-  
-    if      (point.Y() <=  -0.2) y =  -0.19999;
-    else if (point.Y() >= 607.8) y = 607.79999;
-  
-    if      (point.Z() <=  -0.8) z =  -0.79999;
-    else if (point.Z() >= 696.2) z = 696.19999;
-    
+ 
+    if      (TMath::Abs(point.X()) ==    0.0    ) x =                           -0.00001;
+    else if (TMath::Abs(point.X()) <     0.00001) x =   TMath::Sign(point.X(),1)*0.00001;
+    else if (TMath::Abs(point.X()) >=    352.949  ) x = TMath::Sign(point.X(),1)*352.94899;
+
+    if      (point.Y() <=   3.6375) y =   3.63751;
+    else if (point.Y() >= 603.861) y = 603.86099;
+
+    if      (point.Z() <=   -0.59375) z =   -0.59374;
+    else if (point.Z() >= 463.126) z = 463.12599;
+   
   }
   return {x, y, z};
 }
