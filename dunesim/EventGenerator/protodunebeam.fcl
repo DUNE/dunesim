@@ -141,7 +141,6 @@ protodune_triggeredbeam:
 # For ProtoDUNE-HD we need to account for the change in coordinate system
 # with respect to ProtoDUNE-SP. In the new coordinate system, the old
 # (0,0,0) point is now at (0,7.2,-144.93)
-
 protodunehd_triggeredbeam: @local::protodune_triggeredbeam
 protodunehd_triggeredbeam.BeamY: 455.649     # 448.449 + 7.2
 protodunehd_triggeredbeam.BeamZ: -274.734    # -129.804 + -144.93
