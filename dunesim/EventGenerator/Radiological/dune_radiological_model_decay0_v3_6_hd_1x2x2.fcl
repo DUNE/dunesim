@@ -1,0 +1,74 @@
+#include "dune_radiological_model_decay0_v3_4_hd_1x2x2.fcl"
+
+BEGIN_PROLOG
+#  v3.1.5-12112023/Juergen Reichenbacher: As APA electronics boards in geometry break Wire-Cell reco, added fix for those backgrounds, independent now of boards being present in geometry (-> dune10kt_1x2x6_gammas_in_APAboards)
+#                 /removed also historic model v2 early Rn222 daughters from the plate-out decay chain on PDS (starts now with Pb210, as pointed out by Laura Paulucci)
+#  v3.1.6-03082024/Juergen Reichenbacher: gamma BGs in LAr on center APA of HD 1x2x6(2) need to be attenuated by 40.0 cm of dead wall LAr using Lambda(E[MeV]) parameterization (JR 3/7/2024) to match FD1 outer APAs
+#                                         rate only of neutron BG at center APA of HD 1x2x6(2) need to be reduced by 1/e (LArSoft fitted neutron attenuation length of ~40 cm in LAr) to match FD1 outer APAs
+
+
+dune10kt_1x2x2_gammas_in_APAboards:  # 3.81 cm thick (2*4*4.76 mm), 16.5 cm in the vertical direction, and as wide as the APA frames on top of upper APAs and bottom of lower APAs - J. Reichenbacher (12/11/2023)
+{
+   module_type:           "RadioGen"
+   PathToFile:             "Flux/Radionuclides/v03_06/"
+   Nuclide:               ["Uranium_238_chain_dominantGammaOnly_JR", "Uranium_238_chain_dominantGammaOnly_JR", "Thorium_232_chain_dominantGammaOnly_JR", "Thorium_232_chain_dominantGammaOnly_JR", "Potassium_40_dominantGammaOnly_JR", "Potassium_40_dominantGammaOnly_JR"]
+   Material:              [".*",".*",".*",".*",".*",".*"]
+   BqPercc:               [ 0.0197377, 0.0197377, 0.0353206, 0.0353206, 0.00129237, 0.00129237 ] # activity -- Becquerels per cc. with measured density of 1.75 g/cm^3 and multiplied with integral chain emission rate of TGraphs -JReichenbacher (12/11/2023)
+                          # integral gamma activity in U238 decay chain:  8.925e-3 Bq/cc * 2.21151 gammas/chain = 0.0197377  BqPercc
+                          # integral gamma activity in Th232 decay chain: 0.0126   Bq/cc * 2.80322 gammas/chain = 0.0353206  BqPercc
+                          # integral gamma activity in K40 decay:         0.01225  Bq/cc * 0.1055  gammas/decay = 0.00129237 BqPercc
+   T0:                    [ -2246000.,-2246000.,-2246000.,-2246000.,-2246000.,-2246000. ] # starting time in ns
+   T1:                    [  2246000., 2246000., 2246000., 2246000., 2246000., 2246000. ] # ending time in ns
+   X0:                    [   -2. ,   -2. ,   -2. ,   -2. ,   -2. ,   -2. ] # in cm in world coordinates, low x-values of planes
+   X1:                    [    2. ,    2. ,    2. ,    2. ,    2. ,    2. ] # in cm in world coordinates, high x-values of planes
+   Y0:                    [  601. , -617. ,  601. , -617. ,  601. , -617. ] # in cm in world coordinates, low y-values of planes
+   Y1:                    [  617. , -601. ,  617. , -601. ,  617. , -601. ] # in cm in world coordinates, high y-values of planes
+   Z0:                    [    0. ,    0. ,    0. ,    0. ,    0. ,    0. ] # in cm in world coordinates, low z-values of planes
+   Z1:                    [  464. ,  464. ,  464. ,  464. ,  464. ,  464. ] # in cm in world coordinates, high z-values of planes  (changed down from 1395. for 1x2x6 -> 464. for 1x2x2 - JR 02/05/2024)
+}
+
+dune10kt_1x2x2_gammas_from_cavernwall_atLAr.PathToFile: "Flux/Radionuclides/v03_06/"
+dune10kt_1x2x2_gammas_from_cavernwall_atLAr.Nuclide:    ["FDcavernGammasAtLArFlux", "FDcavernGammasAtLArFlux", "FDcavernGammasAtLArFlux", "FDcavernGammasAtLArFlux_APA_HD1x2x6_400mmLAr_attenuated"] # downscaled above 3.3 MeV for overestimated (alpha, gamma) production in Geant4 -JReichenbacher (05/16/2023)
+dune10kt_1x2x2_gammas_from_cavernwall_atLAr.BqPercc:    [ 1.05104, 1.05104, 1.05104, 0.0254278 ] # activity -- Becquerels per cc. 1.05104 assumes 4pi flux of 0.25597 gammas/(cm^2 sec) at LAr interface propagated from cavernwalls (rock+shotcrete SDSMT assay data) and impact factor 3.0 (~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
+   #  0.0254278 gammas/(cm^2 sec) 4pi flux in LAr on center APA of HD 1x2x6(2) is attenuated by 40.0 cm of dead wall LAr using Lambda(E[MeV]) parameterization (JR 3/7/2024) to match FD1 outer APAs
+
+dune10kt_1x2x2_gammas_from_foam_atLAr.PathToFile: "Flux/Radionuclides/v03_06/"
+dune10kt_1x2x2_gammas_from_foam_atLAr.Nuclide:    ["FDfoamGammasAtLArFlux", "FDfoamGammasAtLArFlux", "FDfoamGammasAtLArFlux", "FDfoamGammasAtLArFlux_APA_HD1x2x6_400mmLAr_attenuated"] # downscaled above 3.3 MeV for overestimated (alpha, gamma) production in Geant4 -JReichenbacher (05/16/2023)
+dune10kt_1x2x2_gammas_from_foam_atLAr.BqPercc:    [ 0.0441274, 0.0441274, 0.0441274, 0.0010171 ] # activity -- Becquerels per cc. is 4pi flux of 0.0441274 gammas/(cm^2 sec) at LAr interface propagated from R-PUF foam (ICPMS PNNL assay data from C. Jackson) -JReichenbacher (06/13/2023)
+   #  0.0010171 gammas/(cm^2 sec) 4pi flux in LAr on center APA of HD 1x2x6(2) is attenuated by 40.0 cm of dead wall LAr using Lambda(E[MeV]) parameterization (JR 3/7/2024) to match FD1 outer APAs
+
+dune10kt_1x2x2_neutrons_from_cavernwall_atLAr.BqPercc: [ 0.00000026996, 0.00000026996, 0.00000026996, 0.000000099313 ] # activity -- Becquerels per cc. 0.00000026996 assumes 4pi flux of 0.00000009862 neutrons/(cm^2 sec) at LAr interface propagated from cavernwalls (rock+shotcrete SDSMT assay data) and impact factor 2.0 (less than for gammas, ~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
+   #  0.000000099313 neutrons/(cm^2 sec) 4pi flux at center APA of HD 1x2x6(2) is 1/e reduced value (LArSoft fitted neutron attenuation length of ~40 cm in LAr) to match FD1 outer APAs (JR 3/8/2024)
+
+dune10kt_1x2x2_CryostatNGammas_from_CavernNeutrons_atLAr.PathToFile: "Flux/Radionuclides/v03_06/"
+dune10kt_1x2x2_CryostatNGammas_from_CavernNeutrons_atLAr.Nuclide:    ["FDcryostatNGammasAtLArFluxFromCavernNeutrons", "FDcryostatNGammasAtLArFluxFromCavernNeutrons", "FDcryostatNGammasAtLArFluxFromCavernNeutrons", "FDcryostatNGammasAtLArFluxFromCavernNeutrons_APA_HD1x2x6_400mmLAr_attenuated"]
+dune10kt_1x2x2_CryostatNGammas_from_CavernNeutrons_atLAr.BqPercc:    [ 0.0000016793, 0.0000016793, 0.0000016793, 0.00000013384 ] # activity -- Becquerels per cc. 0.0000016793 assumes 4pi flux of 0.00000061347 Ngammas/(cm^2 sec) at LAr interface stemming from n-captures in cryostat due to propagated cavernwall neutrons (rock+shotcrete SDSMT assay data) and impact factor 2.0 (less than for caverngammas, ~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
+   #  0.00000013384 gammas/(cm^2 sec) 4pi flux in LAr on center APA of HD 1x2x6(2) is attenuated by 40.0 cm of dead wall LAr using Lambda(E[MeV]) parameterization (JR 3/7/2024) to match FD1 outer APAs
+
+dune10kt_1x2x2_CavernNGammas_atLAr.PathToFile: "Flux/Radionuclides/v03_06/"
+dune10kt_1x2x2_CavernNGammas_atLAr.Nuclide:    ["FDcavernNGammasAtLArFlux", "FDcavernNGammasAtLArFlux", "FDcavernNGammasAtLArFlux", "FDcavernNGammasAtLArFlux_APA_HD1x2x6_400mmLAr_attenuated"]
+dune10kt_1x2x2_CavernNGammas_atLAr.BqPercc:    [ 0.0000005439, 0.0000005439, 0.0000005439, 0.00000003424 ] # activity -- Becquerels per cc. 0.0000005439 assumes 4pi flux of 0.0000001987 Ngammas/(cm^2 sec) at LAr interface propagated through cryostat stemming from n-captures in rock+shotcrete (SDSMT assay data) and impact factor 2.0 (for n-captures less than for direct caverngammas, ~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
+   #  0.00000003424 gammas/(cm^2 sec) 4pi flux in LAr on center APA of HD 1x2x6(2) is attenuated by 40.0 cm of dead wall LAr using Lambda(E[MeV]) parameterization (JR 3/7/2024) to match FD1 outer APAs
+
+
+#  ===============================================================================================================================================================
+#  _lowBgAPA version:  Has 0. BqPercc for external BGs on inner APA plane to simulate only internal BGs on shielded inner APA of FD1  -JReichenbacher (3/8/2024)
+#  ===============================================================================================================================================================
+
+dune10kt_1x2x2_lowBgAPA_gammas_from_cavernwall_atLAr:                      @local::dune10kt_1x2x2_gammas_from_cavernwall_atLAr
+dune10kt_1x2x2_lowBgAPA_gammas_from_cavernwall_atLAr.BqPercc:              [ 1.05104, 1.05104, 1.05104, 0. ] # activity -- Becquerels per cc. 
+
+dune10kt_1x2x2_lowBgAPA_gammas_from_foam_atLAr:                            @local::dune10kt_1x2x2_gammas_from_foam_atLAr
+dune10kt_1x2x2_lowBgAPA_gammas_from_foam_atLAr.BqPercc:                    [ 0.0441274, 0.0441274, 0.0441274, 0. ] # activity -- Becquerels per cc. 
+
+dune10kt_1x2x2_lowBgAPA_neutrons_from_cavernwall_atLAr:                    @local::dune10kt_1x2x2_neutrons_from_cavernwall_atLAr 
+dune10kt_1x2x2_lowBgAPA_neutrons_from_cavernwall_atLAr.BqPercc:            [ 0.00000026996, 0.00000026996, 0.00000026996, 0. ] # activity -- Becquerels per cc. 
+
+dune10kt_1x2x2_lowBgAPA_CryostatNGammas_from_CavernNeutrons_atLAr:         @local::dune10kt_1x2x2_CryostatNGammas_from_CavernNeutrons_atLAr 
+dune10kt_1x2x2_lowBgAPA_CryostatNGammas_from_CavernNeutrons_atLAr.BqPercc: [ 0.0000016793, 0.0000016793, 0.0000016793, 0. ] # activity -- Becquerels per cc. 
+
+dune10kt_1x2x2_lowBgAPA_CavernNGammas_atLAr:                               @local::dune10kt_1x2x2_CavernNGammas_atLAr
+dune10kt_1x2x2_lowBgAPA_CavernNGammas_atLAr.BqPercc:                       [ 0.0000005439, 0.0000005439, 0.0000005439, 0. ] # activity -- Becquerels per cc. 
+
+
+END_PROLOG
