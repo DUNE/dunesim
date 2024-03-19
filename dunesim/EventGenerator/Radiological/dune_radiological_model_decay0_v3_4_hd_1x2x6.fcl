@@ -1,10 +1,9 @@
-#include "services_dune.fcl"
 #include "dune_radiological_model_decay0_v3_4_hd_common.fcl"
 
 BEGIN_PROLOG
 
 # This is MASSIVELY dependent on the geometry
-#Convinced myself again that best is to have only one 1cm thin vertical center plane at inner APA to emulate external backgrounds comming in through cryostat (and not at the CPAs that are unrealistically positioned on the outside in the 1x2x6), and then two 1cm thin planes on top and bottom both 25cm offset from TPC, and similarly at both faces. This should more accurately represent the worst case scenario in the FD HD. - J. Reichenbacher (05/05/2023)
+# Convinced myself again that best is to have only one 1cm thin vertical center plane at inner APA to emulate external backgrounds comming in through cryostat (and not at the CPAs that are unrealistically positioned on the outside in the 1x2x6), and then two 1cm thin planes on top and bottom both 25cm offset from TPC, and similarly at both faces. This should more accurately represent the worst case scenario in the FD HD. - J. Reichenbacher (05/05/2023)
 
 dune10kt_1x2x6_gammas_from_cavernwall_atLAr: 
 {
