@@ -79,13 +79,8 @@ services: {
 
 }
 
-  #@table::protodune_simulation_services
-  #TFileService: { #closeFileFast: true
-  #                fileName: "datadriven_hist.root" #can be overridden by '-T'
-  #              }
 }
 
-#Start each new event with an empty event.
 source:
 {
   module_type: H4BeamInput

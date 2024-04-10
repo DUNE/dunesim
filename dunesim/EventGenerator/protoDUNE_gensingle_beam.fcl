@@ -15,17 +15,86 @@ services:
   TFileService: { #closeFileFast: true
                   fileName: "beamevent_hist.root" #can be overridden by '-T'
                 }
+  H4BeamFileService: {
+     FileName:  "dummy.root"
+    
+     # The tree names from the beam simulation files
+     TOF1TreeName:      "VirtualDetector/TOF1"
+     BPROF1TreeName:    "VirtualDetector/BPROF1"
+     BPROF2TreeName:    "VirtualDetector/BPROF2"
+     BPROF3TreeName:    "VirtualDetector/BPROF3"
+     TRIG1TreeName:     "VirtualDetector/TRIG1"
+     BPROFEXTTreeName:  "VirtualDetector/BPROFEXT"
+     BPROF4TreeName:    "VirtualDetector/BPROF4"
+     TRIG2TreeName:     "VirtualDetector/TRIG2"
+     NP04frontTreeName: "Detector/NP04front"
+    
+     # Set true to use the data driven method for the primary beam particle
+     UseDataDrivenPrimary: false
+    
+     # In the beam simulation particles at the front face are saved in a 20m x 20m box
+     # To save time we can choose a 10m x 10m box instead
+     ReduceNP04frontArea: true
+    
+     StartEvent: 0
+     # From protoDUNE_gensingle.fcl
+     # Updated geometry values:
+     BeamX: -4.994 # In cm
+     BeamY: 455.649
+     BeamZ: -274.734
+     Verbose: false 
+     IncludeAnti: true
+    
+     SamplingFileName: "dummy.root"
+     ResolutionFileName: "dummy2.root"
+     Seed: 0
+    
+     MaxSamples: 10000
+    
+     BeamThetaShift: 0.0114276
+     BeamPhiShift: -0.0761654
+    
+     ###New rotations - same final z axis as those 
+     ###from Paola, but the X axis is kept horizontal 
+     RotateMonitorYZ: 11.4328
+     RotateMonitorXZ: -10.7985
+    
+     L1: 1.98
+     L2: 1.69472
+     L3: 2.11666
+     BeamBend: .12003
+    
+    
+     ## New parameters for momentum spectrometer
+     LMag: 2.1645
+     NominalP: "1"
+     B: 1.294817
+    
+    
+     # Position of the beam monitor positions in z in [mm]
+     BPROFEXTPosZ:  707555 #707479 -- old values
+     BPROF4PosZ :   716124 #716048
+     TRIG2PosZ:     716296
+     NP04frontPosZ: 717243
+    
+     # Intensity variables
+     Intensity: 1.e6 # Number of interactions on the secondary target in one spill
+     ReadoutWindow: 3.0 # In milliseconds
+     BeamSpillLength: 4.8 # In seconds
+    
+     SaveOutputTree: false
+
+  }
 
 }
 
 #Start each new event with an empty event.
 source:
 {
-  module_type: EmptyEvent
+  module_type: H4BeamInput
   timestampPlugin: { plugin_type: "GeneratedEventTimestamp" }
-  maxEvents:   100
-  firstRun:    1           # Run number to use for this file
-  firstEvent:  1           # number of first event in the file
+  maxEvents:   10
+  #skipEvents: 1
 }
 
 physics:
@@ -54,9 +123,9 @@ outputs:
 
 # Specific to the GEANT H4 Beam simulation by Nikos and paths at CERN
 #physics.producers.generator.FileName: "/mnt/nas00/scratch/h4/with_mu_halo_wo_shielding/H4_TILT22_APR_TARGSEC_ROTCENT_FTFP_BERT_7GeV_6M_reduced.root"
-physics.producers.generator.FileName: "/pnfs/dune/persistent/dunepro/beam_data/simulation/mcc10/H4_v34b_1GeV_-27.7_10M_1.root" 
-physics.producers.generator.GoodParticleTreeName: "NTuples/GoodParticle"
-physics.producers.generator.AllParticlesTreeName: "Detector/NP04FieldCage"
+#physics.producers.generator.FileName: "/pnfs/dune/persistent/dunepro/beam_data/simulation/mcc10/H4_v34b_1GeV_-27.7_10M_1.root" 
+#physics.producers.generator.GoodParticleTreeName: "NTuples/GoodParticle"
+#physics.producers.generator.AllParticlesTreeName: "Detector/NP04FieldCage"
 physics.producers.generator.StartEvent: 0
 # Set the beam position and direction to fire the particles in the desired way
 physics.producers.generator.BeamX: 7.966 # In cm, taken from protoDUNE_gensingle.fcl

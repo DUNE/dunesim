@@ -35,6 +35,10 @@ bool dune::H4BeamInputDetail::readNext(art::RunPrincipal const* const inR,
   outE = 0;
 
   art::ServiceHandle<dune::H4BeamFileService> beamFileService;
+  if (fAccessedFirstEvent) {
+    //This class can do this because it's a friend
+    beamFileService->IncrementEvent();
+  }
   if (beamFileService->GetCurrentEvent() >= fNEventsAvailable) return false;
   size_t run_id = beamFileService->GetRun();
 
@@ -53,8 +57,9 @@ bool dune::H4BeamInputDetail::readNext(art::RunPrincipal const* const inR,
 
   //Increment here
   //This class can do this because it's a friend
-  beamFileService->IncrementEvent();
+  //beamFileService->IncrementEvent();
 
+  fAccessedFirstEvent = true;
   return true;
 }
 

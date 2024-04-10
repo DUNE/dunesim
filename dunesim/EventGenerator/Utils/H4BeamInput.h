@@ -49,5 +49,6 @@ class dune::H4BeamInputDetail {
   int fLogLevel;
   int fSkipEvents = 0;
   size_t fNEventsAvailable = 0;
+  bool fAccessedFirstEvent = false;
  };
 #endif

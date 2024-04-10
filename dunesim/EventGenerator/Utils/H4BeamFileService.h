@@ -34,6 +34,10 @@ namespace dune
       return fFinalTriggeredEventIDs.get();
     };
 
+    int GetCurrentEventID() {
+      return fFinalTriggeredEventIDs->at(fCurrentEvent);
+    };
+
     void Reset();
     size_t GetRun() {
       return fRun;
@@ -41,6 +45,10 @@ namespace dune
 
     size_t GetCurrentEvent() {
       return fCurrentEvent;
+    };
+
+    evgen::ProtoDUNETriggeredBeamUtils & GetBeamUtils() {
+      return fBeamUtils;
     };
 
   private:

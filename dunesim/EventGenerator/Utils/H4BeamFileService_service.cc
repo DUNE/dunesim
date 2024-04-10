@@ -21,6 +21,7 @@ dune::H4BeamFileService::H4BeamFileService(
   fBPROF4TreeName    = p.get<std::string>("BPROF4TreeName");
   fTRIG2TreeName      = p.get<std::string>("TRIG2TreeName");
   fNP04frontTreeName = p.get<std::string>("NP04frontTreeName");
+  fIsNP02 = p.get<bool>("IsNP02", false);
 
 }
 
