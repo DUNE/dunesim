@@ -39,15 +39,15 @@ class dune::H4BeamInputDetail {
                 art::SubRunPrincipal*& outSR,
                 art::EventPrincipal*& outE);
 
-  void skipEvents(int n);
   void closeCurrentFile() {
     art::ServiceHandle<dune::H4BeamFileService> beamFileService;
     beamFileService->Reset();
   };
 
  private:
-  int fLogLevel;
-  size_t fNEventsAvailable = 0;
   art::SourceHelper const& pmaker;
+  int fLogLevel;
+  int fSkipEvents = 0;
+  size_t fNEventsAvailable = 0;
  };
 #endif

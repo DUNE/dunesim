@@ -11,6 +11,9 @@ namespace dune
 {
 
   class H4BeamFileService {
+
+  friend class H4BeamInputDetail;
+
   public:
     explicit H4BeamFileService(fhicl::ParameterSet const& p, art::ActivityRegistry& areg);
     // The compiler-generated destructor is fine for non-base
@@ -40,10 +43,9 @@ namespace dune
       return fCurrentEvent;
     };
 
-    void IncrementEvent(int n=1) {fCurrentEvent += n;}
-
   private:
 
+    void IncrementEvent(int n=1) {fCurrentEvent += n;}
     size_t fCurrentEvent = 0;
     std::unique_ptr<std::map<int, evgen::BeamEvent>> fAllBeamEvents;
     std::unique_ptr<std::vector<int>> fFinalTriggeredEventIDs;

@@ -4,9 +4,8 @@ dune::H4BeamInputDetail::H4BeamInputDetail(
     fhicl::ParameterSet const & ps,
     art::ProductRegistryHelper & rh,
     art::SourceHelper const & sh) 
-  : pmaker(sh) {
-
-}
+  : pmaker(sh),
+    fSkipEvents(ps.get<int>("skipEvents", 0)) {}
 
 void dune::H4BeamInputDetail::readFile(
     std::string const & filename, art::FileBlock*& fb) {
@@ -16,6 +15,7 @@ void dune::H4BeamInputDetail::readFile(
 
   art::ServiceHandle<dune::H4BeamFileService> beamFileService;
   beamFileService->OpenFile(filename);
+  beamFileService->IncrementEvent(fSkipEvents);
   fNEventsAvailable = beamFileService->GetEventIDs()->size();
   MF_LOG_INFO("H4Beam")
       << "Has events: " << fNEventsAvailable;
@@ -51,16 +51,12 @@ bool dune::H4BeamInputDetail::readNext(art::RunPrincipal const* const inR,
   size_t event = beamFileService->GetCurrentEvent();
   outE = pmaker.makeEventPrincipal(run_id, 1, event, 0);
 
-  //Increment here -- trust others won't
+  //Increment here
+  //This class can do this because it's a friend
   beamFileService->IncrementEvent();
 
   return true;
 }
-
-void dune::H4BeamInputDetail::skipEvents(int n) {
-  art::ServiceHandle<dune::H4BeamFileService> beamFileService;
-  beamFileService->IncrementEvent(n);
-};
 
 //typedef for shorthand
 namespace dune {

@@ -91,6 +91,7 @@ source:
   module_type: H4BeamInput
   timestampPlugin: { plugin_type: "GeneratedEventTimestamp" }
   maxEvents:   10
+  #skipEvents: 1
 }
 
 physics:
