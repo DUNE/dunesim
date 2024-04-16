@@ -251,7 +251,6 @@ product		version		qual	flags		<table_format=2>
 dunecore	v09_83_01d00	-
 genie_phyopt	v3_04_00	-
 genie_xsec	v3_04_00	-	optional
-cetmodules	v3_22_02	-	only_for_build
 end_product_list
 ####################################
 
@@ -298,21 +297,6 @@ end_product_list
 # qualifiers required to set up the compiler should be specified in the
 # appropriate column for that product.
 #
-##################
-# Notes.
-#
-# * A column for every product in the product table (see above) is
-#   *required* unless the only_for_build flag is specified, in which
-#   case it is optional.
-#
-####################################
-qualifier	dunecore	genie_xsec		genie_phyopt	notes
-c14:debug	c14:debug	e1000:AR2320i00000:k250	dkcharmtau
-c14:prof	c14:prof	e1000:AR2320i00000:k250	dkcharmtau
-e26:debug	e26:debug	e1000:AR2320i00000:k250	dkcharmtau
-e26:prof	e26:prof	e1000:AR2320i00000:k250	dkcharmtau
-end_qualifier_list
-####################################
 
 ####################################
 # Table fragment.
@@ -328,10 +312,27 @@ table_fragment_begin
 table_fragment_end
 ####################################
 
-####################################
-# Backmatter.
-#
-# Comments and editor-specific metadata.
+
+# Add the dependent product and version
+
+product          version
+cetmodules	 v3_24_01	-	only_for_build
+cetbuildtools	 v8_20_00	-	only_for_build
+dunecore         v09_89_01d00
+genie_xsec       v3_04_00       -       optional
+genie_phyopt     v3_04_00
+end_product_list
+
+
+# We now define allowed qualifiers and the corresponding qualifiers for the depdencies.
+# Make a table by adding columns before "notes".
+qualifier       dunecore      genie_xsec              genie_phyopt    notes
+c14:debug       c14:debug     AR2320i00000:e1000:k250 dkcharmtau   
+c14:prof        c14:prof      AR2320i00000:e1000:k250 dkcharmtau   
+e26:debug       e26:debug     AR2320i00000:e1000:k250  dkcharmtau    
+e26:prof        e26:prof      AR2320i00000:e1000:k250  dkcharmtau   
+end_qualifier_list
+>>>>>>> develop
 
 # Preserve tabs and formatting in emacs and vi / vim:
 

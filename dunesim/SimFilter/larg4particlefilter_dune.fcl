@@ -10,4 +10,12 @@ dune35t_larg4particlefilter.StartInTPC:               [ 0  ,  0  ] # 0: don't ca
 dune35t_larg4particlefilter.StopInTPC:                [ 1  ,  1  ] # 0: don't care if it stops in TPC or not, 1: particle must stop in TPC, 2: particle must not stop in TPC
 dune35t_larg4particlefilter.ParticleMinTPCLength:     [ -1., -1. ] # Minimum particle trajectory length inside of the TPC.  Units are cm.  Negative value means ignore check
 
+dunefd_neutrontpcfilter: @local::standard_larg4particlefilter
+dunefd_neutrontpcfilter.InterestingPDGs:                [ 2112 ] # Demand a neutron
+dunefd_neutrontpcfilter.ParticleMinMomentum:            [ -1 ]   # Do not demand a lower momentum bound          
+dunefd_neutrontpcfilter.ParticleMaxMomentum:            [ -1 ]   # Do not demand an upper momentum bound
+dunefd_neutrontpcfilter.StartInTPC:                     [  0 ]   # Do not demand that the neutron starts in the TPC
+dunefd_neutrontpcfilter.StopInTPC:                      [  1 ]   # DO demand that the neutron stops in the TPC
+dunefd_neutrontpcfilter.ParticleMinTPCLength:           [ -1 ]   # Do not demand that the neutron has a minimum trajectory length in the TPC
+dunefd_neutrontpcfilter.RequireAllInterestingParticles: true
 END_PROLOG
