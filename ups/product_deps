@@ -317,7 +317,6 @@ table_fragment_end
 
 product          version
 cetmodules	 v3_24_01	-	only_for_build
-cetbuildtools	 v8_20_00	-	only_for_build
 dunecore         v09_89_01d00
 genie_xsec       v3_04_00       -       optional
 genie_phyopt     v3_04_00
@@ -332,7 +331,6 @@ c14:prof        c14:prof      AR2320i00000:e1000:k250 dkcharmtau
 e26:debug       e26:debug     AR2320i00000:e1000:k250  dkcharmtau    
 e26:prof        e26:prof      AR2320i00000:e1000:k250  dkcharmtau   
 end_qualifier_list
->>>>>>> develop
 
 # Preserve tabs and formatting in emacs and vi / vim:
 
