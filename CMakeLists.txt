@@ -41,6 +41,7 @@ find_ups_product( dunecore )
 find_ups_product( lardata )
 find_ups_product( clhep )
 find_ups_product( nugen )
+find_ups_product( dunepdlegacy )
 find_ups_geant4( )
 
 # macros for artdaq_dictionary and simple_plugin
