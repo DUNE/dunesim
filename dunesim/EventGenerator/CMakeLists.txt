@@ -7,35 +7,32 @@ include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
 #art_make_library( LIBRARY_NAME ProtoDUNETriggeredBeamUtils
 #		  SOURCE ProtoDUNETriggeredBeamUtils.cxx
 #		  LIBRARIES
-#                       ROOT_BASIC_LIB_LIST 
 #	    )
 
 art_make( BASENAME_ONLY
           MODULE_LIBRARIES 
-                        larcoreobj_SummaryData
-                        larcorealg_Geometry
-                        larcore_Geometry_Geometry_service
+                        larcoreobj::SummaryData
+                        larcorealg::Geometry
+                        larcore::Geometry_Geometry_service
                         nurandom::RandomUtils_NuRandomService_service
-                        larsim_Simulation lardataobj_Simulation
-                        lardataobj_RecoBase
+                        larsim::Simulation lardataobj::Simulation
+                        lardataobj::RecoBase
+                        lardata::Utilities
                         nusimdata::SimulationBase
-                        ART_FRAMEWORK_CORE
-                        ART_FRAMEWORK_PRINCIPAL
-                        ART_FRAMEWORK_SERVICES_REGISTRY
-                        ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE
                         art::Persistency_Common
                         art::Persistency_Provenance
-                        art::Utilities canvas
+                        art::Utilities canvas::canvas
                         messagefacility::MF_MessageLogger
-                        hep_concurrency
+                        hep_concurrency::hep_concurrency
                         fhiclcpp::fhiclcpp
-                        cetlib::cetlib cetlib_except
-                        CLHEP
-                        ROOT_BASIC_LIB_LIST
-                        SQLITE3
-                        ROOT_EG
+                        cetlib::cetlib cetlib_except::cetlib_except
+			CLHEP::CLHEP
+			SQLite::SQLite3
+                        ROOT::EG
+			ROOT::Tree
                         ifdh::ifdh
                         dunesim_EventGenerator_ProtoDUNEbeamDataProducts
+                        dunecore::ArtSupport
                         ProtoDUNETriggeredBeamUtils
  )
 
