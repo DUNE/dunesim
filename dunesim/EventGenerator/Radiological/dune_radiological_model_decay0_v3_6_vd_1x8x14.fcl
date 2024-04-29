@@ -7,22 +7,28 @@ BEGIN_PROLOG
 # Convinced myself that best is to have four 1cm thin vertical planes on sides (along x-drift in rotated VD geo) to emulate external backgrounds coming in through cryostat (but NO PLANE at the horizontal Cathode that is realistically positioned on the inside at half height in the VD), and then just one 1cm thin plane on top, all approx. 25cm offset from active TPC. This should more accurately represent the worst case scenario in the FD VD. - J. Reichenbacher (08/14/2023)
 #  VD 1x8x14 version v3.1.4 is same as VD 1x8x6 version v3.1.4, except external backgrounds extend to z=2174cm and upper cathode mesh BGs have geometry caused larger 'rate' values by factor 2.1364  -JReichenbacher (10/13/2023)
 #  VD 1x8x14 version v3.1.5 is same as VD 1x8x6 version v3.1.5, except external backgrounds extend to z=2195cm and upper cathode mesh BGs have geometry caused larger 'rate' values by factor 2.1364  -JReichenbacher (2/28/2024)
+#  VD 1x8x14 version v3.1.6 is same as VD 1x8x6 version v3.1.4 again, except external backgrounds extend to z=2195cm and upper cathode mesh BGs have geometry caused larger 'rate' values by factor 2.1364  -JReichenbacher (4/20/2024)
+#  All geometry agnostic external backgrounds that are the same for all HD and VD FHiCLs have identical filenames and start now with 'FD' in front of filename  -JReichenbacher (4/20/2024)
 
-dunevd10kt_1x8x14_gammas_from_cavernwall_atLAr.Nuclide:    ["FDcavernGammasAtLArFlux_WestFaceVD1x8x6_285mmLAr_upscaled", "FDcavernGammasAtLArFlux_EastFaceVD1x8x6_135mmLAr_attenuated", "FDcavernGammasAtLArFlux", "FDcavernGammasAtLArFlux", "FDcavernGammasAtLArFlux"] # downscaled above 3.3 MeV for overestimated (alpha, gamma) production in Geant4 -JReichenbacher (05/16/2023)
-dunevd10kt_1x8x14_gammas_from_cavernwall_atLAr.PathToFile: "Flux/Radionuclides/v03_05/"
-dunevd10kt_1x8x14_gammas_from_cavernwall_atLAr.BqPercc:    [ 53.2952, 0.147498, 1.05104, 1.05104, 1.05104 ] # activity -- Becquerels per cc. 1.05104 assumes 4pi flux of 0.25597 gammas/(cm^2 sec) at LAr interface propagated from cavernwalls (rock+shotcrete SDSMT assay data) and impact factor 3.0 (~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
+
+#dunevd10kt_1x8x14_gammas_from_cavernwall_atLAr.Nuclide:    ["FDcavernGammasAtLArFlux_WestFaceVD1x8x6_285mmLAr_upscaled", "FDcavernGammasAtLArFlux_EastFaceVD1x8x6_135mmLAr_attenuated", "FDcavernGammasAtLArFlux", "FDcavernGammasAtLArFlux", "FDcavernGammasAtLArFlux"] # downscaled above 3.3 MeV for overestimated (alpha, gamma) production in Geant4 -JReichenbacher (05/16/2023)
+dunevd10kt_1x8x14_gammas_from_cavernwall_atLAr.PathToFile: "Flux/Radionuclides/v03_06/"
+dunevd10kt_1x8x14_gammas_from_cavernwall_atLAr.BqPercc:    [ 1.05104, 1.05104, 1.05104, 1.05104, 1.05104 ] # activity -- Becquerels per cc. 1.05104 assumes 4pi flux of 0.25597 gammas/(cm^2 sec) at LAr interface propagated from cavernwalls (rock+shotcrete SDSMT assay data) and impact factor 3.0 (~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
 dunevd10kt_1x8x14_gammas_from_cavernwall_atLAr.Z0:         [ -103.5, 2194.5, -103., -103. , -103.  ] # in cm in world coordinates, low z-values of planes for VD 1x8x14  -JReichenbacher (2/28/2024)
 dunevd10kt_1x8x14_gammas_from_cavernwall_atLAr.Z1:         [ -102.5, 2195.5, 2195., 2195. , 2195.  ] # in cm in world coordinates, high z-values of planes for VD 1x8x14 -JReichenbacher (2/28/2024)
 
+dunevd10kt_1x8x14_gammas_from_foam_atLAr.PathToFile:       "Flux/Radionuclides/v03_06/"
 dunevd10kt_1x8x14_gammas_from_foam_atLAr.Z0:               [ -103.5, 2194.5, -103., -103. , -103.  ] # in cm in world coordinates, low z-values of planes for VD 1x8x14  -JReichenbacher (2/28/2024)
 dunevd10kt_1x8x14_gammas_from_foam_atLAr.Z1:               [ -102.5, 2195.5, 2195., 2195. , 2195.  ] # in cm in world coordinates, high z-values of planes for VD 1x8x14 -JReichenbacher (2/28/2024)
 
 dunevd10kt_1x8x14_neutrons_from_cavernwall_atLAr.Z0:       [ -103.5, 2194.5, -103., -103. , -103.  ] # in cm in world coordinates, low z-values of planes for VD 1x8x14  -JReichenbacher (2/28/2024)
 dunevd10kt_1x8x14_neutrons_from_cavernwall_atLAr.Z1:       [ -102.5, 2195.5, 2195., 2195. , 2195.  ] # in cm in world coordinates, high z-values of planes for VD 1x8x14 -JReichenbacher (2/28/2024)
 
-dunevd10kt_1x8x14_CryostatNGammas_from_CavernNeutrons_atLAr.Z0: [ -103.5, 2194.5, -103., -103. , -103.  ] # in cm in world coordinates, low z-values of planes for VD 1x8x14  -JReichenbacher (2/28/2024)
-dunevd10kt_1x8x14_CryostatNGammas_from_CavernNeutrons_atLAr.Z1: [ -102.5, 2195.5, 2195., 2195. , 2195.  ] # in cm in world coordinates, high z-values of planes for VD 1x8x14 -JReichenbacher (2/28/2024)
+dunevd10kt_1x8x14_CryostatNGammas_from_CavernNeutrons_atLAr.PathToFile: "Flux/Radionuclides/v03_06/"
+dunevd10kt_1x8x14_CryostatNGammas_from_CavernNeutrons_atLAr.Z0:         [ -103.5, 2194.5, -103., -103. , -103.  ] # in cm in world coordinates, low z-values of planes for VD 1x8x14  -JReichenbacher (2/28/2024)
+dunevd10kt_1x8x14_CryostatNGammas_from_CavernNeutrons_atLAr.Z1:         [ -102.5, 2195.5, 2195., 2195. , 2195.  ] # in cm in world coordinates, high z-values of planes for VD 1x8x14 -JReichenbacher (2/28/2024)
 
+dunevd10kt_1x8x14_CavernNGammas_atLAr.PathToFile:          "Flux/Radionuclides/v03_06/"
 dunevd10kt_1x8x14_CavernNGammas_atLAr.Z0:                  [ -103.5, 2194.5, -103., -103. , -103.  ] # in cm in world coordinates, low z-values of planes for VD 1x8x14  -JReichenbacher (2/28/2024)
 dunevd10kt_1x8x14_CavernNGammas_atLAr.Z1:                  [ -102.5, 2195.5, 2195., 2195. , 2195.  ] # in cm in world coordinates, high z-values of planes for VD 1x8x14 -JReichenbacher (2/28/2024)
 
