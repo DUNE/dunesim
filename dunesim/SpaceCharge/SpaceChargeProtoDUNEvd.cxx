@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////
-// \file SpaceChargeProtoDUNEhd.cxx
+// \file SpaceChargeProtoDUNEvd.cxx
 //
 // \brief implementation of class for storing/accessing space charge distortions for ProtoDUNEhd
 //
@@ -14,7 +14,7 @@
 #include "math.h"
 #include "stdio.h"
 // LArSoft includes
-#include "dunesim/SpaceCharge/SpaceChargeProtoDUNEhd.h"
+#include "dunesim/SpaceCharge/SpaceChargeProtoDUNEvd.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 // Framework includes
 #include "cetlib_except/exception.h"
@@ -26,7 +26,7 @@
 #include "TLeaf.h"
 #include "TSpline.h"
 //-----------------------------------------------
-spacecharge::SpaceChargeProtoDUNEhd::SpaceChargeProtoDUNEhd(
+spacecharge::SpaceChargeProtoDUNEvd::SpaceChargeProtoDUNEvd(
   fhicl::ParameterSet const& pset
 )
 {
@@ -34,8 +34,8 @@ spacecharge::SpaceChargeProtoDUNEhd::SpaceChargeProtoDUNEhd(
 }
 //------------------------------------------------
 
-//bool spacecharge::SpaceChargeProtoDUNEhd::Configure(fhicl::ParameterSet const& pset, detinfo::DetectorProperties const* detprop)
-bool spacecharge::SpaceChargeProtoDUNEhd::Configure(fhicl::ParameterSet const& pset, 
+//bool spacecharge::SpaceChargeProtoDUNEvd::Configure(fhicl::ParameterSet const& pset, detinfo::DetectorProperties const* detprop)
+bool spacecharge::SpaceChargeProtoDUNEvd::Configure(fhicl::ParameterSet const& pset, 
                                                   detinfo::DetectorPropertiesData const& detProp)
 {  
 
@@ -60,7 +60,7 @@ bool spacecharge::SpaceChargeProtoDUNEhd::Configure(fhicl::ParameterSet const& p
       fEDChargeLossZLow.size() != ieds ||
       fEDChargeLossZHigh.size() != ieds)
     {
-      throw cet::exception("SpaceChargeProtoDUNEhd") << "Inconsistent configuration sizes: " <<
+      throw cet::exception("SpaceChargeProtoDUNEvd") << "Inconsistent configuration sizes: " <<
 	ieds << " " << 
 	fEDAXPosOffs.size() << " " <<
         fEDBZPosOffs.size() << " " <<
@@ -86,7 +86,7 @@ bool spacecharge::SpaceChargeProtoDUNEhd::Configure(fhicl::ParameterSet const& p
     sp.find_file(fInputFilename,fname);
     
     std::unique_ptr<TFile> infile(new TFile(fname.c_str(), "READ"));
-    if(!infile->IsOpen()) throw cet::exception("SpaceChargeProtoDUNEhd") << "Could not find the space charge effect file '" << fname << "'!\n";
+    if(!infile->IsOpen()) throw cet::exception("SpaceChargeProtoDUNEvd") << "Could not find the space charge effect file '" << fname << "'!\n";
     
     if ((fRepresentationType == "Voxelized_TH3") || (fRepresentationType == "Splines_TH3")) { 
         
@@ -209,7 +209,7 @@ bool spacecharge::SpaceChargeProtoDUNEhd::Configure(fhicl::ParameterSet const& p
         std::string fname2;
         sp.find_file(fInputFilename,fname2);
         std::unique_ptr<TFile> infile2(new TFile(fname2.c_str(), "READ"));
-        if(!infile2->IsOpen()) throw cet::exception("SpaceChargeProtoDUNEhd") << "Could not find the space charge effect file '" << fname2 << "'!\n";
+        if(!infile2->IsOpen()) throw cet::exception("SpaceChargeProtoDUNEvd") << "Could not find the space charge effect file '" << fname2 << "'!\n";
         
         TTree* treeD_posX = (TTree*)infile2->Get("SpaCEtree_fwdDisp");
         TTree* treeE_posX = (TTree*)infile2->Get("SpaCEtree");
@@ -234,7 +234,7 @@ bool spacecharge::SpaceChargeProtoDUNEhd::Configure(fhicl::ParameterSet const& p
         std::string fname2;
         sp.find_file(fInputFilename,fname2);
         std::unique_ptr<TFile> infile2(new TFile(fname2.c_str(), "READ"));
-        if(!infile2->IsOpen()) throw cet::exception("SpaceChargeProtoDUNEhd") << "Could not find the space charge effect file '" << fname2 << "'!\n";
+        if(!infile2->IsOpen()) throw cet::exception("SpaceChargeProtoDUNEvd") << "Could not find the space charge effect file '" << fname2 << "'!\n";
         
         TTree* treeD_negX = (TTree*)infile2->Get("SpaCEtree_fwdDisp");
         TTree* treeE_negX = (TTree*)infile2->Get("SpaCEtree");
@@ -349,7 +349,7 @@ bool spacecharge::SpaceChargeProtoDUNEhd::Configure(fhicl::ParameterSet const& p
     sp.find_file(fCalInputFilename,fname);
     
     std::unique_ptr<TFile> infile(new TFile(fname.c_str(), "READ"));
-    if(!infile->IsOpen()) throw cet::exception("SpaceChargeProtoDUNEhd") << "Could not find the space charge effect file '" << fname << "'!\n";
+    if(!infile->IsOpen()) throw cet::exception("SpaceChargeProtoDUNEvd") << "Could not find the space charge effect file '" << fname << "'!\n";
   
     if ((fRepresentationType == "Voxelized_TH3") || (fRepresentationType == "Splines_TH3")) { 
    
@@ -475,7 +475,7 @@ bool spacecharge::SpaceChargeProtoDUNEhd::Configure(fhicl::ParameterSet const& p
         std::string fname2;
         sp.find_file(fCalInputFilename,fname2);
         std::unique_ptr<TFile> infile2(new TFile(fname2.c_str(), "READ"));
-        if(!infile2->IsOpen()) throw cet::exception("SpaceChargeProtoDUNEhd") << "Could not find the space charge effect file '" << fname2 << "'!\n";
+        if(!infile2->IsOpen()) throw cet::exception("SpaceChargeProtoDUNEvd") << "Could not find the space charge effect file '" << fname2 << "'!\n";
         
         TTree* treeD_posX = (TTree*)infile2->Get("SpaCEtree_bkwdDisp");
         TTree* treeE_posX = (TTree*)infile2->Get("SpaCEtree");
@@ -498,7 +498,7 @@ bool spacecharge::SpaceChargeProtoDUNEhd::Configure(fhicl::ParameterSet const& p
         std::string fname2;
         sp.find_file(fCalInputFilename,fname2);
         std::unique_ptr<TFile> infile2(new TFile(fname2.c_str(), "READ"));
-        if(!infile2->IsOpen()) throw cet::exception("SpaceChargeProtoDUNEhd") << "Could not find the space charge effect file '" << fname2 << "'!\n";
+        if(!infile2->IsOpen()) throw cet::exception("SpaceChargeProtoDUNEvd") << "Could not find the space charge effect file '" << fname2 << "'!\n";
         
         TTree* treeD_negX = (TTree*)infile2->Get("SpaCEtree_bkwdDisp");
         TTree* treeE_negX = (TTree*)infile2->Get("SpaCEtree");
@@ -535,7 +535,7 @@ bool spacecharge::SpaceChargeProtoDUNEhd::Configure(fhicl::ParameterSet const& p
   return true;
 }
 //------------------------------------------------
-bool spacecharge::SpaceChargeProtoDUNEhd::Update(uint64_t ts) 
+bool spacecharge::SpaceChargeProtoDUNEvd::Update(uint64_t ts) 
 {
   if (ts == 0) return false;
   return true;
@@ -543,39 +543,39 @@ bool spacecharge::SpaceChargeProtoDUNEhd::Update(uint64_t ts)
 //----------------------------------------------------------------------------
 /// Return boolean indicating whether or not to turn simulation of SCE on for
 /// spatial distortions
-bool spacecharge::SpaceChargeProtoDUNEhd::EnableSimSpatialSCE() const
+bool spacecharge::SpaceChargeProtoDUNEvd::EnableSimSpatialSCE() const
 {
   return fEnableSimSpatialSCE;
 }
 //----------------------------------------------------------------------------
 /// Return boolean indicating whether or not to turn simulation of SCE on for
 /// E field distortions
-bool spacecharge::SpaceChargeProtoDUNEhd::EnableSimEfieldSCE() const
+bool spacecharge::SpaceChargeProtoDUNEvd::EnableSimEfieldSCE() const
 {
   return fEnableSimEfieldSCE;
 }
 //----------------------------------------------------------------------------
 /// Return boolean indicating whether or not to apply SCE corrections
-//bool spacecharge::SpaceChargeProtoDUNEhd::EnableCorrSCE() const
+//bool spacecharge::SpaceChargeProtoDUNEvd::EnableCorrSCE() const
 //{
 //  return fEnableCorrSCE;
 //}
 
 /// Return boolean indicating whether or not to apply SCE corrections
-bool spacecharge::SpaceChargeProtoDUNEhd::EnableCalSpatialSCE() const
+bool spacecharge::SpaceChargeProtoDUNEvd::EnableCalSpatialSCE() const
 {
   return fEnableCalSpatialSCE;
 }
 
 /// Return boolean indicating whether or not to apply SCE corrections
-bool spacecharge::SpaceChargeProtoDUNEhd::EnableCalEfieldSCE() const
+bool spacecharge::SpaceChargeProtoDUNEvd::EnableCalEfieldSCE() const
 {
   return fEnableCalEfieldSCE;
 }
 //----------------------------------------------------------------------------
 /// Primary working method of service that provides position offsets to be
 /// used in ionization electron drift
-geo::Vector_t spacecharge::SpaceChargeProtoDUNEhd::GetPosOffsets(geo::Point_t const& tmp_point) const
+geo::Vector_t spacecharge::SpaceChargeProtoDUNEvd::GetPosOffsets(geo::Point_t const& tmp_point) const
 {
 
   std::vector<double> thePosOffsets;
@@ -614,7 +614,7 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNEhd::GetPosOffsets(geo::Point_t co
 //----------------------------------------------------------------------------
 /// Primary working method of service that provides position offsets to be
 /// used in calibration of space charge
-geo::Vector_t spacecharge::SpaceChargeProtoDUNEhd::GetCalPosOffsets(geo::Point_t const& tmp_point, int const& TPCid) const
+geo::Vector_t spacecharge::SpaceChargeProtoDUNEvd::GetCalPosOffsets(geo::Point_t const& tmp_point, int const& TPCid) const
 {
 	
   std::vector<double> thePosOffsets;
@@ -656,7 +656,7 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNEhd::GetCalPosOffsets(geo::Point_t
 
 //----------------------------------------------------------------------------
 /// Provides position offsets using voxelized interpolation
-std::vector<double> spacecharge::SpaceChargeProtoDUNEhd::GetOffsetsVoxel(geo::Point_t const& point, TH3F* hX, TH3F* hY, TH3F* hZ, int maptype, int driftvol) const
+std::vector<double> spacecharge::SpaceChargeProtoDUNEvd::GetOffsetsVoxel(geo::Point_t const& point, TH3F* hX, TH3F* hY, TH3F* hZ, int maptype, int driftvol) const
 {
   if (fRepresentationType == "Voxelized_TH3"){
   
@@ -689,11 +689,11 @@ std::vector<double> spacecharge::SpaceChargeProtoDUNEhd::GetOffsetsVoxel(geo::Po
 
 //----------------------------------------------------------------------------
 /// Build 3d histograms for voxelized interpolation
-std::vector<TH3F*> spacecharge::SpaceChargeProtoDUNEhd::Build_TH3(TTree* tree_pos, TTree* eTree_pos, TTree* tree_neg, TTree* eTree_neg, std::string xvar, std::string yvar, std::string zvar, std::string posLeaf) const
+std::vector<TH3F*> spacecharge::SpaceChargeProtoDUNEvd::Build_TH3(TTree* tree_pos, TTree* eTree_pos, TTree* tree_neg, TTree* eTree_neg, std::string xvar, std::string yvar, std::string zvar, std::string posLeaf) const
 {
 
   //Define the protoDUNE detector
-  double Lx = 3.6, Ly = 6.0, Lz = 4.6;
+  double Lx = 4.0, Ly = 3.4, Lz = 3.0;
   double numDivisions_x = 18.0;
   double cell_size = Lx/numDivisions_x;
   double numDivisions_y = TMath::Nint((Ly/Lx)*((Double_t)numDivisions_x));
@@ -794,7 +794,7 @@ std::vector<TH3F*> spacecharge::SpaceChargeProtoDUNEhd::Build_TH3(TTree* tree_po
 
 //----------------------------------------------------------------------------
 /// Provides position offsets using a parametric representation
-std::vector<double> spacecharge::SpaceChargeProtoDUNEhd::GetPosOffsetsParametric(double xVal, double yVal, double zVal) const
+std::vector<double> spacecharge::SpaceChargeProtoDUNEvd::GetPosOffsetsParametric(double xVal, double yVal, double zVal) const
 {
   std::vector<double> thePosOffsetsParametric;
   double xValNew = TransformX(xVal);
@@ -808,7 +808,7 @@ std::vector<double> spacecharge::SpaceChargeProtoDUNEhd::GetPosOffsetsParametric
 //----------------------------------------------------------------------------
 /// Provides one position offset using a parametric representation, for a given
 /// axis
-double spacecharge::SpaceChargeProtoDUNEhd::GetOnePosOffsetParametric(double xValNew, double yValNew, double zValNew, std::string axis) const
+double spacecharge::SpaceChargeProtoDUNEvd::GetOnePosOffsetParametric(double xValNew, double yValNew, double zValNew, std::string axis) const
 {      
   double parA[6][7];
   double parB[6];
@@ -930,7 +930,7 @@ double spacecharge::SpaceChargeProtoDUNEhd::GetOnePosOffsetParametric(double xVa
 //----------------------------------------------------------------------------
 /// Primary working method of service that provides E field offsets to be
 /// used in charge/light yield calculation (e.g.)
-geo::Vector_t spacecharge::SpaceChargeProtoDUNEhd::GetEfieldOffsets(geo::Point_t const& tmp_point) const
+geo::Vector_t spacecharge::SpaceChargeProtoDUNEvd::GetEfieldOffsets(geo::Point_t const& tmp_point) const
 {
 
   std::vector<double> theEfieldOffsets;
@@ -958,7 +958,7 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNEhd::GetEfieldOffsets(geo::Point_t
 //----------------------------------------------------------------------------
 /// Primary working method of service that provides E field offsets to be
 /// used in charge/light yield calculation (e.g.) for calibration
-geo::Vector_t spacecharge::SpaceChargeProtoDUNEhd::GetCalEfieldOffsets(geo::Point_t const& tmp_point, int const& TPCid) const
+geo::Vector_t spacecharge::SpaceChargeProtoDUNEvd::GetCalEfieldOffsets(geo::Point_t const& tmp_point, int const& TPCid) const
 { 
   std::vector<double> theEfieldOffsets;
   geo::Point_t point = tmp_point;
@@ -995,7 +995,7 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNEhd::GetCalEfieldOffsets(geo::Poin
 
 //----------------------------------------------------------------------------
 /// Provides E field offsets using a parametric representation
-std::vector<double> spacecharge::SpaceChargeProtoDUNEhd::GetEfieldOffsetsParametric(double xVal, double yVal, double zVal) const
+std::vector<double> spacecharge::SpaceChargeProtoDUNEvd::GetEfieldOffsetsParametric(double xVal, double yVal, double zVal) const
 {
   std::vector<double> theEfieldOffsetsParametric;
   double xValNew = TransformX(xVal);
@@ -1009,7 +1009,7 @@ std::vector<double> spacecharge::SpaceChargeProtoDUNEhd::GetEfieldOffsetsParamet
 //----------------------------------------------------------------------------
 /// Provides one E field offset using a parametric representation, for a given
 /// axis
-double spacecharge::SpaceChargeProtoDUNEhd::GetOneEfieldOffsetParametric(double xValNew, double yValNew, double zValNew, std::string axis) const
+double spacecharge::SpaceChargeProtoDUNEvd::GetOneEfieldOffsetParametric(double xValNew, double yValNew, double zValNew, std::string axis) const
 {      
   xValNew -= 1.8;
   yValNew -= 3.0;
@@ -1129,66 +1129,66 @@ double spacecharge::SpaceChargeProtoDUNEhd::GetOneEfieldOffsetParametric(double 
   return offsetValNew;
 }
 //----------------------------------------------------------------------------
-/// Transform X to SCE X coordinate:  [0.0,3.52949] --> [0.0,3.6]
-double spacecharge::SpaceChargeProtoDUNEhd::TransformX(double xVal) const
+/// Transform X to SCE X coordinate:  [0.0,3.4153] --> [0.0,3.3]
+double spacecharge::SpaceChargeProtoDUNEvd::TransformX(double xVal) const
 {
   double xValNew;
-  xValNew = (3.6/3.52949)*(fabs(xVal)/100.0);
+  xValNew = (3.3/3.4153)*(fabs(xVal)/100.0);
   return xValNew;
 }
 //----------------------------------------------------------------------------
-/// Transform Y to SCE Y coordinate:  [0.036375,6.03861] --> [0.0,6.0]
-double spacecharge::SpaceChargeProtoDUNEhd::TransformY(double yVal) const
+/// Transform Y to SCE Y coordinate:  [-3.37,3.37] --> [0.0,6.6]
+double spacecharge::SpaceChargeProtoDUNEvd::TransformY(double yVal) const
 {
   double yValNew;
-  yValNew = (6.00/(6.03861-0.036375))*((yVal-3.6375)/100.0);
+  yValNew = (6.6/6.74)*((yVal+337.0)/100.0);
   return yValNew;
 }
 //----------------------------------------------------------------------------
-/// Transform Z to SCE Z coordinate:  [-0.0059375,4.63126] --> [0.0,4.8]
-double spacecharge::SpaceChargeProtoDUNEhd::TransformZ(double zVal) const
+/// Transform Z to SCE Z coordinate:  [0.0,2.993] --> [0.0,3.0]
+double spacecharge::SpaceChargeProtoDUNEvd::TransformZ(double zVal) const
 {
   double zValNew;
-  zValNew = (4.8/(4.63126+0.0059375))*((zVal+0.59375)/100.0);
+  zValNew = (3.0/2.993)*(zVal/100.0);
   return zValNew;
 }
 //----------------------------------------------------------------------------
 /// Check to see if point is inside boundaries of map (allow to go slightly out of range)
-bool spacecharge::SpaceChargeProtoDUNEhd::IsInsideBoundaries(geo::Point_t const& point) const
+bool spacecharge::SpaceChargeProtoDUNEvd::IsInsideBoundaries(geo::Point_t const& point) const
 {
   if((fRepresentationType=="Voxelized_TH3") || (fRepresentationType == "Splines_TH3")){
   	return !(
-         (TMath::Abs(point.X()) <= 0.0) || (TMath::Abs(point.X()) >= 352.949)
-      || (point.Y()             <= 3.6375) || (point.Y()             >= 603.861)
-      || (point.Z()             <= -0.59375) || (point.Z()             >= 463.126)
+         (TMath::Abs(point.X()) <= 0.0) || (TMath::Abs(point.X()) >= 341.53)
+      || (point.Y()             <= -337.0) || (point.Y()             >= 337.0)
+      || (point.Z()             <= 0.0) || (point.Z()             >= 299.3)
     );
   } else{
   	return !(
-         (TMath::Abs(point.X()) <=  0.0) || (TMath::Abs(point.X()) >= 352.949)
-      || (point.Y()             <= 3.6375) || (point.Y()             >= 603.861)
-      || (point.Z()             <= -0.59375) || (point.Z()             >= 463.126)
+         (TMath::Abs(point.X()) <=  0.0) || (TMath::Abs(point.X()) >= 341.53)
+      || (point.Y()             <= -337.0) || (point.Y()             >= 337.0)
+      || (point.Z()             <= 0.0) || (point.Z()             >= 299.3)
     );
   }
 } 
   
-bool spacecharge::SpaceChargeProtoDUNEhd::IsTooFarFromBoundaries(geo::Point_t const& point) const
+bool spacecharge::SpaceChargeProtoDUNEvd::IsTooFarFromBoundaries(geo::Point_t const& point) const
 {
   if((fRepresentationType=="Voxelized_TH3") || (fRepresentationType == "Splines_TH3")){
     return (
-         (TMath::Abs(point.X()) < -20.0) || (TMath::Abs(point.X())  >= 352.949)
-      || (point.Y()             < -16.3625) || (point.Y()              >  623.861)
-      || (point.Z()             < -20.59375) || (point.Z()              >  483.126)
+         (TMath::Abs(point.X()) < -20.0) || (TMath::Abs(point.X())  >= 341.53)
+      || (point.Y()             < -357.0) || (point.Y()              > 357.0)
+      || (point.Z()             < -20.0) || (point.Z()              > 319.3)
     );
   } else {
     return (
-         (TMath::Abs(point.X()) < -20.0) || (TMath::Abs(point.X())  >= 352.949)
-      || (point.Y()             < -16.3625) || (point.Y()              >  623.861)
-      || (point.Z()             < -20.59375) || (point.Z()              >  483.126)
+         (TMath::Abs(point.X()) < -20.0) || (TMath::Abs(point.X())  >= 341.53)
+      || (point.Y()             < -357.0) || (point.Y()              > 357.0)
+      || (point.Z()             < -20.0) || (point.Z()              > 319.3)
     );
   }
 }
 
-geo::Point_t spacecharge::SpaceChargeProtoDUNEhd::PretendAtBoundary(geo::Point_t const& point) const
+geo::Point_t spacecharge::SpaceChargeProtoDUNEvd::PretendAtBoundary(geo::Point_t const& point) const
 {
   double x = point.X(), y = point.Y(), z = point.Z();
   
@@ -1196,33 +1196,33 @@ geo::Point_t spacecharge::SpaceChargeProtoDUNEhd::PretendAtBoundary(geo::Point_t
   
     if      (TMath::Abs(point.X()) ==    0.0    ) x =                           -0.00001;
     else if (TMath::Abs(point.X()) <	 0.00001) x =   TMath::Sign(point.X(),1)*0.00001; 
-    else if (TMath::Abs(point.X()) >=    352.949  ) x = TMath::Sign(point.X(),1)*352.94899;
+    else if (TMath::Abs(point.X()) >=    341.53  ) x = TMath::Sign(point.X(),1)*341.52999;
   
-    if      (point.Y() <=   3.6375) y =   3.63751;
-    else if (point.Y() >= 603.861) y = 603.86099;
+    if      (point.Y() <=   -337.0) y =   -336.99999;
+    else if (point.Y() >= 337.0) y = 336.99999;
   
-    if      (point.Z() <=   -0.59375) z =   -0.59374;
-    else if (point.Z() >= 463.126) z = 463.12599;
+    if      (point.Z() <=   0.0) z =   0.00001;
+    else if (point.Z() >= 299.3) z = 299.29999;
     
   } else { 
- 
-    if      (TMath::Abs(point.X()) ==    0.0    ) x =                           -0.00001;
-    else if (TMath::Abs(point.X()) <     0.00001) x =   TMath::Sign(point.X(),1)*0.00001;
-    else if (TMath::Abs(point.X()) >=    352.949  ) x = TMath::Sign(point.X(),1)*352.94899;
-
-    if      (point.Y() <=   3.6375) y =   3.63751;
-    else if (point.Y() >= 603.861) y = 603.86099;
-
-    if      (point.Z() <=   -0.59375) z =   -0.59374;
-    else if (point.Z() >= 463.126) z = 463.12599;
-   
+  
+    if      (TMath::Abs(point.X()) ==    0.0) x =                           -0.00001;
+    else if (TMath::Abs(point.X()) <	 0.00001) x =   TMath::Sign(point.X(),1)*0.00001; 
+    else if (TMath::Abs(point.X()) >=  341.53) x = TMath::Sign(point.X(),1)*341.52999;
+  
+    if      (point.Y() <=  -337.0) y =  -336.99999;
+    else if (point.Y() >= 337.0) y = 336.99999;
+  
+    if      (point.Z() <=  0.0) z =  0.00001;
+    else if (point.Z() >= 299.3) z = 299.29999;
+    
   }
   return {x, y, z};
 }
 
 //----------------------------------------------------------------------------
 /// Create one spline for later use in SCE map interpolation
-TSpline3* spacecharge::SpaceChargeProtoDUNEhd::MakeSpline(TH3F* spline_hist, int dim1, int dim2_bin, int dim3_bin, int maptype, int driftvol) const
+TSpline3* spacecharge::SpaceChargeProtoDUNEvd::MakeSpline(TH3F* spline_hist, int dim1, int dim2_bin, int dim3_bin, int maptype, int driftvol) const
 {
   TSpline3 *spline = 0;
   
@@ -1246,7 +1246,7 @@ TSpline3* spacecharge::SpaceChargeProtoDUNEhd::MakeSpline(TH3F* spline_hist, int
     }
   }
   else {
-    cet::exception("SpaceChargeProtoDUNEhd::MakeSpline") << "Unkown dimension " << dim1 << "\n";
+    cet::exception("SpaceChargeProtoDUNEvd::MakeSpline") << "Unkown dimension " << dim1 << "\n";
   }
 
   if(maptype == 1)
@@ -1358,7 +1358,7 @@ TSpline3* spacecharge::SpaceChargeProtoDUNEhd::MakeSpline(TH3F* spline_hist, int
 
 //----------------------------------------------------------------------------
 /// Interpolate given SCE map using splines
-double spacecharge::SpaceChargeProtoDUNEhd::InterpolateSplines(TH3F* interp_hist, double xVal, double yVal, double zVal, int dim, int maptype, int driftvol) const
+double spacecharge::SpaceChargeProtoDUNEvd::InterpolateSplines(TH3F* interp_hist, double xVal, double yVal, double zVal, int dim, int maptype, int driftvol) const
 {
 
   //std::cout << "Interpolating " << interp_hist->GetName() << std::endl;
@@ -1639,7 +1639,7 @@ double spacecharge::SpaceChargeProtoDUNEhd::InterpolateSplines(TH3F* interp_hist
 }
 
 
-geo::Vector_t spacecharge::SpaceChargeProtoDUNEhd::ElectronDiverterPosOffsets(geo::Point_t const& point) const
+geo::Vector_t spacecharge::SpaceChargeProtoDUNEvd::ElectronDiverterPosOffsets(geo::Point_t const& point) const
 {
   double z = point.Z();
   double offset[3] = {0,0,0};
