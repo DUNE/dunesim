@@ -1,4 +1,4 @@
-#include "dune_radiological_model_decay0_v3_4_vd_1x8x14.fcl"
+#include "dune_radiological_model_decay0_vd_1x8x14.fcl"
 
 BEGIN_PROLOG
 

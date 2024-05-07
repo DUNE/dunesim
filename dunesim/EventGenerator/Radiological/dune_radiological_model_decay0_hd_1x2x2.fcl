@@ -1,6 +1,10 @@
 #include "dune_radiological_model_decay0_v3_4_hd_1x2x2.fcl"
 
 BEGIN_PROLOG
+##################################
+# Decay0 Radiological Model v3.6 #
+##################################
+
 #  v3.1.5-12112023/Juergen Reichenbacher: As APA electronics boards in geometry break Wire-Cell reco, added fix for those backgrounds, independent now of boards being present in geometry (-> dune10kt_1x2x6_gammas_in_APAboards)
 #                 /removed also historic model v2 early Rn222 daughters from the plate-out decay chain on PDS (starts now with Pb210, as pointed out by Laura Paulucci)
 #  v3.1.6-03082024/Juergen Reichenbacher: gamma BGs in LAr on center APA of HD 1x2x6(2) need to be attenuated by 40.0 cm of dead wall LAr using Lambda(E[MeV]) parameterization (JR 3/7/2024) to match FD1 outer APAs
