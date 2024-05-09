@@ -1,0 +1,38 @@
+#include "dune_radiological_model_decay0_v3_4_vd_1x8x6.fcl"
+
+BEGIN_PROLOG
+
+
+# This is MASSIVELY dependent on the geometry
+# Convinced myself that best is to have four 1cm thin vertical planes on sides (along x-drift in rotated VD geo) to emulate external backgrounds coming in through cryostat (but NO PLANE at the horizontal Cathode that is realistically positioned on the inside at half height in the VD), and then just one 1cm thin plane on top, all approx. 25cm offset from active TPC. This should more accurately represent the worst case scenario in the FD VD. - J. Reichenbacher (08/14/2023)
+# v3.1.5.VD-02272024/Juergen Reichenbacher: Changed external background planes on East and West face to be placed 6 cm behind gdml-wise mis-placed wall Arapucas and attenuated/upscaled those gamma BGs accordingly to match FD2
+
+
+#COULD INHERIT FROM HD 1X2X6 TO MAKE MAINTAINANCE EASIER (LP)
+dunevd10kt_1x8x6_gammas_from_cavernwall_atLAr.Nuclide:               ["FDcavernGammasAtLArFlux_WestFaceVD1x8x6_285mmLAr_upscaled", "FDcavernGammasAtLArFlux_EastFaceVD1x8x6_135mmLAr_attenuated", "FDcavernGammasAtLArFlux", "FDcavernGammasAtLArFlux", "FDcavernGammasAtLArFlux"] # downscaled above 3.3 MeV for overestimated (alpha, gamma) production in Geant4 -JReichenbacher (05/16/2023)
+dunevd10kt_1x8x6_gammas_from_cavernwall_atLAr.PathToFile:    "Flux/Radionuclides/v03_02_01/"
+dunevd10kt_1x8x6_gammas_from_cavernwall_atLAr.Z0:            [ -103.5,  999.5, -103., -103. , -103.  ] # in cm in world coordinates, low z-values of planes
+dunevd10kt_1x8x6_gammas_from_cavernwall_atLAr.Z1:            [ -102.5, 1000.5, 1000., 1000. , 1000.  ] # in cm in world coordinates, high z-values of planes
+
+
+dunevd10kt_1x8x6_gammas_from_foam_atLAr:                   @local::dunevd10kt_1x8x6_gammas_from_cavernwall_atLAr
+dunevd10kt_1x8x6_gammas_from_foam_atLAr.Nuclide:           ["FDfoamGammasAtLArFlux", "FDfoamGammasAtLArFlux", "FDfoamGammasAtLArFlux", "FDfoamGammasAtLArFlux", "FDfoamGammasAtLArFlux"] # downscaled above 3.3 MeV for overestimated (alpha, gamma) production in Geant4 -JReichenbacher (05/16/2023)
+dunevd10kt_1x8x6_gammas_from_foam_atLAr.BqPercc:           [ 0.0441274, 0.0441274, 0.0441274, 0.0441274, 0.0441274 ] # activity -- Becquerels per cc. is 4pi flux of 0.0441274 gammas/(cm^2 sec) at LAr interface propagated from R-PUF foam (ICPMS PNNL assay data from C. Jackson) -JReichenbacher (06/13/2023)
+
+
+dunevd10kt_1x8x6_neutrons_from_cavernwall_atLAr:           @local::dunevd10kt_1x8x6_gammas_from_cavernwall_atLAr
+dunevd10kt_1x8x6_neutrons_from_cavernwall_atLAr.Nuclide:   ["FDcavernNeutronsAtLArFlux", "FDcavernNeutronsAtLArFlux", "FDcavernNeutronsAtLArFlux", "FDcavernNeutronsAtLArFlux", "FDcavernNeutronsAtLArFlux"]
+dunevd10kt_1x8x6_neutrons_from_cavernwall_atLAr.BqPercc:   [ 0.00000026996, 0.00000026996, 0.00000026996, 0.00000026996, 0.00000026996 ] # activity -- Becquerels per cc. 0.00000026996 assumes 4pi flux of 0.00000009862 neutrons/(cm^2 sec) at LAr interface propagated from cavernwalls (rock+shotcrete SDSMT assay data) and impact factor 2.0 (less than for gammas, ~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
+
+
+dunevd10kt_1x8x6_CryostatNGammas_from_CavernNeutrons_atLAr:          @local::dunevd10kt_1x8x6_gammas_from_cavernwall_atLAr
+dunevd10kt_1x8x6_CryostatNGammas_from_CavernNeutrons_atLAr.Nuclide:  ["FDcryostatNGammasAtLArFluxFromCavernNeutrons", "FDcryostatNGammasAtLArFluxFromCavernNeutrons", "FDcryostatNGammasAtLArFluxFromCavernNeutrons", "FDcryostatNGammasAtLArFluxFromCavernNeutrons", "FDcryostatNGammasAtLArFluxFromCavernNeutrons"]
+dunevd10kt_1x8x6_CryostatNGammas_from_CavernNeutrons_atLAr.BqPercc:  [ 0.0000016793, 0.0000016793, 0.0000016793, 0.0000016793, 0.0000016793 ] # activity -- Becquerels per cc. 0.0000016793 assumes 4pi flux of 0.00000061347 Ngammas/(cm^2 sec) at LAr interface stemming from n-captures in cryostat due to propagated cavernwall neutrons (rock+shotcrete SDSMT assay data) and impact factor 2.0 (less than for caverngammas, ~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
+
+
+dunevd10kt_1x8x6_CavernNGammas_atLAr:                      @local::dunevd10kt_1x8x6_gammas_from_cavernwall_atLAr
+dunevd10kt_1x8x6_CavernNGammas_atLAr.Nuclide:              ["FDcavernNGammasAtLArFlux", "FDcavernNGammasAtLArFlux", "FDcavernNGammasAtLArFlux", "FDcavernNGammasAtLArFlux", "FDcavernNGammasAtLArFlux"]
+dunevd10kt_1x8x6_CavernNGammas_atLAr.BqPercc:              [ 0.0000005439, 0.0000005439, 0.0000005439, 0.0000005439, 0.0000005439 ] # activity -- Becquerels per cc. 0.0000005439 assumes 4pi flux of 0.0000001987 Ngammas/(cm^2 sec) at LAr interface propagated through cryostat stemming from n-captures in rock+shotcrete (SDSMT assay data) and impact factor 2.0 (for n-captures less than for direct caverngammas, ~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
+
+
+END_PROLOG
