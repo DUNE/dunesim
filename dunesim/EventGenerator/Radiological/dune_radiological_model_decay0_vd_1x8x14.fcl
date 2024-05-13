@@ -49,6 +49,7 @@ dunevd10kt_1x8x14_gammas_from_foam_atLAr.BqPercc:           [ 0.0441274, 0.04412
 
 dunevd10kt_1x8x14_neutrons_from_cavernwall_atLAr:           @local::dunevd10kt_1x8x14_gammas_from_cavernwall_atLAr
 dunevd10kt_1x8x14_neutrons_from_cavernwall_atLAr.Nuclide:   ["FDcavernNeutronsAtLArFlux", "FDcavernNeutronsAtLArFlux", "FDcavernNeutronsAtLArFlux", "FDcavernNeutronsAtLArFlux", "FDcavernNeutronsAtLArFlux"]
+dunevd10kt_1x8x14_neutrons_from_cavernwall_atLAr.PathToFile: "Flux/Radionuclides/v03_02_01/"
 dunevd10kt_1x8x14_neutrons_from_cavernwall_atLAr.BqPercc:   [ 0.00000026996, 0.00000026996, 0.00000026996, 0.00000026996, 0.00000026996 ] # activity -- Becquerels per cc. 0.00000026996 assumes 4pi flux of 0.00000009862 neutrons/(cm^2 sec) at LAr interface propagated from cavernwalls (rock+shotcrete SDSMT assay data) and impact factor 2.0 (less than for gammas, ~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
 
 
