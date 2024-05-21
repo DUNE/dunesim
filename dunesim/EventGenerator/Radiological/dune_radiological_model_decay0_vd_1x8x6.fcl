@@ -19,30 +19,30 @@ dunevd10kt_1x8x6_42Kfrom42Ar_in_upperCathodeMesh.distrib_x: "(7.2257e+4*TMath::E
 dunevd10kt_1x8x6_222Rn_chain_218PoOnly_in_upperCathodeMesh:{
    @table::dunevd10kt_222Rn_chain_218PoOnly_in_LAr
    rate: 0.892971 # 0.000001395 BqPercc * 7.2257% ions * 2*0.004285s * 650cm drift * (4*337.5cm + 2*78cm) width * (3*300cm + 2*78cm) length  =  0.892971 events in [-0.004285s, 0.004285s]  -JReichenbacher (10/11/2023)
-   BqPercc: @erase #4.45529e-5 // CHANGED to 0.000001395*7.2257% ions * 1*650cm upper drift collection * 0.68 C.L. for +/- sigma of 0.5 cm range  -JReichenbacher (09/22/2023)
+   BqPercc: 1.2942e-6 # This param is probably not needed but is put here to be consistent with Juergen's original fhicl
 #  BqPercc: 0.001 // only for quick check of 'delta-fct.' method (otherwise use line above!)
    distrib_x: "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
 }
 
 dunevd10kt_1x8x6_222Rn_chain_214PbOnly_in_upperCathodeMesh:           @local::dunevd10kt_222Rn_chain_214PbOnly_in_LAr
-dunevd10kt_1x8x6_222Rn_chain_214PbOnly_in_upperCathodeMesh.BqPercc:   @erase #1.98573e-4 # CHANGED to 0.000001395*32.2051% ions * 1*650cm upper drift collection * 0.68 C.L. for +/- sigma of 0.5 cm range  -JReichenbacher (09/25/2023)
+dunevd10kt_1x8x6_222Rn_chain_214PbOnly_in_upperCathodeMesh.BqPercc:   9.4574e-7 # This param is probably not needed but is put here to be consistent with Juergen's original fhicl
 dunevd10kt_1x8x6_222Rn_chain_214PbOnly_in_upperCathodeMesh.rate:      3.97999 # 0.000001395 BqPercc * 32.2051% ions * 2*0.004285s * 650cm drift * (4*337.5cm + 2*78cm) width * (3*300cm + 2*78cm) length  =  3.97999 events in [-0.004285s, 0.004285s]  -JReichenbacher (10/11/2023)
 dunevd10kt_1x8x6_222Rn_chain_214PbOnly_in_upperCathodeMesh.distrib_x: "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
 
 dunevd10kt_1x8x6_222Rn_chain_214BiOnly_in_upperCathodeMesh:           @local::dune10kt_222Rn_chain_214BiOnly_in_LAr
-dunevd10kt_1x8x6_222Rn_chain_214BiOnly_in_upperCathodeMesh.BqPercc:   @erase #3.54691e-4 # CHANGED to 0.000001395*57.5246% ions * 1*650cm upper drift collection * 0.68 C.L. for +/- sigma of 0.5 cm range  -JReichenbacher (09/25/2023)
+dunevd10kt_1x8x6_222Rn_chain_214BiOnly_in_upperCathodeMesh.BqPercc:   5.9253e-7 # This param is probably not needed but is put here to be consistent with Juergen's original fhicl
 dunevd10kt_1x8x6_222Rn_chain_214BiOnly_in_upperCathodeMesh.rate:      7.10904 # 0.000001395 BqPercc * 57.5246% ions * 2*0.004285s * 650cm drift * (4*337.5cm + 2*78cm) width * (3*300cm + 2*78cm) length  =  7.10904 events in [-0.004285s, 0.004285s]  -JReichenbacher (10/11/2023)
 dunevd10kt_1x8x6_222Rn_chain_214BiOnly_in_upperCathodeMesh.distrib_x: "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
 
 dunevd10kt_1x8x6_222Rn_chain_210PbOnly_in_upperCathodeMesh:            @local::dune10kt_222Rn_chain_210PbOnly_in_CPA
-dunevd10kt_1x8x6_222Rn_chain_210PbOnly_in_upperCathodeMesh.BqPercc:    @erase #4.51234e-4 # CHANGED to 0.000001395*73.1822% ions * 1*650cm upper drift collection * 0.68 C.L. for +/- sigma of 0.5 cm range  -JReichenbacher (09/25/2023)
+dunevd10kt_1x8x6_222Rn_chain_210PbOnly_in_upperCathodeMesh.BqPercc:    3.7411e-7 # This param is probably not needed but is put here to be consistent with Juergen's original fhicl 
 dunevd10kt_1x8x6_222Rn_chain_210PbOnly_in_upperCathodeMesh.rate:       9.04405 #0.000001395 BqPercc * 73.1822% ions * 2*0.004285s * 650cm drift * (4*337.5cm + 2*78cm) width * (3*300cm + 2*78cm) length  =  9.04405 events in [-0.004285s, 0.004285s]  -JReichenbacher (10/11/2023)
 dunevd10kt_1x8x6_222Rn_chain_210PbOnly_in_upperCathodeMesh.distrib_x:  "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
 dunevd10kt_1x8x6_222Rn_chain_210PbOnly_in_upperCathodeMesh.material:   LAr
 dunevd10kt_1x8x6_222Rn_chain_210PbOnly_in_upperCathodeMesh.volume_gen: @erase
 
 dunevd10kt_1x8x6_222Rn_chain_from210Bi_in_upperCathodeMesh:            @local::dunevd10kt_1x8x6_222Rn_chain_210PbOnly_in_upperCathodeMesh
-dunevd10kt_1x8x6_222Rn_chain_from210Bi_in_upperCathodeMesh.BqPercc:    @erase #4.51234e-4 # CHANGED to same new number as for 210Pb in upperCathodeMesh b/c 210Bi is 210Pb daughter and assume decay products stay in upperCathodeMesh  -JReichenbacher (09/25/2023)
+dunevd10kt_1x8x6_222Rn_chain_from210Bi_in_upperCathodeMesh.BqPercc:    3.7411e-7 # This param is probably not needed but is put here to be consistent with Juergen's original fhicl
 dunevd10kt_1x8x6_222Rn_chain_from210Bi_in_upperCathodeMesh.rate:       9.04405 #0.000001395 BqPercc * 73.1822% ions * 2*0.004285s * 650cm drift * (4*337.5cm + 2*78cm) width * (3*300cm + 2*78cm) length  =  9.04405 events in [-0.004285s, 0.004285s]  -JReichenbacher (10/11/2023)
 dunevd10kt_1x8x6_222Rn_chain_from210Bi_in_upperCathodeMesh.isotope:    @erase
 dunevd10kt_1x8x6_222Rn_chain_from210Bi_in_upperCathodeMesh.decay_chain:{
@@ -51,7 +51,7 @@ dunevd10kt_1x8x6_222Rn_chain_from210Bi_in_upperCathodeMesh.decay_chain:{
 } 
 
 dunevd10kt_1x8x6_220Rn_chain_from212Pb_in_upperCathodeMesh:            @local::dunevd10kt_220Rn_chain_212PbOnly_in_LAr
-dunevd10kt_1x8x6_220Rn_chain_from212Pb_in_upperCathodeMesh.BqPercc:    @erase #1.38116e-4 # from 222Rn decay chain divided by 3 corresponding to SD Mines assay results for ProtoDUNE Cu-getter and mol-sieve filter materials w/ accumulation as below  -JReichenbacher (09/25/2023)
+dunevd10kt_1x8x6_220Rn_chain_from212Pb_in_upperCathodeMesh.BqPercc:    1.395e-6 # This param is probably not needed but is put here to be consistent with Juergen's original fhicl
 dunevd10kt_1x8x6_220Rn_chain_from212Pb_in_upperCathodeMesh.rate:       2.76825 # (0.000001395/3) BqPercc * 67.2% ions * 2*0.004285s * 650cm drift * (4*337.5cm + 2*78cm) width * (3*300cm + 2*78cm) length  =  2.76825 events in [-0.004285s, 0.004285s]  -JReichenbacher (10/11/2023)
    # CHANGED to (0.000001395/3)*67.2% ions * 1*650cm upper drift collection * 0.68 C.L. for +/- sigma of 0.5 cm range
 dunevd10kt_1x8x6_220Rn_chain_from212Pb_in_upperCathodeMesh.distrib_x:  "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."

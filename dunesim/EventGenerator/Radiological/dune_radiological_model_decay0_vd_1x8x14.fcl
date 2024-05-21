@@ -3,7 +3,7 @@
 
 BEGIN_PROLOG
 ##################################
-# Decay0 Radiological Model v3. #
+# Decay0 Radiological Model v3.6 #
 ##################################
 
 # This is MASSIVELY dependent on the geometry
