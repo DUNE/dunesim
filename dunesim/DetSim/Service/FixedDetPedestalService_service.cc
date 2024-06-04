@@ -8,13 +8,8 @@
 //**********************************************************************
 
 FixedDetPedestalService::
-FixedDetPedestalService(const fhicl::ParameterSet& pset, art::ActivityRegistry&)
-: FixedDetPedestalService(pset.get<fhicl::ParameterSet>("FixedDetPedestal")) { }
-
-//**********************************************************************
-
-FixedDetPedestalService::
-FixedDetPedestalService(const fhicl::ParameterSet& pset) {
+FixedDetPedestalService(const fhicl::ParameterSet& outer_pset) {
+  auto const pset = outer_pset.get<fhicl::ParameterSet>("FixedDetPedestal");
   m_PedMeanU    = pset.get<float>("PedMeanU");
   m_PedMeanV    = pset.get<float>("PedMeanV");
   m_PedMeanX    = pset.get<float>("PedMeanX");
@@ -40,11 +35,11 @@ FixedDetPedestalService(const fhicl::ParameterSet& pset) {
 //**********************************************************************
 
 float FixedDetPedestalService::PedMean(raw::ChannelID_t ch) const {
-  if      ( m_hgeo->View(ch) == geo::kZ ) return m_PedMeanZ;
-  else if ( m_hgeo->View(ch) == geo::kU ) return m_PedMeanU;
-  else if ( m_hgeo->View(ch) == geo::kV ) return m_PedMeanV;
-  else if ( m_hgeo->View(ch) == geo::kX ) return m_PedMeanX;
-  else if ( m_hgeo->View(ch) == geo::kY ) return m_PedMeanY;
+  if      ( m_wireReadout->View(ch) == geo::kZ ) return m_PedMeanZ;
+  else if ( m_wireReadout->View(ch) == geo::kU ) return m_PedMeanU;
+  else if ( m_wireReadout->View(ch) == geo::kV ) return m_PedMeanV;
+  else if ( m_wireReadout->View(ch) == geo::kX ) return m_PedMeanX;
+  else if ( m_wireReadout->View(ch) == geo::kY ) return m_PedMeanY;
   return -999.0;
 }
 

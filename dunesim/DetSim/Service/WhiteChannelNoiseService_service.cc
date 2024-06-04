@@ -2,7 +2,7 @@
 
 #include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 #include "dunesim/DetSim/Service/WhiteChannelNoiseService.h"
-#include "larcore/Geometry/Geometry.h"
+#include "larcore/Geometry/WireReadout.h"
 #include "nurandom/RandomUtils/NuRandomService.h"
 #include "art_root_io/TFileService.h"
 #include "dunecore/Utilities/SignalShapingServiceDUNE.h"
@@ -85,8 +85,7 @@ int WhiteChannelNoiseService::addNoise(detinfo::DetectorClocksData const&,
       << "\033[00m"
       << std::endl;
   }
-  art::ServiceHandle<geo::Geometry> geo;
-  const geo::View_t view = geo->View(chan);
+  const geo::View_t view = art::ServiceHandle<geo::WireReadout>()->Get().View(chan);
   CLHEP::HepRandomEngine& engine = *m_pran;
   CLHEP::RandGaussQ rGauss_Ind(engine, 0.0, fNoiseFactVec[0]);
   CLHEP::RandGaussQ rGauss_Col(engine, 0.0, fNoiseFactVec[1]);

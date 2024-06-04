@@ -3,10 +3,10 @@
 #include <set>
 
 
-#include "art/Framework/Core/EDFilter.h" 
-#include "art/Framework/Core/ModuleMacros.h" 
-#include "art/Framework/Principal/Event.h" 
-#include "larcore/Geometry/Geometry.h"
+#include "art/Framework/Core/EDFilter.h"
+#include "art/Framework/Core/ModuleMacros.h"
+#include "art/Framework/Principal/Event.h"
+#include "larcore/Geometry/AuxDetGeometry.h"
 #include "lardataobj/Simulation/AuxDetSimChannel.h"
 #include "nusimdata/SimulationBase/MCTruth.h"
 #include "lardataobj/RawData/RawDigit.h"
@@ -40,7 +40,7 @@ namespace filt{
       std::vector<int> fInterestingPDGs; //A vector of particle PDGs which want to be filtered on
       double fParticleMinEnergy;  //The minimum energy of a particle to be filtered
       double fParticleMaxEnergy;  //The maximum energy of a particle to be filtered
-  
+
       bool IsInterestingParticle(const simb::MCParticle& particle);  //Define whether a particular particle is initially worth saving e.g. is it a muon, pion etc
       bool UsesCounterSetPair(const CounterSetPair &CSP, const std::set<unsigned int> &usedCounterIDs); //Check if a list of counter IDs matches with those in a particular set pair
       bool UsesCounterSet(const std::vector<unsigned int> &counterIDs, const std::set<unsigned int> &usedCounterIDs); //Check if any of a list of counters are counter in a particular counter set
@@ -62,7 +62,7 @@ namespace filt{
     fInterestingPDGs = pset.get<std::vector<int> >("InterestingPDGs");
     std::cout<<"NInteresting PDGs: " << fInterestingPDGs.size() << std::endl;
     for (unsigned int i = 0; i < fInterestingPDGs.size(); i++){
-      std::cout<<"-- PDG: " << fInterestingPDGs[i] << std::endl; 
+      std::cout<<"-- PDG: " << fInterestingPDGs[i] << std::endl;
     }
     fParticleMinEnergy = pset.get<double>("ParticleMinEnergy",0);
     std::cout<<"Particle min energy: " << fParticleMinEnergy << std::endl;
@@ -72,7 +72,7 @@ namespace filt{
 
   bool LArG4ExtCounterFilter::filter(art::Event & e){
 
-    art::ServiceHandle<geo::Geometry> geom;
+    auto const& auxDetGeom = art::ServiceHandle<geo::AuxDetGeometry>()->GetProvider();
 
 
     //Get the vector of particles
@@ -93,8 +93,8 @@ namespace filt{
           TLorentzVector pos4 = particle.Position(pt);
           //If the position is not contained in a counter, the function throws an exception.  We don't want to end the process when this happens
           try{
-            //std::cout<<"AuxDetID: " << geom->FindAuxDetAtPosition(pos) << "  pdg: " << particle.PdgCode() << std::endl;
-            unsigned int counterID = geom->FindAuxDetAtPosition(geo::vect::toPoint(pos4.Vect()));
+            //std::cout<<"AuxDetID: " << geom->FindAuxDetAtPosition(pos) << "  pdg: " << particle->PdgCode() << std::endl;
+            unsigned int counterID = auxDetGeom.FindAuxDetAtPosition(geo::vect::toPoint(pos4.Vect()));
             usedExtCounterIDs.insert(counterID);
           }
           catch(...){};
@@ -119,14 +119,14 @@ namespace filt{
   void LArG4ExtCounterFilter::beginJob() {
 
     //Need to get the counter information.  By doing this at the start of the job, rather than per event, the code assumes the geomtry is not going to change between events
-    art::ServiceHandle<geo::Geometry> geom;
+    auto const& auxDetGeom = art::ServiceHandle<geo::AuxDetGeometry>()->GetProvider();
     //Create the pairwise counter sets
     CounterSetPair EWCounterSetPair;
     CounterSetPair NupSdownCounterSetPair;
     CounterSetPair NdownSupCounterSetPair;
     //A stupid way of storing the IDs of the counters, this REALLY needs changing
     //The code loops through all of the counters in the geomtry, and if the number matches a particular counter number e.g. one of the east counters, store it in the correct, pairwise set
-    for (unsigned int i = 0; i < geom->NAuxDets(); i++){
+    for (unsigned int i = 0; i < auxDetGeom.NAuxDets(); i++){
       //The WE counter pairs
       if (i >=6 && i <= 15) EWCounterSetPair.setA.push_back(i);
       else if (i >= 28 && i <=37) EWCounterSetPair.setB.push_back(i);

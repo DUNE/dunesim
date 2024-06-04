@@ -9,21 +9,12 @@
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 #include "larevt/CalibrationDBI/Interface/DetPedestalService.h"
 #include "larevt/CalibrationDBI/Interface/DetPedestalProvider.h"
-#include "larcore/Geometry/Geometry.h"
-
-namespace fhicl {
-class ParameterSet;
-}
-namespace art {
-class ActivityRegistry;
-}
+#include "larcore/Geometry/WireReadout.h"
+#include "fhiclcpp/fwd.h"
 
 class FixedDetPedestalService : public lariov::DetPedestalService, public lariov::DetPedestalProvider {
 
 public:
-
-  // Service ctor.
-  FixedDetPedestalService(const fhicl::ParameterSet& pset, art::ActivityRegistry& reg);
 
   // Provider ctor.
   FixedDetPedestalService(const fhicl::ParameterSet& pset);
@@ -40,7 +31,7 @@ private:
   const lariov::DetPedestalProvider& DoGetPedestalProvider() const;
 
   // We use the geometry service to obtain the orientation for each channel.
-  art::ServiceHandle<geo::Geometry> m_hgeo;
+  geo::WireReadoutGeom const* m_wireReadout = &art::ServiceHandle<geo::WireReadout>()->Get();
 
   // Pedestal value.
   float m_PedMeanU;
