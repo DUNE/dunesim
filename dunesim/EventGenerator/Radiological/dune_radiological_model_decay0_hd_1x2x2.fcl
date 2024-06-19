@@ -14,7 +14,7 @@ BEGIN_PROLOG
 dune10kt_1x2x2_gammas_in_APAboards:  # 3.81 cm thick (2*4*4.76 mm), 16.5 cm in the vertical direction, and as wide as the APA frames on top of upper APAs and bottom of lower APAs - J. Reichenbacher (12/11/2023)
 {
    module_type:           "RadioGen"
-   PathToFile:             "Flux/Radionuclides/v03_06/"
+   PathToFile:             "Flux/Radionuclides/v03_05/"
    Nuclide:               ["Uranium_238_chain_dominantGammaOnly_JR", "Uranium_238_chain_dominantGammaOnly_JR", "Thorium_232_chain_dominantGammaOnly_JR", "Thorium_232_chain_dominantGammaOnly_JR", "Potassium_40_dominantGammaOnly_JR", "Potassium_40_dominantGammaOnly_JR"]
    Material:              [".*",".*",".*",".*",".*",".*"]
    BqPercc:               [ 0.0197377, 0.0197377, 0.0353206, 0.0353206, 0.00129237, 0.00129237 ] # activity -- Becquerels per cc. with measured density of 1.75 g/cm^3 and multiplied with integral chain emission rate of TGraphs -JReichenbacher (12/11/2023)

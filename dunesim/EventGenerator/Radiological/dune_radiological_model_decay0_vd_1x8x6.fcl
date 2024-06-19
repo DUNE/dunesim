@@ -3,11 +3,12 @@
 
 BEGIN_PROLOG
 ##################################
-# Decay0 Radiological Model v3.4 #
+# Decay0 Radiological Model v3.5 #
 ##################################
 
 # This is MASSIVELY dependent on the geometry
 # Convinced myself that best is to have four 1cm thin vertical planes on sides (along x-drift in rotated VD geo) to emulate external backgrounds coming in through cryostat (but NO PLANE at the horizontal Cathode that is realistically positioned on the inside at half height in the VD), and then just one 1cm thin plane on top, all approx. 25cm offset from active TPC. This should more accurately represent the worst case scenario in the FD VD. - J. Reichenbacher (08/14/2023)
+# v3.1.5.VD-02272024/Juergen Reichenbacher: Changed external background planes on East and West face to be placed 6 cm behind gdml-wise mis-placed wall Arapucas and attenuated/upscaled those gamma BGs accordingly to match FD2
 
 
 dunevd10kt_1x8x6_42Kfrom42Ar_in_upperCathodeMesh:           @local::dune10kt_42Kfrom42Ar_in_LAr
@@ -18,30 +19,30 @@ dunevd10kt_1x8x6_42Kfrom42Ar_in_upperCathodeMesh.distrib_x: "(7.2257e+4*TMath::E
 dunevd10kt_1x8x6_222Rn_chain_218PoOnly_in_upperCathodeMesh:{
    @table::dunevd10kt_222Rn_chain_218PoOnly_in_LAr
    rate: 0.892971 # 0.000001395 BqPercc * 7.2257% ions * 2*0.004285s * 650cm drift * (4*337.5cm + 2*78cm) width * (3*300cm + 2*78cm) length  =  0.892971 events in [-0.004285s, 0.004285s]  -JReichenbacher (10/11/2023)
-   BqPercc: @erase #4.45529e-5 // CHANGED to 0.000001395*7.2257% ions * 1*650cm upper drift collection * 0.68 C.L. for +/- sigma of 0.5 cm range  -JReichenbacher (09/22/2023)
+   BqPercc: 1.2942e-6 # This param is probably not needed but is put here to be consistent with Juergen's original fhicl
 #  BqPercc: 0.001 // only for quick check of 'delta-fct.' method (otherwise use line above!)
    distrib_x: "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
 }
 
 dunevd10kt_1x8x6_222Rn_chain_214PbOnly_in_upperCathodeMesh:           @local::dunevd10kt_222Rn_chain_214PbOnly_in_LAr
-dunevd10kt_1x8x6_222Rn_chain_214PbOnly_in_upperCathodeMesh.BqPercc:   @erase #1.98573e-4 # CHANGED to 0.000001395*32.2051% ions * 1*650cm upper drift collection * 0.68 C.L. for +/- sigma of 0.5 cm range  -JReichenbacher (09/25/2023)
+dunevd10kt_1x8x6_222Rn_chain_214PbOnly_in_upperCathodeMesh.BqPercc:   9.4574e-7 # This param is probably not needed but is put here to be consistent with Juergen's original fhicl
 dunevd10kt_1x8x6_222Rn_chain_214PbOnly_in_upperCathodeMesh.rate:      3.97999 # 0.000001395 BqPercc * 32.2051% ions * 2*0.004285s * 650cm drift * (4*337.5cm + 2*78cm) width * (3*300cm + 2*78cm) length  =  3.97999 events in [-0.004285s, 0.004285s]  -JReichenbacher (10/11/2023)
 dunevd10kt_1x8x6_222Rn_chain_214PbOnly_in_upperCathodeMesh.distrib_x: "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
 
 dunevd10kt_1x8x6_222Rn_chain_214BiOnly_in_upperCathodeMesh:           @local::dune10kt_222Rn_chain_214BiOnly_in_LAr
-dunevd10kt_1x8x6_222Rn_chain_214BiOnly_in_upperCathodeMesh.BqPercc:   @erase #3.54691e-4 # CHANGED to 0.000001395*57.5246% ions * 1*650cm upper drift collection * 0.68 C.L. for +/- sigma of 0.5 cm range  -JReichenbacher (09/25/2023)
+dunevd10kt_1x8x6_222Rn_chain_214BiOnly_in_upperCathodeMesh.BqPercc:   5.9253e-7 # This param is probably not needed but is put here to be consistent with Juergen's original fhicl
 dunevd10kt_1x8x6_222Rn_chain_214BiOnly_in_upperCathodeMesh.rate:      7.10904 # 0.000001395 BqPercc * 57.5246% ions * 2*0.004285s * 650cm drift * (4*337.5cm + 2*78cm) width * (3*300cm + 2*78cm) length  =  7.10904 events in [-0.004285s, 0.004285s]  -JReichenbacher (10/11/2023)
 dunevd10kt_1x8x6_222Rn_chain_214BiOnly_in_upperCathodeMesh.distrib_x: "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
 
 dunevd10kt_1x8x6_222Rn_chain_210PbOnly_in_upperCathodeMesh:            @local::dune10kt_222Rn_chain_210PbOnly_in_CPA
-dunevd10kt_1x8x6_222Rn_chain_210PbOnly_in_upperCathodeMesh.BqPercc:    @erase #4.51234e-4 # CHANGED to 0.000001395*73.1822% ions * 1*650cm upper drift collection * 0.68 C.L. for +/- sigma of 0.5 cm range  -JReichenbacher (09/25/2023)
+dunevd10kt_1x8x6_222Rn_chain_210PbOnly_in_upperCathodeMesh.BqPercc:    3.7411e-7 # This param is probably not needed but is put here to be consistent with Juergen's original fhicl 
 dunevd10kt_1x8x6_222Rn_chain_210PbOnly_in_upperCathodeMesh.rate:       9.04405 #0.000001395 BqPercc * 73.1822% ions * 2*0.004285s * 650cm drift * (4*337.5cm + 2*78cm) width * (3*300cm + 2*78cm) length  =  9.04405 events in [-0.004285s, 0.004285s]  -JReichenbacher (10/11/2023)
 dunevd10kt_1x8x6_222Rn_chain_210PbOnly_in_upperCathodeMesh.distrib_x:  "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
 dunevd10kt_1x8x6_222Rn_chain_210PbOnly_in_upperCathodeMesh.material:   LAr
 dunevd10kt_1x8x6_222Rn_chain_210PbOnly_in_upperCathodeMesh.volume_gen: @erase
 
 dunevd10kt_1x8x6_222Rn_chain_from210Bi_in_upperCathodeMesh:            @local::dunevd10kt_1x8x6_222Rn_chain_210PbOnly_in_upperCathodeMesh
-dunevd10kt_1x8x6_222Rn_chain_from210Bi_in_upperCathodeMesh.BqPercc:    @erase #4.51234e-4 # CHANGED to same new number as for 210Pb in upperCathodeMesh b/c 210Bi is 210Pb daughter and assume decay products stay in upperCathodeMesh  -JReichenbacher (09/25/2023)
+dunevd10kt_1x8x6_222Rn_chain_from210Bi_in_upperCathodeMesh.BqPercc:    3.7411e-7 # This param is probably not needed but is put here to be consistent with Juergen's original fhicl
 dunevd10kt_1x8x6_222Rn_chain_from210Bi_in_upperCathodeMesh.rate:       9.04405 #0.000001395 BqPercc * 73.1822% ions * 2*0.004285s * 650cm drift * (4*337.5cm + 2*78cm) width * (3*300cm + 2*78cm) length  =  9.04405 events in [-0.004285s, 0.004285s]  -JReichenbacher (10/11/2023)
 dunevd10kt_1x8x6_222Rn_chain_from210Bi_in_upperCathodeMesh.isotope:    @erase
 dunevd10kt_1x8x6_222Rn_chain_from210Bi_in_upperCathodeMesh.decay_chain:{
@@ -50,7 +51,7 @@ dunevd10kt_1x8x6_222Rn_chain_from210Bi_in_upperCathodeMesh.decay_chain:{
 } 
 
 dunevd10kt_1x8x6_220Rn_chain_from212Pb_in_upperCathodeMesh:            @local::dunevd10kt_220Rn_chain_212PbOnly_in_LAr
-dunevd10kt_1x8x6_220Rn_chain_from212Pb_in_upperCathodeMesh.BqPercc:    @erase #1.38116e-4 # from 222Rn decay chain divided by 3 corresponding to SD Mines assay results for ProtoDUNE Cu-getter and mol-sieve filter materials w/ accumulation as below  -JReichenbacher (09/25/2023)
+dunevd10kt_1x8x6_220Rn_chain_from212Pb_in_upperCathodeMesh.BqPercc:    1.395e-6 # This param is probably not needed but is put here to be consistent with Juergen's original fhicl
 dunevd10kt_1x8x6_220Rn_chain_from212Pb_in_upperCathodeMesh.rate:       2.76825 # (0.000001395/3) BqPercc * 67.2% ions * 2*0.004285s * 650cm drift * (4*337.5cm + 2*78cm) width * (3*300cm + 2*78cm) length  =  2.76825 events in [-0.004285s, 0.004285s]  -JReichenbacher (10/11/2023)
    # CHANGED to (0.000001395/3)*67.2% ions * 1*650cm upper drift collection * 0.68 C.L. for +/- sigma of 0.5 cm range
 dunevd10kt_1x8x6_220Rn_chain_from212Pb_in_upperCathodeMesh.distrib_x:  "(7.2257e+4*TMath::Exp(-(x+320.)*(x+320.)/(2.*0.5*0.5)))+1."
@@ -59,7 +60,7 @@ dunevd10kt_1x8x6_220Rn_chain_from212Pb_in_upperCathodeMesh.distrib_x:  "(7.2257e
 dunevd10kt_1x8x6_gammas_from_cavernwall_atLAr: 
 {
    module_type:           "RadioGen"
-   Nuclide:               ["FDcavernGammasAtLArFlux", "FDcavernGammasAtLArFlux", "FDcavernGammasAtLArFlux", "FDcavernGammasAtLArFlux", "FDcavernGammasAtLArFlux"] # downscaled above 3.3 MeV for overestimated (alpha, gamma) production in Geant4 -JReichenbacher (05/16/2023)
+   Nuclide:               ["FDcavernGammasAtLArFlux_WestFaceVD1x8x6_285mmLAr_upscaled", "FDcavernGammasAtLArFlux_EastFaceVD1x8x6_135mmLAr_attenuated", "FDcavernGammasAtLArFlux", "FDcavernGammasAtLArFlux", "FDcavernGammasAtLArFlux"] # downscaled above 3.3 MeV for overestimated (alpha, gamma) production in Geant4 -JReichenbacher (05/16/2023)
    PathToFile:             "Flux/Radionuclides/v03_02_01/"
    Material:              [".*",".*",".*",".*",".*"]
    BqPercc:               [ 1.05104, 1.05104, 1.05104, 1.05104, 1.05104 ] # activity -- Becquerels per cc. 1.05104 assumes 4pi flux of 0.25597 gammas/(cm^2 sec) at LAr interface propagated from cavernwalls (rock+shotcrete SDSMT assay data) and impact factor 3.0 (~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
@@ -69,8 +70,8 @@ dunevd10kt_1x8x6_gammas_from_cavernwall_atLAr:
    X1:                    [  350. ,  350. ,  350.,  350. ,  350.5 ] # in cm in world coordinates, high x-values of planes
    Y0:                    [ -750. , -750. , -751.,  750. , -750.  ] # in cm in world coordinates, low y-values of planes
    Y1:                    [  750. ,  750. , -750.,  751. ,  750.  ] # in cm in world coordinates, high y-values of planes
-   Z0:                    [  -78.5,  973.5,  -78.,  -78. ,  -78.  ] # in cm in world coordinates, low z-values of planes
-   Z1:                    [  -77.5,  974.5,  974.,  974. ,  974.  ] # in cm in world coordinates, high z-values of planes
+   Z0:                    [ -103.5,  999.5, -103., -103. , -103.  ] # in cm in world coordinates, low z-values of planes
+   Z1:                    [ -102.5, 1000.5, 1000., 1000. , 1000.  ] # in cm in world coordinates, high z-values of planes
 }
 
 
