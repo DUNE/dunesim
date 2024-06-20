@@ -3,6 +3,7 @@
 #include "dunesim/DetectorVariations/RandomChannelStatusService.h"
 #include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 
+#include "larcore/Geometry/WireReadout.h"
 #include "larcore/Geometry/Geometry.h"
 #include "lardataobj/Simulation/sim.h" // GetRandomNumberSeed()
 
@@ -62,26 +63,29 @@ namespace detvar
 
   /// For whatever reason the iterators in Geometry can't be used to initialize
   /// a vector directly
-  template<class T, class It_t> std::vector<T> VectorViaSet(It_t begin,
-                                                            It_t end)
+  template<class T, class It_t, class Sentinel_t>
+  std::vector<T> toVector(It_t it, Sentinel_t end)
   {
-    const std::set<T> s(begin, end);
-    return std::vector<T>(s.begin(), s.end());
+    std::vector<T> result;
+    for (; it != end; ++it) {
+      result.push_back(*it);
+    }
+    return result;
   }
 
   class RandomTPC
   {
   public:
-    RandomTPC(const geo::GeometryCore* geom)
-      : fCryos(VectorViaSet<geo::CryostatID>(geom->begin<geo::CryostatID>(),
+    RandomTPC(const geo::GeometryCore* geom, const geo::WireReadoutGeom* wireReadout)
+      : fCryos(toVector<geo::CryostatID>(geom->begin<geo::CryostatID>(),
                                              geom->end<geo::CryostatID>()))
     {
       for(geo::CryostatID c: fCryos){
-        fTPCs[c] = VectorViaSet<geo::TPCID>(geom->begin<geo::TPCID>(c),
+        fTPCs[c] = toVector<geo::TPCID>(geom->begin<geo::TPCID>(c),
                                             geom->end<geo::TPCID>(c));
 
-        fTPCsets[c] = VectorViaSet<readout::TPCsetID>(geom->begin<readout::TPCsetID>(c),
-                                                      geom->end<readout::TPCsetID>(c));
+        fTPCsets[c] = toVector<readout::TPCsetID>(wireReadout->begin<readout::TPCsetID>(c),
+                                                  wireReadout->end<readout::TPCsetID>(c));
       }
     }
 
@@ -122,9 +126,9 @@ namespace detvar
       // Search through all the wires associated with this channel for the
       // top-most position (where it attaches to the APA frame) and quote that
       // Z position.
-      const std::vector<geo::WireID> wires = geom->ChannelToWire(c);
+      const std::vector<geo::WireID> wires = wireReadout->ChannelToWire(c);
       for(const geo::WireID& wire: wires){
-        const geo::WireGeo& wg = geom->Wire(wire);
+        const geo::WireGeo& wg = wireReadout->Wire(wire);
         if(wg.GetStart().Y() > y){
           y = wg.GetStart().Y();
           z = wg.GetStart().Z();
@@ -139,24 +143,25 @@ namespace detvar
     }
 
     art::ServiceHandle<geo::Geometry> geom;
+    geo::WireReadoutGeom const* wireReadout = &art::ServiceHandle<geo::WireReadout>()->Get();
   };
 
   //......................................................................
   // Three vectors, one for each view. Will be sorted by ID number
   std::vector<std::vector<raw::ChannelID_t>>
-  ChannelsForTPC(const geo::GeometryCore* geom, geo::TPCID tpc)
+  ChannelsForTPC(const geo::GeometryCore* geom, geo::WireReadoutGeom const* wireReadout, geo::TPCID tpc)
   {
     // No good way of enumerating all the unique channels, or selecting them by
     // index. Have to figure them out from the wires.
     std::set<raw::ChannelID_t> chanset[3];
-    for(geo::WireID const& wire: geom->Iterate<geo::WireID>(tpc)){
-      const raw::ChannelID_t chan = geom->PlaneWireToChannel(wire);
+    for(geo::WireID const& wire: wireReadout->Iterate<geo::WireID>(tpc)){
+      const raw::ChannelID_t chan = wireReadout->PlaneWireToChannel(wire);
       // But this also gives us wires that are actually attached to the other
       // face and just wrapped onto this face. So long as the order of the
       // vector returned from this function is meaningful, this should work
       // to keep just the ones we need.
-      if(geom->ChannelToWire(chan)[0] == wire)
-        chanset[geom->View(chan)].insert(chan);
+      if(wireReadout->ChannelToWire(chan)[0] == wire)
+        chanset[wireReadout->View(chan)].insert(chan);
     }
     // We'll want to index by channel number within the APAs. Sort spatially as
     // our best guess as to that mapping.
@@ -189,15 +194,14 @@ namespace detvar
       abort();
     }
 
-    art::ServiceHandle<geo::Geometry> geom;
-
     // TODO don't seem to be able to access the RandomNumberGenerator service
     // from here, let alone anything to do with seeds.
     //    const unsigned int seed = pset.get<unsigned int>("Seed", sim::GetRandomNumberSeed());
     //    auto& engine = createEngine(seed);
     //    CLHEP::RandFlat r(engine);
 
-    const unsigned int target = badfrac*geom->Nchannels();
+    auto const& wireReadout = art::ServiceHandle<geo::WireReadout>()->Get();
+    const unsigned int target = badfrac * wireReadout.Nchannels();
 
     switch(mode){
     case kRandomChans:    MarkChansBad(target);    break;
@@ -216,9 +220,11 @@ namespace detvar
     }
 
     // goodchans = allchans - badchans
+    art::ServiceHandle<geo::Geometry> geom;
+
     std::set<raw::ChannelID_t> allchans;
-    for(geo::WireID const& wire: geom->Iterate<geo::WireID>())
-      allchans.insert(geom->PlaneWireToChannel(wire));
+    for(geo::WireID const& wire: wireReadout.Iterate<geo::WireID>())
+      allchans.insert(wireReadout.PlaneWireToChannel(wire));
 
     std::set_difference(allchans.begin(), allchans.end(),
                         fBadChans.begin(), fBadChans.end(),
@@ -229,12 +235,13 @@ namespace detvar
   void RandomChannelStatusProvider::MarkChansBad(unsigned int target)
   {
     art::ServiceHandle<geo::Geometry> geom;
+    auto const& wireReadout = art::ServiceHandle<geo::WireReadout>()->Get();
 
     // Geometry doesn't have a way to iterate directly over channels. Iterate
     // over the wires and convert them. Use a set to remove duplicates
     std::set<raw::ChannelID_t> allchans;
-    for(geo::WireID const& wire: geom->Iterate<geo::WireID>())
-      allchans.insert(geom->PlaneWireToChannel(wire));
+    for(geo::WireID const& wire: wireReadout.Iterate<geo::WireID>())
+      allchans.insert(wireReadout.PlaneWireToChannel(wire));
 
     // But a vector is much easier to pick from randomly. This will be used for
     // the random chans mode.
@@ -256,20 +263,21 @@ namespace detvar
   void RandomChannelStatusProvider::MarkAPAsBad(unsigned int target)
   {
     art::ServiceHandle<geo::Geometry> geom;
+    auto const& wireReadout = art::ServiceHandle<geo::WireReadout>()->Get();
 
     std::map<readout::TPCsetID, std::set<raw::ChannelID_t>> tpcset_to_chans;
-    for(const readout::TPCsetID& ts: geom->Iterate<readout::TPCsetID>()){
+    for(const readout::TPCsetID& ts: wireReadout.Iterate<readout::TPCsetID>()){
       // There is no version of IterateWireIDs over a TPCset. Use another layer
       // of indirection.
-      for(geo::TPCID t: geom->TPCsetToTPCs(ts)){
-        for(const geo::WireID& wire: geom->Iterate<geo::WireID>(t)){
-          const raw::ChannelID_t chan = geom->PlaneWireToChannel(wire);
+      for(geo::TPCID t: wireReadout.TPCsetToTPCs(ts)){
+        for(const geo::WireID& wire: wireReadout.Iterate<geo::WireID>(t)){
+          const raw::ChannelID_t chan = wireReadout.PlaneWireToChannel(wire);
           tpcset_to_chans[ts].insert(chan);
         }
       }
     }
 
-    RandomTPC tpcs(geom.get());
+    RandomTPC tpcs(geom.get(), &wireReadout);
 
     while(fBadChans.size() < target){
       // Mark all the channels in this TPCset (both sides of an APA) bad
@@ -288,21 +296,22 @@ namespace detvar
   void RandomChannelStatusProvider::MarkAPASidesBad(unsigned int target)
   {
     art::ServiceHandle<geo::Geometry> geom;
+    auto const& wireReadout = art::ServiceHandle<geo::WireReadout>()->Get();
 
     std::map<geo::TPCID, std::vector<raw::ChannelID_t>> tpc_to_chans;
-    for(const geo::WireID& wire: geom->Iterate<geo::WireID>()){
+    for(const geo::WireID& wire: wireReadout.Iterate<geo::WireID>()){
       // Geometry doesn't provide a way to directly iterate the channels in the
       // TPC. Instead iterate the wires and convert to channels
-        const raw::ChannelID_t chan = geom->PlaneWireToChannel(wire);
+        const raw::ChannelID_t chan = wireReadout.PlaneWireToChannel(wire);
         // But this also gives us wires that are actually attached to the other
         // face and just wrapped onto this face. So long as the order of the
         // vector returned from this function is meaningful, this should work
         // to keep just the ones we need.
-        if(geom->ChannelToWire(chan)[0] == wire)
+        if(wireReadout.ChannelToWire(chan)[0] == wire)
         tpc_to_chans[wire.asPlaneID().asTPCID()].push_back(chan);
     }
 
-    RandomTPC tpcs(geom.get());
+    RandomTPC tpcs(geom.get(), &wireReadout);
 
     while(fBadChans.size() < target){
       const geo::TPCID t = tpcs.GetTPC();
@@ -323,8 +332,9 @@ namespace detvar
   MarkBoardsOrChipsBad(EMode_t mode, unsigned int target)
   {
     art::ServiceHandle<geo::Geometry> geom;
+    auto const& wireReadout = art::ServiceHandle<geo::WireReadout>()->Get();
 
-    RandomTPC tpcs(geom.get());
+    RandomTPC tpcs(geom.get(), &wireReadout);
 
     // Generate exactly the requested fraction of bad channels (rather than a
     // random sample with that probability). Should make results of studies
@@ -332,7 +342,7 @@ namespace detvar
     while(fBadChans.size() < target){
       const geo::TPCID t = tpcs.GetTPC();
 
-      const std::vector<std::vector<raw::ChannelID_t>> chans = ChannelsForTPC(geom.get(), t);
+      const std::vector<std::vector<raw::ChannelID_t>> chans = ChannelsForTPC(geom.get(), &wireReadout, t);
 
       // An APA has 20 boards total, 10 on each side. ie a side has 480 W wires
       // and 400+400 U+V wires.

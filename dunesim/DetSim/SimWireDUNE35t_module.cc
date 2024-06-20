@@ -37,7 +37,7 @@ extern "C" {
 #include "lardataobj/RawData/raw.h"
 #include "lardata/DetectorInfoServices/LArPropertiesService.h"
 #include "dunecore/Utilities/SignalShapingServiceDUNE.h"
-#include "larcore/Geometry/Geometry.h"
+#include "larcore/Geometry/WireReadout.h"
 
 #include "lardataobj/Simulation/sim.h"
 #include "lardataobj/Simulation/SimChannel.h"
@@ -296,19 +296,19 @@ namespace detsim {
 				     << "greater than FFTSize!";
 
     fChargeWork.resize(fNTicks, 0.);
-    art::ServiceHandle<geo::Geometry> geo;
+    auto const& wireReadout = art::ServiceHandle<geo::WireReadout>()->Get();
 
     bool foundfirstcollectionchannel = false;
     fFirstChannelsInPlane.push_back(0);
-    unsigned int currentPlaneNumber = geo->ChannelToWire(0).at(0).Plane; // ID of current wire plane
-    unsigned int currentTPCNumber = geo->ChannelToWire(0).at(0).TPC; // ID of current wire plane
+    unsigned int currentPlaneNumber = wireReadout.ChannelToWire(0).at(0).Plane; // ID of current wire plane
+    unsigned int currentTPCNumber = wireReadout.ChannelToWire(0).at(0).TPC; // ID of current wire plane
 
-    for (uint32_t ichan=0;ichan<geo->Nchannels();ichan++)
+    for (uint32_t ichan=0;ichan<wireReadout.Nchannels();ichan++)
       {
 
 	if(!foundfirstcollectionchannel)
 	  {
-	    const geo::View_t view = geo->View(ichan);
+            const geo::View_t view = wireReadout.View(ichan);
 	    if (view == geo::kZ)
 	      {
 		foundfirstcollectionchannel = true;
@@ -317,8 +317,8 @@ namespace detsim {
 	      }
 	  }
 
-	const unsigned int thisPlaneNumber = geo->ChannelToWire(ichan).at(0).Plane;
-	const unsigned int thisTPCNumber = geo->ChannelToWire(ichan).at(0).TPC;
+        const unsigned int thisPlaneNumber = wireReadout.ChannelToWire(ichan).at(0).Plane;
+        const unsigned int thisTPCNumber = wireReadout.ChannelToWire(ichan).at(0).TPC;
 		
 	if(thisPlaneNumber != currentPlaneNumber || (thisPlaneNumber == geo::kZ && thisTPCNumber != currentTPCNumber))
 	  {
@@ -334,7 +334,7 @@ namespace detsim {
 	throw  cet::exception("SimWireDUNE35t  BeginJob") << " Could not find any collection channels\n";
       }
     
-    fLastChannelsInPlane.push_back(geo->Nchannels()-1);
+    fLastChannelsInPlane.push_back(wireReadout.Nchannels()-1);
 
      
     // //Check starting and ending channels for each wire plane
@@ -349,7 +349,7 @@ namespace detsim {
     //Generate noise if selected to be on
     if(fNoiseOn && fNoiseModel==1){
 
-      //fNoise.resize(geo->Nchannels());
+      //fNoise.resize(wireReadout.Nchannels());
       fNoiseZ.resize(fNoiseArrayPoints);
       fNoiseU.resize(fNoiseArrayPoints);
       fNoiseV.resize(fNoiseArrayPoints);
@@ -403,32 +403,30 @@ namespace detsim {
     double xyzbeg[3],xyzend[3];
     unsigned int lastwire = 0;
 
-    // Numbers in comments are from Geometry V3 for debugging purposes.
-
     // APA 0
     constexpr geo::TPCID apa0{0,0};
     constexpr geo::PlaneID apa0_plane0{apa0,0};
-    geo->WireEndPoints(geo::WireID{apa0_plane0,0},xyzbeg,xyzend);  // first U wire in TPC 0.
+    wireReadout.WireEndPoints(geo::WireID{apa0_plane0,0},xyzbeg,xyzend);  // first U wire in TPC 0.
     zcomb2 = xyzbeg[2];  // 0.0
     ycomb5 = xyzend[1];  // 113.142
 
-    lastwire = geo->Nwires(apa0_plane0)-1;  // 358 in v3
-    geo->WireEndPoints(geo::WireID{apa0_plane0,lastwire},xyzbeg,xyzend);  // last U wire in TPC 0.
+    lastwire = wireReadout.Nwires(apa0_plane0)-1;  // 358 in v3
+    wireReadout.WireEndPoints(geo::WireID{apa0_plane0,lastwire},xyzbeg,xyzend);  // last U wire in TPC 0.
     zcomb5 = xyzend[2];  // 50.8929
     ycomb2 = xyzbeg[1];  // -82.9389
 
     constexpr geo::PlaneID apa0_plane1{apa0, 1};
-    geo->WireEndPoints(geo::WireID{apa0_plane1,0},xyzbeg,xyzend);  // first V wire in TPC 0.
+    wireReadout.WireEndPoints(geo::WireID{apa0_plane1,0},xyzbeg,xyzend);  // first V wire in TPC 0.
     zcomb4 = xyzend[2];  //  50.5774
     ycomb4 = xyzbeg[1];  //  113.142
 
-    lastwire = geo->Nwires(apa0_plane1)-1;  // 344 in v3
-    geo->WireEndPoints(geo::WireID{apa0_plane1,lastwire},xyzbeg,xyzend);  // last V wire in TPC 0.
+    lastwire = wireReadout.Nwires(apa0_plane1)-1;  // 344 in v3
+    wireReadout.WireEndPoints(geo::WireID{apa0_plane1,lastwire},xyzbeg,xyzend);  // last V wire in TPC 0.
     zcomb3 = xyzbeg[2];  //  0.3155
     ycomb3 = xyzend[1];  //  -82.6234
 
     // the collection wires appear to end where they meet their comb.
-    //geo->WireEndPoints(0,0,2,0,xyzbeg,xyzend);  // first collection wire in TPC 0
+    //wireReadout.WireEndPoints(0,0,2,0,xyzbeg,xyzend);  // first collection wire in TPC 0
     //ycomb3 = xyzbeg[2];  // -82.308
     //ycomb4 = xyzend[2];  // 113.142
 
@@ -443,26 +441,26 @@ namespace detsim {
     // APA 1
     constexpr geo::TPCID apa1{0, 2};
     constexpr geo::PlaneID apa1_plane0{apa1,0};
-    geo->WireEndPoints(geo::WireID{apa1_plane0,0},xyzbeg,xyzend);  // first U wire in TPC 2.
+    wireReadout.WireEndPoints(geo::WireID{apa1_plane0,0},xyzbeg,xyzend);  // first U wire in TPC 2.
     zcomb11 = xyzend[2];  // 102.817
     ycomb8 = xyzbeg[1];  // -85.221
 
-    lastwire = geo->Nwires(apa1_plane0)-1;  // 194 in v3
-    geo->WireEndPoints(geo::WireID{apa1_plane0,lastwire},xyzbeg,xyzend);  // last U wire in TPC 2.
+    lastwire = wireReadout.Nwires(apa1_plane0)-1;  // 194 in v3
+    wireReadout.WireEndPoints(geo::WireID{apa1_plane0,lastwire},xyzbeg,xyzend);  // last U wire in TPC 2.
     zcomb8 = xyzbeg[2];  // 51.924
     ycomb11 = xyzend[1];  // -0.831
 
     constexpr geo::PlaneID apa1_plane1{apa1, 1};
-    geo->WireEndPoints(geo::WireID{apa1_plane1,0},xyzbeg,xyzend);  // first V wire in TPC 2.
+    wireReadout.WireEndPoints(geo::WireID{apa1_plane1,0},xyzbeg,xyzend);  // first V wire in TPC 2.
     zcomb9 = xyzbeg[2];  //  52.2395 
     ycomb9 = xyzend[1];  //  -85.222
 
-    lastwire = geo->Nwires(apa1_plane1)-1;  // 188 in v3
-    geo->WireEndPoints(geo::WireID{apa1_plane1,lastwire},xyzbeg,xyzend);  // last V wire in TPC 2.
+    lastwire = wireReadout.Nwires(apa1_plane1)-1;  // 188 in v3
+    wireReadout.WireEndPoints(geo::WireID{apa1_plane1,lastwire},xyzbeg,xyzend);  // last V wire in TPC 2.
     zcomb10 = xyzend[2];  //  102.501
     ycomb10 = xyzbeg[1];  //  -1.14655
 
-    //geo->WireEndPoints(0,2,2,0,xyzbeg,xyzend);  // first collection wire in TPC 2
+    //wireReadout.WireEndPoints(0,2,2,0,xyzbeg,xyzend);  // first collection wire in TPC 2
     //ycombx = xyzbeg[2];  // -85.222   edges of the combs
     //ycombx = xyzend[2];  // -1.46205
 
@@ -476,26 +474,26 @@ namespace detsim {
     // APA 2
     constexpr geo::TPCID apa2{0, 4};
     constexpr geo::PlaneID apa2_plane0{apa2,0};
-    geo->WireEndPoints(geo::WireID{apa2_plane0,0},xyzbeg,xyzend);  // first U wire in TPC 4.
+    wireReadout.WireEndPoints(geo::WireID{apa2_plane0,0},xyzbeg,xyzend);  // first U wire in TPC 4.
     zcomb8 = xyzbeg[2]; // 51.924 -- same as above
     ycomb17 = xyzend[1];  // 113.142 -- same as above 
 
-    lastwire = geo->Nwires(apa2_plane0)-1;  // 235 in v3
-    geo->WireEndPoints(geo::WireID{apa2_plane0,lastwire},xyzbeg,xyzend);  // last U wire in TPC 4.
+    lastwire = wireReadout.Nwires(apa2_plane0)-1;  // 235 in v3
+    wireReadout.WireEndPoints(geo::WireID{apa2_plane0,lastwire},xyzbeg,xyzend);  // last U wire in TPC 4.
     zcomb11 = xyzend[2];  // 102.817 -- same as above 
     ycomb14 = xyzbeg[1];  // 0.83105 
 
     constexpr geo::PlaneID apa2_plane1{apa2, 1};
-    geo->WireEndPoints(geo::WireID{apa2_plane1,0},xyzbeg,xyzend);  // first V wire in TPC 4.
+    wireReadout.WireEndPoints(geo::WireID{apa2_plane1,0},xyzbeg,xyzend);  // first V wire in TPC 4.
     zcomb10 = xyzend[2];  //   102.501 -- same as above
     ycomb16 = xyzbeg[1];  //  113.142 -- everything ends here in y
 
-    lastwire = geo->Nwires(apa2_plane1)-1;  // 227 in v3
-    geo->WireEndPoints(geo::WireID{apa2_plane1,lastwire},xyzbeg,xyzend);  // last V wire in TPC 4.
+    lastwire = wireReadout.Nwires(apa2_plane1)-1;  // 227 in v3
+    wireReadout.WireEndPoints(geo::WireID{apa2_plane1,lastwire},xyzbeg,xyzend);  // last V wire in TPC 4.
     zcomb9 = xyzbeg[2];  //  52.2395  -- same as above
     ycomb15 = xyzend[1];  //  1.14655
 
-    //geo->WireEndPoints(0,4,2,0,xyzbeg,xyzend);  // first collection wire in TPC 1
+    //wireReadout.WireEndPoints(0,4,2,0,xyzbeg,xyzend);  // first collection wire in TPC 1
     //ycombx = xyzbeg[2];  // 52.2234   edges of the combs -- not what we want
     //ycombx = xyzend[2];  // 113.142   for this
 
@@ -510,27 +508,27 @@ namespace detsim {
     // APA 3 -- a lot like APA 0
     constexpr geo::TPCID apa3{0, 6};
     constexpr geo::PlaneID apa3_plane0{apa3,0};
-    geo->WireEndPoints(geo::WireID{apa3_plane0,0},xyzbeg,xyzend);  // first U wire in TPC 6.
+    wireReadout.WireEndPoints(geo::WireID{apa3_plane0,0},xyzbeg,xyzend);  // first U wire in TPC 6.
     zcomb14 = xyzbeg[2];  // 103.84
     ycomb5 = xyzend[1];  //  113.142 -- same as above
 
-    lastwire = geo->Nwires(apa3_plane0)-1;  // 358 in v3
-    geo->WireEndPoints(geo::WireID{apa3_plane0,lastwire},xyzbeg,xyzend);  // last U wire in TPC 6.
+    lastwire = wireReadout.Nwires(apa3_plane0)-1;  // 358 in v3
+    wireReadout.WireEndPoints(geo::WireID{apa3_plane0,lastwire},xyzbeg,xyzend);  // last U wire in TPC 6.
     zcomb17 = xyzend[2];  // 154.741
     ycomb2 = xyzbeg[1];  // -82.9389 -- same as above
 
     constexpr geo::PlaneID apa3_plane1{apa3, 1};
-    geo->WireEndPoints(geo::WireID{apa3_plane1,0},xyzbeg,xyzend);  // first V wire in TPC 6.
+    wireReadout.WireEndPoints(geo::WireID{apa3_plane1,0},xyzbeg,xyzend);  // first V wire in TPC 6.
     zcomb16 = xyzend[2];  //  154.425
     ycomb4 = xyzbeg[1];  //  113.142 -- same as above
 
-    lastwire = geo->Nwires(apa3_plane1)-1;  // 344 in v3
-    geo->WireEndPoints(geo::WireID{apa3_plane1,lastwire},xyzbeg,xyzend);  // last V wire in TPC 6.
+    lastwire = wireReadout.Nwires(apa3_plane1)-1;  // 344 in v3
+    wireReadout.WireEndPoints(geo::WireID{apa3_plane1,lastwire},xyzbeg,xyzend);  // last V wire in TPC 6.
     zcomb15 = xyzbeg[2];  //  104.164
     ycomb3 = xyzend[1];  //  -82.6234 -- same as above
 
     // the collection wires appear to end where they meet their comb.
-    //geo->WireEndPoints(0,6,2,0,xyzbeg,xyzend);  // first collection wire in TPC 0
+    //wireReadout.WireEndPoints(0,6,2,0,xyzbeg,xyzend);  // first collection wire in TPC 0
     //ycomb3 = xyzbeg[2];  // -82.308
     //ycomb4 = xyzend[2];  // 113.142
 
@@ -587,7 +585,7 @@ namespace detsim {
   void SimWireDUNE35t::produce(art::Event& evt)
   {
     // get the geometry to be able to figure out signal types and chan -> plane mappings
-    art::ServiceHandle<geo::Geometry> geo;
+    auto const& wireReadout = art::ServiceHandle<geo::WireReadout>()->Get();
     unsigned int signalSize = fNTicks;
 
     // vectors for working
@@ -602,7 +600,7 @@ namespace detsim {
     // of entries as the number of channels in the detector
     // and set the entries for the channels that have signal on them
     // using the chanHandle
-    std::vector<const sim::SimChannel*> channels(geo->Nchannels());
+    std::vector<const sim::SimChannel*> channels(wireReadout.Nchannels());
     for(size_t c = 0; c < chanHandle.size(); ++c){
       channels[chanHandle[c]->Channel()] = chanHandle[c];
     }
@@ -640,7 +638,7 @@ namespace detsim {
 
     auto const clockData = art::ServiceHandle<detinfo::DetectorClocksService const>()->DataFor(evt);
 
-    for(chan = 0; chan < geo->Nchannels(); chan++) {    
+    for(chan = 0; chan < wireReadout.Nchannels(); chan++) {
       
  
       fChargeWork.clear();    
@@ -654,7 +652,7 @@ namespace detsim {
 
       // get the sim::SimChannel for this channel
       const sim::SimChannel* sc = channels[chan];
-      const geo::View_t view = geo->View(chan);
+      const geo::View_t view = wireReadout.View(chan);
 
 
       if( sc ){      
@@ -821,7 +819,7 @@ namespace detsim {
 
       float ped_mean = fCollectionPed;
       float ped_rms = fCollectionPedRMS;
-      geo::SigType_t sigtype = geo->SignalType(chan);
+      geo::SigType_t sigtype = wireReadout.SignalType(chan);
       if (sigtype == geo::kInduction){
         ped_mean = fInductionPed;
 	ped_rms = fInductionPedRMS;
