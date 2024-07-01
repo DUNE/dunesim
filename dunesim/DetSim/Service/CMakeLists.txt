@@ -16,10 +16,10 @@ cet_build_plugin(Dune35tSimChannelExtractService
                 lardataobj::Simulation
                 lardata::Utilities
                 dunecore::SignalShapingServiceDUNE_service
-                art::Utilities canvas
+                art::Utilities canvas::canvas
                 cetlib::cetlib 
 		cetlib_except::cetlib_except
-                ROOT_BASIC_LIB_LIST
+                ROOT::Core
              )
 
 cet_build_plugin(GenericSimChannelExtractService   
@@ -34,7 +34,7 @@ cet_build_plugin(GenericSimChannelExtractService
 		canvas::canvas
                 cetlib::cetlib 
 		cetlib_except::cetlib_except
-                ROOT_BASIC_LIB_LIST
+                ROOT::Core
              )
 
 cet_build_plugin(DPhaseSimChannelExtractService   
@@ -46,13 +46,13 @@ cet_build_plugin(DPhaseSimChannelExtractService
                 lardata::Utilities
                 dunecore::SignalShapingServiceDUNEDPhase_service
                 dunecore::CrpGainService_service
-                art::Utilities canvas
+                art::Utilities canvas::canvas
                 art::Framework_Core
                 cetlib::cetlib 
 		cetlib_except::cetlib_except
-                ROOT_BASIC_LIB_LIST
+                ROOT::Core
 		nurandom::RandomUtils_NuRandomService_service
-		CLHEP
+		CLHEP::CLHEP
              )
 
 cet_build_plugin(ExponentialChannelNoiseService   
@@ -64,15 +64,15 @@ cet_build_plugin(ExponentialChannelNoiseService
                 art_root_io::TFileService_service
                 nurandom::RandomUtils_NuRandomService_service
                 art::Framework_Core
-                art::Utilities canvas
+                art::Utilities canvas::canvas
                 cetlib::cetlib 
 		cetlib_except::cetlib_except
-                CLHEP
-                ROOT_BASIC_LIB_LIST
+                CLHEP::CLHEP
+                ROOT::Core
              )
               
 cet_build_plugin(ShapedCohProtoDUNENoiseService   art::service
-                dunepdlegacy_Services_ChannelMap_PdspChannelMapService_service
+                dunepdlegacy::Services_ChannelMap_PdspChannelMapService_service
                 larcorealg::Geometry
                 dunecore::SignalShapingServiceDUNE_service
                 art_root_io::tfile_support
@@ -84,8 +84,8 @@ cet_build_plugin(ShapedCohProtoDUNENoiseService   art::service
 		canvas::canvas
                 cetlib::cetlib 
 		cetlib_except::cetlib_except
-                CLHEP
-                ROOT_BASIC_LIB_LIST
+                CLHEP::CLHEP
+                ROOT::Core
              )
 
 cet_build_plugin(DPhaseRealisticNoiseService   
@@ -103,8 +103,8 @@ cet_build_plugin(DPhaseRealisticNoiseService
 	       canvas::canvas
                cetlib::cetlib 
 	       cetlib_except::cetlib_except
-               CLHEP
-               ROOT_BASIC_LIB_LIST
+               CLHEP::CLHEP
+               ROOT::Core
              )
 
 cet_build_plugin(DPhaseCoherentNoiseService   
@@ -121,8 +121,8 @@ cet_build_plugin(DPhaseCoherentNoiseService
 		canvas::canvas
                 cetlib::cetlib 
 		cetlib_except::cetlib_except
-                CLHEP
-                ROOT_BASIC_LIB_LIST
+                CLHEP::CLHEP
+                ROOT::Core
               )
 
 cet_build_plugin(ProtoDUNEChannelNoiseService   
@@ -134,11 +134,11 @@ cet_build_plugin(ProtoDUNEChannelNoiseService
                 art_root_io::TFileService_service
                 nurandom::RandomUtils_NuRandomService_service
                 art::Framework_Core
-                art::Utilities canvas
+                art::Utilities canvas::canvas
                 cetlib::cetlib 
 		cetlib_except::cetlib_except
-                CLHEP
-                ROOT_BASIC_LIB_LIST
+                CLHEP::CLHEP
+                ROOT::Core
              )
 
 cet_build_plugin(SPhaseChannelNoiseService   
@@ -150,11 +150,11 @@ cet_build_plugin(SPhaseChannelNoiseService
                 art_root_io::TFileService_service
                 nurandom::RandomUtils_NuRandomService_service
                 art::Framework_Core
-                art::Utilities canvas
+                art::Utilities canvas::canvas
                 cetlib::cetlib 
 		cetlib_except::cetlib_except
-                CLHEP
-                ROOT_BASIC_LIB_LIST
+                CLHEP::CLHEP
+                ROOT::Core
              )
 
 cet_build_plugin(SPhaseUniqChannelNoiseService   
@@ -166,11 +166,11 @@ cet_build_plugin(SPhaseUniqChannelNoiseService
                 art_root_io::TFileService_service
                 nurandom::RandomUtils_NuRandomService_service
                 art::Framework_Core
-                art::Utilities canvas
+                art::Utilities canvas::canvas
                 cetlib::cetlib 
 		cetlib_except::cetlib_except
-                CLHEP
-                ROOT_BASIC_LIB_LIST
+                CLHEP::CLHEP
+                ROOT::Core
              )
 
 cet_build_plugin(WhiteChannelNoiseService   
@@ -186,12 +186,15 @@ cet_build_plugin(WhiteChannelNoiseService
 		canvas::canvas
                 cetlib::cetlib 
 		cetlib_except::cetlib_except
-                CLHEP
-                ROOT_BASIC_LIB_LIST
+                CLHEP::CLHEP
+                ROOT::Core
              )
 
 cet_build_plugin(ProvidedPedestalAdditionService 
                 art::service
+                dunecore::DuneInterface_Data
+                larevt::CalibrationDBI_Providers
+                larcore::headers
                 nurandom::RandomUtils_NuRandomService_service
                 art_root_io::tfile_support
                 ROOT::Core
@@ -202,8 +205,8 @@ cet_build_plugin(ProvidedPedestalAdditionService
                 cetlib::cetlib 
 		cetlib_except::cetlib_except
                 messagefacility::MF_MessageLogger
-                CLHEP
-                ROOT_BASIC_LIB_LIST
+                CLHEP::CLHEP
+		ROOT::Hist
              )
 
 cet_build_plugin(Dune35tZeroSuppressService        
@@ -211,6 +214,7 @@ cet_build_plugin(Dune35tZeroSuppressService
                 dunesim_DetSim
                 cetlib::cetlib 
 		cetlib_except::cetlib_except
+                larcoreobj::headers
 )
 
 cet_build_plugin(Legacy35tZeroSuppressService  
@@ -218,18 +222,23 @@ cet_build_plugin(Legacy35tZeroSuppressService
                 dunesim_DetSim
                 cetlib::cetlib 
 		cetlib_except::cetlib_except
+                larcoreobj::headers
 )
 
 cet_build_plugin(FixedZeroSuppressService      
                 art::service
                 cetlib::cetlib 
-		cetlib_except::cetlib_except
+	 	cetlib_except::cetlib_except
+                dunecore::DuneInterface_Data
+                larcoreobj::headers
 )
 
 cet_build_plugin(ReplaceCompressService        
                 art::service
                 cetlib::cetlib 
 		cetlib_except::cetlib_except
+                dunecore::DuneInterface_Data
+                larcoreobj::headers
 )
 
 cet_build_plugin(LarsoftHuffmanCompressService 
@@ -242,6 +251,7 @@ cet_build_plugin(LarsoftHuffmanCompressService
 
 cet_build_plugin(StuckBitAdcDistortionService   
                 art::service
+                dunecore::DuneInterface_Data
                 larcorealg::Geometry
                 art_root_io::tfile_support
                 ROOT::Core
@@ -252,26 +262,29 @@ cet_build_plugin(StuckBitAdcDistortionService
                 messagefacility::MF_MessageLogger
                 cetlib::cetlib 
 		cetlib_except::cetlib_except
-                CLHEP
-                ROOT_BASIC_LIB_LIST
+                CLHEP::CLHEP
+                ROOT::Core
              )
 
 cet_build_plugin(FixedDetPedestalService 
                 art::service
                 larcorealg::Geometry
-                art::Utilities canvas
+                larcoreobj::headers
+                larevt::CalibrationDBI_Providers
+                larcore::headers
+                art::Utilities canvas::canvas
                 cetlib::cetlib 
 		cetlib_except::cetlib_except
-                ROOT_BASIC_LIB_LIST
+                ROOT::Core
 )
 
 #cet_build_plugin(DPhaseFixedDetPedestalService 
 #                art::service
 #                larcorealg::Geometry
-#                art::Utilities canvas
+#                art::Utilities canvas::canvas
 #                cetlib::cetlib 
 #                cetlib_except::cetlib_except
-#                ROOT_BASIC_LIB_LIST
+#                ROOT::Core
 #)
 
 add_subdirectory(test)

@@ -3,21 +3,20 @@ include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
 
 art_make(
           MODULE_LIBRARIES dunesim_EventGenerator_ProtoDUNEbeamDataProducts
-          LIB_LIBRARIES lardataobj_Simulation
-          ART_FRAMEWORK_CORE
-          ART_FRAMEWORK_PRINCIPAL
-          ART_FRAMEWORK_SERVICES_REGISTRY
-          ART_ROOT_IO_TFILE_SUPPORT
+          LIB_LIBRARIES lardataobj::Simulation
+          larcoreobj::headers
+          nusimdata::SimulationBase
+          art::Framework_Services_Registry
+          art_root_io::tfile_support
           ROOT::Core
-          ART_ROOT_IO_TFILESERVICE_SERVICE
+	  art_root_io::TFileService_service
           art::Persistency_Common
           art::Utilities 
           art::Persistency_Common
           art::Persistency_Provenance 
 	  canvas::canvas
           messagefacility::MF_MessageLogger
-          cetlib::cetlib cetlib_except
-          ROOT_BASIC_LIB_LIST
+          cetlib::cetlib cetlib_except::cetlib_except
         )
 
 install_headers()
@@ -27,16 +26,14 @@ install_scripts()
 
 
 #cet_make( LIBRARY_NAME     
-#	  LIBRARIES lardataobj_Simulation
+#	  LIBRARIES lardataobj::Simulation
 #	  LIBRARIES nusimdata::SimulationBase
 #                    canvas::canvas
 #                    messagefacility::MF_MessageLogger
-#                    
-#                    cetlib::cetlib cetlib_except
-#                    ROOT_BASIC_LIB_LIST
+#                    cetlib::cetlib cetlib_except::cetlib_except
 #          NO_DICTIONARY )
 
-#art_dictionary( DICTIONARY_LIBRARIES lardataobj_Simulation )
+#art_dictionary( DICTIONARY_LIBRARIES lardataobj::Simulation )
 
 #install_headers()
 #install_fhicl()

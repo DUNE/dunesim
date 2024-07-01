@@ -17,8 +17,13 @@ BEGIN_PROLOG
 #  v3.1.2-06132023/Juergen Reichenbacher: Increased external background rates by area factor of 1.3687 (= cryostat surface / argon surface) and foamGammas rate by 4pi/2pi correction
 #  v3.1.3-08222023/Juergen Reichenbacher: Reduced activity in APA steel to numbers measured at South Dakota (SDSMT+SURF) for APA steel sample from Daresbury production site
 #  v3.1.4-09142023/Juergen Reichenbacher: Included backgrounds from APA electronics boards based on SDSMT assays of FR4 Sussex boards and changed activity in CPA to assayed FR4 activities too (CPA->3mm =>adjusted K42&RnDaughters on CPA)
+#  ==================================================================================================================================================================================================================================
+#  HD 1x2x2 version v3.1.4 is same as HD 1x2x6 version v3.1.4, except external backgrounds stop at z=490cm and face plane at z=490cm is left out to make it more representative for a 10 kton HD module  -JReichenbacher (09/15/2023)
+#  ==================================================================================================================================================================================================================================
+#  v3.1.5-02052024/Juergen Reichenbacher: As APA electronics boards in geometry break Wire-Cell reco, added fix for those backgrounds, independent now of boards being present in geometry (-> dune10kt_1x2x6_gammas_in_APAboards)
+#                 /removed also historic model v2 early Rn222 daughters from the plate-out decay chain on PDS (starts now with Pb210, as pointed out by Laura Paulucci)
 
-// Drop the 1x2x6 where necessary (everything "should work")
+// Leave '1x2x6' and everything "should work" for '1x2x2' (only external backgrounds are changed to stop at z=490cm and a 5th plane at z=490cm is missing on purpose)  -JReichenbacher (09/15/2023)
 
 #The Generator names provided that should be called from other files are:
 #dune10kt_1x2x6_39ar     #Ar39 in LAr
@@ -279,13 +284,9 @@ dune10kt_222Rn_chain_in_PDS:{
    BqPercc: 0.000021
    volume_gen: ".*Arapuca.*"
    decay_chain:{ # ALL THESE ARE ASSUMED TO BE @ EQUILIBRIUM!!
-      isotope_0:"Rn222"
-      isotope_1:"Po218"
-      isotope_2:"Pb214"
-      isotope_3:"Bi214"
-      isotope_4:"Pb210"
-      isotope_5:"Bi210"
-      isotope_6:"Po210"
+      isotope_0:"Pb210"
+      isotope_1:"Bi210"
+      isotope_2:"Po210"
    }
 }
 
@@ -435,19 +436,18 @@ dune10kt_1x2x6_neutron_from_rock: // Center region is added to simulate neutrons
 dune10kt_1x2x6_gammas_from_cavernwall_atLAr: // Convinced myself again that best is to have only one 1cm thin vertical center plane at inner APA to emulate external backgrounds comming in through cryostat (and not at the CPAs that are unrealistically positioned on the outside in the 1x2x6), and then two 1cm thin planes on top and bottom both 25cm offset from TPC, and similarly at both faces. This should more accurately represent the worst case scenario in the FD HD. - J. Reichenbacher (05/05/2023)
 {
    module_type:           "RadioGen"
-   Nuclide:               ["FDcavernGammasAtLArFlux", "FDcavernGammasAtLArFlux", "FDcavernGammasAtLArFlux", "FDcavernGammasAtLArFlux", "FDcavernGammasAtLArFlux"] # downscaled above 3.3 MeV for overestimated (alpha, gamma) production in Geant4 -JReichenbacher (05/16/2023)
-   PathToFile:             "Flux/Radionuclides/v03_02_01/"
-   Material:              [".*",".*",".*",".*",".*"]
-   BqPercc:               [ 1.05104, 1.05104, 1.05104, 1.05104, 1.05104 ] # activity -- Becquerels per cc. 1.05104 assumes 4pi flux of 0.25597 gammas/(cm^2 sec) at LAr interface propagated from cavernwalls (rock+shotcrete SDSMT assay data) and impact factor 3.0 (~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
-   T0:                    [ -2246000.,-2246000.,-2246000.,-2246000.,-2246000 ] # starting time in ns
-   T1:                    [  2246000., 2246000., 2246000., 2246000., 2246000 ] # ending time in ns
+   Nuclide:               ["CavernGammasAtLArFlux", "CavernGammasAtLArFlux", "CavernGammasAtLArFlux", "CavernGammasAtLArFlux"] # downscaled above 3.3 MeV for overestimated (alpha, gamma) production in Geant4 -JReichenbacher (05/16/2023)
+   Material:              [".*",".*",".*",".*"]
+   BqPercc:               [ 1.05104, 1.05104, 1.05104, 1.05104 ] # activity -- Becquerels per cc. 1.05104 assumes 4pi flux of 0.25597 gammas/(cm^2 sec) at LAr interface propagated from cavernwalls (rock+shotcrete SDSMT assay data) and impact factor 3.0 (~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
+   T0:                    [ -2246000.,-2246000.,-2246000.,-2246000. ] # starting time in ns
+   T1:                    [  2246000., 2246000., 2246000., 2246000. ] # ending time in ns
    
-   X0:                    [ -375. , -375. , -375., -375.,    -0.5 ] # in cm in world coordinates, low x-values of planes
-   X1:                    [  375. ,  375. ,  375.,  375.,     0.5 ] # in cm in world coordinates, high x-values of planes
-   Y0:                    [ -625. , -625. , -625.5, 624.5, -625.  ] # in cm in world coordinates, low y-values of planes
-   Y1:                    [  625. ,  625. , -624.5, 625.5,  625.  ] # in cm in world coordinates, high y-values of planes
-   Z0:                    [  -25.5, 1419.5,  -25.,  -25.,   -25.  ] # in cm in world coordinates, low z-values of planes
-   Z1:                    [  -24.5, 1420.5, 1420., 1420.,  1420.  ] # in cm in world coordinates, high z-values of planes
+   X0:                    [ -375. , -375., -375.,    -0.5 ] # in cm in world coordinates, low x-values of planes
+   X1:                    [  375. ,  375.,  375.,     0.5 ] # in cm in world coordinates, high x-values of planes
+   Y0:                    [ -625. , -625.5, 624.5, -625.  ] # in cm in world coordinates, low y-values of planes
+   Y1:                    [  625. , -624.5, 625.5,  625.  ] # in cm in world coordinates, high y-values of planes
+   Z0:                    [  -25.5,  -25.,  -25.,   -25.  ] # in cm in world coordinates, low z-values of planes
+   Z1:                    [  -24.5,  490.,  490.,   490.  ] # in cm in world coordinates, high z-values of planes
 }
 
 
@@ -455,19 +455,18 @@ dune10kt_1x2x6_gammas_from_cavernwall_atLAr: // Convinced myself again that best
 dune10kt_1x2x6_gammas_from_foam_atLAr: // Convinced myself again that best is to have only one 1cm thin vertical center plane at inner APA to emulate external backgrounds comming in through cryostat (and not at the CPAs that are unrealistically positioned on the outside in the 1x2x6), and then two 1cm thin planes on top and bottom both 25cm offset from TPC, and similarly at both faces. This should more accurately represent the worst case scenario in the FD HD. - J. Reichenbacher (05/05/2023)
 {
    module_type:           "RadioGen"
-   Nuclide:               ["FDfoamGammasAtLArFlux", "FDfoamGammasAtLArFlux", "FDfoamGammasAtLArFlux", "FDfoamGammasAtLArFlux", "FDfoamGammasAtLArFlux"] # downscaled above 3.3 MeV for overestimated (alpha, gamma) production in Geant4 -JReichenbacher (05/16/2023)
-   PathToFile:             "Flux/Radionuclides/v03_02_01/"
-   Material:              [".*",".*",".*",".*",".*"]
-   BqPercc:               [ 0.0441274, 0.0441274, 0.0441274, 0.0441274, 0.0441274 ] # activity -- Becquerels per cc. is 4pi flux of 0.0441274 gammas/(cm^2 sec) at LAr interface propagated from R-PUF foam (ICPMS PNNL assay data from C. Jackson) -JReichenbacher (06/13/2023)
-   T0:                    [ -2246000.,-2246000.,-2246000.,-2246000.,-2246000 ] # starting time in ns
-   T1:                    [  2246000., 2246000., 2246000., 2246000., 2246000 ] # ending time in ns
+   Nuclide:               ["foamGammasAtLArFlux", "foamGammasAtLArFlux", "foamGammasAtLArFlux", "foamGammasAtLArFlux"] # downscaled above 3.3 MeV for overestimated (alpha, gamma) production in Geant4 -JReichenbacher (05/16/2023)
+   Material:              [".*",".*",".*",".*"]
+   BqPercc:               [ 0.0441274, 0.0441274, 0.0441274, 0.0441274 ] # activity -- Becquerels per cc. is 4pi flux of 0.0441274 gammas/(cm^2 sec) at LAr interface propagated from R-PUF foam (ICPMS PNNL assay data from C. Jackson) -JReichenbacher (06/13/2023)
+   T0:                    [ -2246000.,-2246000.,-2246000.,-2246000. ] # starting time in ns
+   T1:                    [  2246000., 2246000., 2246000., 2246000. ] # ending time in ns
    
-   X0:                    [ -375. , -375. , -375., -375.,    -0.5 ] # in cm in world coordinates, low x-values of planes
-   X1:                    [  375. ,  375. ,  375.,  375.,     0.5 ] # in cm in world coordinates, high x-values of planes
-   Y0:                    [ -625. , -625. , -625.5, 624.5, -625.  ] # in cm in world coordinates, low y-values of planes
-   Y1:                    [  625. ,  625. , -624.5, 625.5,  625.  ] # in cm in world coordinates, high y-values of planes
-   Z0:                    [  -25.5, 1419.5,  -25.,  -25.,   -25.  ] # in cm in world coordinates, low z-values of planes
-   Z1:                    [  -24.5, 1420.5, 1420., 1420.,  1420.  ] # in cm in world coordinates, high z-values of planes
+   X0:                    [ -375. , -375., -375.,    -0.5 ] # in cm in world coordinates, low x-values of planes
+   X1:                    [  375. ,  375.,  375.,     0.5 ] # in cm in world coordinates, high x-values of planes
+   Y0:                    [ -625. , -625.5, 624.5, -625.  ] # in cm in world coordinates, low y-values of planes
+   Y1:                    [  625. , -624.5, 625.5,  625.  ] # in cm in world coordinates, high y-values of planes
+   Z0:                    [  -25.5,  -25.,  -25.,   -25.  ] # in cm in world coordinates, low z-values of planes
+   Z1:                    [  -24.5,  490.,  490.,   490.  ] # in cm in world coordinates, high z-values of planes
 }
 
 
@@ -475,19 +474,18 @@ dune10kt_1x2x6_gammas_from_foam_atLAr: // Convinced myself again that best is to
 dune10kt_1x2x6_neutrons_from_cavernwall_atLAr: // Convinced myself again that best is to have only one 1cm thin vertical center plane at inner APA to emulate external backgrounds comming in through cryostat (and not at the CPAs that are unrealistically positioned on the outside in the 1x2x6), and then two 1cm thin planes on top and bottom both 25cm offset from TPC, and similarly at both faces. This should more accurately represent the worst case scenario in the FD HD. - J. Reichenbacher (05/05/2023)
 {
    module_type:           "RadioGen"
-   Nuclide:               ["FDcavernNeutronsAtLArFlux", "FDcavernNeutronsAtLArFlux", "FDcavernNeutronsAtLArFlux", "FDcavernNeutronsAtLArFlux", "FDcavernNeutronsAtLArFlux"]
-   PathToFile:             "Flux/Radionuclides/v03_02_01/"
-   Material:              [".*",".*",".*",".*",".*"]
-   BqPercc:               [ 0.00000026996, 0.00000026996, 0.00000026996, 0.00000026996, 0.00000026996 ] # activity -- Becquerels per cc. 0.00000026996 assumes 4pi flux of 0.00000009862 neutrons/(cm^2 sec) at LAr interface propagated from cavernwalls (rock+shotcrete SDSMT assay data) and impact factor 2.0 (less than for gammas, ~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
-   T0:                    [ -2246000.,-2246000.,-2246000.,-2246000.,-2246000 ] # starting time in ns
-   T1:                    [  2246000., 2246000., 2246000., 2246000., 2246000 ] # ending time in ns
+   Nuclide:               ["CavernNeutronsAtLArFlux", "CavernNeutronsAtLArFlux", "CavernNeutronsAtLArFlux", "CavernNeutronsAtLArFlux"]
+   Material:              [".*",".*",".*",".*"]
+   BqPercc:               [ 0.00000026996, 0.00000026996, 0.00000026996, 0.00000026996 ] # activity -- Becquerels per cc. 0.00000026996 assumes 4pi flux of 0.00000009862 neutrons/(cm^2 sec) at LAr interface propagated from cavernwalls (rock+shotcrete SDSMT assay data) and impact factor 2.0 (less than for gammas, ~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
+   T0:                    [ -2246000.,-2246000.,-2246000.,-2246000. ] # starting time in ns
+   T1:                    [  2246000., 2246000., 2246000., 2246000. ] # ending time in ns
    
-   X0:                    [ -375. , -375. , -375., -375.,    -0.5 ] # in cm in world coordinates, low x-values of planes
-   X1:                    [  375. ,  375. ,  375.,  375.,     0.5 ] # in cm in world coordinates, high x-values of planes
-   Y0:                    [ -625. , -625. , -625.5, 624.5, -625.  ] # in cm in world coordinates, low y-values of planes
-   Y1:                    [  625. ,  625. , -624.5, 625.5,  625.  ] # in cm in world coordinates, high y-values of planes
-   Z0:                    [  -25.5, 1419.5,  -25.,  -25.,   -25.  ] # in cm in world coordinates, low z-values of planes
-   Z1:                    [  -24.5, 1420.5, 1420., 1420.,  1420.  ] # in cm in world coordinates, high z-values of planes
+   X0:                    [ -375. , -375., -375.,    -0.5 ] # in cm in world coordinates, low x-values of planes
+   X1:                    [  375. ,  375.,  375.,     0.5 ] # in cm in world coordinates, high x-values of planes
+   Y0:                    [ -625. , -625.5, 624.5, -625.  ] # in cm in world coordinates, low y-values of planes
+   Y1:                    [  625. , -624.5, 625.5,  625.  ] # in cm in world coordinates, high y-values of planes
+   Z0:                    [  -25.5,  -25.,  -25.,   -25.  ] # in cm in world coordinates, low z-values of planes
+   Z1:                    [  -24.5,  490.,  490.,   490.  ] # in cm in world coordinates, high z-values of planes
 }
 
 
@@ -495,19 +493,18 @@ dune10kt_1x2x6_neutrons_from_cavernwall_atLAr: // Convinced myself again that be
 dune10kt_1x2x6_CryostatNGammas_from_CavernNeutrons_atLAr: // Convinced myself again that best is to have only one 1cm thin vertical center plane at inner APA to emulate external backgrounds comming in through cryostat (and not at the CPAs that are unrealistically positioned on the outside in the 1x2x6), and then two 1cm thin planes on top and bottom both 25cm offset from TPC, and similarly at both faces. This should more accurately represent the worst case scenario in the FD HD. - J. Reichenbacher (05/05/2023)
 {
    module_type:           "RadioGen"
-   Nuclide:               ["FDcryostatNGammasAtLArFluxFromCavernNeutrons", "FDcryostatNGammasAtLArFluxFromCavernNeutrons", "FDcryostatNGammasAtLArFluxFromCavernNeutrons", "FDcryostatNGammasAtLArFluxFromCavernNeutrons", "FDcryostatNGammasAtLArFluxFromCavernNeutrons"]
-   PathToFile:             "Flux/Radionuclides/v03_02_01/"
-   Material:              [".*",".*",".*",".*",".*"]
-   BqPercc:               [ 0.0000016793, 0.0000016793, 0.0000016793, 0.0000016793, 0.0000016793 ] # activity -- Becquerels per cc. 0.0000016793 assumes 4pi flux of 0.00000061347 Ngammas/(cm^2 sec) at LAr interface stemming from n-captures in cryostat due to propagated cavernwall neutrons (rock+shotcrete SDSMT assay data) and impact factor 2.0 (less than for caverngammas, ~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
-   T0:                    [ -2246000.,-2246000.,-2246000.,-2246000.,-2246000 ] # starting time in ns
-   T1:                    [  2246000., 2246000., 2246000., 2246000., 2246000 ] # ending time in ns
+   Nuclide:               ["CryostatNGammasAtLArFluxFromCavernNeutrons", "CryostatNGammasAtLArFluxFromCavernNeutrons", "CryostatNGammasAtLArFluxFromCavernNeutrons", "CryostatNGammasAtLArFluxFromCavernNeutrons"]
+   Material:              [".*",".*",".*",".*"]
+   BqPercc:               [ 0.0000016793, 0.0000016793, 0.0000016793, 0.0000016793 ] # activity -- Becquerels per cc. 0.0000016793 assumes 4pi flux of 0.00000061347 Ngammas/(cm^2 sec) at LAr interface stemming from n-captures in cryostat due to propagated cavernwall neutrons (rock+shotcrete SDSMT assay data) and impact factor 2.0 (less than for caverngammas, ~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
+   T0:                    [ -2246000.,-2246000.,-2246000.,-2246000. ] # starting time in ns
+   T1:                    [  2246000., 2246000., 2246000., 2246000. ] # ending time in ns
    
-   X0:                    [ -375. , -375. , -375., -375.,    -0.5 ] # in cm in world coordinates, low x-values of planes
-   X1:                    [  375. ,  375. ,  375.,  375.,     0.5 ] # in cm in world coordinates, high x-values of planes
-   Y0:                    [ -625. , -625. , -625.5, 624.5, -625.  ] # in cm in world coordinates, low y-values of planes
-   Y1:                    [  625. ,  625. , -624.5, 625.5,  625.  ] # in cm in world coordinates, high y-values of planes
-   Z0:                    [  -25.5, 1419.5,  -25.,  -25.,   -25.  ] # in cm in world coordinates, low z-values of planes
-   Z1:                    [  -24.5, 1420.5, 1420., 1420.,  1420.  ] # in cm in world coordinates, high z-values of planes
+   X0:                    [ -375. , -375., -375.,    -0.5 ] # in cm in world coordinates, low x-values of planes
+   X1:                    [  375. ,  375.,  375.,     0.5 ] # in cm in world coordinates, high x-values of planes
+   Y0:                    [ -625. , -625.5, 624.5, -625.  ] # in cm in world coordinates, low y-values of planes
+   Y1:                    [  625. , -624.5, 625.5,  625.  ] # in cm in world coordinates, high y-values of planes
+   Z0:                    [  -25.5,  -25.,  -25.,   -25.  ] # in cm in world coordinates, low z-values of planes
+   Z1:                    [  -24.5,  490.,  490.,   490.  ] # in cm in world coordinates, high z-values of planes
 }
 
 
@@ -515,20 +512,40 @@ dune10kt_1x2x6_CryostatNGammas_from_CavernNeutrons_atLAr: // Convinced myself ag
 dune10kt_1x2x6_CavernNGammas_atLAr: // Convinced myself again that best is to have only one 1cm thin vertical center plane at inner APA to emulate external backgrounds comming in through cryostat (and not at the CPAs that are unrealistically positioned on the outside in the 1x2x6), and then two 1cm thin planes on top and bottom both 25cm offset from TPC, and similarly at both faces. This should more accurately represent the worst case scenario in the FD HD. - J. Reichenbacher (05/05/2023)
 {
    module_type:           "RadioGen"
-   Nuclide:               ["FDcavernNGammasAtLArFlux", "FDcavernNGammasAtLArFlux", "FDcavernNGammasAtLArFlux", "FDcavernNGammasAtLArFlux", "FDcavernNGammasAtLArFlux"]
-   PathToFile:             "Flux/Radionuclides/v03_02_01/"
-   Material:              [".*",".*",".*",".*",".*"]
-   BqPercc:               [ 0.0000005439, 0.0000005439, 0.0000005439, 0.0000005439, 0.0000005439 ] # activity -- Becquerels per cc. 0.0000005439 assumes 4pi flux of 0.0000001987 Ngammas/(cm^2 sec) at LAr interface propagated through cryostat stemming from n-captures in rock+shotcrete (SDSMT assay data) and impact factor 2.0 (for n-captures less than for direct caverngammas, ~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
-   T0:                    [ -2246000.,-2246000.,-2246000.,-2246000.,-2246000 ] # starting time in ns
-   T1:                    [  2246000., 2246000., 2246000., 2246000., 2246000 ] # ending time in ns
+   Nuclide:               ["CavernNGammasAtLArFlux", "CavernNGammasAtLArFlux", "CavernNGammasAtLArFlux", "CavernNGammasAtLArFlux"]
+   Material:              [".*",".*",".*",".*"]
+   BqPercc:               [ 0.0000005439, 0.0000005439, 0.0000005439, 0.0000005439 ] # activity -- Becquerels per cc. 0.0000005439 assumes 4pi flux of 0.0000001987 Ngammas/(cm^2 sec) at LAr interface propagated through cryostat stemming from n-captures in rock+shotcrete (SDSMT assay data) and impact factor 2.0 (for n-captures less than for direct caverngammas, ~4x shotcrete activity) applied due to our worst case shotcrete we appear to get from our recent shotcrete assays and area factor of 1.3687 -JReichenbacher (06/13/2023)
+   T0:                    [ -2246000.,-2246000.,-2246000.,-2246000. ] # starting time in ns
+   T1:                    [  2246000., 2246000., 2246000., 2246000. ] # ending time in ns
    
-   X0:                    [ -375. , -375. , -375., -375.,    -0.5 ] # in cm in world coordinates, low x-values of planes
-   X1:                    [  375. ,  375. ,  375.,  375.,     0.5 ] # in cm in world coordinates, high x-values of planes
-   Y0:                    [ -625. , -625. , -625.5, 624.5, -625.  ] # in cm in world coordinates, low y-values of planes
-   Y1:                    [  625. ,  625. , -624.5, 625.5,  625.  ] # in cm in world coordinates, high y-values of planes
-   Z0:                    [  -25.5, 1419.5,  -25.,  -25.,   -25.  ] # in cm in world coordinates, low z-values of planes
-   Z1:                    [  -24.5, 1420.5, 1420., 1420.,  1420.  ] # in cm in world coordinates, high z-values of planes
+   X0:                    [ -375. , -375., -375.,    -0.5 ] # in cm in world coordinates, low x-values of planes
+   X1:                    [  375. ,  375.,  375.,     0.5 ] # in cm in world coordinates, high x-values of planes
+   Y0:                    [ -625. , -625.5, 624.5, -625.  ] # in cm in world coordinates, low y-values of planes
+   Y1:                    [  625. , -624.5, 625.5,  625.  ] # in cm in world coordinates, high y-values of planes
+   Z0:                    [  -25.5,  -25.,  -25.,   -25.  ] # in cm in world coordinates, low z-values of planes
+   Z1:                    [  -24.5,  490.,  490.,   490.  ] # in cm in world coordinates, high z-values of planes
 }
+
+
+dune10kt_1x2x6_gammas_in_APAboards:  // 3.81 cm thick (2*4*4.76 mm), 16.5 cm in the vertical direction, and as wide as the APA frames on top of upper APAs and bottom of lower APAs - J. Reichenbacher (12/11/2023)
+{
+   module_type:           "RadioGen"
+   Nuclide:               ["Uranium_238_chain_dominantGammaOnly_JR", "Uranium_238_chain_dominantGammaOnly_JR", "Thorium_232_chain_dominantGammaOnly_JR", "Thorium_232_chain_dominantGammaOnly_JR", "K_40_dominantGammaOnly_JR", "K_40_dominantGammaOnly_JR"]
+   Material:              [".*",".*",".*",".*",".*",".*"]
+   BqPercc:               [ 0.0197377, 0.0197377, 0.0353206, 0.0353206, 0.00129237, 0.00129237 ] # activity -- Becquerels per cc. with measured density of 1.75 g/cm^3 and multiplied with integral chain emission rate of TGraphs -JReichenbacher (12/11/2023)
+   T0:                    [ -2246000.,-2246000.,-2246000.,-2246000.,-2246000.,-2246000. ] # starting time in ns
+   T1:                    [  2246000., 2246000., 2246000., 2246000., 2246000., 2246000. ] # ending time in ns
+   
+   X0:                    [   -2. ,   -2. ,   -2. ,   -2. ,   -2. ,   -2. ] # in cm in world coordinates, low x-values of planes
+   X1:                    [    2. ,    2. ,    2. ,    2. ,    2. ,    2. ] # in cm in world coordinates, high x-values of planes
+   Y0:                    [  601. , -617. ,  601. , -617. ,  601. , -617. ] # in cm in world coordinates, low y-values of planes
+   Y1:                    [  617. , -601. ,  617. , -601. ,  617. , -601. ] # in cm in world coordinates, high y-values of planes
+   Z0:                    [    0. ,    0. ,    0. ,    0. ,    0. ,    0. ] # in cm in world coordinates, low z-values of planes
+   Z1:                    [  464. ,  464. ,  464. ,  464. ,  464. ,  464. ] # in cm in world coordinates, high z-values of planes  (changed down from 1395. for 1x2x6 -> 464. for 1x2x2 - JR 02/05/2024)
+}
+# integral gamma activity in U238 decay chain:  8.925e-3 Bq/cc * 2.21151 gammas/chain = 0.0197377  BqPercc
+# integral gamma activity in Th232 decay chain: 0.0126   Bq/cc * 2.80322 gammas/chain = 0.0353206  BqPercc
+# integral gamma activity in K40 decay:         0.01225  Bq/cc * 0.1055  gammas/decay = 0.00129237 BqPercc
 
 
 END_PROLOG

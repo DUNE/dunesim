@@ -34,12 +34,11 @@ art_make( BASENAME_ONLY
 			   canvas::canvas
 			   messagefacility::MF_MessageLogger 
  	                   fhiclcpp::fhiclcpp
-			   cetlib::cetlib cetlib_except
-			   CLHEP
-                           ROOT_GEOM
-                           ROOT_XMLIO
-                           ROOT_GDML
-			   ROOT_BASIC_LIB_LIST
+			   cetlib::cetlib cetlib_except::cetlib_except
+			   CLHEP::CLHEP
+                           ROOT::Geom
+                           ROOT::XMLIO
+                           ROOT::Gdml
         )
 
 add_subdirectory(Utility)
