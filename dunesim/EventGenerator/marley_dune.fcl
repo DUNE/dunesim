@@ -46,7 +46,7 @@ dune_marley_gvkm: @local::dune_marley_nue_spectrum
 dune_marley_gvkm.marley_parameters.source: {
   type:      "tgraph"
   neutrino:  "ve"
-  tfile:     "gvkm_nue_spectrum.root"
+  tfile:     "Flux/Supernova/v1/gvkm_nue_spectrum.root"
   namecycle: "NueSpectrum"
   Emax: 100.
 }
