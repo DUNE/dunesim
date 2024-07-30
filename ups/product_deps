@@ -196,7 +196,7 @@ table_fragment_end
 
 product          version
 cetmodules	 v3_24_01	-	only_for_build
-dunecore         v09_91_02d01
+dunecore         v09_91_03d00
 genie_xsec       v3_04_00       -       optional
 genie_phyopt     v3_04_00
 end_product_list
