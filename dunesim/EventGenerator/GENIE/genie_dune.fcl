@@ -116,7 +116,7 @@ anu_fluxfiles_OptimizedEngineeredNov2017: {
 
 dunefd_10kt_genie_nu_lbnf_dk2nu: {
     @table::dune_fd_genie_nu_simple_flux_1x2x6_window
-    #FiducialCut: "mbox: -350, -530, -20, 350, 530, 920"    #TODO: define a suitable FV
+    FiducialCut: "mbox: -800, -650, -50, 800, 650, 5900"    #TODO: define a suitable FV
     FluxType: "dk2nu"
     DetectorLocation: "dune10kt_v7"
     @table::nu_fluxfiles_OptimizedEngineeredNov2017
