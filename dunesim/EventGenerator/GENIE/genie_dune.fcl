@@ -123,7 +123,7 @@ dunefd_10kt_genie_nu_lbnf_dk2nu: {
 }
 
 dunefd_10kt_genie_anu_lbnf_dk2nu: {
-   @table::dunefd_10kt_genie_nu_lbnf_dk2nu:                                      
+   @table::dunefd_10kt_genie_nu_lbnf_dk2nu 
    @table::anu_fluxfiles_OptimizedEngineeredNov2017
 }
 
