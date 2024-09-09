@@ -104,6 +104,29 @@ dunefdvd_1x8x6_genie_anu_lbnf_dk2nu_fluxpaths: {
     FluxFiles: ["g4lbne_v3r5p4_QGSP_BERT_OptimizedEngineeredNov2017_antineutrino*.dk2nu.root"]
 }
 
+nu_fluxfiles_OptimizedEngineeredNov2017: {
+    FluxSearchPaths: "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/Flux/g4lbne/v3r5p4/QGSP_BERT/OptimizedEngineeredNov2017/neutrino/flux/"
+    FluxFiles: ["g4lbne_v3r5p4_QGSP_BERT_OptimizedEngineeredNov2017_neutrino*.dk2nu.root"]
+}
+
+anu_fluxfiles_OptimizedEngineeredNov2017: {
+    FluxSearchPaths: "/cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/Flux/g4lbne/v3r5p4/QGSP_BERT/OptimizedEngineeredNov2017/antineutrino/flux/"
+    FluxFiles: ["g4lbne_v3r5p4_QGSP_BERT_OptimizedEngineeredNov2017_antineutrino*.dk2nu.root"]
+}
+
+dunefd_10kt_genie_nu_lbnf_dk2nu: {
+    @table::dune_fd_genie_nu_simple_flux_1x2x6_window
+    #FiducialCut: "mbox: -350, -530, -20, 350, 530, 920"    #TODO: define a suitable FV
+    FluxType: "dk2nu"
+    DetectorLocation: "dune10kt_v7"
+    @table::nu_fluxfiles_OptimizedEngineeredNov2017
+}
+
+dunefd_10kt_genie_anu_lbnf_dk2nu: {
+   @table::dunefd_10kt_genie_nu_lbnf_dk2nu:                                      
+   @table::anu_fluxfiles_OptimizedEngineeredNov2017
+}
+
 #atmospheric neutrino configurations
 
 # this configuration is tuned on the full geometry (10 kton) of the far detector:
