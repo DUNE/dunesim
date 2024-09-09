@@ -14,7 +14,7 @@
     <reuse> 10 </reuse>
   </param_set>
 
-  <param_set name="dune10kt_v7_refactored">
+  <param_set name="dune10kt_v7">
     <using_param_set>dune10kt_v1_1x2x6</using_param_set>
     <window>
       <point coord="det"> -8.952000, -14.289929, -5.111201 </point>
