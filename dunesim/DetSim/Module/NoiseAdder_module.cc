@@ -66,7 +66,7 @@ private:
 
     // Declare member data here.
     art::ServiceHandle<ChannelNoiseService> m_noiseService;
-    std::map<int, ElectronicsAddress> m_channelMap;
+    std::map<int, ElectronicsAddress> m_wireReadout;
 };
 
 
@@ -84,8 +84,8 @@ NoiseAdder::NoiseAdder(fhicl::ParameterSet const & p) : EDProducer{p}
     //
     // https://cdcvs.fnal.gov/redmine/projects/dune-raw-data/repository/revisions/develop/entry/dune-raw-data/Services/ChannelMap/mapmakers/MakePdspChannelMap_v3.C
     cet::search_path sp("FW_SEARCH_PATH");
-    std::string channelMapFile=sp.find_file("protoDUNETPCChannelMap_v3.txt");
-    std::ifstream fin(channelMapFile.c_str());
+    std::string wireReadoutFile=sp.find_file("protoDUNETPCChannelMap_v3.txt");
+    std::ifstream fin(wireReadoutFile.c_str());
 
     int crateNo, slotNo, fiberNo, FEMBChannel,
         StreamChannel, slotID, fiberID,
@@ -96,7 +96,7 @@ NoiseAdder::NoiseAdder(fhicl::ParameterSet const & p) : EDProducer{p}
           >> StreamChannel >> slotID >> fiberID
           >> chipNo >> chipChannel >> asicNo
           >> asicChannel >> planeType >> offlineChannel){
-        m_channelMap.emplace(std::make_pair(offlineChannel,
+        m_wireReadout.emplace(std::make_pair(offlineChannel,
                                             ElectronicsAddress(crateNo, slotNo, fiberNo, asicNo, asicChannel)));
     }
 }

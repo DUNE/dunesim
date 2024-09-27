@@ -7,6 +7,7 @@
 
 #include "../FixedDetPedestalService.h"
 #include "dunecore/ArtSupport/ArtServiceHelper.h"
+#include "larcore/Geometry/WireReadout.h"
 #include "larcore/Geometry/Geometry.h"
 #include <string>
 #include <iostream>
@@ -43,12 +44,13 @@ int test_FixedDetPedestalService() {
   oss << "#include \"geometry_dune.fcl\"" << endl;
   oss << "services.DetPedestalService: @local::dune_fixedpeds" << endl;
   oss << "services.Geometry: @local::dune35t_geo" << endl;
-  oss << "services.ExptGeoHelperInterface: @local::dune_geometry_helper" << endl;
+  oss << "services.WireReadout: @local::dune35t_wire_readout" << endl;
   ArtServiceHelper::load_services(oss.str());
 
   cout << myname << line << endl;
   cout << myname << "Fetch geometry service." << endl;
-  ServiceHandle<Geometry> hgeo;
+  ServiceHandle<geo::Geometry> hgeo;
+  auto const& wireReadout = art::ServiceHandle<geo::WireReadout>()->Get();
   cout << myname << "Detector: " << hgeo->DetectorName() << endl;
 
   cout << myname << line << endl;
@@ -70,12 +72,12 @@ int test_FixedDetPedestalService() {
        << endl;
   for ( int chan : chans ) {
     cout << setw(hchan) << chan
-         << setw(hview) << hgeo->View(chan)
+         << setw(hview) << wireReadout.View(chan)
          << setw(hmean) << pdpp->PedMean(chan)
          << setw(hmean) << pdpp->PedRms(chan)
          << endl;
     float meanExp = 1800;
-    if ( hgeo->View(chan) == geo::kZ ) {
+    if ( wireReadout.View(chan) == geo::kZ ) {
       meanExp = 500.0;
     }
     assert( pdpp->PedMean(chan) == meanExp );

@@ -6,7 +6,7 @@
 #include "lardata/Utilities/LArFFT.h"
 #include "lardata/DetectorInfoServices/DetectorClocksService.h"
 #include "lardataalg/DetectorInfo/DetectorClocksData.h"
-#include "larcore/Geometry/Geometry.h"
+#include "larcore/Geometry/WireReadout.h"
 #include "nurandom/RandomUtils/NuRandomService.h"
 #include "art_root_io/TFileService.h"
 #include "CLHEP/Random/JamesRandom.h"
@@ -115,8 +115,8 @@ int ExponentialChannelNoiseService::addNoise(detinfo::DetectorClocksData const&,
     if ( noisechan == fNoiseArrayPoints ) --noisechan;
   }
   fNoiseChanHist->Fill(noisechan);
-  art::ServiceHandle<geo::Geometry> geo;
-  const geo::View_t view = geo->View(chan);
+  auto const& wireReadout = art::ServiceHandle<geo::WireReadout>()->Get();
+  const geo::View_t view = wireReadout.View(chan);
   for ( unsigned int itck=0; itck<sigs.size(); ++itck ) {
     double tnoise = 0.0;
     double wnoise = 0.0;
