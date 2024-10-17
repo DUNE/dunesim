@@ -7,7 +7,7 @@
 #include "art/Framework/Core/EDFilter.h" 
 #include "art/Framework/Core/ModuleMacros.h" 
 #include "art/Framework/Principal/Event.h" 
-#include "larcore/Geometry/Geometry.h"
+#include "larcore/Geometry/AuxDetGeometry.h"
 #include "nusimdata/SimulationBase/MCTruth.h"
 #include "lardataobj/RawData/RawDigit.h"
 #include "lardataobj/RawData/raw.h"
@@ -18,7 +18,6 @@ namespace filt{
   class GenFilter : public art::EDFilter {
     public:
       explicit GenFilter(fhicl::ParameterSet const & pset);
-      virtual ~GenFilter() {};
       virtual bool filter(art::Event& e);
       void reconfigure(fhicl::ParameterSet const& pset);
       void beginJob() ;
@@ -123,15 +122,15 @@ namespace filt{
   }
 
   void GenFilter::beginJob() {
-    art::ServiceHandle<geo::Geometry> geom;
+    auto const& auxDetGeom = art::ServiceHandle<geo::AuxDetGeometry>()->GetProvider();
 
     CounterSetPair EWCounterSetPair;
     CounterSetPair NupSdownCounterSetPair;
     CounterSetPair NdownSupCounterSetPair;
 
-    for (unsigned int i = 0; i < geom->NAuxDets(); i++){
+    for (unsigned int i = 0; i < auxDetGeom.NAuxDets(); i++){
       //The WE counter pairs
-      geo::AuxDetGeo const* counter = &(geom->AuxDet(i));
+      geo::AuxDetGeo const* counter = &(auxDetGeom.AuxDet(i));
       if (i >=6 && i <= 15) EWCounterSetPair.setA.push_back(counter);
       else if (i >= 28 && i <=37) EWCounterSetPair.setB.push_back(counter);
       //The N (up) S (down) counter pairs
