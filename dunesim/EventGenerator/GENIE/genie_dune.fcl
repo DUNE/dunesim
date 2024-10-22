@@ -265,6 +265,33 @@ dune_fd_atmo_flux_rotation_precise: {
 } # dune_fd_atmo_flux_rotation_precise
 
 
+dune_fdvd_atmo_flux_rotation_precise: {
+  # Flux rotation for HD:
+  # [
+  #   +sin(phi), -cos(phi), +0.000,
+  #     +0.000,    +0.000,  +1.000, # new y is old z
+  #   -cos(phi), -sin(phi), +0.000  # new z
+  # ]
+  # Additional rotation for VD:
+  # [
+  #    0, 1, 0,
+  #   -1, 0, 0,
+  #    0, 0, 1
+  #]
+  # Giving a total rotation of:
+  # [
+  #   +cos(phi), sin(phi), +0.000,
+  #     +0.000,    +0.000,  +1.000, # new y is old z
+  #   sin(phi), -cos(phi), +0.000  # new z
+  # ]
+  FluxRotCfg: "newxyz"
+  FluxRotValues: [
+    +0.1564, +0.9877, +0.0000,
+    +0.0000, +0.0000, +1.0000,
+    +0.9877, -0.1564, +0.0000
+    ]
+}
+
 dune_fd_genie_atmo_min_flux:            @local::dune_fd_genie_atmo
 dune_fd_genie_atmo_min_flux.TopVolume:  "volCryostat"
 dune_fd_genie_atmo_min_flux.FluxType:   "atmo_BARTOL"
@@ -316,6 +343,13 @@ dune_fd_genie_atmo_max_weighted_honda.FiducialCut: "mbox:-363,-608,-0,363,608,13
 dune_fd_genie_atmo_max_weighted_honda: {
     @table::dune_fd_genie_atmo_max_weighted_honda
     @table::dune_fd_atmo_flux_rotation_precise
+}
+
+#Weighted generation framework for VD detector
+dune_fdvd_genie_atmo_max_weighted_honda: {
+    @table::dune_fd_genie_atmo_max_weighted_honda
+    @table::dune_fdvd_atmo_flux_rotation_precise
+    FiducialCut: "mbox:-325,-325,-677,677,0,900" #Only interactions in the active volume
 }
 
 
