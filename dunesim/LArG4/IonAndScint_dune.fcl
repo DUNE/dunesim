@@ -62,7 +62,7 @@ protodunehd_ionandscint_separate: @local::protodunehd_ionandscint_correlated
 protodunehd_ionandscint_separate.ISCalcAlg: "Separate"
 
 # active volume
-protodunehd_ionandscint: @local::protodunehd_ionandscint_separate
+protodunehd_ionandscint: @local::protodunehd_ionandscint_correlated
 protodunehd_ionandscint.Instances: "LArG4DetectorServicevolTPCActiveInner"
 # external laterals volume
 protodunehd_ionandscint_external: @local::protodunehd_ionandscint
