@@ -36,7 +36,7 @@
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
 #include "lardataobj/RawData/raw.h"
-#include "larcore/Geometry/Geometry.h"
+#include "larcore/Geometry/WireReadout.h"
 #include "lardataobj/Simulation/sim.h"
 #include "lardataobj/Simulation/SimChannel.h"
 #include "lardataobj/RawData/RawDigit.h"
@@ -93,7 +93,7 @@ private:
   std::unique_ptr<AdcSimulator> m_pads;
 
   // Services.
-  art::ServiceHandle<geo::Geometry> m_pgeo;
+  geo::WireReadoutGeom const* m_wireReadout = &art::ServiceHandle<geo::WireReadout>()->Get();
   art::ServiceHandle<AdcSuppressService> m_pzs;
   art::ServiceHandle<AdcCompressService> m_pcmp;
   art::ServiceHandle<SimChannelExtractService> m_pscx;
@@ -194,7 +194,7 @@ void SimWireDUNE::produce(art::Event& evt) {
   // and set the entries for the channels that have signal on them
   // using the chanHandle
   std::vector<const sim::SimChannel*> chanHandle;
-  std::vector<const sim::SimChannel*> simChannels(m_pgeo->Nchannels(), nullptr);
+  std::vector<const sim::SimChannel*> simChannels(m_wireReadout->Nchannels(), nullptr);
   evt.getView(fSimChannelLabel, chanHandle);
   for ( size_t c=0; c<chanHandle.size(); ++c ) {
     simChannels[chanHandle[c]->Channel()] = chanHandle[c];
@@ -202,7 +202,7 @@ void SimWireDUNE::produce(art::Event& evt) {
 
   // Do the same as above, but for the RawDigits, so we can map from channel number to digit
   std::vector<const raw::RawDigit*> inputDigitsHandle;
-  std::vector<const raw::RawDigit*> inputDigits(m_pgeo->Nchannels(), nullptr);
+  std::vector<const raw::RawDigit*> inputDigits(m_wireReadout->Nchannels(), nullptr);
   if(fUseRawDigitInput){
     evt.getView(fRawDigitInputLabel, inputDigitsHandle);
     for ( size_t c=0; c<inputDigitsHandle.size(); ++c ) {
@@ -222,7 +222,7 @@ void SimWireDUNE::produce(art::Event& evt) {
   m_pcns->newEvent();
   // Loop over channels.
   std::map<int,double>::iterator mapIter;
-  for ( unsigned int chan = 0; chan<m_pgeo->Nchannels(); ++chan ) {
+  for ( unsigned int chan = 0; chan<m_wireReadout->Nchannels(); ++chan ) {
 
     // Get the SimChannel for this channel
     const sim::SimChannel* psc = simChannels[chan];

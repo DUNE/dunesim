@@ -55,7 +55,7 @@ namespace spacecharge {
       std::vector<TH3F*> SCEhistograms = std::vector<TH3F*>(7); //Histograms are Dx, Dy, Dz, dEx/E0, dEy/E0, dEz/E0 (positive; repeat for negative)
       std::vector<TH3F*> CalSCEhistograms = std::vector<TH3F*>(6); 
       
-      short int driftcoordinate;
+      geo::Coordinate driftcoordinate;
       Double_t  Anodebin;
 
       //    geo::Point_t PretendAtBoundary(geo::Point_t const& point) const; //?
