@@ -14,16 +14,18 @@
 #include <vector>
 #include "math.h"
 #include "stdio.h"
+
 // LArSoft includes
 #include "dunesim/SpaceCharge/SpaceChargeProtoDUNEdp.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "larcore/CoreUtils/ServiceUtil.h"
+#include "larcore/Geometry/WireReadout.h"
 #include "larcore/Geometry/Geometry.h"
-#
+
 // Framework includes
 #include "cetlib_except/exception.h"
-
 #include "art/Framework/Services/Registry/ServiceHandle.h"
+
 // ROOT includes
 #include "TFile.h"
 #include "TH3.h"
@@ -41,7 +43,7 @@ spacecharge::SpaceChargeProtoDUNEdp::SpaceChargeProtoDUNEdp(
   fhicl::ParameterSet const& pset
 )
 {
-  driftcoordinate=0;
+  driftcoordinate=geo::Coordinate::X;
   //Configure(pset);
 }
 //------------------------------------------------
@@ -57,10 +59,8 @@ bool spacecharge::SpaceChargeProtoDUNEdp::Configure(fhicl::ParameterSet const& p
   fEfield = detProp.Efield();
   std::cout<<"Efield : "<<fEfield<<std::endl;
 
-  art::ServiceHandle<geo::Geometry> geom;
-  //  auto const* geom = lar::providerFrom<geo::GeometryCore>();
-  driftcoordinate = geom->TPC().DetectDriftDirection();
-  if( driftcoordinate==1 || driftcoordinate==2 )
+  driftcoordinate = art::ServiceHandle<geo::Geometry>()->TPC().DriftAxisWithSign().coordinate;
+  if( driftcoordinate==geo::Coordinate::X || driftcoordinate==geo::Coordinate::Y )
    {
         std::cout<<" drift coordinate: "<<driftcoordinate<<std::endl;
    }else{ throw cet::exception("CRTGen") << "unknown drift coordinate "<< driftcoordinate << " \n"; }
@@ -98,13 +98,13 @@ bool spacecharge::SpaceChargeProtoDUNEdp::Configure(fhicl::ParameterSet const& p
     TH3F* hDx_sim_orig;
     TH3F* hDy_sim_orig;
     TH3F* hEndPoint_sim_orig; //was X
-    if (driftcoordinate==1){
+    if (driftcoordinate==geo::Coordinate::X){
       hDx_sim_orig= (TH3F*)infile->Get("hDeltaLength");
       hDy_sim_orig = (TH3F*)infile->Get("hEndPointDY");
       hEndPoint_sim_orig = (TH3F*)infile->Get("hEndPointX");
       Anodebin = hEndPoint_sim_orig->GetXaxis()->GetXmax();
 
-    }else if (driftcoordinate==2){
+    }else if (driftcoordinate==geo::Coordinate::Y){
       hDx_sim_orig= (TH3F*)infile->Get("hEndPointDX");
       hDy_sim_orig = (TH3F*)infile->Get("hDeltaLength");
       hEndPoint_sim_orig = (TH3F*)infile->Get("hEndPointY");
@@ -265,9 +265,9 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNEdp::GetPosOffsets(geo::Point_t co
               {
 
                 //	              std::cout<<"hits anode: "<< tmp_point.X()<<" "<< tmp_point.Y()<<" "<< tmp_point.Z()<<" "<<thePosOffsets[0]<<" "<< thePosOffsets[1]<<" "<< thePosOffsets[2]<<std::endl;
-                if(driftcoordinate==1){
+                if(driftcoordinate==geo::Coordinate::X){
                   return {-thePosOffsets[0], thePosOffsets[1], thePosOffsets[2] };
-                }else if (driftcoordinate==2)
+                }else if (driftcoordinate==geo::Coordinate::Y)
                    { //is Voxel ready for y-shift?
                      return {thePosOffsets[0], -thePosOffsets[1], thePosOffsets[2] };
                    }else{
@@ -490,10 +490,10 @@ c.R();
        theEfieldOffsets[1]= theEfieldOffsets[1]/(-1000.0);
        theEfieldOffsets[2]= theEfieldOffsets[2]/(-1000.0);
 
-       if(driftcoordinate==1){
+       if(driftcoordinate==geo::Coordinate::X){
        theEfieldOffsets[0]=theEfieldOffsets[0]-fEfield;
 
-       }else if(driftcoordinate==2){
+       }else if(driftcoordinate==geo::Coordinate::Y){
          theEfieldOffsets[1]=theEfieldOffsets[1]-fEfield;
        }else{
          std::cout<<" Problem with drift field coordiate system for Efield calculation "<<std::endl;

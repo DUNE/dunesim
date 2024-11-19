@@ -1,5 +1,4 @@
-#include "services_dune.fcl"
-#include "dune_radiological_model_decay0_v3_4_hd_1x2x6.fcl"
+#include "dune_radiological_model_decay0_hd_common.fcl"
 
 BEGIN_PROLOG
 #  ==================================================================================================================================================================================================================================
@@ -9,34 +8,37 @@ BEGIN_PROLOG
 #  This is MASSIVELY dependent on the geometry
 #  ==================================================================================================================================================================================================================================
 
-
-dune10kt_1x2x2_gammas_from_cavernwall_atLAr:              @local::dune10kt_1x2x6_gammas_from_cavernwall_atLAr
-dune10kt_1x2x2_gammas_from_cavernwall_atLAr.Material:     [".*",".*",".*",".*"]
-dune10kt_1x2x2_gammas_from_cavernwall_atLAr.BqPercc:      [ 1.05104, 1.05104, 1.05104, 1.05104 ] 
-dune10kt_1x2x2_gammas_from_cavernwall_atLAr.T0:           [ -2246000.,-2246000.,-2246000.,-2246000. ] # starting time in ns
-dune10kt_1x2x2_gammas_from_cavernwall_atLAr.T1:           [  2246000., 2246000., 2246000., 2246000. ] # ending time in ns
-dune10kt_1x2x2_gammas_from_cavernwall_atLAr.X0:           [ -375. , -375., -375.,    -0.5 ] # in cm in world coordinates, low x-values of planes
-dune10kt_1x2x2_gammas_from_cavernwall_atLAr.X1:           [  375. ,  375.,  375.,     0.5 ] # in cm in world coordinates, high x-values of planes
-dune10kt_1x2x2_gammas_from_cavernwall_atLAr.Y0:           [ -625. , -625.5, 624.5, -625.  ] # in cm in world coordinates, low y-values of planes
-dune10kt_1x2x2_gammas_from_cavernwall_atLAr.Y1:           [  625. , -624.5, 625.5,  625.  ] # in cm in world coordinates, high y-values of planes
-dune10kt_1x2x2_gammas_from_cavernwall_atLAr.Z0:           [  -25.5,  -25.,  -25.,   -25.  ] # in cm in world coordinates, low z-values of planes
-dune10kt_1x2x2_gammas_from_cavernwall_atLAr.Z1:           [  -24.5,  490.,  490.,   490.  ] # in cm in world coordinates, high z-values of planes
-
+dune10kt_1x2x2_gammas_from_cavernwall_atLAr:
+{
+   module_type:           "RadioGen"
+   Nuclide:               ["FDcavernGammasAtLArFlux", "FDcavernGammasAtLArFlux", "FDcavernGammasAtLArFlux", "FDcavernGammasAtLArFlux"] # downscaled above 3.3 MeV for overestimated (alpha, gamma) production in Geant4 -JReichenbacher (05/16/2023)
+   PathToFile:             "Flux/Radionuclides/v03_02_01/"
+   Material:     [".*",".*",".*",".*"]
+   BqPercc:      [ 1.05104, 1.05104, 1.05104, 1.05104 ] 
+   T0:           [ -2246000.,-2246000.,-2246000.,-2246000. ] # starting time in ns
+   T1:           [  2246000., 2246000., 2246000., 2246000. ] # ending time in ns
+   X0:           [ -375. , -375., -375.,    -0.5 ] # in cm in world coordinates, low x-values of planes
+   X1:           [  375. ,  375.,  375.,     0.5 ] # in cm in world coordinates, high x-values of planes
+   Y0:           [ -625. , -625.5, 624.5, -625.  ] # in cm in world coordinates, low y-values of planes
+   Y1:           [  625. , -624.5, 625.5,  625.  ] # in cm in world coordinates, high y-values of planes
+   Z0:           [  -25.5,  -25.,  -25.,   -25.  ] # in cm in world coordinates, low z-values of planes
+   Z1:           [  -24.5,  490.,  490.,   490.  ] # in cm in world coordinates, high z-values of planes
+}
 
 dune10kt_1x2x2_gammas_from_foam_atLAr:                    @local::dune10kt_1x2x2_gammas_from_cavernwall_atLAr
-dune10kt_1x2x2_gammas_from_foam_atLAr.Nuclide:            ["FDfoamGammasAtLArFlux", "FDfoamGammasAtLArFlux", "FDfoamGammasAtLArFlux", "FDfoamGammasAtLArFlux", "FDfoamGammasAtLArFlux"] 
+dune10kt_1x2x2_gammas_from_foam_atLAr.Nuclide:            ["FDfoamGammasAtLArFlux", "FDfoamGammasAtLArFlux", "FDfoamGammasAtLArFlux", "FDfoamGammasAtLArFlux"] 
 dune10kt_1x2x2_gammas_from_foam_atLAr.BqPercc:            [ 0.0441274, 0.0441274, 0.0441274, 0.0441274 ] # activity
 
 dune10kt_1x2x2_neutrons_from_cavernwall_atLAr:            @local::dune10kt_1x2x2_gammas_from_cavernwall_atLAr
-dune10kt_1x2x2_neutrons_from_cavernwall_atLAr.Nuclide:    ["FDcavernNeutronsAtLArFlux", "FDcavernNeutronsAtLArFlux", "FDcavernNeutronsAtLArFlux", "FDcavernNeutronsAtLArFlux", "FDcavernNeutronsAtLArFlux"]
+dune10kt_1x2x2_neutrons_from_cavernwall_atLAr.Nuclide:    ["FDcavernNeutronsAtLArFlux", "FDcavernNeutronsAtLArFlux", "FDcavernNeutronsAtLArFlux", "FDcavernNeutronsAtLArFlux"]
 dune10kt_1x2x2_neutrons_from_cavernwall_atLAr.BqPercc:    [ 0.00000026996, 0.00000026996, 0.00000026996, 0.00000026996 ] # activity
 
 dune10kt_1x2x2_CryostatNGammas_from_CavernNeutrons_atLAr:          @local::dune10kt_1x2x2_gammas_from_cavernwall_atLAr
-dune10kt_1x2x2_CryostatNGammas_from_CavernNeutrons_atLAr.Nuclide:  ["FDcryostatNGammasAtLArFluxFromCavernNeutrons", "FDcryostatNGammasAtLArFluxFromCavernNeutrons", "FDcryostatNGammasAtLArFluxFromCavernNeutrons", "FDcryostatNGammasAtLArFluxFromCavernNeutrons", "FDcryostatNGammasAtLArFluxFromCavernNeutrons"]
+dune10kt_1x2x2_CryostatNGammas_from_CavernNeutrons_atLAr.Nuclide:  ["FDcryostatNGammasAtLArFluxFromCavernNeutrons", "FDcryostatNGammasAtLArFluxFromCavernNeutrons", "FDcryostatNGammasAtLArFluxFromCavernNeutrons", "FDcryostatNGammasAtLArFluxFromCavernNeutrons"]
 dune10kt_1x2x2_CryostatNGammas_from_CavernNeutrons_atLAr.BqPercc:  [ 0.0000016793, 0.0000016793, 0.0000016793, 0.0000016793 ] # activity 
 
 dune10kt_1x2x2_CavernNGammas_atLAr:                      @local::dune10kt_1x2x2_gammas_from_cavernwall_atLAr
-dune10kt_1x2x2_CavernNGammas_atLAr.Nuclide:              ["FDcavernNGammasAtLArFlux", "FDcavernNGammasAtLArFlux", "FDcavernNGammasAtLArFlux", "FDcavernNGammasAtLArFlux", "FDcavernNGammasAtLArFlux"]
+dune10kt_1x2x2_CavernNGammas_atLAr.Nuclide:              ["FDcavernNGammasAtLArFlux", "FDcavernNGammasAtLArFlux", "FDcavernNGammasAtLArFlux", "FDcavernNGammasAtLArFlux"]
 dune10kt_1x2x2_CavernNGammas_atLAr.BqPercc:              [ 0.0000005439, 0.0000005439, 0.0000005439, 0.0000005439 ] # activity 
 
 END_PROLOG

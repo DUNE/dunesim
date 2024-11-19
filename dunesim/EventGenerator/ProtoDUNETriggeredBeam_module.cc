@@ -265,6 +265,7 @@ namespace evgen{
         TGraph * fTriggersGraph;
         int fOutputPDG;
         int fOutputEvent;
+        std::vector<int> fOutputSecondaryPDGs;
         double fOutputMomentum;
         double fOutputUnsmearedMomentum;
         double fOutputHUpstream, fOutputVUpstream;
@@ -501,7 +502,6 @@ void evgen::ProtoDUNETriggeredBeam::beginJob(){
         fOutputTree->Branch("VUpstream", &fOutputVUpstream);
         fOutputTree->Branch("HDownstream", &fOutputHDownstream);
         fOutputTree->Branch("VDownstream", &fOutputVDownstream);
-      }
     }
 }
 
@@ -695,6 +695,18 @@ void evgen::ProtoDUNETriggeredBeam::GenerateTrueEvent(simb::MCTruth &mcTruth, co
   }
 
   std::cout << "Created event with " << mcTruth.NParticles() << " particles." << std::endl;
+
+  if (fSaveOutputTree) {
+    fOutputPDG = triggerParticle.PdgCode();
+    fOutputMomentum = triggerParticle.P();
+    fOutputSecondaryPDGs.clear();
+    fOutputSecondaryPDGs.insert(fOutputSecondaryPDGs.end(),
+                                secondary_pdgs.begin(),
+                                secondary_pdgs.end());
+
+    fOutputTree->Fill();
+  }
+
 }
 
 //---------------------------------------------------------------------------------------

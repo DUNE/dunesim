@@ -1,6 +1,10 @@
 #include "services_dune.fcl"
 
 BEGIN_PROLOG
+##################################
+# Decay0 Radiological Model v3.4 #
+##################################
+
 # -JReichenbacher (01/11/2017)
 #  v2.01/JS: use only generator and not also arGen
 #  v2.1-02142017/JR: moved photon paddles by (0.5+0.476+0.001) cm in x

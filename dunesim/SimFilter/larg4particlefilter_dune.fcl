@@ -18,4 +18,13 @@ dunefd_neutrontpcfilter.StartInTPC:                     [  0 ]   # Do not demand
 dunefd_neutrontpcfilter.StopInTPC:                      [  1 ]   # DO demand that the neutron stops in the TPC
 dunefd_neutrontpcfilter.ParticleMinTPCLength:           [ -1 ]   # Do not demand that the neutron has a minimum trajectory length in the TPC
 dunefd_neutrontpcfilter.RequireAllInterestingParticles: true
+
+dunefd_alphafilter: @local::standard_larg4particlefilter
+dunefd_alphafilter.InterestingPDGs:                [ 1000020040 ] # Demand an alpha
+dunefd_alphafilter.ParticleMinMomentum:            [ -1 ]   # Demand a lower momentum bound in GeV          
+dunefd_alphafilter.ParticleMaxMomentum:            [ -1 ]   # Do not demand an upper momentum bound
+dunefd_alphafilter.StartInTPC:                     [  0 ]   # Do not demand that the alpha starts in the TPC
+dunefd_alphafilter.StopInTPC:                      [  1 ]   # DO demand that the alpha stops in the TPC
+dunefd_alphafilter.ParticleMinTPCLength:           [ -1 ]   # Do not demand that the alpha has a minimum trajectory length in the TPC
+dunefd_alphafilter.RequireAllInterestingParticles: true
 END_PROLOG

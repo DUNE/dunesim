@@ -21,7 +21,7 @@
 //#include "art/canvas/Utilities/Exception.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "lardata/Utilities/LArFFT.h"
-#include "larcore/Geometry/Geometry.h"
+#include "larcore/Geometry/WireReadout.h"
 #include "nurandom/RandomUtils/NuRandomService.h"
 #include "art_root_io/TFileService.h"
 #include "CLHEP/Random/JamesRandom.h"
@@ -92,8 +92,8 @@ DPhaseCoherentNoiseService::DPhaseCoherentNoiseService(fhicl::ParameterSet const
   //sanity checks for the imported maps and find max frequency array length
   int max =0;
 
-  art::ServiceHandle<geo::Geometry> geo;
-  for(Channel chan=0; chan< geo->Nchannels() ; chan++){
+  auto const& wireReadout = art::ServiceHandle<geo::WireReadout>()->Get();
+  for(Channel chan=0; chan< wireReadout.Nchannels() ; chan++){
 
     vector<float> amplitudeArray;
     vector<float> frequencyArray;
@@ -150,8 +150,8 @@ int DPhaseCoherentNoiseService::addNoise(detinfo::DetectorClocksData const& cloc
 
   unsigned int ntick = detProp.NumberTimeSamples();
 
-  art::ServiceHandle<geo::Geometry> geo;
-  const geo::View_t view = geo->View(chan);
+  auto const& wireReadout = art::ServiceHandle<geo::WireReadout>()->Get();
+  const geo::View_t view = wireReadout.View(chan);
 
   //get the map associated to channel and phase array associated to channel
   int num = getNumber( chan );
@@ -380,8 +380,8 @@ void DPhaseCoherentNoiseService::makePhaseMap( Map & phaseMap ,int size,
 
   //loop over all channels
   int index=0; //keep track of the groups already checked;
-  art::ServiceHandle<geo::Geometry> geo;
-  for(Channel chan=0; chan< geo->Nchannels() ; chan++){
+  auto const& wireReadout = art::ServiceHandle<geo::WireReadout>()->Get();
+  for(Channel chan=0; chan< wireReadout.Nchannels() ; chan++){
 
     //assign each channel to a group
     if( chan >= (Channel)fChannelGroup.at(index) ){

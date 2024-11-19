@@ -22,6 +22,7 @@
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "lardata/Utilities/LArFFT.h"
 #include "larcore/Geometry/Geometry.h"
+#include "larcore/Geometry/WireReadout.h"
 #include "lardataobj/RawData/raw.h"
 
 using std::string;
@@ -69,11 +70,10 @@ namespace {
     string gname = "dune35t4apa_v6";
     service_configs.emplace("Geometry",
                             "DisableWiresInG4: true GDML: \"dune35t4apa_v6.gdml\" Name: \"" + gname +
-                            "\" ROOT: \"" + gname + "\""
-                            " SortingParameters: { DetectorVersion: \"" + gname + "\""
-                            " ChannelsPerOpDet: 12" +
-                            "} SurfaceY: 0");
-    service_configs.emplace("ExptGeoHelperInterface", "service_provider: \"DUNEGeometryHelper\"");
+                            "\" ROOT: \"" + gname + "\"" +
+                            " SortingParameters: { tool_type: GeoObjectSorter35 }" +
+                            " SurfaceY: 0");
+    service_configs.emplace("WireReadout", "service_provider: DUNEWireReadout ChannelsPerOpDet: 12 DetectorVersion: \"dune35t4apa_v6\"");
     service_configs.emplace("LArPropertiesService", LArPropertiesServiceConfigurationString);
     service_configs.emplace("DetectorPropertiesService", DetectorPropertiesServiceConfigurationString);
     service_configs.emplace("DetectorClocksService", "ClockSpeedExternal: 3.125e1 ClockSpeedOptical: 128 ClockSpeedTPC: 2 ClockSpeedTrigger: 16 DefaultBeamTime: 0 DefaultTrigTime: 0 FramePeriod: 1600 G4RefTime: 0 InheritClockConfig: false TrigModuleName: \"\" TriggerOffsetTPC: 0 service_provider: \"DetectorClocksServiceStandard\" ");
@@ -119,16 +119,13 @@ int test_ExponentialChannelNoiseService(unsigned int ntick, unsigned int maxchan
   ExponentialChannelNoiseService noisvc(pset);
 
   ServiceHandle<LArFFT> hfftsvc;
-  ServiceHandle<geo::Geometry> hgeosvc;
 
   AdcSignal ped = 1000;
   cout << myname << line << endl;
   cout << myname << "Create signal with ped=" << ped << " and " << ntick << " ticks." << endl;
   cout << myname << "FFT size: " << hfftsvc->FFTSize() << endl;
-  cout << myname << "Detector: " << hgeosvc->DetectorName() << endl;
+  cout << myname << "Detector: " << art::ServiceHandle<geo::Geometry>()->DetectorName() << endl;
   AdcSignalVector sigsin(ntick, ped);
-  for ( unsigned int isig=0; isig<20; ++isig ) {
-  }
   double sum = 0.0;
   double sumsq = 0.0;
   double sumdsq = 0.0;
@@ -146,8 +143,9 @@ int test_ExponentialChannelNoiseService(unsigned int ntick, unsigned int maxchan
   unsigned int countind = 0;
   // Loop over channels.
   cout << myname << "Looping over channels." << endl;
+  auto const& wireReadout = art::ServiceHandle<geo::WireReadout>()->Get();
   for ( unsigned int icha=0; icha<1000000; ++icha ) {
-    geo::SigType_t sigtyp = hgeosvc->SignalType(icha);
+    geo::SigType_t sigtyp = wireReadout.SignalType(icha);
     if ( sigtyp == geo::kMysteryType ) break;
     if ( icha >= maxchan ) break;
     ++nchan;
