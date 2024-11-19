@@ -85,6 +85,9 @@ namespace spacecharge {
       bool fEnableCalSpatialSCE;
       bool fEnableCalEfieldSCE;
       bool fEnableCorrSCE;
+
+      double fScaleFactor;
+      bool fVaryByScaleFactor;
       
       double fEfield;
       

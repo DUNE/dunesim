@@ -52,6 +52,9 @@ bool spacecharge::SpaceChargeProtoDUNE::Configure(fhicl::ParameterSet const& pse
   fEDChargeLossZLow                  = pset.get<std::vector<double>>("EDChargeLossZLow");
   fEDChargeLossZHigh                 = pset.get<std::vector<double>>("EDChargeLossZHigh");
 
+  fScaleFactor = pset.get<double>("ScaleFactor", 1.);
+  fVaryByScaleFactor = pset.get<bool>("VaryByScaleFactor", false);
+
   size_t ieds = fEnableElectronDiverterDistortions.size();
   if (fEDZCenter.size() != ieds ||
       fEDAXPosOffs.size() != ieds ||
@@ -602,6 +605,13 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetPosOffsets(geo::Point_t cons
   }else if(fRepresentationType == "Parametric") thePosOffsets = GetPosOffsetsParametric(point.X(), point.Y(), point.Z());
   else thePosOffsets.resize(3,0.0); 
  
+  //Vary offsets 
+  if (fVaryByScaleFactor) {
+    thePosOffsets[0] *= fScaleFactor;
+    thePosOffsets[1] *= fScaleFactor;
+    thePosOffsets[2] *= fScaleFactor;
+  }
+
   geo::Point_t pafteroffset(point.X()+thePosOffsets[0], point.Y()+thePosOffsets[1], point.Z()+thePosOffsets[2]);
   geo::Vector_t edoffset = ElectronDiverterPosOffsets(pafteroffset);
   thePosOffsets[0] += edoffset.X();
@@ -651,6 +661,12 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetCalPosOffsets(geo::Point_t c
       
   } else thePosOffsets.resize(3,0.0);
   
+  if (fVaryByScaleFactor) {
+    thePosOffsets[0] *= fScaleFactor;
+    thePosOffsets[1] *= fScaleFactor;
+    thePosOffsets[2] *= fScaleFactor;
+  }
+
   return { thePosOffsets[0], thePosOffsets[1], thePosOffsets[2] };
 }
 
