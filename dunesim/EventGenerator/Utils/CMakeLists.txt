@@ -5,10 +5,11 @@ art_make_library( LIBRARY_NAME ProtoDUNETriggeredBeamUtils
 		  SOURCE ProtoDUNETriggeredBeamUtils.cxx
 		  LIBRARIES
                        fhiclcpp::fhiclcpp
-                       ROOT_BASIC_LIB_LIST 
+		       ROOT::Core
+		       ROOT::Physics
 	        )
 
-art_make_exec( NAME runEventCounter
+cet_make_exec( NAME runEventCounter
 	       SOURCE runEventCounter.c++
 	       LIBRARIES ProtoDUNETriggeredBeamUtils 
 	    )

@@ -1,31 +1,26 @@
 
 art_make(
           MODULE_LIBRARIES
-                        larcoreobj_SummaryData
-                        larcore_Geometry_Geometry_service
-			                  larcorealg_Geometry
+                        larcoreobj::SummaryData
+                        larcore::Geometry_Geometry_service
+			                  larcorealg::Geometry
                         nurandom::RandomUtils_NuRandomService_service
-                        larsim_Simulation lardataobj_Simulation
+                        larsim::Simulation lardataobj::Simulation
                         nusimdata::SimulationBase
-                        ART_FRAMEWORK_CORE
-                        ART_FRAMEWORK_PRINCIPAL
-                        ART_FRAMEWORK_SERVICES_REGISTRY
-                        ART_ROOT_IO_TFILE_SUPPORT
+                        nugen::EventGeneratorBase_GENIE
                         ROOT::Core
-                        ART_ROOT_IO_TFILESERVICE_SERVICE
-                        ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE
                         art::Persistency_Common
                         art::Persistency_Provenance
                         art::Utilities
                         canvas::canvas
                         messagefacility::MF_MessageLogger
-
+                        art_root_io::tfile_support
                         fhiclcpp::fhiclcpp
-                        cetlib::cetlib cetlib_except
-                        CLHEP
-                        ROOT_BASIC_LIB_LIST
-                        SQLITE3
-                        ROOT_EG
+                        cetlib::cetlib cetlib_except::cetlib_except
+			CLHEP::CLHEP
+			ROOT::Tree
+			SQLite::SQLite3
+                        ROOT::EG
                         ifdh::ifdh
         )
 

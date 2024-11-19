@@ -1,7 +1,11 @@
 #include "services_dune.fcl"
-#include "dune_radiological_model_decay0_v3_4_hd_common.fcl"
+#include "dune_radiological_model_decay0_hd_common.fcl"
 
 BEGIN_PROLOG
+##################################
+# Decay0 Radiological Model v3.4 #
+##################################
+
 # -JReichenbacher (01/11/2017)
 #  v3.1.3.VD-08142023/Juergen Reichenbacher: started porting v3 to VD (fine-tuned for external background planes upper z-position from 1000 cm to 996 cm based on Sergio Manthey's and Gleb Sinev's validations)
 #  v3.1.4.VD-09152023/Juergen Reichenbacher: Changed external background planes to have larger dead LAr gap of 78cm, except for top (25cm conservatively as ambiguous dimension numbers have been found for top)

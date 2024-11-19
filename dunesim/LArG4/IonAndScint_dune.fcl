@@ -6,7 +6,7 @@ BEGIN_PROLOG
 dunefd_ionandscint_correlated:
 {
   module_type: "IonAndScint"
-  Instances:   "LArG4DetectorServicevolTPCInner;LArG4DetectorServicevolTPCPlaneVInner;LArG4DetectorServicevolTPCActiveOuter;LArG4DetectorServicevolTPCPlaneUInner;LArG4DetectorServicevolTPCPlaneZInner;LArG4DetectorServicevolTPCActiveInner;LArG4DetectorServicevolTPCActive" # separated by semicolon 
+  Instances:   "LArG4DetectorServicevolTPCInner;LArG4DetectorServicevolTPCPlaneVInner;LArG4DetectorServicevolTPCActiveOuter;LArG4DetectorServicevolTPCPlaneUInner;LArG4DetectorServicevolTPCPlaneZInner;LArG4DetectorServicevolTPCActiveInner;LArG4DetectorServicevolTPCActive,LArG4DetectorServicevolTPCInner0;LArG4DetectorServicevolTPCPlaneVInner0;LArG4DetectorServicevolTPCPlaneUInner0;LArG4DetectorServicevolTPCPlaneZInner0;LArG4DetectorServicevolTPCActiveInner0;LArG4DetectorServicevolTPCActive0;LArG4DetectorServicevolTPCInner1;LArG4DetectorServicevolTPCPlaneVInner1;LArG4DetectorServicevolTPCPlaneUInner1;LArG4DetectorServicevolTPCPlaneZInner1;LArG4DetectorServicevolTPCActiveInner1;LArG4DetectorServicevolTPCActive1" # separated by semicolon 
   ISCalcAlg:   "Correlated"
 }   
 dunefd_ionandscint_nest: @local::dunefd_ionandscint_correlated
@@ -62,7 +62,7 @@ protodunehd_ionandscint_separate: @local::protodunehd_ionandscint_correlated
 protodunehd_ionandscint_separate.ISCalcAlg: "Separate"
 
 # active volume
-protodunehd_ionandscint: @local::protodunehd_ionandscint_separate
+protodunehd_ionandscint: @local::protodunehd_ionandscint_correlated
 protodunehd_ionandscint.Instances: "LArG4DetectorServicevolTPCActiveInner"
 # external laterals volume
 protodunehd_ionandscint_external: @local::protodunehd_ionandscint

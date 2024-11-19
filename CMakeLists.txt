@@ -3,13 +3,14 @@
 # ======================================================================
 
 
-cmake_minimum_required (VERSION 3.19 FATAL_ERROR)
+cmake_minimum_required (VERSION 3.20 FATAL_ERROR)
+# cmake_policy(VERSION 3.19)
 
+
+find_package(cetmodules REQUIRED)
 project(dunesim LANGUAGES CXX)
-set(${PROJECT_NAME}_CMAKE_PROJECT_VERSION_STRING 09.85.00d00)
-
-# cetbuildtools contains our cmake modules
-find_package(cetbuildtools REQUIRED)
+set(${PROJECT_NAME}_CMAKE_PROJECT_VERSION_STRING 10.01.01d00)
+set(${PROJECT_NAME}_FW_DIR "config_data")
 
 include(CetCMakeEnv)
 cet_cmake_env()
@@ -22,26 +23,26 @@ cet_set_compiler_flags(DIAGS CAUTIOUS
 
 cet_report_compiler_flags()
 
-find_ups_product( art )
-find_ups_product( art_root_io )
-find_ups_product( canvas_root_io )
-find_ups_boost( )
-find_ups_root()
-find_ups_product( cetbuildtools )
-find_ups_product( larevt )
-find_ups_product( larsim )
-find_ups_product( lardataalg )
-find_ups_product( lardataobj )
-find_ups_product( larcore )
-find_ups_product( larcorealg )
-find_ups_product( larcoreobj )
-find_ups_product( nusimdata )
-find_ups_product( nurandom )
-find_ups_product( dunecore )
-find_ups_product( lardata )
-find_ups_product( clhep )
-find_ups_product( nugen )
-find_ups_geant4( )
+find_package( art REQUIRED EXPORT )
+find_package( art_root_io REQUIRED EXPORT )
+find_package( canvas_root_io REQUIRED EXPORT )
+find_package( Boost REQUIRED )
+find_package(ROOT REQUIRED)
+find_package( larevt REQUIRED EXPORT )
+find_package( larsim REQUIRED EXPORT )
+find_package( lardataalg REQUIRED EXPORT )
+find_package( lardataobj REQUIRED EXPORT )
+find_package( larcore REQUIRED EXPORT )
+find_package( larcorealg REQUIRED EXPORT )
+find_package( larcoreobj REQUIRED EXPORT )
+find_package( nusimdata REQUIRED EXPORT )
+find_package( nurandom REQUIRED EXPORT )
+find_package( dunecore REQUIRED EXPORT )
+find_package( dunepdlegacy REQUIRED EXPORT )
+find_package( lardata REQUIRED EXPORT )
+find_package( CLHEP REQUIRED EXPORT )
+find_package( nugen REQUIRED EXPORT )
+find_package( Geant4 REQUIRED EXPORT )
 
 # macros for artdaq_dictionary and simple_plugin
 include(ArtDictionary)
@@ -49,7 +50,6 @@ include(ArtMake)
 include(BuildPlugins)
 
 add_subdirectory(dunesim)
-add_subdirectory(ups)
 add_subdirectory(macros)
 
-include(UseCPack)
+cet_cmake_config()
