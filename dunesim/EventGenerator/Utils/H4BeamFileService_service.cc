@@ -39,8 +39,8 @@ void dune::H4BeamFileService::OpenFile(const std::string & filename) {
   }
 
 
-  int first_pos = filename.find_last_of("_")+1;
-  int last_pos = filename.find_last_of(".");
+  const int first_pos = filename.find_last_of("_")+1;
+  const int last_pos = filename.find_last_of(".");
   std::cout << "Getting run " <<
                last_pos << " " <<
                first_pos << " " <<
