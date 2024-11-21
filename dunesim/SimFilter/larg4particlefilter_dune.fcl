@@ -27,4 +27,22 @@ dunefd_alphafilter.StartInTPC:                     [  0 ]   # Do not demand that
 dunefd_alphafilter.StopInTPC:                      [  1 ]   # DO demand that the alpha stops in the TPC
 dunefd_alphafilter.ParticleMinTPCLength:           [ -1 ]   # Do not demand that the alpha has a minimum trajectory length in the TPC
 dunefd_alphafilter.RequireAllInterestingParticles: true
+
+dunefd_gammafilter: @local::standard_larg4particlefilter
+dunefd_gammafilter.InterestingPDGs:                [ 22 ]   # Demand a gamma
+dunefd_gammafilter.ParticleMinMomentum:            [ -1 ]   # Demand a lower momentum bound in GeV          
+dunefd_gammafilter.ParticleMaxMomentum:            [ -1 ]   # Do not demand an upper momentum bound
+dunefd_gammafilter.StartInTPC:                     [  0 ]   # Do not demand that the alpha starts in the TPC
+dunefd_gammafilter.StopInTPC:                      [  1 ]   # DO demand that the alpha stops in the TPC
+dunefd_gammafilter.ParticleMinTPCLength:           [ -1 ]   # Do not demand that the alpha has a minimum trajectory length in the TPC
+dunefd_gammafilter.RequireAllInterestingParticles: true
+
+dunefd_electronfilter: @local::standard_larg4particlefilter
+dunefd_electronfilter.InterestingPDGs:                [ 11 ]   # Demand an electron
+dunefd_electronfilter.ParticleMinMomentum:            [ -1 ]   # Demand a lower momentum bound in GeV          
+dunefd_electronfilter.ParticleMaxMomentum:            [ -1 ]   # Do not demand an upper momentum bound
+dunefd_electronfilter.StartInTPC:                     [  0 ]   # Do not demand that the alpha starts in the TPC
+dunefd_electronfilter.StopInTPC:                      [  1 ]   # DO demand that the alpha stops in the TPC
+dunefd_electronfilter.ParticleMinTPCLength:           [ -1 ]   # Do not demand that the alpha has a minimum trajectory length in the TPC
+dunefd_electronfilter.RequireAllInterestingParticles: true
 END_PROLOG
