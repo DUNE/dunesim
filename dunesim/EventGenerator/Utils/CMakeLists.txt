@@ -30,19 +30,19 @@ simple_plugin(H4BeamFileService "service"
 )
 
 simple_plugin( H4BeamFileTester "module"
-                        ART_FRAMEWORK_CORE
-                        ART_FRAMEWORK_PRINCIPAL
-                        ART_FRAMEWORK_SERVICES_REGISTRY
-                        ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE
+                        ${ART_FRAMEWORK_CORE}
+                        ${ART_FRAMEWORK_PRINCIPAL}
+                        ${ART_FRAMEWORK_SERVICES_REGISTRY}
+                        ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
                         art::Persistency_Common
                         art::Persistency_Provenance
-                        art::Utilities canvas
+                        art::Utilities ${canvas}
                         messagefacility::MF_MessageLogger
-                        hep_concurrency
+                        ${hep_concurrency}
                         fhiclcpp::fhiclcpp
-                        cetlib::cetlib cetlib_except
-                        CLHEP
-                        ROOT_BASIC_LIB_LIST
+                        cetlib::cetlib ${cetlib_except}
+                        ${CLHEP}
+                        ${ROOT_BASIC_LIB_LIST}
                         dunesim_EventGenerator_ProtoDUNEbeamDataProducts
                         ProtoDUNETriggeredBeamUtils
                         dunesim::EventGenerator_Utils_H4BeamFileService_service

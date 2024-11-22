@@ -502,6 +502,7 @@ void evgen::ProtoDUNETriggeredBeam::beginJob(){
         fOutputTree->Branch("VUpstream", &fOutputVUpstream);
         fOutputTree->Branch("HDownstream", &fOutputHDownstream);
         fOutputTree->Branch("VDownstream", &fOutputVDownstream);
+      }
     }
 }
 
