@@ -355,7 +355,7 @@ dune_fd_genie_atmo_max_weighted_honda: {
 dune_fdvd_genie_atmo_max_weighted_honda: {
     @table::dune_fd_genie_atmo_max_weighted_honda
     @table::dune_fdvd_atmo_flux_rotation_precise
-    FiducialCut: "mbox:-325,-325,-677,677,0,900" #Only interactions in the active volume
+    FiducialCut: "mbox:-325,-677,-0,325,677,900" #Only interactions in the active volume
 }
 
 

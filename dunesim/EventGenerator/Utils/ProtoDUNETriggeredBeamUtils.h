@@ -1,3 +1,6 @@
+#ifndef ProtoDUNETriggeredBeamUtils_h
+#define ProtoDUNETriggeredBeamUtils_h
+
 #include "TTree.h"
 #include "TVector3.h"
 #include "TFile.h"
@@ -148,3 +151,4 @@ namespace evgen {
  };
 }
 
+#endif
