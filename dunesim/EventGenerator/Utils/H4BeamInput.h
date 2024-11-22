@@ -46,7 +46,7 @@ class dune::H4BeamInputDetail {
 
  private:
   art::SourceHelper const& pmaker;
-  int fLogLevel;
+  //int fLogLevel;
   int fSkipEvents = 0;
   size_t fNEventsAvailable = 0;
   bool fAccessedFirstEvent = false;
