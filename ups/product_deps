@@ -196,7 +196,7 @@ table_fragment_end
 
 product          version
 cetmodules	 v3_24_01	-	only_for_build
-dunecore         v10_01_03d00
+dunetrigger      v10_01_03d00
 genie_xsec       v3_04_00       -       optional
 genie_phyopt     v3_04_00
 end_product_list
@@ -204,7 +204,7 @@ end_product_list
 
 # We now define allowed qualifiers and the corresponding qualifiers for the depdencies.
 # Make a table by adding columns before "notes".
-qualifier       dunecore      genie_xsec              genie_phyopt    notes
+qualifier       dunetrigger   genie_xsec              genie_phyopt    notes
 c14:debug       c14:debug     AR2320i00000:e1000:k250 dkcharmtau   
 c14:prof        c14:prof      AR2320i00000:e1000:k250 dkcharmtau   
 e26:debug       e26:debug     AR2320i00000:e1000:k250  dkcharmtau    
