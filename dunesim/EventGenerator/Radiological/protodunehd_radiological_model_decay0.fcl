@@ -1,0 +1,35 @@
+#include "services_dune.fcl"
+#include "dune_radiological_model_decay0_hd_common.fcl"
+
+BEGIN_PROLOG
+##################################
+# Decay0 Radiological Model v3.4 #
+##################################
+
+# -JReichenbacher (01/11/2017)
+#  v3.1.3.VD-08142023/Juergen Reichenbacher: started porting v3 to VD (fine-tuned for external background planes upper z-position from 1000 cm to 996 cm based on Sergio Manthey's and Gleb Sinev's validations)
+#  v3.1.4.VD-09152023/Juergen Reichenbacher: Changed external background planes to have larger dead LAr gap of 78cm, except for top (25cm conservatively as ambiguous dimension numbers have been found for top)
+#                                            Checked on Arapuca and implemented Rn daughter plate-out for Tile X-Arapuca geometry, added 232Th decay chain background in Cathode, added U, Th, K backgrounds in CRP (Anode)
+#                                            Added migration backgrounds from 222Rn and 220Rn decay products in LAr & with new 'delta-fct.' method in LAr 5 cm above Cathode FRP frame
+#                                            Added more realistic migration of 42K from 42Ar to upper cathode mesh using new 'delta-fct.' method in LAr 5 cm above Cathode FRP frame too
+#                                            Use 'rate' instead of 'BqPercc' command for new 'delta-fct.' 42K method in LAr 5 cm above Cathode FRP frame ('rate' value needs to be adjusted if volume changes!!!)
+#                                            Modify 'rate' values by multiplying by 2*0.004285s to accomodate that in larsimrad Twindow is not multiplied to rate (in contrast to documentation v1) -> Remember: adjust if volume changes!!!
+
+protodunehd_39Ar_in_LAr:                   @local::dune10kt_39Ar_in_LAr
+protodunehd_85Kr_in_LAr:                   @local::dune10kt_85Kr_in_LAr
+protodunehd_42Ar_in_LAr:                   @local::dune10kt_42Ar_in_LAr
+protodunehd_42Kfrom42Ar_in_LAr:            @local::dune10kt_42Kfrom42Ar_in_LAr
+
+protodunehd_40K_in_CPA:                    @local::dune10kt_1x2x6_40K_in_CPA               #does NOT depend anymore on thickness of 'CathodeGrid' for FRP frame in VD
+protodunehd_238U_chain_in_CPA:             @local::dune10kt_1x2x6_238U_chain_in_CPA
+protodunehd_232Th_chain_in_CPA:            @local::dune10kt_1x2x6_232Th_chain_in_CPA       #does NOT depend anymore on thickness of 'CathodeGrid' for FRP frame in VD
+
+protodunehd_60Co_in_APA:                   @local::dune10kt_1x2x6_60Co_in_APA              #does depend on thickness of 'AnodePlate' for VD
+protodunehd_238U_chain_in_APA:             @local::dune10kt_1x2x6_238U_chain_in_APA        #does depend on thickness of 'AnodePlate' for VD
+protodunehd_232Th_chain_in_APA:            @local::dune10kt_1x2x6_232Th_chain_in_APA       #does depend on thickness of 'AnodePlate' for VD
+
+protodunehd_40K_in_APAboards:              @local::dune10kt_40K_in_APAboards         #does depend on thickness of 'AnodePlate' for VD
+protodunehd_238U_chain_in_APAboards:       @local::dune10kt_238U_chain_in_APAboards  #does depend on thickness of 'AnodePlate' for VD
+protodunehd_232Th_chain_in_APAboards:      @local::dune10kt_232Th_chain_in_APAboards #does depend on thickness of 'AnodePlate' for VD
+
+END_PROLOG
