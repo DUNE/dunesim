@@ -1,0 +1,4 @@
+#include "pdsp_1GeV_h4input_cosmics.fcl"
+physics.producers.generator.NominalP: "0.5"
+services.TFileService.fileName: "prod_beam_p0.5GeV_cosmics_protodunesp_hist.root"
+outputs.out1.fileName: "prod_beam_p0.5GeV_cosmics_protodunesp.root"
