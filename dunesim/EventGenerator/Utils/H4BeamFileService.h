@@ -39,6 +39,9 @@ namespace dune
     };
 
     void Reset();
+    size_t GetSubRun() {
+      return fSubRun;
+    };
     size_t GetRun() {
       return fRun;
     };
@@ -59,6 +62,9 @@ namespace dune
     std::unique_ptr<std::vector<int>> fFinalTriggeredEventIDs;
     evgen::ProtoDUNETriggeredBeamUtils fBeamUtils;
     size_t fRun;
+    size_t fSubRun = 1;
+    bool fOverrideRun = false;
+    bool fOverrideSubRun = false;
 
     std::string fTRIG1TreeName, fTRIG2TreeName, fTOF1TreeName, fBPROF1TreeName,
                 fBPROF2TreeName, fBPROF3TreeName, fBPROF4TreeName,
