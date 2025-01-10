@@ -32,4 +32,12 @@ protodunehd_40K_in_APAboards:              @local::dune10kt_40K_in_APAboards    
 protodunehd_238U_chain_in_APAboards:       @local::dune10kt_238U_chain_in_APAboards  #does depend on thickness of 'AnodePlate' for VD
 protodunehd_232Th_chain_in_APAboards:      @local::dune10kt_232Th_chain_in_APAboards #does depend on thickness of 'AnodePlate' for VD
 
+protodunehd_207Bi_source:{
+  module_type: "Decay0Gen"
+  isotope: "Bi207"
+  volume_gen:"volBiSource" # CERN source with 5 um thick Ti foils
+  material: "Vacuum"
+  BqPercc: 1.9e10          # should correspond to 37 kBq/cc 
+}
+
 END_PROLOG
