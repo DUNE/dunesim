@@ -17,7 +17,7 @@ services:
   RandomNumberGenerator: {} #ART native random number generator
   FileCatalogMetadata:  @local::art_file_catalog_mc
   @table::protodune_refactored_simulation_services
-  H4BeamFileService: @local::h4_beam_file_service_pdhd
+  H4BeamFileService: @local::h4_beam_file_service_pdsp
   #NuRandomService:       @local::dune_prod_seedservice
 }
 
