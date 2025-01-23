@@ -22,7 +22,6 @@ dune::H4BeamFileService::H4BeamFileService(
   fTRIG2TreeName      = p.get<std::string>("TRIG2TreeName");
   fNP04frontTreeName = p.get<std::string>("NP04frontTreeName");
   fIsNP02 = p.get<bool>("IsNP02", false);
-
 }
 
 // sets the pointer and assumes ownership of it
@@ -38,18 +37,37 @@ void dune::H4BeamFileService::OpenFile(const std::string & filename) {
           "Input file " << filename << " cannot be read.\n";
   }
 
+  for (auto const & p : fhicl::ParameterSetRegistry::get()) {
+    if (p.second.has_key("source")) {
+      //std::cout << "Found source" << std::endl;
+      //if (p.second.has_key("source.firstEvent")) {
+      //  std::cout << "firstEvent: " << p.second.get<int>("source.firstEvent") << std::endl;
+      //}
+      if (p.second.has_key("source.firstSubRun")) {
+        fSubRun = p.second.get<int>("source.firstSubRun");
+        std::cout << "firstSubRun: " << fSubRun << std::endl;
+      }
+      if (p.second.has_key("source.firstRun")) {
+        fRun = p.second.get<int>("source.firstRun");
+        std::cout << "firstRun: " << fRun << std::endl;
+        fOverrideRun = true;
+      }
+    }
+  }
 
-  const int first_pos = filename.find_last_of("_")+1;
-  const int last_pos = filename.find_last_of(".");
-  std::cout << "Getting run " <<
-               last_pos << " " <<
-               first_pos << " " <<
-               filename.substr(
-                 first_pos, last_pos - first_pos) << std::endl;
+  if (!fOverrideRun) {
+    const int first_pos = filename.find_last_of("_")+1;
+    const int last_pos = filename.find_last_of(".");
+    std::cout << "Getting run " <<
+                 last_pos << " " <<
+                 first_pos << " " <<
+                 filename.substr(
+                   first_pos, last_pos - first_pos) << std::endl;
 
-  fRun = std::stoul(filename.substr(
-    first_pos,
-    last_pos - first_pos));
+    fRun = std::stoul(filename.substr(
+      first_pos,
+      last_pos - first_pos));
+  }
 
   TTree *frontFaceTree = (TTree*)inputFile->Get(fNP04frontTreeName.c_str());
   std::cout << "Front face tree: " << frontFaceTree << std::endl;
