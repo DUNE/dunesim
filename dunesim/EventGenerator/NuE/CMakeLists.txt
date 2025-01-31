@@ -18,7 +18,6 @@ art_make(
 			ROOT::Hist
 			SQLite::SQLite3
                         ROOT::EG
-                        ifdh::ifdh
         )
 
 install_headers()
