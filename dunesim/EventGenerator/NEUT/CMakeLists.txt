@@ -19,7 +19,6 @@ art_make(
 			CLHEP::CLHEP
 			SQLite::SQLite3
                         ROOT::EG
-                        ifdh::ifdh
         )
 
 install_headers()
