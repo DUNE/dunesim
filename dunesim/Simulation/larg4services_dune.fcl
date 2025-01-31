@@ -165,10 +165,22 @@ protodunevd_drifty_larg4detector:
     stepLimits    : [0.3, 0.3] # corresponding stepLimits in mm for the volumes in the volumeNames list
 }
 
+# I would drop this and leave only dune10kt_1x2x2_larg4detector
+# but maybe it's better to do it in two steps to prevent build failures
+# and check if it's used somewhere else than dunefd_1x2x2_simulation_services
 dune10kt_1x2x2_v4_larg4detector:
 {
     category      : "world"
     gdmlFileName_ : @local::dune10kt_1x2x2_v4_refactored_geo.GDML
+    volumeNames   : ["volTPCActiveInner", "volTPCActiveOuter"] # list of volumes for which the stepLimit should be set
+    stepLimits    : [0.4, 0.4] # corresponding stepLimits in mm for the volumes in the volumeNames list
+}
+# 
+
+dune10kt_1x2x2_larg4detector:
+{
+    category      : "world"
+    gdmlFileName_ : @local::dune10kt_1x2x2_refactored_geo.GDML
     volumeNames   : ["volTPCActiveInner", "volTPCActiveOuter"] # list of volumes for which the stepLimit should be set
     stepLimits    : [0.4, 0.4] # corresponding stepLimits in mm for the volumes in the volumeNames list
 }
