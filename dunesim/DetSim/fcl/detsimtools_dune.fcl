@@ -10,12 +10,12 @@
 tools.adcsim_ideal: {
   tool_type: IdealAdcSimulator
   Vsen: 1.0
-  Nbit: 12
+  Nbit: 14 # used to be 12
 }
 
 tools.adcsim_noisy: {
    tool_type: NoisyAdcSimulator
    Vsen: 1.0
-   Nbit: 12
+   Nbit: 14 # used to be 12
    Noise:5
 }
