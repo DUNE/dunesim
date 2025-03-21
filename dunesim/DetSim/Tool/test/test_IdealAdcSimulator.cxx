@@ -51,7 +51,6 @@ int test_IdealAdcSimulator(bool useExistingFcl) {
 #endif
   string line = "-----------------------------";
 
-  // do we like these printouts?
   cout << myname << line << endl;
   string fclfile = "test_IdealAdcSimulator.fcl";
   if ( ! useExistingFcl ) {
@@ -60,7 +59,7 @@ int test_IdealAdcSimulator(bool useExistingFcl) {
     fout << "mytool: {" << endl;
     fout << "  tool_type: IdealAdcSimulator" << endl;
     fout << "  Vsen: 2.0" << endl;
-    fout << "  Nbit: 14" << endl; 
+    fout << "  Nbit: 12" << endl;
     fout << "}" << endl;
     fout.close();
   } else {
