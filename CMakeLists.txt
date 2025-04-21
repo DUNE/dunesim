@@ -9,7 +9,7 @@ cmake_minimum_required (VERSION 3.20 FATAL_ERROR)
 
 find_package(cetmodules REQUIRED)
 project(dunesim LANGUAGES CXX)
-set(${PROJECT_NAME}_CMAKE_PROJECT_VERSION_STRING 09.91.04d00)
+set(${PROJECT_NAME}_CMAKE_PROJECT_VERSION_STRING 09.91.04d01)
 set(${PROJECT_NAME}_FW_DIR "config_data")
 
 include(CetCMakeEnv)
