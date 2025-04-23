@@ -2,14 +2,19 @@
 
 BEGIN_PROLOG
 
+####################################
 # DUNE-specific MARLEY configurations
-dune_marley_monoenergetic: @local::standard_marley_monoenergetic
 
-dune_marley_nue_spectrum: @local::standard_marley_nue_spectrum
-dune_marley_nue_spectrum.marley_parameters.reactions: [ "ve40ArCC_Bhattacharya2009.react", "ES.react" ] 
+dune_marley_monoenergetic: @local::standard_marley_monoenergetic
 
 dune_marley_fermi_dirac: @local::standard_marley_fermi_dirac
 
+####################################
+## SuperNova
+
+# Spectrum files are under /cvmfs/dune.osgstorage.org/pnfs/fnal.gov/usr/dune/persistent/stash/Flux/Supernova/
+
+### Flat
 dune_marley_flat: @local::standard_marley
 dune_marley_flat.marley_parameters.source: {
       type: "histogram"
@@ -35,6 +40,71 @@ dune_marley_nue_es_flat.marley_parameters.source.E_bin_lefts: [ 2. ]
 dune_marley_nue_es_flat_halfActiveVol: @local::dune_marley_nue_es_flat
 dune_marley_nue_es_flat_halfActiveVol.vertex: { type: "box"  min_position: [ 2.7, -608.0, -1.0 ]  max_position: [ 363.4, 608.0, 1394.0 ]} 
 
+# VD-specific MARLEY configurations to include the region between FC and Cryo wall in the neutrino gen position
+dunevd_marley_nue_cc_flat: @local::dune_marley_nue_cc_flat
+dunevd_marley_nue_cc_flat.vertex: { type: "box"  min_position: [ -327.0, -732.0, -57.0 ]  max_position: [ 375.0, 732.0, 2157.0 ]  check_active: false }
+
+dunevd_marley_nue_es_flat: @local::dune_marley_nue_es_flat
+dunevd_marley_nue_es_flat.vertex: { type: "box"  min_position: [ -327.0, -732.0, -57.0 ]  max_position: [ 375.0, 732.0, 2157.0 ]  check_active: false }
+
+# this is not to be used directly, since there shall not be a "standard" spectrum 
+# (in marley.fcl it's Livermore, for no special reason)
+dune_marley_nue_spectrum: @local::standard_marley_nue_spectrum
+dune_marley_nue_spectrum.marley_parameters.reactions: [ "ve40ArCC_Bhattacharya2009.react", "ES.react" ] 
+dune_marley_nue_spectrum.marley_parameters.direction: "isotropic"
+
+### Livermore
+dune_marley_livermore: @local::dune_marley_nue_spectrum
+dune_marley_livermore.marley_parameters.source: {
+  type:      "tgraph"
+  neutrino:  "ve"
+  tfile:     "Flux/Supernova/v2/livermore.root"
+  namecycle: "Nue"
+  Emax: 100.
+}
+
+dune_marley_nue_cc_livermore: @local::dune_marley_livermore
+dune_marley_nue_cc_livermore.marley_parameters.reactions: ["ve40ArCC_Bhattacharya2009.react" ]
+
+dune_marley_nue_es_livermore: @local::dune_marley_livermore
+dune_marley_nue_es_livermore.marley_parameters.reactions: ["ES.react" ]
+
+### GKVM
+dune_marley_gkvm: @local::dune_marley_nue_spectrum
+dune_marley_gkvm.marley_parameters.source: {
+  type:      "tgraph"
+  neutrino:  "ve"
+  tfile:     "Flux/Supernova/v2/gkvm.root"
+  namecycle: "Nue"
+  Emax: 100.
+}
+
+dune_marley_nue_cc_gkvm: @local::dune_marley_gkvm
+dune_marley_nue_cc_gkvm.marley_parameters.reactions: ["ve40ArCC_Bhattacharya2009.react" ]
+
+dune_marley_nue_es_gkvm: @local::dune_marley_gkvm
+dune_marley_nue_es_gkvm.marley_parameters.reactions: ["ES.react" ]
+
+### Garching
+dune_marley_garching: @local::dune_marley_nue_spectrum
+dune_marley_garching.marley_parameters.source: {
+  type:      "tgraph"
+  neutrino:  "ve"
+  tfile:     "Flux/Supernova/v2/garching.root"
+  namecycle: "Nue"
+  Emax: 100.
+}
+
+dune_marley_nue_cc_garching: @local::dune_marley_garching
+dune_marley_nue_cc_garching.marley_parameters.reactions: ["ve40ArCC_Bhattacharya2009.react" ]
+
+dune_marley_nue_es_garching: @local::dune_marley_garching
+dune_marley_nue_es_garching.marley_parameters.reactions: ["ES.react" ]
+
+
+####################################
+## Solar
+
 dune_marley_solar_flat: @local::dune_marley_flat
 dune_marley_solar_flat.marley_parameters.source.Emax: 30.
 dune_marley_solar_flat.marley_parameters.source.E_bin_lefts: [2.]
@@ -45,29 +115,6 @@ dune_marley_solar_nue_cc_flat.marley_parameters.reactions: ["ve40ArCC_Bhattachar
 dune_marley_solar_nue_es_flat: @local::dune_marley_solar_flat
 dune_marley_solar_nue_es_flat.marley_parameters.reactions: ["ES.react" ]
 
-dune_marley_gvkm: @local::dune_marley_nue_spectrum
-dune_marley_gvkm.marley_parameters.source: {
-  type:      "tgraph"
-  neutrino:  "ve"
-  tfile:     "Flux/Supernova/v1/gvkm_nue_spectrum.root"
-  namecycle: "NueSpectrum"
-  Emax: 100.
-}
-dune_marley_gvkm.marley_parameters.reactions: ["ve40ArCC_Bhattacharya2009.react", "ES.react" ]
-dune_marley_gvkm.marley_parameters.direction: "isotropic"
-
-dune_marley_nue_cc_gvkm: @local::dune_marley_gvkm
-dune_marley_nue_cc_gvkm.marley_parameters.reactions: ["ve40ArCC_Bhattacharya2009.react" ]
-
-dune_marley_nue_es_gvkm: @local::dune_marley_gvkm
-dune_marley_nue_es_gvkm.marley_parameters.reactions: ["ES.react" ]
-
-# VD-specific MARLEY configurations to include the region between FC and Cryo wall in the neutrino gen position
-dunevd_marley_nue_cc_flat: @local::dune_marley_nue_cc_flat
-dunevd_marley_nue_cc_flat.vertex: { type: "box"  min_position: [ -327.0, -732.0, -57.0 ]  max_position: [ 375.0, 732.0, 2157.0 ]  check_active: false }
-
-dunevd_marley_nue_es_flat: @local::dune_marley_nue_es_flat
-dunevd_marley_nue_es_flat.vertex: { type: "box"  min_position: [ -327.0, -732.0, -57.0 ]  max_position: [ 375.0, 732.0, 2157.0 ]  check_active: false }
-
+####################################
 
 END_PROLOG
