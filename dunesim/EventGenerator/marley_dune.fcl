@@ -59,7 +59,7 @@ dune_marley_livermore.marley_parameters.source: {
   type:      "tgraph"
   neutrino:  "ve"
   tfile:     "Flux/Supernova/v2/livermore.root"
-  namecycle: "Nue"
+  namecycle: "nue_E"
   Emax: 100.
 }
 
@@ -75,7 +75,7 @@ dune_marley_gkvm.marley_parameters.source: {
   type:      "tgraph"
   neutrino:  "ve"
   tfile:     "Flux/Supernova/v2/gkvm.root"
-  namecycle: "Nue"
+  namecycle: "nue_E"
   Emax: 100.
 }
 
@@ -91,7 +91,7 @@ dune_marley_garching.marley_parameters.source: {
   type:      "tgraph"
   neutrino:  "ve"
   tfile:     "Flux/Supernova/v2/garching.root"
-  namecycle: "Nue"
+  namecycle: "nue_E"
   Emax: 100.
 }
 
