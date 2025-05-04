@@ -85,6 +85,10 @@ dune_marley_nue_cc_gkvm.marley_parameters.reactions: ["ve40ArCC_Bhattacharya2009
 dune_marley_nue_es_gkvm: @local::dune_marley_gkvm
 dune_marley_nue_es_gkvm.marley_parameters.reactions: ["ES.react" ]
 
+# this takes into account a typo present in many old configurations, so that they can still be used
+dune_marley_nue_es_gvkm: @local::dune_marley_nue_es_gkvm
+dune_marley_nue_cc_gvkm: @local::dune_marley_nue_cc_gkvm
+
 ### Garching
 dune_marley_garching: @local::dune_marley_nue_spectrum
 dune_marley_garching.marley_parameters.source: {
