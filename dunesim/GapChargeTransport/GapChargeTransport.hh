@@ -16,20 +16,20 @@ namespace gap {
 
     std::pair<geo::Point_t, int> GetOffset(double x, double y, double z, int n) const override;
 
-    bool EnableGapChargeTransport() const override { return fEnableGapChargeTransport; }
+    std::string fp4_volume;
+    std::string Volume() const override;
 
   private:
-    bool fEnableGapChargeTransport;
+    enum class FunctionType { Linear };
+    FunctionType ParseFunctionType(const std::string& s) const;
     art::ServiceHandle<geo::Geometry> geom;
-    std::string functionType;
-    double p1;
-    double p2;
-    double p3;
-    double activeVolumeSizeX, activeVolumeSizeY, activeVolumeSizeZ;
-    double average_gap_X, average_gap_Y, average_gap_Z;
-    double minZ, minY, minX, maxX, maxY, maxZ;
-    int nTPCsX, nTPCsY, nTPCsZ, totalTPCs;
-    double detector_size_X, detector_size_Y, detector_size_Z;
+    FunctionType fFunctionType;
+    double fp1_dist, fp2_prob, fp3_shift;
+    double fActiveVolumeSizeX, fActiveVolumeSizeY, fActiveVolumeSizeZ;
+    double fAverage_gap_X, fAverage_gap_Y, fAverage_gap_Z;
+    double fMinX, fMinY, fMinZ, fMaxX, fMaxY, fMaxZ;
+    int fnTPCsX, fnTPCsY, fnTPCsZ, fTotalTPCs;
+    double fDetector_size_X, fDetector_size_Y, fDetector_size_Z;
     double DistanceToNearestActiveVolume(GapInfo gap, double x) const;
     double ComputeShiftProbability(GapInfo gap, double x, double y, double z) const;
     double LinearShiftProbability(GapInfo gap, double x, double y, double z) const;
