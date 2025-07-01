@@ -23,58 +23,22 @@ protodunevd_42Ar_in_LAr:                   @local::dunevd10kt_42Ar_in_LAr
     
 protodunevd_42Kfrom42Ar_in_LAr:            @local::dunevd10kt_42Kfrom42Ar_in_LAr
 
-protodunevd_40K_in_Cathode_nonTCOside:     @local::dunevd10kt_40K_in_Cathode # does NOT depend anymore on thickness of 'CathodeGrid' for FRP frame in VD
-protodunevd_40K_in_Cathode_nonTCOside.volume_gen:"volCathode_nonTCOSide"
+protodunevd_40K_in_Anode:                  @local::dunevd10kt_40K_in_Anode
+protodunevd_40K_in_Anode.volume_gen:       "anode_plate"
 
-protodunevd_238U_chain_in_Cathode_nonTCOside:         @local::dunevd10kt_238U_chain_in_Cathode  # does NOT depend anymore on thickness of 'CathodeGrid' for FRP frame in VD
-protodunevd_238U_chain_in_Cathode_nonTCOside.volume_gen:"volCathode_nonTCOSide"
+protodunevd_238U_chain_in_Anode:           @local::dunevd10kt_238U_chain_in_Anode #does depend on thickness of 'AnodePlate' for VD
+protodunevd_238U_chain_in_Anode.volume_gen:"anode_plate"
 
-protodunevd_232Th_chain_in_Cathode_nonTCOside:        @local::dunevd10kt_232Th_chain_in_Cathode #does NOT depend anymore on thickness of 'CathodeGrid' for FRP frame in VD
-protodunevd_232Th_chain_in_Cathode_nonTCOside.volume_gen:"volCathode_nonTCOSide"
+protodunevd_232Th_chain_in_Anode:          @local::dunevd10kt_232Th_chain_in_Anode #does depend on thickness of 'AnodePlate' for VD
+protodunevd_232Th_chain_in_Anode.volume_gen:"anode_plate"
 
-protodunevd_40K_in_Cathode_TCOside:     @local::dunevd10kt_40K_in_Cathode # does NOT depend anymore on thickness of 'CathodeGrid' for FRP frame in VD
-protodunevd_40K_in_Cathode_TCOside.volume_gen:"volCathode_TCOSide"
+protodunevd_40K_in_Cathode:                @local::dunevd10kt_40K_in_Cathode # does NOT depend anymore on thickness of 'CathodeGrid' for FRP frame in VD
+protodunevd_40K_in_Cathode.volume_gen:     "cathode_volume"
 
-protodunevd_238U_chain_in_Cathode_TCOside:         @local::dunevd10kt_238U_chain_in_Cathode  # does NOT depend anymore on thickness of 'CathodeGrid' for FRP frame in VD
-protodunevd_238U_chain_in_Cathode_TCOside.volume_gen:"volCathode_TCOSide"
+protodunevd_238U_chain_in_Cathode:         @local::dunevd10kt_238U_chain_in_Cathode  # does NOT depend anymore on thickness of 'CathodeGrid' for FRP frame in VD
+protodunevd_238U_chain_in_Cathode.volume_gen:"cathode_volume"
 
-protodunevd_232Th_chain_in_Cathode_TCOside:        @local::dunevd10kt_232Th_chain_in_Cathode #does NOT depend anymore on thickness of 'CathodeGrid' for FRP frame in VD
-protodunevd_232Th_chain_in_Cathode_TCOside.volume_gen:"volCathode_TCOSide"
-
-protodunevd_40K_in_Anode0:                  @local::dunevd10kt_40K_in_Anode   # does depend on thickness of 'AnodePlate' for VD
-protodunevd_40K_in_Anode0.volume_gen:       "volAnode_nonTCOSide_bot"
-
-protodunevd_238U_chain_in_Anode0:           @local::dunevd10kt_238U_chain_in_Anode #does depend on thickness of 'AnodePlate' for VD
-protodunevd_238U_chain_in_Anode0.volume_gen:"volAnode_nonTCOSide_bot"
-
-protodunevd_232Th_chain_in_Anode0:          @local::dunevd10kt_232Th_chain_in_Anode #does depend on thickness of 'AnodePlate' for VD
-protodunevd_232Th_chain_in_Anode0.volume_gen:"volAnode_nonTCOSide_bot"
-
-protodunevd_40K_in_Anode1:                  @local::dunevd10kt_40K_in_Anode   # does depend on thickness of 'AnodePlate' for VD
-protodunevd_40K_in_Anode1.volume_gen:       "volAnode_TCOSide_bot"
-
-protodunevd_238U_chain_in_Anode1:           @local::dunevd10kt_238U_chain_in_Anode #does depend on thickness of 'AnodePlate' for VD
-protodunevd_238U_chain_in_Anode1.volume_gen:"volAnode_TCOSide_bot"
-
-protodunevd_232Th_chain_in_Anode1:          @local::dunevd10kt_232Th_chain_in_Anode #does depend on thickness of 'AnodePlate' for VD
-protodunevd_232Th_chain_in_Anode1.volume_gen:"volAnode_TCOSide_bot"
-
-protodunevd_40K_in_Anode2:                  @local::dunevd10kt_40K_in_Anode   # does depend on thickness of 'AnodePlate' for VD
-protodunevd_40K_in_Anode2.volume_gen:       "volAnode_nonTCOSide_top"
-
-protodunevd_238U_chain_in_Anode2:           @local::dunevd10kt_238U_chain_in_Anode #does depend on thickness of 'AnodePlate' for VD
-protodunevd_238U_chain_in_Anode2.volume_gen:"volAnode_nonTCOSide_top"
-
-protodunevd_232Th_chain_in_Anode2:          @local::dunevd10kt_232Th_chain_in_Anode #does depend on thickness of 'AnodePlate' for VD
-protodunevd_232Th_chain_in_Anode2.volume_gen:"volAnode_nonTCOSide_top"
-
-protodunevd_40K_in_Anode3:                  @local::dunevd10kt_40K_in_Anode   # does depend on thickness of 'AnodePlate' for VD
-protodunevd_40K_in_Anode3.volume_gen:       "volAnode_TCOSide_top"
-
-protodunevd_238U_chain_in_Anode3:           @local::dunevd10kt_238U_chain_in_Anode #does depend on thickness of 'AnodePlate' for VD
-protodunevd_238U_chain_in_Anode3.volume_gen:"volAnode_TCOSide_top"
-
-protodunevd_232Th_chain_in_Anode3:          @local::dunevd10kt_232Th_chain_in_Anode #does depend on thickness of 'AnodePlate' for VD
-protodunevd_232Th_chain_in_Anode3.volume_gen:"volAnode_TCOSide_top"
+protodunevd_232Th_chain_in_Cathode:        @local::dunevd10kt_232Th_chain_in_Cathode #does NOT depend anymore on thickness of 'CathodeGrid' for FRP frame in VD
+protodunevd_232Th_chain_in_Cathode.volume_gen:"cathode_volume"
 
 END_PROLOG
