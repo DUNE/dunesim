@@ -18,3 +18,10 @@ cet_build_plugin(
 install_headers()
 install_source()
 install_fhicl()
+
+
+target_include_directories(dunesim_GapChargeTransport_GapChargeTransport_tool
+    PRIVATE
+        $ENV{LARSIM_DIR}/include
+        )
+
