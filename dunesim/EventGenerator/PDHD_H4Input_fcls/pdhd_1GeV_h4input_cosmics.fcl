@@ -27,7 +27,7 @@ physics:
 
  producers:
  {
-   generator: @local::protodune_triggeredbeam
+   generator: @local::protodunehd_triggeredbeam
    cosmicgenerator: @local::protodune_corsika_cmc
    ar39:             @local::protodunehd_39Ar_in_LAr
    kr85:             @local::protodunehd_85Kr_in_LAr
@@ -105,6 +105,4 @@ source:
   #maxEvents:   10
   #skipEvents: 1
 }
-## This block controls the datadriven primary generator. 
-#physics.producers.generator.UseDataDrivenPrimary: false 
 physics.producers.generator.NominalP: "1"
