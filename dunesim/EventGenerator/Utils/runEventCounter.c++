@@ -172,11 +172,11 @@ fhicl::ParameterSet GetGenerator(fhicl::ParameterSet & pset) {
 
 void CountFile(std::string filename, CountConfig & config, std::ofstream & output_file, evgen::ProtoDUNETriggeredBeamUtils & beam_utils) {
   std::cout << filename << std::endl;
-  if (filename.find("/pnfs") != 0) {
-    throw cet::exception("ProtoDUNETriggeredBeam") << "Filename " <<
-        filename << " does not start with /pnfs as required for streaming" << std::endl;
-  }
-  filename.replace(0, 5, "root://fndca1.fnal.gov:1094//pnfs/fnal.gov/usr");
+  //if (filename.find("/pnfs") != 0) {
+  //  throw cet::exception("ProtoDUNETriggeredBeam") << "Filename " <<
+  //      filename << " does not start with /pnfs as required for streaming" << std::endl;
+  //}
+  //filename.replace(0, 5, "root://fndca1.fnal.gov:1094//pnfs/fnal.gov/usr");
 
   auto * fIn = TFile::Open(filename.c_str());
   auto * tree = static_cast<TTree*>(fIn->Get("NTuples/GoodParticle"));
