@@ -16,7 +16,9 @@ evgen::ProtoDUNETriggeredBeamUtils::ProtoDUNETriggeredBeamUtils(fhicl::Parameter
    fRotateMonitorXZ(pset.get<float>("RotateMonitorXZ")),
    fRotateMonitorYZ(pset.get<float>("RotateMonitorYZ")),
    fNP04frontPos(pset.get<float>("NP04frontPosZ"))
-   {}
+   {
+  BeamMonitorBasisVectors();
+}
 
 TVector3 evgen::ProtoDUNETriggeredBeamUtils::ConvertProfCoordinates(double x, double y, double z, double zOffset){
   const double off = fNP04frontPos - zOffset;
