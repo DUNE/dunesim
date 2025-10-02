@@ -49,6 +49,8 @@ int main(int argc, char ** argv){
   std::string output_filename;
   std::string mc_file;
   std::string data_file;
+  std::string input_str = "";
+  bool get_file_list_from_fcl = true;
   int nworkers = 1;
   // Options to run
   for (int iArg = 1; iArg < argc; iArg++) {
@@ -61,6 +63,10 @@ int main(int argc, char ** argv){
     if (!strcasecmp(argv[iArg],"-n")) {
      nworkers = std::atoi(argv[++iArg]);
     }
+    if ((!strcasecmp(argv[iArg],"-i"))) {
+      input_str = argv[++iArg];
+      get_file_list_from_fcl = false;
+    }
     if (!strcasecmp(argv[iArg],"-h")) {
       std::cout << "Usage: runEventCounter -c fclfile.fcl -o output_file [-n nthreads]" << std::endl;
       return 1;
@@ -70,7 +76,30 @@ int main(int argc, char ** argv){
   //Fcl pars
   auto pset = GetPars(fcl_file);
   auto generator = GetGenerator(pset);
-  auto file_list = pset.get<std::vector<std::string>>("Files");
+  std::vector<std::string> file_list;
+  if (get_file_list_from_fcl) {
+    auto temp_list = pset.get<std::vector<std::string>>("Files");
+    file_list.insert(file_list.end(), temp_list.begin(), temp_list.end());
+  }
+  else{
+    // file_list.push_back(input_str);
+
+    std::cout << "Parsing " << input_str << std::endl;
+
+    size_t start = 0;
+    std::string delimiter = ",";
+    size_t end = input_str.find(delimiter);
+    while (end != std::string::npos) {
+        file_list.push_back(input_str.substr(start, end - start));
+        start = end + delimiter.length();
+        end = input_str.find(delimiter, start);
+        std::cout << "Added " << file_list.back() << std::endl;
+    }
+    // Add the last token (or the original string if no delimiter was found)
+    file_list.push_back(input_str.substr(start, input_str.length() - start));
+    std::cout << "Added " << file_list.back() << std::endl;
+  }
+  
 
   CountConfig config(generator);
   CountConfig config_cp(config);
