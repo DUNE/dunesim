@@ -1,0 +1,49 @@
+#include "g4inforeducer.fcl"
+#include "simplemerge.fcl"
+
+BEGIN_PROLOG
+
+#info reducer - produces lite version of sim energy deposit
+pdunesp_sedlite: @local::dune_largeant_info_reducer
+pdunesp_sedlite.SimEnergyDepositLabel: "largeant:LArG4DetectorServicevolTPCActive"
+pdunesp_sedlite.useOrigTrackID: true #needed since TrackID overwritten by DUNE modules
+
+pdunehd_sedlite: @local::dune_largeant_info_reducer
+pdunehd_sedlite.SimEnergyDepositLabel: "largeant:LArG4DetectorServicevolTPCActiveInner"
+pdunehd_sedlite.useOrigTrackID: true #needed since TrackID overwritten by DUNE modules
+
+#simple merge - merges nominal and dropped mcparticles into separate list
+dune_simplemerge: @local::simplemerge
+dune_simplemerge.InputSourcesLabels: ["largeant", "largeant:droppedMCParticles"]
+
+#supera for mpvmpr
+dune_supera_mpvmpr: {
+    module_type: "LArSoftSuperaDriver"
+    supera_params: "supera_dune_mpvmpr.fcl"
+    out_filename: "larcv.root"
+    unique_filename: true
+    stream: "mc"
+    StrictDataLoading: false
+}
+
+#supera for data
+dune_supera_data: {
+    module_type: "LArSoftSuperaDriver"
+    supera_params: "supera_dune_data.fcl"
+    out_filename: "larcv.root"
+    unique_filename: true
+    stream: "data"
+    StrictDataLoading: false
+}
+
+#supera for everything else
+dune_supera: {
+    module_type: "LArSoftSuperaDriver"
+    supera_params: "supera_dune_corsika.fcl"
+    out_filename: "larcv.root"
+    unique_filename: true
+    stream: "mc"
+    StrictDataLoading: false
+}
+
+END_PROLOG
