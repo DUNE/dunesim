@@ -13,7 +13,12 @@ cet_make_exec( NAME runEventCounter
 	       SOURCE runEventCounter.c++
 	       LIBRARIES ProtoDUNETriggeredBeamUtils 
 	    )
-
+cet_make_exec( NAME reformat_g4bl
+	       SOURCE reformat_g4bl.c++
+	       LIBRARIES
+            ${ROOT_LIBRARIES}
+            dunecore_DuneObj
+	    )
 simple_plugin(H4BeamInput "source"
   art::Framework_Services_Registry
   dunesim::EventGenerator_Utils_H4BeamFileService_service
