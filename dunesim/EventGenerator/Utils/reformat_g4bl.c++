@@ -187,19 +187,20 @@ int main(int argc, char ** argv) {
     }
 
     //Define the set of 'detectors' (aka devices) through which particles may travel
-    std::string first_detector = "BeforeTarget";
+    //std::string first_detector = "BeforeTarget";
     std::vector<std::string> next_detector_list = {
-        "BeforeTarget",
-        "AfterTarget",
-        "TOF1",
-        "COLL1",
-        "BPROF1",
-        "BPROF2",
-        "BPROF3",
-        "TRIG1",
-        "BPROFEXT",
-        "BPROF4",
-        "TRIG2"
+        "VirtualDetector/BeforeTarget",
+        "VirtualDetector/AfterTarget",
+        "VirtualDetector/TOF1",
+        "VirtualDetector/COLL1",
+        "VirtualDetector/BPROF1",
+        "VirtualDetector/BPROF2",
+        "VirtualDetector/BPROF3",
+        "VirtualDetector/TRIG1",
+        "VirtualDetector/BPROFEXT",
+        "VirtualDetector/BPROF4",
+        "VirtualDetector/TRIG2",
+        "Detector/NP04front"
     };
 
     std::cout << "Will process\n";
@@ -207,12 +208,12 @@ int main(int argc, char ** argv) {
 
     //Open the input file and grab the first detector
     TFile * f = TFile::Open(input_file.c_str());
-    TTree * first_tree = (TTree*)f->Get(("VirtualDetector/" + first_detector).c_str());
+    //TTree * first_tree = (TTree*)f->Get(first_detector.c_str());
 
     //Make a representation of it and set the branches
-    DetectorHolder before_target;
-    before_target.SetTree(first_tree);
-    first_tree->GetEntry(0);
+    //DetectorHolder before_target;
+    //before_target.SetTree(first_tree);
+    //first_tree->GetEntry(0);
 
     //Also make reps for each other tree
     std::map<std::string, TTree*> next_trees;
@@ -221,7 +222,7 @@ int main(int argc, char ** argv) {
     int overall_event = std::numeric_limits<int>::max();
     int max_tree_count = 0;
     for (const auto & s : next_detector_list) {
-        next_trees.insert({s, (TTree*)f->Get(("VirtualDetector/"+ s).c_str())});
+        next_trees.insert({s, (TTree*)f->Get(s.c_str())});
         DetectorHolder * holder = new DetectorHolder();
         holder->SetTree(next_trees[s]);
         next_holders.insert({s, holder});

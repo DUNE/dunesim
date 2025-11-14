@@ -317,4 +317,12 @@ protodunedp_triggeredbeam:
 
 }
 
+protodunevd_triggeredbeam: @local::protodunedp_triggeredbeam
+protodunevd_triggeredbeam.BeamZ: -277.2
+protodunevd_triggeredbeam.BeamX: 248
+protodunevd_triggeredbeam.BeamY: 427.2
+
+h2_beam_file_service_pdvd: @local::protodunevd_triggeredbeam
+h2_beam_file_service_pdvd.module_type: @erase
+
 END_PROLOG
