@@ -11,6 +11,7 @@ art_make( BASENAME_ONLY
                         nurandom::RandomUtils_NuRandomService_service
                         larsim::Simulation lardataobj::Simulation
                         lardataobj::RecoBase
+                        lardataalg::UtilitiesHeaders
                         lardata::Utilities
                         nusimdata::SimulationBase
                         art::Persistency_Common

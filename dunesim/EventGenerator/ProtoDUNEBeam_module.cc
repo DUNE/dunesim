@@ -44,6 +44,7 @@
 #include "lardataobj/RecoBase/TrackingTypes.h"
 #include "lardataobj/RecoBase/TrackTrajectory.h"
 #include "lardataobj/RecoBase/Track.h"
+#include "lardataalg/Utilities/TrackingTypeUtils.h"
 #include "dunesim/EventGenerator/ProtoDUNEbeamDataProducts/ProtoDUNEBeamInstrument.h"
 //#include "dunesim/EventGenerator/ProtoDUNEbeamTPCmatching/ProtoDUNEbeammatch.h"
 //#include "dunesim/EventGenerator/ProtoDUNEbeamTPCmatching/ProtoDUNEBeamToF.h"
