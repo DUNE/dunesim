@@ -19,6 +19,7 @@
 #include "art_root_io/TFileService.h"
 #include "nusimdata/SimulationBase/MCTruth.h"
 #include "nusimdata/SimulationBase/MCParticle.h"
+#include "lardataalg/Utilities/TrackingTypeUtils.h"
 #include "dunecore/DuneObj/ProtoDUNEBeamEvent.h"
 #include "dunecore/DuneObj/ProtoDUNEBeamSpill.h"
 
