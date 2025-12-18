@@ -29,6 +29,7 @@
 #include "nusimdata/SimulationBase/MCParticle.h"
 #include "larcore/Geometry/Geometry.h"
 #include "larcoreobj/SummaryData/RunData.h"
+#include "lardataalg/Utilities/TrackingTypeUtils.h"
 #include <memory>
 #include <string>
 #include <map>
