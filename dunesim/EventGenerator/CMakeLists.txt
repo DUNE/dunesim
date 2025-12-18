@@ -12,6 +12,7 @@ art_make( BASENAME_ONLY
                         larsim::Simulation lardataobj::Simulation
                         lardataobj::RecoBase
                         lardata::Utilities
+                        lardataalg::UtilitiesHeaders
                         nusimdata::SimulationBase
                         art::Persistency_Common
                         art::Persistency_Provenance
