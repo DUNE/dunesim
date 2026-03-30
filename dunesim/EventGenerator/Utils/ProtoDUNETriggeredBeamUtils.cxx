@@ -129,8 +129,8 @@ void evgen::ProtoDUNETriggeredBeamUtils::ConvertMomentum(float & px, float & py,
     //Then we need to swap x and y
     momVec.RotateY(fNP02Rotation*TMath::Pi()/180.);
     px = (fNP02XDrift ? momVec.Y() : momVec.X());
-    py = (fNP02XDrift ? -1.*momVec.X() : momVec.Y());
-    pz = momVec.Z();
+    py = (fNP02XDrift ? momVec.X() : momVec.Y());
+    pz = -momVec.Z();
   }
 }
 
