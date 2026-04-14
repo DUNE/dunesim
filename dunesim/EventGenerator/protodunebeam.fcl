@@ -243,7 +243,7 @@ protodunedp_triggeredbeam:
 
  # In the beam simulation particles at the front face are saved in a 20m x 20m box
  # To save time we can choose a 10m x 10m box instead
- ReduceNP04frontArea: false
+ ReduceNP04frontArea: true
 
  StartEvent: 0
  ##Given by Slavic Galymov
@@ -305,7 +305,7 @@ protodunedp_triggeredbeam:
  # Position of the beam monitor positions in z in [mm]
  BPROFEXTPosZ:  30000 ##semi-dummy value. similar in distance to the NP04 values
  BPROF4PosZ :   39692
- TRIG2PosZ:     716296
+ TRIG2PosZ:     39864 #What is this supposed to be
  NP04frontPosZ: 40610
 
  # Intensity variables
@@ -318,9 +318,10 @@ protodunedp_triggeredbeam:
 }
 
 protodunevd_triggeredbeam: @local::protodunedp_triggeredbeam
-protodunevd_triggeredbeam.BeamZ: -277.2
 protodunevd_triggeredbeam.BeamX: 248
 protodunevd_triggeredbeam.BeamY: 427.2
+protodunevd_triggeredbeam.BeamZ: -277.2
+protodunevd_triggeredbeam.NP02Rotation: 0
 
 h2_beam_file_service_pdvd: @local::protodunevd_triggeredbeam
 h2_beam_file_service_pdvd.module_type: @erase
