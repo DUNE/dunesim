@@ -160,8 +160,8 @@ namespace gap {
     else {
       distance = the_gap.GetRightBorder() - x;
     }
-    mf::LogInfo("GapChargeTransport")
-      << "left" << the_gap.GetLeftBorder() << " " << x << " " << the_gap.GetRightBorder();
+    mf::LogInfo("GapChargeTransport") << "left " << the_gap.GetLeftBorder() << " " << x << " "
+                                      << the_gap.GetRightBorder() << " right";
     return distance;
   }
 
@@ -198,17 +198,17 @@ namespace gap {
   }
 
   // the main function - here the new postion and the new charge are defined, this is called inside the IonAndScint module
-  std::pair<geo::Point_t, int> GapChargeTransport::GetOffset(double x,
-                                                             double y,
-                                                             double z,
-                                                             int n_el) const
+  std::pair<geo::Point_t, float> GapChargeTransport::GetOffset(double x,
+                                                               double y,
+                                                               double z,
+                                                               float n_el) const
   {
     mf::LogInfo("GapChargeTransport")
-      << "Calculation Initialized, x =" << x << ", y = " << y << ", z = ";
-    mf::LogInfo("GapChargeTransport") << "nelectrons = " << n_el;
+      << "Calculation Initialized, x =" << x << ", y = " << y << ", z = " << z;
+    mf::LogInfo("GapChargeTransport") << "charge = " << n_el;
     GapInfo the_gap = Gap(x, y, z);
     double probability = ComputeShiftProbability(the_gap, x, y, z);
-    int n = round(probability * n_el);
+    float n = probability * n_el;
     double shifted_x, shifted_y, shifted_z;
     shifted_x = x;
     shifted_y = y;
@@ -219,17 +219,23 @@ namespace gap {
       if (the_gap.GetDirection() == GapInfo::MovingDirection::RIGHT) dir = 1;
       mf::LogInfo("GapChargeTransport") << dir;
       mf::LogInfo("GapChargeTransport") << GapInfo::GapToString(the_gap.GetType());
+      mf::LogInfo("GapChargeTransport")
+        << "(" << shifted_x << ", " << shifted_y << ", " << shifted_z << ")";
       switch (the_gap.GetType()) {
       case GapInfo::GapType::X:
         shifted_x = shifted_x + dir * (DistanceToNearestActiveVolume(the_gap, x) + fp3_shift);
+        break;
       case GapInfo::GapType::Y:
         shifted_y = shifted_y + dir * (DistanceToNearestActiveVolume(the_gap, y) + fp3_shift);
+        break;
       case GapInfo::GapType::Z:
         shifted_z = shifted_z + dir * (DistanceToNearestActiveVolume(the_gap, z) + fp3_shift);
+        break;
       default: break;
       }
-      mf::LogInfo("GapChargeTransport") << "MOVING THE CHARGE TO THE ACTIVE VOLUME " << shifted_x
-                                        << " " << shifted_y << " " << shifted_z;
+      mf::LogInfo("GapChargeTransport")
+        << "MOVING THE CHARGE TO THE " << GapInfo::GapToString(the_gap.GetDirection())
+        << " ACTIVE VOLUME " << shifted_x << " " << shifted_y << " " << shifted_z;
       the_gap = Gap(shifted_x, shifted_y, shifted_z);
     }
     return std::make_pair(geo::Point_t(shifted_x, shifted_y, shifted_z), n);
