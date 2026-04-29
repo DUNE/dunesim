@@ -18,7 +18,8 @@ namespace gap {
 
     std::string fp4_volume;
     std::string Volume() const override;
-
+    double fp5_max_gap;
+    double MaxGap() const override;
   private:
     enum class FunctionType { Linear };
     FunctionType ParseFunctionType(const std::string& s) const;

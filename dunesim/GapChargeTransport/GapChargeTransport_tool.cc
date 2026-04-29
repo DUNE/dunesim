@@ -23,6 +23,7 @@ namespace gap {
     fp2_prob = pset.get<double>("ProbabilityBorder");
     fp3_shift = pset.get<double>("Shift");
     fp4_volume = pset.get<std::string>("Volume");
+    fp5_max_gap = pset.get<double>("MaxGap");;
 
     const geo::TPCGeo& one_tpc = geom->TPC(geo::TPCID(0, 0));
     geo::BoxBoundedGeo activeVolume = one_tpc.ActiveBoundingBox();
@@ -63,7 +64,7 @@ namespace gap {
       (fDetector_size_Y - (double)fnTPCsZ * fActiveVolumeSizeY) / (double)(fnTPCsY - 1);
     fAverage_gap_X =
       (fDetector_size_X - (double)fnTPCsX * fActiveVolumeSizeX) / (double)(fnTPCsX - 1);
-    if (fAverage_gap_Z > 2 || fAverage_gap_Y > 2 || fAverage_gap_X > 2) {
+    if (fAverage_gap_Z > fp5_max_gap || fAverage_gap_Y > fp5_max_gap || fAverage_gap_X > fp5_max_gap) {
       mf::LogWarning("GapChargeTransport")
         << "WARNING: The gaps are weirdly huge: y = " << fAverage_gap_Y
         << ", z = " << fAverage_gap_Z << ", x = " << fAverage_gap_X;
@@ -247,6 +248,12 @@ namespace gap {
     if (fp4_volume == "LArG4DetectorServicevolEnclosureTPC") return fp4_volume;
     throw cet::exception("GapChargeTransport")
       << "Incorrect name of the volume containing the gaps";
+  }
+
+  //return max gap size
+  double GapChargeTransport::MaxGap() const
+  {
+    return fp5_max_gap;
   }
 }
 
