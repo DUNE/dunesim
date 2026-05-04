@@ -19,11 +19,11 @@ namespace gap {
     auto const* geom = lar::providerFrom<geo::Geometry>();
 
     fFunctionType = ParseFunctionType(pset.get<std::string>("FunctionType"));
-    fp1_dist = pset.get<double>("DistanceZero");
-    fp2_prob = pset.get<double>("ProbabilityBorder");
-    fp3_shift = pset.get<double>("Shift");
+    fp1_dist = pset.get<double>("DistanceZero", 1.0);
+    fp2_prob = pset.get<double>("ProbabilityBorder", 0.99);
+    fp3_shift = pset.get<double>("Shift", 0.2);
     fp4_volume = pset.get<std::string>("Volume");
-    fp5_max_gap = pset.get<double>("MaxGap");;
+    fp5_max_gap = pset.get<double>("MaxGap", 4.25);;
 
     const geo::TPCGeo& one_tpc = geom->TPC(geo::TPCID(0, 0));
     geo::BoxBoundedGeo activeVolume = one_tpc.ActiveBoundingBox();
