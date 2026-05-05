@@ -14,11 +14,12 @@ namespace gap {
   public:
     explicit GapChargeTransport(fhicl::ParameterSet const& pset);
 
-    std::pair<geo::Point_t, int> GetOffset(double x, double y, double z, int n) const override;
+    std::pair<geo::Point_t, float> GetOffset(double x, double y, double z, float n) const override;
 
     std::string fp4_volume;
     std::string Volume() const override;
-
+    double fp5_max_gap;
+    double MaxGap() const override;
   private:
     enum class FunctionType { Linear };
     FunctionType ParseFunctionType(const std::string& s) const;
