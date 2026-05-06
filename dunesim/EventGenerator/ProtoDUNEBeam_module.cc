@@ -48,6 +48,7 @@
 //#include "dunesim/EventGenerator/ProtoDUNEbeamTPCmatching/ProtoDUNEbeammatch.h"
 //#include "dunesim/EventGenerator/ProtoDUNEbeamTPCmatching/ProtoDUNEBeamToF.h"
 #include "lardata/Utilities/AssociationUtil.h"
+#include "lardataalg/Utilities/TrackingTypeUtils.h"
 // art extensions
 #include "nurandom/RandomUtils/NuRandomService.h"
 #include "art_root_io/TFileService.h"
