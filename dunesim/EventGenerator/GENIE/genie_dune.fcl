@@ -127,6 +127,19 @@ dunefd_10kt_genie_anu_lbnf_dk2nu: {
    @table::anu_fluxfiles_OptimizedEngineeredNov2017
 }
 
+dunefdvd_10kt_genie_nu_lbnf_dk2nu: {
+    @table::dune_fd_genie_nu_simple_flux_1x2x6_window
+    FiducialCut: "mbox: -690., -710., -40., 690., 710., 6010."    #D Brailsford 7th May 2026 - FV taken as active volume (manually taken from LArSoft EVD), extended by 30cm and then rounded up or down to the nearest 10 (to extend a bit more).
+    FluxType: "dk2nu"
+    DetectorLocation: "dunevd10kt_v6"
+    @table::nu_fluxfiles_OptimizedEngineeredNov2017
+}
+
+dunefdvd_10kt_genie_anu_lbnf_dk2nu: {
+   @table::dunefdvd_10kt_genie_nu_lbnf_dk2nu 
+   @table::anu_fluxfiles_OptimizedEngineeredNov2017
+}
+
 #atmospheric neutrino configurations
 
 # this configuration is tuned on the full geometry (10 kton) of the far detector:
