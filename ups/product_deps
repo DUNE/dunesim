@@ -195,8 +195,8 @@ table_fragment_end
 # Add the dependent product and version
 
 product          version
-cetmodules	 v3_24_01	-	only_for_build
-dunetrigger      v10_20_06d01
+cetmodules	 v3_27_04	-	only_for_build
+dunetrigger      v10_20_07d00
 genie_xsec       v3_06_00       -       optional
 genie_phyopt     v3_06_00
 end_product_list
