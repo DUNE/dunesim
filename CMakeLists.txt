@@ -44,6 +44,7 @@ find_package( lardata REQUIRED EXPORT )
 find_package( CLHEP REQUIRED EXPORT )
 find_package( nugen REQUIRED EXPORT )
 find_package( Geant4 REQUIRED EXPORT )
+find_package ( HDF5 REQUIRED EXPORT )
 
 # macros for artdaq_dictionary and simple_plugin
 include(ArtDictionary)
