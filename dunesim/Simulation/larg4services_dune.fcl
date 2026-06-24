@@ -93,6 +93,7 @@ dune_particle_list_action:
   EnergyCut: 1e-5 # Kinetic Energy cut in [MeV]
   keepEMShowerDaughters: true
   storeTrajectories: true
+  KeepDroppedParticlesInVolumes: ["volTPCActive"] 
   keepGenTrajectories: ["generator"]       # list of generator labels for which we want to store
                                            # trajectory points. The protodune beam label is simply
                                            # "generator"
@@ -110,6 +111,7 @@ dune_particle_list_action:
   SparsifyTrajectories: true               # call SparsifyTrajectory() method on MCParticles with full trajectories
                                            # being stored. This helps reduce memory usage in the root output stage
                                            # if there are many trajectory points.
+  StoreDroppedMCParticles: true
   SparsifyMargin: 0.015      # required when SparsifyTrajectories is set to true
   KeepTransportation: true   # When sparsifying: forces steps with the 'Transportation' process to be saved
                              # --- Useful in protodune to keep the first step in the active volume
