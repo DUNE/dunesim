@@ -9,7 +9,7 @@ cmake_minimum_required (VERSION 3.20 FATAL_ERROR)
 
 find_package(cetmodules REQUIRED)
 project(dunesim LANGUAGES CXX)
-set(${PROJECT_NAME}_CMAKE_PROJECT_VERSION_STRING 10.20.09d02)
+set(${PROJECT_NAME}_CMAKE_PROJECT_VERSION_STRING 10.21.00d00)
 set(${PROJECT_NAME}_FW_DIR "config_data")
 
 include(CetCMakeEnv)
@@ -44,6 +44,7 @@ find_package( lardata REQUIRED EXPORT )
 find_package( CLHEP REQUIRED EXPORT )
 find_package( nugen REQUIRED EXPORT )
 find_package( Geant4 REQUIRED EXPORT )
+find_package ( HDF5 REQUIRED EXPORT )
 
 # macros for artdaq_dictionary and simple_plugin
 include(ArtDictionary)

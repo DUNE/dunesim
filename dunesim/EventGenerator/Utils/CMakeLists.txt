@@ -16,8 +16,8 @@ cet_make_exec( NAME runEventCounter
 cet_make_exec( NAME reformat_g4bl
 	       SOURCE reformat_g4bl.c++
 	       LIBRARIES
-            ${ROOT_LIBRARIES}
-            dunecore_DuneObj
+	       ROOT::Tree
+               dunecore::DuneObj
 	    )
 simple_plugin(H4BeamInput "source"
   art::Framework_Services_Registry
