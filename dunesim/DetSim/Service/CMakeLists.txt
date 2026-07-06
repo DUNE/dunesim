@@ -6,7 +6,7 @@
 # CMake instructions for DetSim services.
 
 # Add plugin for each service.
-
+add_compile_options( "-Wno-error=array-bounds" )
 cet_build_plugin(Dune35tSimChannelExtractService   
                 art::service
                 dunesim::DetSim
