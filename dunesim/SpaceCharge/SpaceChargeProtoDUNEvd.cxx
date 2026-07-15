@@ -70,11 +70,10 @@ bool spacecharge::SpaceChargeProtoDUNEvd::Configure(fhicl::ParameterSet const& p
     }
 
   //auto const *detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
-  //fEfield = detprop->Efield();
 
   bool created_efield_splines = false;
 
-  fEfield = detProp.Efield();
+  fEfield = detProp.PerPlaneEfield();
   
   if((fEnableSimSpatialSCE == true) || (fEnableSimEfieldSCE == true))
   {

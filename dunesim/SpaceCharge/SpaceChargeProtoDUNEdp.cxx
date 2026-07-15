@@ -56,7 +56,7 @@ bool spacecharge::SpaceChargeProtoDUNEdp::Configure(fhicl::ParameterSet const& p
   fEnableCalSpatialSCE = pset.get<bool>("EnableCalSpatialSCE");
   fEnableCalEfieldSCE = pset.get<bool>("EnableCalEfieldSCE");
 
-  fEfield = detProp.Efield();
+  fEfield = detProp.PerPlaneEfield();
   std::cout<<"Efield : "<<fEfield<<std::endl;
 
   driftcoordinate = art::ServiceHandle<geo::Geometry>()->TPC().DriftAxisWithSign().coordinate;
@@ -480,7 +480,6 @@ tPosition() ) * 0.5/CLHEP::cm };
       std::cout<<"ISCalculation : "<<EfieldVec.R()<<std::endl;    return EfieldVe\
 c.R();
         */
-       //     fEfield = detprop->Efield(); kV/cm..
        // Efield in larsoft is in kV/cm
        //std::cout<<"SpaceCharge efield: "<<pow( pow(theEfieldOffsets[0],2) + pow(theEfieldOffsets[1],2) +pow(theEfieldOffsets[2],2) ,0.5)/1000.0<<std::endl;
 
