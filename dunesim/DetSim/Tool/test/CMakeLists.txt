@@ -14,7 +14,7 @@ cet_test_env_prepend(CET_PLUGIN_PATH ${TRANSITIVE_PATHS_WITH_LIBRARY_DIR})
 
 cet_enable_asserts()
 
-cet_test(test_IdealAdcSimulator SOURCES test_IdealAdcSimulator.cxx
+cet_test(test_IdealAdcSimulator SOURCE test_IdealAdcSimulator.cxx
   LIBRARIES
     art::Utilities
     dunecore::DuneInterface_Data
