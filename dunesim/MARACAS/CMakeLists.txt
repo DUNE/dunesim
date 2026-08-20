@@ -7,6 +7,7 @@ cet_make_library(LIBRARY_NAME MARACAS
   VDMaracasGrid.cxx
   VDMaracasElectricField.cxx
   VDMaracasDistorter.cxx
+  VDMaracasDistortion.cxx
   LIBRARIES
   PUBLIC
   lardataalg::DetectorInfo
@@ -29,10 +30,19 @@ cet_build_plugin(VDMaracasElectricFieldService art::service
   cetlib_except::cetlib_except
 )
 
-cet_build_plugin(VDMaracasPositionDistorterService art::service
+# cet_build_plugin(VDMaracasPositionDistorterService art::service
+#   LIBRARIES PRIVATE
+#   MARACAS
+#   lardata::PositionDistorterService
+#   lardataalg::DetectorInfo
+#   fhiclcpp::fhiclcpp
+#   cetlib_except::cetlib_except
+# )
+
+# IDistortion chain link (art tool) for ChainedDistorter.
+cet_build_plugin(VDMaracasDistortion art::tool
   LIBRARIES PRIVATE
   MARACAS
-  lardata::PositionDistorterService
   lardataalg::DetectorInfo
   fhiclcpp::fhiclcpp
   cetlib_except::cetlib_except
