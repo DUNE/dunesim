@@ -19,7 +19,13 @@ art_make( NO_PLUGINS
 			
         )
 
-
+# IDistortion chain link (art tool) for ChainedDistorter.
+cet_build_plugin(ElectronDiverterDistortion art::tool
+  LIBRARIES PRIVATE
+  dunesim_SpaceCharge
+  lardataalg::DetectorInfo
+  fhiclcpp::fhiclcpp
+)
 
 install_headers()
 install_fhicl()

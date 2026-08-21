@@ -45,12 +45,6 @@ namespace maracas {
     geo::Point_t Distort(geo::Point_t const& point) const override; ///< forward_delta
     geo::Point_t Correct(geo::Point_t const& point) const override; ///< backward_delta
 
-    // The MARACAS grid clamps out-of-range lookups (no natural bounds), so the
-    // map applies everywhere for now. TODO: expose the grid extent and gate on
-    // it here for a bounded domain.
-    bool PointValidForDistort(geo::Point_t const&) const override { return true; }
-    bool PointValidForCorrect(geo::Point_t const&) const override { return true; }
-
   private:
     geo::Point_t apply(geo::Point_t const& point, bool forward) const;
 
