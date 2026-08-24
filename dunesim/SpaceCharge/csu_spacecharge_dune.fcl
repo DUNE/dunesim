@@ -1,0 +1,117 @@
+## CSU ProtoDUNE space-charge, exposed through the pluggable providers:
+##   services.ElectricFieldService    <- CSUEFieldServiceProtoDUNE (kV/cm)
+##   services.PositionDistorterService <- ChainedDistorterService (CSUDistortionProtoDUNE [+ diverters])
+##
+## Boundary numbers are lifted verbatim from the SpaceChargeProtoDUNE{,hd,vd}
+## IsInsideBoundaries / IsTooFarFromBoundaries / PretendAtBoundary helpers
+## (Voxelized_TH3 / Splines_TH3 branch). NominalEField must match
+## services.DetectorPropertiesService.Efield (== old detProp.PerPlaneEfield()).
+
+BEGIN_PROLOG
+
+################################ map backends ################################
+
+pdsp_csu_maps: {
+  EnableSimSpatialSCE:      true
+  EnableSimEfieldSCE:       true
+  EnableCalSpatialSCE:      true
+  EnableCalEfieldSCE:       true
+  RepresentationType:       "Splines_TH3"
+  InputFilename:            "SpaceChargeProtoDUNE/SCE_DataDriven_180kV_v4.root"
+  CalibrationInputFilename: "SpaceChargeProtoDUNE/SCE_DataDriven_180kV_v4.root"
+  Boundary: {
+    XMax:   360.0
+    YRange: [   5.2, 604.0 ]
+    ZRange: [  -0.5, 695.3 ]
+    YFar:   [ -14.8, 624.0 ]
+    ZFar:   [ -20.5, 715.3 ]
+  }
+}
+
+pdhd_csu_maps: {
+  EnableSimSpatialSCE:      true
+  EnableSimEfieldSCE:       true
+  EnableCalSpatialSCE:      true
+  EnableCalEfieldSCE:       true
+  RepresentationType:       "Splines_TH3"
+  InputFilename:            "ProtoDUNE/HD/SpaceCharge/Sim_NoFluidFlow/v2/SCE_PDHD_Sim_NoFluidFlow_E500_v2.root"
+  CalibrationInputFilename: "ProtoDUNE/HD/SpaceCharge/Sim_NoFluidFlow/v2/SCE_PDHD_Sim_NoFluidFlow_E500_v2.root"
+  Boundary: {
+    XMax:   352.949
+    YRange: [   3.6375, 603.861 ]
+    ZRange: [  -0.59375, 463.126 ]
+    YFar:   [ -16.3625, 623.861 ]
+    ZFar:   [ -20.59375, 483.126 ]
+  }
+}
+
+pdvd_csu_maps: {
+  EnableSimSpatialSCE:      true
+  EnableSimEfieldSCE:       true
+  EnableCalSpatialSCE:      true
+  EnableCalEfieldSCE:       true
+  RepresentationType:       "Splines_TH3"
+  InputFilename:            "SCE_PDVD_Sim_NoFluidFlow_E500_v2.root"
+  CalibrationInputFilename: "SCE_PDVD_Sim_NoFluidFlow_E500_v2.root"
+  Boundary: {
+    XMax:   341.53
+    YRange: [ -337.0, 337.0 ]
+    ZRange: [    0.0, 299.3 ]
+    YFar:   [ -357.0, 357.0 ]
+    ZFar:   [  -20.0, 319.3 ]
+  }
+}
+
+############################## E-field services ##############################
+
+pdsp_csu_efield_service: {
+  @table::pdsp_csu_maps
+  service_provider: CSUEFieldServiceProtoDUNE
+  NominalEField:    0.4867   # kV/cm (ProtoDUNE-SP; confirm vs DetectorProperties)
+}
+
+pdhd_csu_efield_service: {
+  @table::pdhd_csu_maps
+  service_provider: CSUEFieldServiceProtoDUNE
+  NominalEField:    0.5      # kV/cm (E500)
+}
+
+pdvd_csu_efield_service: {
+  @table::pdvd_csu_maps
+  service_provider: CSUEFieldServiceProtoDUNE
+  NominalEField:    0.5      # kV/cm (E500)
+}
+
+########################## position-distorter chains #########################
+
+# ProtoDUNE-SP: CSU maps + the two electron diverters (from spacecharge_dune.fcl).
+pdsp_csu_distorter_service: {
+  service_provider: ChainedDistorterService
+  Links: [
+    { tool_type: CSUDistortionProtoDUNE  @table::pdsp_csu_maps },
+    { tool_type: ElectronDiverterDistortion
+      ZCenter: 231.0  AXPosOffs: -3.0  BZPosOffs: -1.0  Width: 2.5
+      ChargeLossZLow: 229.0  ChargeLossZHigh: 233.0 },
+    { tool_type: ElectronDiverterDistortion
+      ZCenter: 463.0  AXPosOffs: -3.0  BZPosOffs: -1.0  Width: 2.5
+      ChargeLossZLow: 461.0  ChargeLossZHigh: 465.0 }
+  ]
+}
+
+# ProtoDUNE-HD: CSU maps only (diverters off for HD).
+pdhd_csu_distorter_service: {
+  service_provider: ChainedDistorterService
+  Links: [
+    { tool_type: CSUDistortionProtoDUNE  @table::pdhd_csu_maps }
+  ]
+}
+
+# ProtoDUNE-VD: CSU maps only.
+pdvd_csu_distorter_service: {
+  service_provider: ChainedDistorterService
+  Links: [
+    { tool_type: CSUDistortionProtoDUNE  @table::pdvd_csu_maps }
+  ]
+}
+
+END_PROLOG

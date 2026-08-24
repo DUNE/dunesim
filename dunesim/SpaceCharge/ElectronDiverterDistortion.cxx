@@ -37,7 +37,7 @@ namespace spacecharge {
     //'Catastrophic' region
     //Make a note that this is won't pass it along
     if (z > fChargeLossZLow && z < fChargeLossZHigh) {
-      return geo::Point_t{2.e9, 2.e9, 2.e9};
+      return geo::Point_t{point.X() - 2.e9, point.Y() + 2.e9, point.Z() + 2.e9};
     }
 
     
@@ -49,7 +49,7 @@ namespace spacecharge {
     double zdiffc = zdiff + zoffset;
     double zexpc = TMath::Exp( -TMath::Sq(zdiffc/fWidth) );
     geo::Vector_t offset{
-      (fAXPosOffs * zexpc),
+      -1.*(fAXPosOffs * zexpc),
       0.,
       zoffset
     };

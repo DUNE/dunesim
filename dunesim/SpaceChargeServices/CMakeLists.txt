@@ -85,6 +85,16 @@ cet_build_plugin(SpaceChargeService3x1x1dphase art::service
               
 )
 
+# CSU ProtoDUNE space-charge E-field provider, as an ElectricFieldService.
+cet_build_plugin(CSUEFieldServiceProtoDUNE art::service
+  LIBRARIES PRIVATE
+  dunesim_SpaceCharge
+  lardata::ElectricFieldService
+  lardataalg::DetectorInfo
+  fhiclcpp::fhiclcpp
+  cetlib_except::cetlib_except
+)
+
 install_headers()
 install_fhicl()
 install_source()

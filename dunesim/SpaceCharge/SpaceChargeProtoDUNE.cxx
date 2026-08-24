@@ -601,6 +601,9 @@ geo::Vector_t spacecharge::SpaceChargeProtoDUNE::GetPosOffsets(geo::Point_t cons
   }else if(fRepresentationType == "Parametric") thePosOffsets = GetPosOffsetsParametric(point.X(), point.Y(), point.Z());
   else thePosOffsets.resize(3,0.0); 
  
+
+  ///For posterity: The first index is a bug here... IonAndScint takes pos offset and applies -1*offset.X().
+  ///That should be reflected here... but whatever. 
   geo::Point_t pafteroffset(point.X()+thePosOffsets[0], point.Y()+thePosOffsets[1], point.Z()+thePosOffsets[2]);
   geo::Vector_t edoffset = ElectronDiverterPosOffsets(pafteroffset);
   thePosOffsets[0] += edoffset.X();
