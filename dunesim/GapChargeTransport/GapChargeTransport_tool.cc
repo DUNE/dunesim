@@ -198,17 +198,17 @@ namespace gap {
   }
 
   // the main function - here the new postion and the new charge are defined, this is called inside the IonAndScint module
-  std::pair<geo::Point_t, int> GapChargeTransport::GetOffset(double x,
+  std::pair<geo::Point_t, float> GapChargeTransport::GetOffset(double x,
                                                              double y,
                                                              double z,
-                                                             int n_el) const
+                                                             float n_el) const
   {
     mf::LogInfo("GapChargeTransport")
       << "Calculation Initialized, x =" << x << ", y = " << y << ", z = ";
     mf::LogInfo("GapChargeTransport") << "nelectrons = " << n_el;
     GapInfo the_gap = Gap(x, y, z);
     double probability = ComputeShiftProbability(the_gap, x, y, z);
-    int n = round(probability * n_el);
+    float n = round(probability * n_el);
     double shifted_x, shifted_y, shifted_z;
     shifted_x = x;
     shifted_y = y;
