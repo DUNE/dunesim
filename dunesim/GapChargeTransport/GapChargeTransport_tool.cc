@@ -235,6 +235,8 @@ namespace gap {
     return std::make_pair(geo::Point_t(shifted_x, shifted_y, shifted_z), n);
   }
 
+  double GapChargeTransport::MaxGap() const {return 0.0;}
+
   //return volume name and throw exception in case there is a typo in the name (in .fcl)
   std::string GapChargeTransport::Volume() const
   {

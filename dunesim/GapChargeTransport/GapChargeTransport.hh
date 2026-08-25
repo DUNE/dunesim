@@ -14,6 +14,7 @@ namespace gap {
   public:
     explicit GapChargeTransport(fhicl::ParameterSet const& pset);
 
+    double MaxGap() const override;
     std::pair<geo::Point_t, float> GetOffset(double x, double y, double z, float n) const override;
 
     std::string fp4_volume;
