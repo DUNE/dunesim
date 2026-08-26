@@ -248,6 +248,11 @@ int main(int argc, char* argv[]) {
   test_ExponentialChannelNoiseService(ntick, maxchan);
   // We must close TFileService to write out histograms.
   cout << "Close services." << endl;
+  // Destroy the art services (and thus close TFileService, which writes
+  // a ROOT file in its destructor) while ROOT/Cling is still alive.
+  // Otherwise the services are only destroyed at program exit, when the
+  // interpreter state they rely on may already be gone, causing a crash.
+  ArtServiceHelper::unload_services();
   return 0;
 }
 
