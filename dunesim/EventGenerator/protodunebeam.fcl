@@ -318,7 +318,7 @@ protodunedp_triggeredbeam:
 }
 
 protodunevd_triggeredbeam: @local::protodunedp_triggeredbeam
-protodunevd_triggeredbeam.BeamX: 248
+protodunevd_triggeredbeam.BeamX: 149.6
 protodunevd_triggeredbeam.BeamY: 427.2
 protodunevd_triggeredbeam.BeamZ: -277.2
 
