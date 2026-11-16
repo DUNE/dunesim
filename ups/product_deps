@@ -87,7 +87,7 @@
 #>  define_pythonpath
 ####################################
 parent		dunesim
-defaultqual	e26
+defaultqual	e28
 ####################################
 
 ####################################
@@ -205,10 +205,8 @@ end_product_list
 # We now define allowed qualifiers and the corresponding qualifiers for the depdencies.
 # Make a table by adding columns before "notes".
 qualifier       dunetrigger   genie_xsec              genie_phyopt    notes
-c14:debug       c14:debug     AR2320i00000:e1000:k250 dkcharmtau   
-c14:prof        c14:prof      AR2320i00000:e1000:k250 dkcharmtau   
-e26:debug       e26:debug     AR2320i00000:e1000:k250  dkcharmtau    
-e26:prof        e26:prof      AR2320i00000:e1000:k250  dkcharmtau   
+e28:debug       e28:debug     AR2320i00000:e1000:k250  dkcharmtau    
+e28:prof        e28:prof      AR2320i00000:e1000:k250  dkcharmtau   
 end_qualifier_list
 
 # Preserve tabs and formatting in emacs and vi / vim:
